@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1B120288C2B00EC9F36 /* AppDelegate.swift */; };
-		201FB1B820288C2B00EC9F36 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1B720288C2B00EC9F36 /* GameScene.swift */; };
-		201FB1BA20288C2B00EC9F36 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1B920288C2B00EC9F36 /* GameViewController.swift */; };
 		201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BB20288C2B00EC9F36 /* Main.storyboard */; };
 		201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BE20288C2B00EC9F36 /* Assets.xcassets */; };
 		201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1C020288C2B00EC9F36 /* LaunchScreen.storyboard */; };
@@ -29,6 +27,11 @@
 		201FB1E3202891C300EC9F36 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E1202891C300EC9F36 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		201FB1E6202891C900EC9F36 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E5202891C900EC9F36 /* RealmSwift.framework */; };
 		201FB1E7202891C900EC9F36 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E5202891C900EC9F36 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
+		204A8ADA2029EE6000E9C11F /* CollectWordsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* CollectWordsScene.swift */; };
+		204DDBED2028AACC00987584 /* GameScenexxx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204DDBEC2028AACC00987584 /* GameScenexxx.swift */; };
+		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
+		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -49,8 +52,6 @@
 /* Begin PBXFileReference section */
 		201FB1AE20288C2B00EC9F36 /* MagicOfWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MagicOfWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		201FB1B120288C2B00EC9F36 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		201FB1B720288C2B00EC9F36 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
-		201FB1B920288C2B00EC9F36 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		201FB1BC20288C2B00EC9F36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		201FB1BE20288C2B00EC9F36 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		201FB1C120288C2B00EC9F36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -69,6 +70,11 @@
 		201FB1D420288CEA00EC9F36 /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		201FB1E1202891C300EC9F36 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		201FB1E5202891C900EC9F36 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
+		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
+		204A8AD92029EE6000E9C11F /* CollectWordsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectWordsScene.swift; sourceTree = "<group>"; };
+		204DDBEC2028AACC00987584 /* GameScenexxx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GameScenexxx.swift; path = MagicOfWords/GameScenexxx.swift; sourceTree = SOURCE_ROOT; };
+		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		2057BA292029F591000DF337 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,8 +82,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */,
 				201FB1E6202891C900EC9F36 /* RealmSwift.framework in Frameworks */,
 				201FB1E2202891C300EC9F36 /* Realm.framework in Frameworks */,
+				2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,6 +99,7 @@
 				201FB1E1202891C300EC9F36 /* Realm.framework */,
 				201FB1B020288C2B00EC9F36 /* MagicOfWords */,
 				201FB1AF20288C2B00EC9F36 /* Products */,
+				2057BA262029F57B000DF337 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -109,15 +118,14 @@
 				201FB1CA20288CE900EC9F36 /* MainViewController.swift */,
 				201FB1CC20288CEA00EC9F36 /* MyFunctions.swift */,
 				201FB1C920288CE900EC9F36 /* MyGlobals.swift */,
-				201FB1CD20288CEA00EC9F36 /* WordListModel.swift */,
 				201FB1B120288C2B00EC9F36 /* AppDelegate.swift */,
-				201FB1B920288C2B00EC9F36 /* GameViewController.swift */,
 				201FB1BB20288C2B00EC9F36 /* Main.storyboard */,
 				201FB1BE20288C2B00EC9F36 /* Assets.xcassets */,
 				201FB1C020288C2B00EC9F36 /* LaunchScreen.storyboard */,
 				201FB1C320288C2B00EC9F36 /* Info.plist */,
 				201FB1E92028940D00EC9F36 /* Scenes */,
 				201FB1E8202893E500EC9F36 /* Language */,
+				201FB1EA20289CEC00EC9F36 /* RealmModels */,
 			);
 			path = MagicOfWords;
 			sourceTree = "<group>";
@@ -137,11 +145,30 @@
 		201FB1E92028940D00EC9F36 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
-				201FB1B720288C2B00EC9F36 /* GameScene.swift */,
+				204DDBEC2028AACC00987584 /* GameScenexxx.swift */,
 				201FB1D120288CEA00EC9F36 /* MenuScene.swift */,
 				201FB1D020288CEA00EC9F36 /* GameTypeScene.swift */,
+				204A8AD92029EE6000E9C11F /* CollectWordsScene.swift */,
 			);
 			path = Scenes;
+			sourceTree = "<group>";
+		};
+		201FB1EA20289CEC00EC9F36 /* RealmModels */ = {
+			isa = PBXGroup;
+			children = (
+				201FB1CD20288CEA00EC9F36 /* WordListModel.swift */,
+				204A8AD72029DDFF00E9C11F /* huWords.txt */,
+			);
+			path = RealmModels;
+			sourceTree = "<group>";
+		};
+		2057BA262029F57B000DF337 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2057BA292029F591000DF337 /* GameKit.framework */,
+				2057BA272029F57B000DF337 /* StoreKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -178,6 +205,14 @@
 					201FB1AD20288C2B00EC9F36 = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.GameCenter = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -205,6 +240,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
+				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
 			);
@@ -217,10 +253,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				204DDBED2028AACC00987584 /* GameScenexxx.swift in Sources */,
 				201FB1D520288CEA00EC9F36 /* MyGlobals.swift in Sources */,
-				201FB1B820288C2B00EC9F36 /* GameScene.swift in Sources */,
 				201FB1DF20288CEA00EC9F36 /* de.swift in Sources */,
-				201FB1BA20288C2B00EC9F36 /* GameViewController.swift in Sources */,
 				201FB1DC20288CEA00EC9F36 /* GameTypeScene.swift in Sources */,
 				201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */,
 				201FB1E020288CEA00EC9F36 /* Language.swift in Sources */,
@@ -231,6 +266,7 @@
 				201FB1D620288CEA00EC9F36 /* MainViewController.swift in Sources */,
 				201FB1DD20288CEA00EC9F36 /* MenuScene.swift in Sources */,
 				201FB1D820288CEA00EC9F36 /* MyFunctions.swift in Sources */,
+				204A8ADA2029EE6000E9C11F /* CollectWordsScene.swift in Sources */,
 				201FB1D920288CEA00EC9F36 /* WordListModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

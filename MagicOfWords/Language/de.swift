@@ -17,9 +17,8 @@ let deDictionary: [TextConstants: String] = [
     .tcNewGame:          "Neues Spiel",
     .tcContinue:         "Fortsetzen",
     .tcSettings:         "Einstellungen",
-    .tcCreateWords:      "Wörter erstellen",
+    .tcCreateWords:      "Wörter sammeln",
     .tcSearchWords:      "Wörter suchen",
-    .tcImport:            "Import Words",
     .tcCancel:           "Abbrechen",
 ]
 

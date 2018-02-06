@@ -17,8 +17,7 @@ let huDictionary: [TextConstants: String] = [
     .tcNewGame:          "Új játék",
     .tcContinue:         "Folytatás",
     .tcSettings:         "Beállítások",
-    .tcCreateWords:      "Szó kirakó",
+    .tcCreateWords:      "Szó gyűjtő",
     .tcSearchWords:      "Szó kereső",
-    .tcImport:            "Import Words",
     .tcCancel:           "Mégsem",
 ]

@@ -1,34 +1,31 @@
 //
-//  GameTypeScene.swift
-//  Szómágia
+//  CollectWordsScene.swift
+//  MagicOfWords
 //
-//  Created by Jozsef Romhanyi on 31/01/2018.
+//  Created by Jozsef Romhanyi on 06/02/2018.
 //  Copyright © 2018 Jozsef Romhanyi. All rights reserved.
 //
 
 import Foundation
 import GameplayKit
-public protocol GameTypeSceneDelegate: class {
+
+public protocol CollectWordsSceneDelegate: class {
     
-    /// Method called when Create Words choosed
-    func collectWordsGame()
-    /// Method called when Search Words choosed
-    func findWords()
-    /// Method called when Choose Game Type cancelled
-    func cancelChooeseGameType()
+    /// Method called when Game finished
+    func gameFinished()
+    
 }
-class GameTypeScene: SKScene {
-    var gameTypeSceneDelegate: GameTypeSceneDelegate?
-    
+class CollectWordsScene: SKScene {
+    var collectWordsSceneDelegate: CollectWordsSceneDelegate?
     override func didMove(to view: SKView) {
-        self.backgroundColor = SKColor(red: 141/255, green: 182/255, blue: 0/255, alpha: 1)
-        createMenuItem(menuInt: .tcCreateWords, firstLine: true)
-        createMenuItem(menuInt: .tcSearchWords)
-        createMenuItem(menuInt: .tcCancel)
+        self.backgroundColor = SKColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+        createMenuItem(menuInt: .tcCancel, firstLine: true)
     }
-    public func setDelegate(delegate: GameTypeSceneDelegate) {
-        gameTypeSceneDelegate = delegate
+
+    public func setDelegate(delegate: CollectWordsSceneDelegate) {
+        collectWordsSceneDelegate = delegate
     }
+
     var line = 0
     func createMenuItem(menuInt: TextConstants, firstLine: Bool = false) {
         line = firstLine ? 1 : line + 1
@@ -42,8 +39,9 @@ class GameTypeScene: SKScene {
         menuItem.color = UIColor.brown
         self.addChild(menuItem)
     }
+
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if gameTypeSceneDelegate == nil {
+        if collectWordsSceneDelegate == nil {
             return
         }
         let firstTouch = touches.first
@@ -52,15 +50,9 @@ class GameTypeScene: SKScene {
         if nodes.count > 0 {
             if let name = nodes.first!.name {
                 switch name {
-                case String(TextConstants.tcCreateWords.rawValue):
-                    gameTypeSceneDelegate!.collectWordsGame()
-                case String(TextConstants.tcSearchWords.rawValue):
-                    gameTypeSceneDelegate!.findWords()
-                    
                 case String(TextConstants.tcCancel.rawValue):
-                    gameTypeSceneDelegate!.cancelChooeseGameType()
+                    collectWordsSceneDelegate!.gameFinished()
 
-                    
                 default: break
                 }
             }
@@ -69,5 +61,5 @@ class GameTypeScene: SKScene {
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
     }
-}
 
+}

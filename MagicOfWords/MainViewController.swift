@@ -10,33 +10,20 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate{
-    func createWordsGame() {
-        print("Create Words choosed")
+class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, CollectWordsSceneDelegate {
+    func gameFinished() {
+        startMenuScene()
+    }
+    
+    func collectWordsGame() {
+        print("Collect Words choosed")
+        startCollectWordsScene()
     }
     
     func findWords() {
         print("Search Words choosed")
     }
     
-    func importWords() {
-        
-        let url = NSURL(string:"http://www.desiquintans.com/downloads/nounlist/nounlist.txt")!
-        let request = URLRequest(url: url as URL)
-        NSURLConnection.sendAsynchronousRequest(request, queue: OperationQueue.current!) { (response, data, error) -> Void in
-            if error != nil {
-                print(error!)
-            } else {
-                if let textFile = NSString(data: data!, encoding: String.Encoding.utf8.rawValue) {
-                    let myStrings = textFile.components(separatedBy: .newlines)
-                    print("\(myStrings.count)")
-                    print("\(myStrings[0..<10])")
-                    print("\(myStrings[1000..<1050])")
-               }
-            }
-        }
-        
-    }
     func cancelChooeseGameType() {
         print("cancel choosed")
         startMenuScene()
@@ -44,6 +31,15 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     
     func xxx() {
         return
+    }
+    
+    func startCollectWordsScene() {
+        let collectWordsScene = CollectWordsScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        if let view = self.view as! SKView? {
+            collectWordsScene.setDelegate(delegate: self)
+            view.presentScene(collectWordsScene)
+        }
+
     }
     
     func startNewGame() {
@@ -66,6 +62,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        importWords()
         startMenuScene()
         
             
@@ -84,4 +81,32 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
             //            view.showsNodeCount = true
         }
     }
+    func importWords() {
+        // File location
+        if realm.objects(WordListModel.self).count > 0 {
+            return
+        }
+        let language = GV.language.getText(.tcAktLanguage)
+        let fileURL = Bundle.main.path(forResource: "\(language)Words", ofType: "txt")
+        // Read from the file
+        var textFile = ""
+        do {
+            textFile = try String(contentsOfFile: fileURL!, encoding: String.Encoding.utf8)
+        } catch let error as NSError {
+            print("Failed reading from URL: \(String(describing: fileURL)), Error: " + error.localizedDescription)
+        }
+        let myStrings = textFile.components(separatedBy: .newlines)
+        for string in myStrings {
+            if realm.objects(WordListModel.self).filter("word = '\(string)'").count == 0 {
+                realm.beginWrite()
+                let wordListModel = WordListModel()
+                wordListModel.length = string.count
+                wordListModel.language = language
+                wordListModel.word = string
+                realm.add(wordListModel)
+                try! realm.commitWrite()
+            }
+        }
+    }
+
 }

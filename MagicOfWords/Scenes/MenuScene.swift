@@ -23,8 +23,6 @@ public protocol MenuSceneDelegate: class {
 
 class MenuScene: SKScene {
     var menuSceneDelegate: MenuSceneDelegate?
-    override func sceneDidLoad() {
-    }
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
         createMenuItem(menuInt: .tcNewGame, firstLine: true)
@@ -54,17 +52,19 @@ class MenuScene: SKScene {
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
-        if let name = nodes.first!.name {
-            switch name {
-            case String(TextConstants.tcNewGame.rawValue):
-                menuSceneDelegate!.startNewGame()
-            case String(TextConstants.tcContinue.rawValue):
-                menuSceneDelegate!.continueGame()
-                
-            case String(TextConstants.tcSettings.rawValue):
-                menuSceneDelegate!.startSettings()
-                
-            default: break
+        if nodes.count > 0 {
+            if let name = nodes.first!.name {
+                switch name {
+                    case String(TextConstants.tcNewGame.rawValue):
+                        menuSceneDelegate!.startNewGame()
+                    case String(TextConstants.tcContinue.rawValue):
+                        menuSceneDelegate!.continueGame()
+                    
+                    case String(TextConstants.tcSettings.rawValue):
+                        menuSceneDelegate!.startSettings()
+                    
+                    default: break
+                }
             }
         }
     }

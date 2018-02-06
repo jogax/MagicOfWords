@@ -21,7 +21,6 @@ enum TextConstants: Int {
     tcSettings,
     tcCreateWords,
     tcSearchWords,
-    tcImport,
     tcCancel
 
 }
