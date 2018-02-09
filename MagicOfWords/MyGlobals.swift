@@ -11,6 +11,9 @@ import AVFoundation
 
 struct GV {
     static let language = Language()
+    static var maxRecordCount = 0
+    static var actRecordCount = 0
+    static var loadingScene: LoadingScene?
 }
 
 

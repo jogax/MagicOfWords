@@ -9,8 +9,13 @@
 import UIKit
 import SpriteKit
 import GameplayKit
+import RealmSwift
 
-class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, CollectWordsSceneDelegate {
+class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, CollectWordsSceneDelegate, LoadingSceneDelegate {
+    func loadingFinished() {
+        startMenuScene()
+    }
+    
     func gameFinished() {
         startMenuScene()
     }
@@ -62,8 +67,12 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        importWords()
-        startMenuScene()
+        
+        GV.loadingScene = LoadingScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        if let view = self.view as! SKView? {
+            GV.loadingScene!.setDelegate(delegate: self)
+            view.presentScene(GV.loadingScene!)
+        }
         
             
             // Get the SKScene from the loaded GKScene
@@ -79,33 +88,6 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
             
             //            view.showsFPS = true
             //            view.showsNodeCount = true
-        }
-    }
-    func importWords() {
-        // File location
-        if realm.objects(WordListModel.self).count > 0 {
-            return
-        }
-        let language = GV.language.getText(.tcAktLanguage)
-        let fileURL = Bundle.main.path(forResource: "\(language)Words", ofType: "txt")
-        // Read from the file
-        var textFile = ""
-        do {
-            textFile = try String(contentsOfFile: fileURL!, encoding: String.Encoding.utf8)
-        } catch let error as NSError {
-            print("Failed reading from URL: \(String(describing: fileURL)), Error: " + error.localizedDescription)
-        }
-        let myStrings = textFile.components(separatedBy: .newlines)
-        for string in myStrings {
-            if realm.objects(WordListModel.self).filter("word = '\(string)'").count == 0 {
-                realm.beginWrite()
-                let wordListModel = WordListModel()
-                wordListModel.length = string.count
-                wordListModel.language = language
-                wordListModel.word = string
-                realm.add(wordListModel)
-                try! realm.commitWrite()
-            }
         }
     }
 

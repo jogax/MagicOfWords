@@ -19,8 +19,9 @@ class CollectWordsScene: SKScene {
     var collectWordsSceneDelegate: CollectWordsSceneDelegate?
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
-        createMenuItem(menuInt: .tcCancel, firstLine: true)
-    }
+//        createMenuItem(menuInt: .tcPackage, firstLine: true)
+        createMenuItem(menuInt: .tcCancel)
+   }
 
     public func setDelegate(delegate: CollectWordsSceneDelegate) {
         collectWordsSceneDelegate = delegate
