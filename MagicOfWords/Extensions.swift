@@ -229,6 +229,16 @@ extension CGFloat {
         return (self < 0)
     }
     
+    func nDecimals(n: Int)->CGFloat {
+        let multiplier: CGFloat = pow(10.0,CGFloat(n))
+        let divisior: CGFloat = 1.0 / multiplier
+        var v: CGFloat = self
+        v = v * multiplier
+        
+        return v.rounded() * divisior
+    }
+
+    
 }
 
 extension String {

@@ -9,6 +9,7 @@
 import Foundation
 import AVFoundation
 
+let exclamationMark = "!"
 struct GV {
     static let language = Language()
     static var maxRecordCount = 0

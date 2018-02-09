@@ -13,6 +13,7 @@ import RealmSwift
 
 class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, CollectWordsSceneDelegate, LoadingSceneDelegate {
     func loadingFinished() {
+        GV.loadingScene = nil
         startMenuScene()
     }
     

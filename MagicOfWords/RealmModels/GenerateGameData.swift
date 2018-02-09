@@ -15,15 +15,26 @@ class GenerateGameData {
     var myLines: [String] = []
     var wordsPointer = 0
     var maxWordsPointer = 0
+    var myLinesPointer = 0
+    var maxLinesPointer = 0
+    var minGameNumber = 0
+    enum WhatToDo: Int {
+        case GenerateWordList = 0, GenerateGameData
+    }
+    var whatToDo = WhatToDo.GenerateWordList
+    var timer = Timer()
     init() {
+        print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         readRecordsAndCalculateCount()
+        // delete all records if choosed
         realm.beginWrite()
-        let recordsToDelete = realm.objects(WordListModel.self)
-        realm.delete(recordsToDelete)
+            let wordListRecordsToDelete = realm.objects(WordListModel.self)
+            realm.delete(wordListRecordsToDelete)
+            let gameDataRecordsToDelete = realm.objects(GameDataModel.self)
+            realm.delete(gameDataRecordsToDelete)
         try! realm.commitWrite()
+        timer = Timer.scheduledTimer(timeInterval: 0.00001, target: self, selector: #selector(importWords(timerX:)), userInfo: nil, repeats: false)
 
-        importWords()
-        createGameData()
     }
     
     func readRecordsAndCalculateCount() {
@@ -55,69 +66,73 @@ class GenerateGameData {
                 countLines += countGames * countWords
             }
         }
-        GV.maxRecordCount = myWords.count + countLines
-        maxRecordCount = myWords.count
+        GV.maxRecordCount = myWords.count - 1 + countLines
+        maxWordsPointer = myWords.count
+        maxLinesPointer = myLines.count
     }
     
-    func createGameData() {
-        realm.beginWrite()
-        let recordsToDelete = realm.objects(GameDataModel.self)
-        realm.delete(recordsToDelete)
-        try! realm.commitWrite()
-        
-        var minGameNumber = 0
-        for line in myLines {
-            print(line)
+    @objc func importWords(timerX: Timer) {
+        // File location
+        switch whatToDo {
+        case .GenerateWordList:
+            repeat {
+                let word = myWords[wordsPointer]
+                wordsPointer += 1
+                if realm.objects(WordListModel.self).filter("word = %@", word).count > 0 || word.count == 0 {
+                    print("Problem: \(word)")
+                } else {
+                    realm.beginWrite()
+                    let wordListModel = WordListModel()
+                    wordListModel.length = word.mySubString(startPos:word.count - 1) == exclamationMark ? word.count - 1 : word.count
+                    wordListModel.word = word
+                    realm.add(wordListModel)
+                    try! realm.commitWrite()
+                }
+                GV.actRecordCount = realm.objects(WordListModel.self).count
+                //GV.loadingScene!.showProgress()
+            } while wordsPointer % 500 != 0 && wordsPointer < maxWordsPointer
+            if wordsPointer == maxWordsPointer {
+                whatToDo = .GenerateGameData
+            }
+            timer = Timer.scheduledTimer(timeInterval: 0.000001, target: self, selector: #selector(importWords(timerX: )), userInfo: nil, repeats: false)
+        case .GenerateGameData:
+            let line = myLines[myLinesPointer]
+            myLinesPointer += 1
             let components = line.components(separatedBy: "/")
             if components.count == 3 {
                 let gameType = Int(components[0])!
                 let maxGameNumber = Int(components[1])!
-                for gameNumber in (minGameNumber + 1)...maxGameNumber {
+                for gameNumber in (minGameNumber + 1)...minGameNumber + maxGameNumber {
                     let random = MyRandom(gameType: gameType, gameNumber: gameNumber)
                     let wordLengths = components[2].components(separatedBy: "-")
                     for wordLength in wordLengths {
                         let words = realm.objects(WordListModel.self).filter("length = %d", Int(wordLength)!)
                         var word = ""
+                        var lastChar = ""
                         repeat {
                             let wordIndex = random.getRandomInt(0, max: words.count - 1)
                             word = words[wordIndex].word
-                        } while realm.objects(GameDataModel.self).filter("word == %@", word).count != 0
+                            lastChar = String(word[word.index(before: word.endIndex)])
+                        } while realm.objects(GameDataModel.self).filter("word == %@", word).count != 0 || lastChar == exclamationMark
                         realm.beginWrite()
                         let gameData = GameDataModel()
                         gameData.gameType = gameType
                         gameData.gameNumber = gameNumber
                         gameData.word = word
-                        print("gameNumber: \(gameNumber), word: \(word)")
                         realm.add(gameData)
                         try! realm.commitWrite()
                         minGameNumber = gameNumber
                     }
-                    print("=====================")
                 }
             }
-        }
-
-    }
-    @objc func importWords() {
-        // File location
-        print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
-        if realm.objects(WordListModel.self).count > 0 {
-            return
-        }
-        for word in myWords {
-            if realm.objects(WordListModel.self).filter("word = '\(word)'").count == 0 {
-                realm.beginWrite()
-                let wordListModel = WordListModel()
-                wordListModel.length = word.count
-                wordListModel.word = word
-                realm.add(wordListModel)
-                try! realm.commitWrite()
-                GV.actRecordCount = realm.objects(WordListModel.self).count
-                //GV.loadingScene!.showProgress()
+            GV.actRecordCount = realm.objects(WordListModel.self).count + realm.objects(GameDataModel.self).count
+            if myLinesPointer == maxLinesPointer {
+                timer.invalidate()
+            } else {
+                timer = Timer.scheduledTimer(timeInterval: 0.000001, target: self, selector: #selector(importWords(timerX: )), userInfo: nil, repeats: false)
             }
         }
     }
-
 }
 
 
