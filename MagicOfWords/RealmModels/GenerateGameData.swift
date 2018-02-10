@@ -24,6 +24,7 @@ class GenerateGameData {
     var whatToDo = WhatToDo.GenerateWordList
     var timer = Timer()
     init() {
+        
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         readRecordsAndCalculateCount()
         // delete all records if choosed
@@ -77,6 +78,7 @@ class GenerateGameData {
         case .GenerateWordList:
             repeat {
                 let word = myWords[wordsPointer]
+                GV.lastSavedWord = word
                 wordsPointer += 1
                 if realm.objects(WordListModel.self).filter("word = %@", word).count > 0 || word.count == 0 {
                     print("Problem: \(word)")
@@ -90,7 +92,7 @@ class GenerateGameData {
                 }
                 GV.actRecordCount = realm.objects(WordListModel.self).count
                 //GV.loadingScene!.showProgress()
-            } while wordsPointer % 500 != 0 && wordsPointer < maxWordsPointer
+            } while wordsPointer % 200 != 0 && wordsPointer < maxWordsPointer
             if wordsPointer == maxWordsPointer {
                 whatToDo = .GenerateGameData
             }
@@ -115,6 +117,7 @@ class GenerateGameData {
                             lastChar = String(word[word.index(before: word.endIndex)])
                         } while realm.objects(GameDataModel.self).filter("word == %@", word).count != 0 || lastChar == exclamationMark
                         realm.beginWrite()
+                        GV.lastSavedWord = word
                         let gameData = GameDataModel()
                         gameData.gameType = gameType
                         gameData.gameNumber = gameNumber

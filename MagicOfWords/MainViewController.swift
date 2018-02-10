@@ -11,7 +11,7 @@ import SpriteKit
 import GameplayKit
 import RealmSwift
 
-class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, CollectWordsSceneDelegate, LoadingSceneDelegate {
+class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WordTrisSceneDelegate, LoadingSceneDelegate {
     func loadingFinished() {
         GV.loadingScene = nil
         startMenuScene()
@@ -21,7 +21,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         startMenuScene()
     }
     
-    func collectWordsGame() {
+    func wordTrisGame() {
         print("Collect Words choosed")
         startCollectWordsScene()
     }
@@ -40,7 +40,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     }
     
     func startCollectWordsScene() {
-        let collectWordsScene = CollectWordsScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        let collectWordsScene = WordTrisScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
             collectWordsScene.setDelegate(delegate: self)
             view.presentScene(collectWordsScene)
@@ -68,12 +68,12 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        GV.loadingScene = LoadingScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        if let view = self.view as! SKView? {
-            GV.loadingScene!.setDelegate(delegate: self)
-            view.presentScene(GV.loadingScene!)
-        }
+        startNewGame()
+//        GV.loadingScene = LoadingScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+//        if let view = self.view as! SKView? {
+//            GV.loadingScene!.setDelegate(delegate: self)
+//            view.presentScene(GV.loadingScene!)
+//        }
         
             
             // Get the SKScene from the loaded GKScene

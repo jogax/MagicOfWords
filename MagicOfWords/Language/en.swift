@@ -17,7 +17,8 @@ let enDictionary: [TextConstants: String] = [
     .tcNewGame:          "New game",
     .tcContinue:         "Continue",
     .tcSettings:         "Settings",
-    .tcCreateWords:      "Collect words",
+    .tcWordTris:         "Wordtris",
     .tcSearchWords:       "Find words",
     .tcCancel:            "Cancel",
+    .tcLoadingInProgress: "Loading English Words in progress",
 ]

@@ -28,7 +28,9 @@
 		201FB1E6202891C900EC9F36 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E5202891C900EC9F36 /* RealmSwift.framework */; };
 		201FB1E7202891C900EC9F36 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E5202891C900EC9F36 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
-		204A8ADA2029EE6000E9C11F /* CollectWordsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* CollectWordsScene.swift */; };
+		204A8ADA2029EE6000E9C11F /* WordTrisScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WordTrisScene.swift */; };
+		204AF9D8202EFE0500528AEA /* ruWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204AF9D7202EFE0500528AEA /* ruWords.txt */; };
+		204AF9DA202F2D7700528AEA /* ruGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204AF9D9202F2D7700528AEA /* ruGameData.txt */; };
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
 		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */; };
@@ -75,7 +77,9 @@
 		201FB1E1202891C300EC9F36 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		201FB1E5202891C900EC9F36 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
-		204A8AD92029EE6000E9C11F /* CollectWordsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectWordsScene.swift; sourceTree = "<group>"; };
+		204A8AD92029EE6000E9C11F /* WordTrisScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTrisScene.swift; sourceTree = "<group>"; };
+		204AF9D7202EFE0500528AEA /* ruWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruWords.txt; sourceTree = "<group>"; };
+		204AF9D9202F2D7700528AEA /* ruGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruGameData.txt; sourceTree = "<group>"; };
 		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2057BA292029F591000DF337 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePackageScene.swift; sourceTree = "<group>"; };
@@ -156,7 +160,7 @@
 				201FB1D120288CEA00EC9F36 /* MenuScene.swift */,
 				2087AC0D202C86FF008DEF26 /* LoadingScene.swift */,
 				201FB1D020288CEA00EC9F36 /* GameTypeScene.swift */,
-				204A8AD92029EE6000E9C11F /* CollectWordsScene.swift */,
+				204A8AD92029EE6000E9C11F /* WordTrisScene.swift */,
 				2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */,
 			);
 			path = Scenes;
@@ -168,7 +172,9 @@
 				201FB1CD20288CEA00EC9F36 /* WordListModel.swift */,
 				2081931F202B472900406D9A /* GameDataModel.swift */,
 				204A8AD72029DDFF00E9C11F /* huWords.txt */,
+				204AF9D7202EFE0500528AEA /* ruWords.txt */,
 				20819321202B484D00406D9A /* huGameData.txt */,
+				204AF9D9202F2D7700528AEA /* ruGameData.txt */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
 			);
 			path = RealmModels;
@@ -252,6 +258,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				20819322202B484D00406D9A /* huGameData.txt in Resources */,
+				204AF9D8202EFE0500528AEA /* ruWords.txt in Resources */,
+				204AF9DA202F2D7700528AEA /* ruGameData.txt in Resources */,
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
@@ -282,7 +290,7 @@
 				201FB1D620288CEA00EC9F36 /* MainViewController.swift in Sources */,
 				201FB1DD20288CEA00EC9F36 /* MenuScene.swift in Sources */,
 				201FB1D820288CEA00EC9F36 /* MyFunctions.swift in Sources */,
-				204A8ADA2029EE6000E9C11F /* CollectWordsScene.swift in Sources */,
+				204A8ADA2029EE6000E9C11F /* WordTrisScene.swift in Sources */,
 				201FB1D920288CEA00EC9F36 /* WordListModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

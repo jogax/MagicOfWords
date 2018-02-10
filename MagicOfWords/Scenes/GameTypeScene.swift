@@ -11,7 +11,7 @@ import GameplayKit
 public protocol GameTypeSceneDelegate: class {
     
     /// Method called when Create Words choosed
-    func collectWordsGame()
+    func wordTrisGame()
     /// Method called when Search Words choosed
     func findWords()
     /// Method called when Choose Game Type cancelled
@@ -22,7 +22,7 @@ class GameTypeScene: SKScene {
     
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 141/255, green: 182/255, blue: 0/255, alpha: 1)
-        createMenuItem(menuInt: .tcCreateWords, firstLine: true)
+        createMenuItem(menuInt: .tcWordTris, firstLine: true)
         createMenuItem(menuInt: .tcSearchWords)
         createMenuItem(menuInt: .tcCancel)
     }
@@ -52,8 +52,8 @@ class GameTypeScene: SKScene {
         if nodes.count > 0 {
             if let name = nodes.first!.name {
                 switch name {
-                case String(TextConstants.tcCreateWords.rawValue):
-                    gameTypeSceneDelegate!.collectWordsGame()
+                case String(TextConstants.tcWordTris.rawValue):
+                    gameTypeSceneDelegate!.wordTrisGame()
                 case String(TextConstants.tcSearchWords.rawValue):
                     gameTypeSceneDelegate!.findWords()
                     

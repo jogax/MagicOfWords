@@ -19,9 +19,10 @@ enum TextConstants: Int {
     tcNewGame,
     tcContinue,
     tcSettings,
-    tcCreateWords,
+    tcWordTris,
     tcSearchWords,
-    tcCancel
+    tcCancel,
+    tcLoadingInProgress
 
 }
 
