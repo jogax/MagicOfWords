@@ -14,6 +14,7 @@ struct GV {
     static let language = Language()
     static var maxRecordCount = 0
     static var actRecordCount = 0
+    static var EndOfFileReached = false
     static var lastSavedWord = ""
     static var loadingScene: LoadingScene?
 }

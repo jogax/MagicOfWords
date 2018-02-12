@@ -357,6 +357,8 @@ extension String {
         let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
         return self[indexStartOfText...]
     }
+    
+    
 }
 
 extension UIColor {

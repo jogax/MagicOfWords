@@ -49,7 +49,7 @@ class GenerateGameData {
         } catch let error as NSError {
             print("Failed reading from URL: \(String(describing: wordFileURL)), Error: " + error.localizedDescription)
         }
-        myWords = wordsFile.components(separatedBy: .newlines)
+        myWords = wordsFile.components(separatedBy: .newlines).sorted(by: {$0 < $1})
         // Read from the GameData file
         let dataFileURL = Bundle.main.path(forResource: "\(language)GameData", ofType: "txt")
         do {
@@ -68,6 +68,7 @@ class GenerateGameData {
             }
         }
         GV.maxRecordCount = myWords.count - 1 + countLines
+        GV.actRecordCount = 0
         maxWordsPointer = myWords.count
         maxLinesPointer = myLines.count
     }
@@ -78,11 +79,21 @@ class GenerateGameData {
         case .GenerateWordList:
             repeat {
                 let word = myWords[wordsPointer]
-                GV.lastSavedWord = word
                 wordsPointer += 1
-                if realm.objects(WordListModel.self).filter("word = %@", word).count > 0 || word.count == 0 {
-                    print("Problem: \(word)")
+                let index0 = word.index(word.startIndex, offsetBy: word.count == 0 ? 0 : 1)
+                let firstChar = String(word[..<index0])
+                var lastChar = "Z"
+                if word.count > 0 {
+                    let lastCharIndex = word.index(word.endIndex, offsetBy: -1)
+                    lastChar = String(word[lastCharIndex])
+                }
+                let wordLastButOne = word.dropLast()
+//                if realm.objects(WordListModel.self).filter("word = %@", word).count > 0 || word.count == 0 || firstChar <= "Я" {
+                if  word.count == 0 || word == myWords[wordsPointer - 2] || firstChar <= "Z" || (lastChar == "s" && myWords[wordsPointer - 2] == wordLastButOne) {
+//                    print("Problem: \(word)")
                 } else {
+                    print(word)
+                    GV.lastSavedWord = word
                     realm.beginWrite()
                     let wordListModel = WordListModel()
                     wordListModel.length = word.mySubString(startPos:word.count - 1) == exclamationMark ? word.count - 1 : word.count
@@ -90,7 +101,7 @@ class GenerateGameData {
                     realm.add(wordListModel)
                     try! realm.commitWrite()
                 }
-                GV.actRecordCount = realm.objects(WordListModel.self).count
+                GV.actRecordCount += 1 //realm.objects(WordListModel.self).count
                 //GV.loadingScene!.showProgress()
             } while wordsPointer % 200 != 0 && wordsPointer < maxWordsPointer
             if wordsPointer == maxWordsPointer {
@@ -131,6 +142,7 @@ class GenerateGameData {
             GV.actRecordCount = realm.objects(WordListModel.self).count + realm.objects(GameDataModel.self).count
             if myLinesPointer == maxLinesPointer {
                 timer.invalidate()
+                GV.EndOfFileReached = true
             } else {
                 timer = Timer.scheduledTimer(timeInterval: 0.000001, target: self, selector: #selector(importWords(timerX: )), userInfo: nil, repeats: false)
             }

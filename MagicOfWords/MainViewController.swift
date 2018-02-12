@@ -69,11 +69,11 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     override func viewDidLoad() {
         super.viewDidLoad()
         startNewGame()
-//        GV.loadingScene = LoadingScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-//        if let view = self.view as! SKView? {
-//            GV.loadingScene!.setDelegate(delegate: self)
-//            view.presentScene(GV.loadingScene!)
-//        }
+        GV.loadingScene = LoadingScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        if let view = self.view as! SKView? {
+            GV.loadingScene!.setDelegate(delegate: self)
+            view.presentScene(GV.loadingScene!)
+        }
         
             
             // Get the SKScene from the loaded GKScene

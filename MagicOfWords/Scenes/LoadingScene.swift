@@ -114,7 +114,8 @@ class LoadingScene: SKScene {
             wordLabel.run(actionFadeAlpha)
             self.addChild(wordLabel)
             self.procentLabel!.text = String(describing: Int(procent * 100)) + " %"
-            if procent == 1.00 {
+            // stop if all records done
+            if GV.EndOfFileReached {
                 loadingSceneDelegate!.loadingFinished()
             }
             
