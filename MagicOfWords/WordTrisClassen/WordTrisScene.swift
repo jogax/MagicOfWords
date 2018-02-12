@@ -8,6 +8,18 @@
 
 import Foundation
 import GameplayKit
+enum MyShapes: Int {
+    case Grid_Shape = 0,
+    Z_Shape_L,
+    Z_Shape_R,
+    L_Shape,
+    T_Shape,
+    I_Shape_1,
+    I_Shape_2,
+    I_Shape_3,
+    I_Shape_4,
+    Edge_Shape
+}
 
 public protocol WordTrisSceneDelegate: class {
     
@@ -16,16 +28,14 @@ public protocol WordTrisSceneDelegate: class {
     
 }
 class WordTrisScene: SKScene {
-    enum MyShapes: Int {
-        case Grid_Shape = 0, Z_Shape, L_Shape, T_Shape, I_Shape, Edge_Shape
-    }
     var collectWordsSceneDelegate: WordTrisSceneDelegate?
+    var wordTrisGameboard: WordTrisGameboard?
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1)
 //        createMenuItem(menuInt: .tcPackage, firstLine: true)
         createMenuItem(menuInt: .tcCancel)
 //        createBackgroundShape()
-        createGridShape(type: .Grid_Shape, position: CGPoint(x:self.frame.midX, y: self.frame.midY))
+        wordTrisGameboard = WordTrisGameboard(countCols: 10)
    }
 
     public func setDelegate(delegate: WordTrisSceneDelegate) {

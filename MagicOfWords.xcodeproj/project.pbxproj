@@ -38,6 +38,9 @@
 		20819322202B484D00406D9A /* huGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20819321202B484D00406D9A /* huGameData.txt */; };
 		20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20819323202B4A7100406D9A /* GenerateGameData.swift */; };
 		2087AC0E202C86FF008DEF26 /* LoadingScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087AC0D202C86FF008DEF26 /* LoadingScene.swift */; };
+		20A6913D203088FF00AB47C0 /* enWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20A6913C203088FF00AB47C0 /* enWords.txt */; };
+		20A6914020309B9F00AB47C0 /* WordTrisShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6913F20309B9F00AB47C0 /* WordTrisShape.swift */; };
+		20A6914220309CC500AB47C0 /* WordTrisGamebord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6914120309CC500AB47C0 /* WordTrisGamebord.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -87,6 +90,9 @@
 		20819321202B484D00406D9A /* huGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huGameData.txt; sourceTree = "<group>"; };
 		20819323202B4A7100406D9A /* GenerateGameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateGameData.swift; sourceTree = "<group>"; };
 		2087AC0D202C86FF008DEF26 /* LoadingScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScene.swift; sourceTree = "<group>"; };
+		20A6913C203088FF00AB47C0 /* enWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enWords.txt; sourceTree = "<group>"; };
+		20A6913F20309B9F00AB47C0 /* WordTrisShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTrisShape.swift; sourceTree = "<group>"; };
+		20A6914120309CC500AB47C0 /* WordTrisGamebord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTrisGamebord.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +141,7 @@
 				201FB1BE20288C2B00EC9F36 /* Assets.xcassets */,
 				201FB1C020288C2B00EC9F36 /* LaunchScreen.storyboard */,
 				201FB1C320288C2B00EC9F36 /* Info.plist */,
+				20A6913E20309B2200AB47C0 /* WordTrisClassen */,
 				201FB1E92028940D00EC9F36 /* Scenes */,
 				201FB1E8202893E500EC9F36 /* Language */,
 				201FB1EA20289CEC00EC9F36 /* RealmModels */,
@@ -160,7 +167,6 @@
 				201FB1D120288CEA00EC9F36 /* MenuScene.swift */,
 				2087AC0D202C86FF008DEF26 /* LoadingScene.swift */,
 				201FB1D020288CEA00EC9F36 /* GameTypeScene.swift */,
-				204A8AD92029EE6000E9C11F /* WordTrisScene.swift */,
 				2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */,
 			);
 			path = Scenes;
@@ -171,6 +177,7 @@
 			children = (
 				201FB1CD20288CEA00EC9F36 /* WordListModel.swift */,
 				2081931F202B472900406D9A /* GameDataModel.swift */,
+				20A6913C203088FF00AB47C0 /* enWords.txt */,
 				204A8AD72029DDFF00E9C11F /* huWords.txt */,
 				204AF9D7202EFE0500528AEA /* ruWords.txt */,
 				20819321202B484D00406D9A /* huGameData.txt */,
@@ -187,6 +194,16 @@
 				2057BA272029F57B000DF337 /* StoreKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		20A6913E20309B2200AB47C0 /* WordTrisClassen */ = {
+			isa = PBXGroup;
+			children = (
+				204A8AD92029EE6000E9C11F /* WordTrisScene.swift */,
+				20A6913F20309B9F00AB47C0 /* WordTrisShape.swift */,
+				20A6914120309CC500AB47C0 /* WordTrisGamebord.swift */,
+			);
+			path = WordTrisClassen;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -260,6 +277,7 @@
 				20819322202B484D00406D9A /* huGameData.txt in Resources */,
 				204AF9D8202EFE0500528AEA /* ruWords.txt in Resources */,
 				204AF9DA202F2D7700528AEA /* ruGameData.txt in Resources */,
+				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
@@ -274,6 +292,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20A6914020309B9F00AB47C0 /* WordTrisShape.swift in Sources */,
 				201FB1D520288CEA00EC9F36 /* MyGlobals.swift in Sources */,
 				2087AC0E202C86FF008DEF26 /* LoadingScene.swift in Sources */,
 				201FB1DF20288CEA00EC9F36 /* de.swift in Sources */,
@@ -281,6 +300,7 @@
 				20819320202B472900406D9A /* GameDataModel.swift in Sources */,
 				201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */,
 				201FB1E020288CEA00EC9F36 /* Language.swift in Sources */,
+				20A6914220309CC500AB47C0 /* WordTrisGamebord.swift in Sources */,
 				2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */,
 				201FB1DE20288CEA00EC9F36 /* en.swift in Sources */,
 				201FB1DA20288CEA00EC9F36 /* hu.swift in Sources */,
