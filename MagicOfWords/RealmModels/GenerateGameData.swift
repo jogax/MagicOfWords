@@ -24,21 +24,30 @@ class GenerateGameData {
     var whatToDo = WhatToDo.GenerateWordList
     var timer = Timer()
     init() {
-        
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
-        readRecordsAndCalculateCount()
-        // delete all records if choosed
-        realm.beginWrite()
-            let wordListRecordsToDelete = realm.objects(WordListModel.self)
-            realm.delete(wordListRecordsToDelete)
-            let gameDataRecordsToDelete = realm.objects(GameDataModel.self)
-            realm.delete(gameDataRecordsToDelete)
-        try! realm.commitWrite()
-        timer = Timer.scheduledTimer(timeInterval: 0.00001, target: self, selector: #selector(importWords(timerX:)), userInfo: nil, repeats: false)
-
+        let version = readRecordsAndCalculateCount()
+        let basicData = realm.objects(BasicDataModel.self)
+        if basicData.count == 0 || basicData.first!.actLanguage != GV.language.getText(.tcAktLanguage) || basicData.first!.actVersion < version  {
+            // delete all records if new loading
+            realm.beginWrite()
+                let wordListRecordsToDelete = realm.objects(WordListModel.self)
+                realm.delete(wordListRecordsToDelete)
+                let gameDataRecordsToDelete = realm.objects(GameDataModel.self)
+                realm.delete(gameDataRecordsToDelete)
+                let basicDataRecordsToDelete = realm.objects(BasicDataModel.self)
+                realm.delete(basicDataRecordsToDelete)
+                let basicData = BasicDataModel()
+                basicData.actLanguage = GV.language.getText(.tcAktLanguage)
+                basicData.actVersion = version
+                realm.add(basicData)
+            try! realm.commitWrite()
+            timer = Timer.scheduledTimer(timeInterval: 0.00001, target: self, selector: #selector(importWords(timerX:)), userInfo: nil, repeats: false)
+        } else {
+            GV.EndOfFileReached = true
+        }
     }
     
-    func readRecordsAndCalculateCount() {
+    func readRecordsAndCalculateCount()->String {
         let language = GV.language.getText(.tcAktLanguage)
         let wordFileURL = Bundle.main.path(forResource: "\(language)Words", ofType: "txt")
         // Read from the file Words
@@ -49,9 +58,13 @@ class GenerateGameData {
         } catch let error as NSError {
             print("Failed reading from URL: \(String(describing: wordFileURL)), Error: " + error.localizedDescription)
         }
-        myWords = wordsFile.components(separatedBy: .newlines).sorted(by: {$0 < $1})
+//        myWords = wordsFile.components(separatedBy: .newlines).sorted(by: {$0 < $1})
+        myWords = wordsFile.components(separatedBy: .newlines)
+        let version = myWords[0]
+        myWords.remove(at: 0)
+
         // Read from the GameData file
-        let dataFileURL = Bundle.main.path(forResource: "\(language)GameData", ofType: "txt")
+        let dataFileURL = Bundle.main.path(forResource: "gameData", ofType: "txt")
         do {
             gameDataFile = try String(contentsOfFile: dataFileURL!, encoding: String.Encoding.utf8)
         } catch let error as NSError {
@@ -71,6 +84,7 @@ class GenerateGameData {
         GV.actRecordCount = 0
         maxWordsPointer = myWords.count
         maxLinesPointer = myLines.count
+        return version
     }
     
     @objc func importWords(timerX: Timer) {
@@ -80,19 +94,19 @@ class GenerateGameData {
             repeat {
                 let word = myWords[wordsPointer]
                 wordsPointer += 1
-                let index0 = word.index(word.startIndex, offsetBy: word.count == 0 ? 0 : 1)
-                let firstChar = String(word[..<index0])
-                var lastChar = "Z"
-                if word.count > 0 {
-                    let lastCharIndex = word.index(word.endIndex, offsetBy: -1)
-                    lastChar = String(word[lastCharIndex])
-                }
-                let wordLastButOne = word.dropLast()
+//                let index0 = word.index(word.startIndex, offsetBy: word.count == 0 ? 0 : 1)
+//                let firstChar = String(word[..<index0])
+//                var lastChar = "Z"
+//                if word.count > 0 {
+//                    let lastCharIndex = word.index(word.endIndex, offsetBy: -1)
+//                    lastChar = String(word[lastCharIndex])
+//                }
 //                if realm.objects(WordListModel.self).filter("word = %@", word).count > 0 || word.count == 0 || firstChar <= "Я" {
-                if  word.count == 0 || word == myWords[wordsPointer - 2] || firstChar <= "Z" || (lastChar == "s" && myWords[wordsPointer - 2] == wordLastButOne) {
+//                if  word.count == 0 || word == myWords[wordsPointer - 2] {//} || firstChar >= "a" {//|| (lastChar == "s" && myWords[wordsPointer - 2] == wordLastButOne) {
 //                    print("Problem: \(word)")
-                } else {
-                    print(word)
+//                } else {
+//                    print(word)
+                if word.count > 0 {
                     GV.lastSavedWord = word
                     realm.beginWrite()
                     let wordListModel = WordListModel()
