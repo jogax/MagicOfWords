@@ -12,6 +12,15 @@ import GameplayKit
 import RealmSwift
 
 class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WordTrisSceneDelegate, LoadingSceneDelegate {
+    func startChooseGameType() {
+        print("Choose game type choosed")
+        let gameTypeScene = GameTypeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        if let view = self.view as! SKView? {
+            gameTypeScene.setDelegate(delegate: self)
+            view.presentScene(gameTypeScene)
+        }
+    }
+    
     func loadingFinished() {
         GV.loadingScene = nil
         startMenuScene()
@@ -23,7 +32,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     
     func wordTrisGame() {
         print("Collect Words choosed")
-        startCollectWordsScene()
+        startWordTrisScene()
     }
     
     func findWords() {
@@ -39,22 +48,36 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         return
     }
     
-    func startCollectWordsScene() {
-        let collectWordsScene = WordTrisScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+    func startWordTrisScene() {
+        let wordTrisScene = WordTrisScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
-            collectWordsScene.setDelegate(delegate: self)
-            view.presentScene(collectWordsScene)
+            wordTrisScene.setDelegate(delegate: self)
+            view.presentScene(wordTrisScene)
         }
 
     }
     
+    func startFindWordsScene() {
+//        let findWordsScene = WordTrisScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+//        if let view = self.view as! SKView? {
+//            wordTrisScene.setDelegate(delegate: self)
+//            view.presentScene(wordTrisScene)
+//        }
+        
+    }
+
     func startNewGame() {
-        print("Start new game")
-        let gameTypeScene = GameTypeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        if let view = self.view as! SKView? {
-            gameTypeScene.setDelegate(delegate: self)
-            view.presentScene(gameTypeScene)
+        let basicData = realm.objects(BasicDataModel.self).first!
+        let gameType = GameType(rawValue: basicData.gameType)!
+        switch gameType {
+        case .WordTris:
+            startWordTrisScene()
+        case .SearchWords:
+            startFindWordsScene()
+        case .NoMoreGames:
+            break
         }
+        print("Start new game")
         
     }
     
@@ -68,7 +91,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        startNewGame()
+        print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         GV.loadingScene = LoadingScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
             GV.loadingScene!.setDelegate(delegate: self)
@@ -89,6 +112,16 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
             
             //            view.showsFPS = true
             //            view.showsNodeCount = true
+        }
+    }
+
+    func printFonts() {
+        let fontFamilyNames = UIFont.familyNames
+        for familyName in fontFamilyNames {
+            print("------------------------------")
+            print("Font Family Name = [\(familyName)]")
+            let names = UIFont.fontNames(forFamilyName: familyName)
+            print("Font Names = [\(names)]")
         }
     }
 

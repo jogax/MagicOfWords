@@ -21,4 +21,7 @@ let huDictionary: [TextConstants: String] = [
     .tcSearchWords:      "Szó kereső",
     .tcCancel:           "Mégsem",
     .tcLoadingInProgress: "A magyar szavak betöltése folyamatban",
+    .tcChooseGameType:    "Játéktípus választás",
+    .tcBack:              "< Vissza",
+    .tcWordsToCollect:    "Kirakandó szavak:",
 ]

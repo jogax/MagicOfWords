@@ -21,4 +21,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcSearchWords:       "Найти слова",
     .tcCancel:            "Отмена",
     .tcLoadingInProgress: "Выпольнется загрузка русских слов",
+    .tcChooseGameType:    "Bыбрать тип игры",
+    .tcBack:              "< Назад",
+    .tcWordsToCollect:    "Слова для сбора:",
 ]

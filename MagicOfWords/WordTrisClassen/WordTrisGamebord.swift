@@ -10,21 +10,54 @@ import Foundation
 import GameplayKit
 
 class WordTrisGameboard: SKShapeNode {
-    var countCols: Int
-    init(countCols: Int) {
-        self.countCols = countCols
+    var parentScene: SKScene
+    var size: Int
+    var grid: Grid?
+    let blockSize: CGFloat?
+    var gameArray: [[WordTrisGameboardItem]]?
+    init(size: Int, parentScene: SKScene) {
+        self.size = size
+        self.parentScene = parentScene
+        self.blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(size)
         super.init()
-        
-//        createMyShape()
+        createBackgroundShape(size: size)
+        gameArray = createNewGameArray(size: size)
+        for col in 0..<size {
+            for row in 0..<size {
+                gameArray![col][row].position = grid!.gridPosition(col: col, row: row) +
+                    CGPoint (x:parentScene.frame.midX, y:parentScene.frame.midY * 0.874)
+                gameArray![col][row].fontSize = parentScene.frame.width / 20
+                parentScene.addChild(gameArray![col][row])
+            }
+        }
+        parentScene.addChild(self)
     }
     
-//    func createMyShape() {
-//        let points: [CGPoint] = [CGPoint(x:50, y: 50), CGPoint: x:200, y: 200]
-//        var path = UIBezierPath()
-//        path.move(to: CGPoint(x: 0, y: 0))
-//        path.addLine(to: points)
-//    }
-//
+    private func createNewGameArray(size: Int) -> [[WordTrisGameboardItem]] {
+        var gameArray: [[WordTrisGameboardItem]] = []
+        
+        for i in 0..<size {
+            gameArray.append( [WordTrisGameboardItem]() )
+            
+            for _ in 0..<size {
+                gameArray[i].append( WordTrisGameboardItem(letter: " ") )
+            }
+        }
+        
+        return gameArray
+    }
+
+    private func createBackgroundShape(size: Int) {
+        //        let myShape =
+
+        grid = Grid(blockSize: blockSize!, rows:size, cols:size)
+        grid!.position = CGPoint (x:parentScene.frame.midX, y:parentScene.frame.midY * 0.9)
+        self.addChild(grid!)
+        
+    }
+
+
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

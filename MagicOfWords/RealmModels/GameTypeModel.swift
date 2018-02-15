@@ -1,5 +1,5 @@
 //
-//  BasicDataModel.swift
+//  OpenedGamesModel.swift
 //  MagicOfWords
 //
 //  Created by Jozsef Romhanyi on 13/02/2018.
@@ -9,12 +9,13 @@
 import Foundation
 import RealmSwift
 
-class BasicDataModel: Object {
-    @objc dynamic var ID = 0
-    @objc dynamic var actLanguage = ""
-    @objc dynamic var actVersion = ""
-    @objc dynamic var gameType = 1
+class GameTypeModel: Object {
+    
+// Specify properties to ignore (Realm won't persist these)
+    
+    @objc dynamic var gameNumber = 0
+    @objc dynamic var gameType = 0
     override  class func primaryKey() -> String {
-        return "ID"
+        return "gameType"
     }
 }

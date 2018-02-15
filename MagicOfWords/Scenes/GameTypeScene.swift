@@ -53,10 +53,17 @@ class GameTypeScene: SKScene {
             if let name = nodes.first!.name {
                 switch name {
                 case String(TextConstants.tcWordTris.rawValue):
-                    gameTypeSceneDelegate!.wordTrisGame()
+                    saveChoosedType(gameType: .WordTris)
+                    let gameTypeRecord = realm.objects(GameTypeModel.self).filter("gameType = %@", GameType.WordTris.rawValue)[0]
+                    GV.gameNumber = gameTypeRecord.gameNumber
+                    GV.gameType = gameTypeRecord.gameType
+                    gameTypeSceneDelegate!.cancelChooeseGameType()
                 case String(TextConstants.tcSearchWords.rawValue):
-                    gameTypeSceneDelegate!.findWords()
-                    
+                    saveChoosedType(gameType: .SearchWords)
+                    let gameTypeRecord = realm.objects(GameTypeModel.self).filter("gameType = %@", GameType.SearchWords.rawValue)[0]
+                    GV.gameNumber = gameTypeRecord.gameNumber
+                    GV.gameType = gameTypeRecord.gameType
+                    gameTypeSceneDelegate!.cancelChooeseGameType()
                 case String(TextConstants.tcCancel.rawValue):
                     gameTypeSceneDelegate!.cancelChooeseGameType()
 
@@ -66,6 +73,14 @@ class GameTypeScene: SKScene {
             }
         }
     }
+    
+    private func saveChoosedType(gameType: GameType) {
+        realm.beginWrite()
+            let basicDataModel = realm.objects(BasicDataModel.self).first!
+            basicDataModel.gameType = gameType.rawValue
+        try! realm.commitWrite()
+    }
+    
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
     }

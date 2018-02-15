@@ -17,6 +17,9 @@ public protocol MenuSceneDelegate: class {
     /// Method called when Continue choosed
     func continueGame()
     
+    /// Method called when Choose Game Type pressed
+    func startChooseGameType()
+    
     /// Method called when Settings choosed
     func startSettings()
 }
@@ -27,6 +30,7 @@ class MenuScene: SKScene {
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
         createMenuItem(menuInt: .tcNewGame, firstLine: true)
         createMenuItem(menuInt: .tcContinue)
+        createMenuItem(menuInt: .tcChooseGameType)
         createMenuItem(menuInt: .tcSettings)
     }
     public func setDelegate(delegate: MenuSceneDelegate) {
@@ -63,7 +67,10 @@ class MenuScene: SKScene {
                     case String(TextConstants.tcSettings.rawValue):
                         menuSceneDelegate!.startSettings()
                     
-                    default: break
+                case String(TextConstants.tcChooseGameType.rawValue):
+                    menuSceneDelegate!.startChooseGameType()
+
+                default: break
                 }
             }
         }

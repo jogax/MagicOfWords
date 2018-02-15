@@ -28,45 +28,63 @@ public protocol WordTrisSceneDelegate: class {
     
 }
 class WordTrisScene: SKScene {
-    var collectWordsSceneDelegate: WordTrisSceneDelegate?
+    var wordTrisSceneDelegate: WordTrisSceneDelegate?
     var wordTrisGameboard: WordTrisGameboard?
+    var wordsToPlay = Array<GameDataModel>()
+    var lettersToPlay = [String]()
+    var grid: Grid?
+    var random: MyRandom?
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1)
 //        createMenuItem(menuInt: .tcPackage, firstLine: true)
-        createMenuItem(menuInt: .tcCancel)
-//        createBackgroundShape()
-        wordTrisGameboard = WordTrisGameboard(countCols: 10)
+        createMenuItem(menuInt: .tcBack)
+        showWordsToCollect()
+        play()
    }
 
     public func setDelegate(delegate: WordTrisSceneDelegate) {
-        collectWordsSceneDelegate = delegate
+        wordTrisSceneDelegate = delegate
     }
 
     var line = 0
     private func createMenuItem(menuInt: TextConstants, firstLine: Bool = false) {
         line = firstLine ? 1 : line + 1
         let menuItem = SKLabelNode(fontNamed: "Noteworthy")// Snell Roundhand")
-        let startYPosition = self.frame.size.height * 0.80
+        let startYPosition = self.frame.height * 0.98
         menuItem.text = GV.language.getText(menuInt)
         menuItem.name = String(menuInt.rawValue)
-        menuItem.fontSize = self.frame.size.height / 30
-        menuItem.position = CGPoint(x: self.frame.size.width / 2, y: startYPosition - (CGFloat(line) * 45) )
+        menuItem.fontSize = self.frame.size.height / 50
+        menuItem.position = CGPoint(x: self.frame.size.width * 0.1, y: startYPosition - (CGFloat(line) * 45) )
         menuItem.fontColor = SKColor.blue
         menuItem.color = UIColor.brown
         self.addChild(menuItem)
     }
     
-    private func createBackgroundShape() {
-//        let myShape =
-//        let countRows = 10
-//        let blockSize = self.frame.size.width * 0.95 / CGFloat(countRows)
-//        if let grid = Grid(blockSize: blockSize, rows:countRows, cols:countRows) {
-//            grid.position = CGPoint (x:frame.midX, y:frame.midY * 0.8)
-//            addChild(grid)
-//
-//        }
+    private func showWordsToCollect() {
+        let wordListToShow = realm.objects(GameDataModel.self).filter("gameType = %d and gameNumber = %d", GV.gameType, GV.gameNumber)
+        wordsToPlay = Array(wordListToShow)
+        createLabel(word: GV.language.getText(.tcWordsToCollect), counter: 0)
+        var counter = 1
+        for wordRecord in wordsToPlay {
+            createLabel(word: wordRecord.word, counter: counter)
+            counter += 1
+        }
+        
     }
-    
+
+    private func createLabel(word: String, counter: Int) {
+        let xPositionMultiplier = [0.2, 0.5, 0.8]
+        let yPositionMultiplier = [0.86, 0.84, 0.82]
+        let label = SKLabelNode(fontNamed: (counter == 0 ? "Noteworthy-Bold" : "Noteworthy"))// Snell Roundhand")
+        let yPosition = self.frame.height * (counter == 0 ? 0.90 : CGFloat((yPositionMultiplier[(counter - 1) / 3])))
+        let xPosition = self.frame.size.width * (counter == 0 ? 0.5 : CGFloat(xPositionMultiplier[(counter - 1) % 3]))
+        label.position = CGPoint(x: xPosition, y: yPosition)
+        label.fontSize = self.frame.size.height / (counter == 0 ? 50 : 50)
+        label.fontColor = .black
+        label.text = word
+        self.addChild(label)
+    }
+
     private func createGridShape(type: MyShapes, cols: Int = 0, position: CGPoint) {
         let path = CGMutablePath()
         path.move(to: CGPoint(x: self.frame.midX, y: self.frame.midY))
@@ -77,9 +95,32 @@ class WordTrisScene: SKScene {
         self.addChild(myShape)
     }
     
+    private func play() {
+        random = MyRandom(gameType: GV.gameType, gameNumber: GV.gameNumber)
+        wordTrisGameboard = WordTrisGameboard(size: 10, parentScene: self)
+        generateLettersForThisGame()
+        
+    }
+    
+    private func generateLettersForThisGame() {
+        var allWords = ""
+        for record in wordsToPlay {
+            allWords += record.word
+            print(allWords)
+        }
+        repeat {
+            var actLength = random!.getRandomInt(1, max: 3)
+            actLength = actLength > allWords.count ? allWords.count : actLength
+            let endIndex = allWords.index(allWords.startIndex, offsetBy: actLength)
+            let word = String(allWords[..<endIndex])
+            allWords = String(allWords.mySubString(startPos: actLength))
+            lettersToPlay.append(word)
+        } while allWords.count > 0
+    }
+    
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if collectWordsSceneDelegate == nil {
+        if wordTrisSceneDelegate == nil {
             return
         }
         let firstTouch = touches.first
@@ -88,8 +129,8 @@ class WordTrisScene: SKScene {
         if nodes.count > 0 {
             if let name = nodes.first!.name {
                 switch name {
-                case String(TextConstants.tcCancel.rawValue):
-                    collectWordsSceneDelegate!.gameFinished()
+                case String(TextConstants.tcBack.rawValue):
+                    wordTrisSceneDelegate!.gameFinished()
 
                 default: break
                 }
@@ -100,61 +141,6 @@ class WordTrisScene: SKScene {
     
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
-    }
-}
-
-class Grid:SKSpriteNode {
-    var rows:Int!
-    var cols:Int!
-    var blockSize:CGFloat!
-    
-    convenience init?(blockSize:CGFloat,rows:Int,cols:Int) {
-        guard let texture = Grid.gridTexture(blockSize: blockSize,rows: rows, cols:cols) else {
-            return nil
-        }
-        self.init(texture: texture, size: texture.size())
-        self.blockSize = blockSize
-        self.rows = rows
-        self.cols = cols
-    }
-    
-    class func gridTexture(blockSize:CGFloat,rows:Int,cols:Int) -> SKTexture? {
-        // Add 1 to the height and width to ensure the borders are within the sprite
-        let size = CGSize(width: CGFloat(cols)*blockSize+1.0, height: CGFloat(rows)*blockSize+1.0)
-        UIGraphicsBeginImageContext(size)
-        
-        guard let context = UIGraphicsGetCurrentContext() else {
-            return nil
-        }
-        let bezierPath = UIBezierPath()
-        let offset:CGFloat = 0.5
-        // Draw vertical lines
-        for i in 0...cols {
-            let x = CGFloat(i)*blockSize + offset
-            bezierPath.move(to: CGPoint(x: x, y: 0))
-            bezierPath.addLine(to: CGPoint(x: x, y: size.height))
-        }
-        // Draw horizontal lines
-        for i in 0...rows {
-            let y = CGFloat(i)*blockSize + offset
-            bezierPath.move(to: CGPoint(x: 0, y: y))
-            bezierPath.addLine(to: CGPoint(x: size.width, y: y))
-        }
-        SKColor.gray.setStroke()
-        bezierPath.lineWidth = 1.0
-        bezierPath.stroke()
-        context.addPath(bezierPath.cgPath)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return SKTexture(image: image!)
-    }
-    
-    func gridPosition(row:Int, col:Int) -> CGPoint {
-        let offset = blockSize / 2.0 + 0.5
-        let x = CGFloat(col) * blockSize - (blockSize * CGFloat(cols)) / 2.0 + offset
-        let y = CGFloat(rows - row - 1) * blockSize - (blockSize * CGFloat(rows)) / 2.0 + offset
-        return CGPoint(x:x, y:y)
     }
 }
 

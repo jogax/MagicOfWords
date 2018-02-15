@@ -24,22 +24,33 @@ class GenerateGameData {
     var whatToDo = WhatToDo.GenerateWordList
     var timer = Timer()
     init() {
-        print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         let version = readRecordsAndCalculateCount()
         let basicData = realm.objects(BasicDataModel.self)
-        if basicData.count == 0 || basicData.first!.actLanguage != GV.language.getText(.tcAktLanguage) || basicData.first!.actVersion < version  {
+        GV.gameType = 1
+        GV.gameNumber = 1
+        if basicData.count == 0 || basicData.first!.actLanguage != GV.language.getText(.tcAktLanguage) || basicData.first!.actVersion != version  {
             // delete all records if new loading
             realm.beginWrite()
                 let wordListRecordsToDelete = realm.objects(WordListModel.self)
                 realm.delete(wordListRecordsToDelete)
                 let gameDataRecordsToDelete = realm.objects(GameDataModel.self)
                 realm.delete(gameDataRecordsToDelete)
-                let basicDataRecordsToDelete = realm.objects(BasicDataModel.self)
-                realm.delete(basicDataRecordsToDelete)
-                let basicData = BasicDataModel()
-                basicData.actLanguage = GV.language.getText(.tcAktLanguage)
-                basicData.actVersion = version
-                realm.add(basicData)
+                let basicDataRecord = realm.objects(BasicDataModel.self)
+                if basicDataRecord.count == 0 {
+                    let basicData = BasicDataModel()
+                    basicData.actLanguage = GV.language.getText(.tcAktLanguage)
+                    basicData.actVersion = version
+                    realm.add(basicData)
+                    for gameType in 1..<GameType.NoMoreGames.rawValue {
+                        let gameTypeRecord = GameTypeModel()
+                        gameTypeRecord.gameType = gameType
+                        gameTypeRecord.gameNumber = 1
+                        realm.add(gameTypeRecord)
+                    }
+                } else {
+                    basicDataRecord.first!.actLanguage = GV.language.getText(.tcAktLanguage)
+                    basicDataRecord.first!.actVersion = version
+                }
             try! realm.commitWrite()
             timer = Timer.scheduledTimer(timeInterval: 0.00001, target: self, selector: #selector(importWords(timerX:)), userInfo: nil, repeats: false)
         } else {
@@ -165,32 +176,32 @@ class GenerateGameData {
 }
 
 
-class MyRandom {
-    var random: GKARC4RandomSource
-    init(gameType: Int, gameNumber: Int) {
-        
-        let gameData = levelDataArray[gameType]!.dataFromHexadecimalString()!
-        random = GKARC4RandomSource(seed: gameData)
-        random.dropValues(2048 + 1000 * gameNumber)
-    }
-    
-    func getRandomInt(_ min: Int, max: Int) -> Int {
-        return min + random.nextInt(upperBound: (max + 1 - min))
-    }
-    
-    private var levelDataArray = [
-        0:"5ff5310cc41380bf720ce9238f984730",
-        1:"c43d64fe101c1051f58927cd68717bf9",
-        2:"119db944bcf1fd22d64e5758fb1d70b3",
-        3:"61d4430034ac9a4aee4c4d7630736664",
-        4:"2753d55686501e3468bf2a0e29c59de4",
-        5:"82bd26db5190373a5dfb9042dceceb52",
-        6:"3b341d1122c7003f1d5369f31ea75dfa",
-        7:"22de5a0c83eb696fa6c134e14f9c2f41",
-        8:"50e40b23e3d82733e3ee8903a00ca7a4",
-        9:"7c5ad945f2127550dd7f3537a25f0d4f",
-        ]
-    
-}
+//class MyRandom {
+//    var random: GKARC4RandomSource
+//    init(gameType: Int, gameNumber: Int) {
+//
+//        let gameData = levelDataArray[gameType]!.dataFromHexadecimalString()!
+//        random = GKARC4RandomSource(seed: gameData)
+//        random.dropValues(2048 + 1000 * gameNumber)
+//    }
+//
+//    func getRandomInt(_ min: Int, max: Int) -> Int {
+//        return min + random.nextInt(upperBound: (max + 1 - min))
+//    }
+//
+//    private var levelDataArray = [
+//        0:"5ff5310cc41380bf720ce9238f984730",
+//        1:"c43d64fe101c1051f58927cd68717bf9",
+//        2:"119db944bcf1fd22d64e5758fb1d70b3",
+//        3:"61d4430034ac9a4aee4c4d7630736664",
+//        4:"2753d55686501e3468bf2a0e29c59de4",
+//        5:"82bd26db5190373a5dfb9042dceceb52",
+//        6:"3b341d1122c7003f1d5369f31ea75dfa",
+//        7:"22de5a0c83eb696fa6c134e14f9c2f41",
+//        8:"50e40b23e3d82733e3ee8903a00ca7a4",
+//        9:"7c5ad945f2127550dd7f3537a25f0d4f",
+//        ]
+//
+//}
 
 

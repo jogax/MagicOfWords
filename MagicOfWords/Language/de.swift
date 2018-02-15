@@ -21,6 +21,9 @@ let deDictionary: [TextConstants: String] = [
     .tcSearchWords:      "Wörter suchen",
     .tcCancel:           "Abbrechen",
     .tcLoadingInProgress: "Deutsche Wörter werden gerade geladen",
+    .tcChooseGameType:    "Spieltyp wählen",
+    .tcBack:              "< Zurück",
+    .tcWordsToCollect:    "Zu sammelnde Wörter:",
 ]
 
 

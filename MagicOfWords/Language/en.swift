@@ -21,4 +21,7 @@ let enDictionary: [TextConstants: String] = [
     .tcSearchWords:       "Find words",
     .tcCancel:            "Cancel",
     .tcLoadingInProgress: "Loading English Words in progress",
+    .tcChooseGameType:    "Choose game type",
+    .tcBack:              "< Back",
+    .tcWordsToCollect:    "Words to collect:",
 ]
