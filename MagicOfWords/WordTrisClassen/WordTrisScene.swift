@@ -8,19 +8,6 @@
 
 import Foundation
 import GameplayKit
-enum MyShapes: Int {
-    case Grid_Shape = 0,
-    Z_Shape_L,
-    Z_Shape_R,
-    L_Shape,
-    T_Shape,
-    I_Shape_1,
-    I_Shape_2,
-    I_Shape_3,
-    I_Shape_4,
-    Edge_Shape
-}
-
 public protocol WordTrisSceneDelegate: class {
     
     /// Method called when Game finished
@@ -99,7 +86,17 @@ class WordTrisScene: SKScene {
         random = MyRandom(gameType: GV.gameType, gameNumber: GV.gameNumber)
         wordTrisGameboard = WordTrisGameboard(size: 10, parentScene: self)
         generateLettersForThisGame()
-        
+        let blockSize = self.frame.width / 14
+        let zShape1 = WordTrisShape(type: .Z_Shape_1, parent: self, blockSize: blockSize).sprite()
+        zShape1.position = CGPoint(x:self.frame.width * 0.19, y:self.frame.height * 0.12)
+        self.addChild(zShape1)
+        let zShape2 = WordTrisShape(type: .Z_Shape_2, parent: self, blockSize: blockSize).sprite()
+        zShape2.position = CGPoint(x:self.frame.width * 0.50, y:self.frame.height * 0.12)
+        self.addChild(zShape2)
+        let lShape2 = WordTrisShape(type: .L_Shape_2, parent: self, blockSize: blockSize).sprite()
+        lShape2.position = CGPoint(x:self.frame.width * 0.81, y:self.frame.height * 0.12)
+        self.addChild(lShape2)
+
     }
     
     private func generateLettersForThisGame() {
