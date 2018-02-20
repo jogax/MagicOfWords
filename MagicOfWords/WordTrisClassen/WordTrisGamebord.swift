@@ -52,6 +52,7 @@ class WordTrisGameboard: SKShapeNode {
 
         grid = Grid(blockSize: blockSize!, rows:size, cols:size)
         grid!.position = CGPoint (x:parentScene.frame.midX, y:parentScene.frame.midY * 0.9)
+        grid!.name = "Gameboard"
         self.addChild(grid!)
         
     }

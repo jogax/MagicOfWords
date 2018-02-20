@@ -357,7 +357,13 @@ extension String {
         let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
         return self[indexStartOfText...]
     }
-    
+
+    func mySubString(startPos: Int, length: Int) -> String.SubSequence {
+        let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
+        let indexEndOfText = self.index(self.startIndex, offsetBy: startPos + length)
+        return self[indexStartOfText..<indexEndOfText]
+    }
+
     
 }
 

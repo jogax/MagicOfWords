@@ -105,18 +105,6 @@ class GenerateGameData {
             repeat {
                 let word = myWords[wordsPointer]
                 wordsPointer += 1
-//                let index0 = word.index(word.startIndex, offsetBy: word.count == 0 ? 0 : 1)
-//                let firstChar = String(word[..<index0])
-//                var lastChar = "Z"
-//                if word.count > 0 {
-//                    let lastCharIndex = word.index(word.endIndex, offsetBy: -1)
-//                    lastChar = String(word[lastCharIndex])
-//                }
-//                if realm.objects(WordListModel.self).filter("word = %@", word).count > 0 || word.count == 0 || firstChar <= "Я" {
-//                if  word.count == 0 || word == myWords[wordsPointer - 2] {//} || firstChar >= "a" {//|| (lastChar == "s" && myWords[wordsPointer - 2] == wordLastButOne) {
-//                    print("Problem: \(word)")
-//                } else {
-//                    print(word)
                 if word.count > 0 {
                     GV.lastSavedWord = word
                     realm.beginWrite()

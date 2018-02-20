@@ -20,12 +20,23 @@ class WordTrisScene: SKScene {
     var wordsToPlay = Array<GameDataModel>()
     var lettersToPlay = [String]()
     var grid: Grid?
+    let heightMultiplicator = CGFloat(0.305)//CGFloat(0.12)
     var random: MyRandom?
+    var ws1: WordTrisShape?
+    var shape1: SKSpriteNode?
+    let shape1Multiplicator = CGFloat(0.19)
+    var ws2: WordTrisShape?
+    var shape2: SKSpriteNode?
+    let shape2Multiplicator = CGFloat(0.52)
+    var ws3: WordTrisShape?
+    var shape3: SKSpriteNode?
+    let shape3Multiplicator = CGFloat(0.81)
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1)
 //        createMenuItem(menuInt: .tcPackage, firstLine: true)
         createMenuItem(menuInt: .tcBack)
         showWordsToCollect()
+        self.name = "WordTrisScene"
         play()
    }
 
@@ -72,30 +83,41 @@ class WordTrisScene: SKScene {
         self.addChild(label)
     }
 
-    private func createGridShape(type: MyShapes, cols: Int = 0, position: CGPoint) {
-        let path = CGMutablePath()
-        path.move(to: CGPoint(x: self.frame.midX, y: self.frame.midY))
-        path.addLine(to: CGPoint(x: self.frame.origin.x + self.frame.width / 2, y: self.frame.origin.y))
-        let myShape = SKShapeNode(path: path)
-        myShape.fillColor = .green
-        
-        self.addChild(myShape)
-    }
+//    private func createGridShape(type: MyShapes, cols: Int = 0, position: CGPoint) {
+//        let path = CGMutablePath()
+//        path.move(to: CGPoint(x: self.frame.midX, y: self.frame.midY))
+//        path.addLine(to: CGPoint(x: self.frame.origin.x + self.frame.width / 2, y: self.frame.origin.y))
+//        let myShape = SKShapeNode(path: path)
+//        myShape.fillColor = .green
+//
+//        self.addChild(myShape)
+//    }
     
     private func play() {
+//        let anchorPoint = CGPoint(x: 0.5, y: 0.5)
         random = MyRandom(gameType: GV.gameType, gameNumber: GV.gameNumber)
         wordTrisGameboard = WordTrisGameboard(size: 10, parentScene: self)
         generateLettersForThisGame()
-        let blockSize = self.frame.width / 14
-        let zShape1 = WordTrisShape(type: .Z_Shape_1, parent: self, blockSize: blockSize).sprite()
-        zShape1.position = CGPoint(x:self.frame.width * 0.19, y:self.frame.height * 0.12)
-        self.addChild(zShape1)
-        let zShape2 = WordTrisShape(type: .Z_Shape_2, parent: self, blockSize: blockSize).sprite()
-        zShape2.position = CGPoint(x:self.frame.width * 0.50, y:self.frame.height * 0.12)
-        self.addChild(zShape2)
-        let lShape2 = WordTrisShape(type: .L_Shape_2, parent: self, blockSize: blockSize).sprite()
-        lShape2.position = CGPoint(x:self.frame.width * 0.81, y:self.frame.height * 0.12)
-        self.addChild(lShape2)
+        let blockSize = self.frame.width / 11.0
+        ws1 = WordTrisShape(type: .Z_Shape_1, parent: self, blockSize: blockSize, letters: ["L", "A", "K", "K"])
+        shape1 = ws1!.sprite()
+//        shape1!.position = CGPoint(x:self.frame.width * shape1Multiplicator, y:self.frame.height * heightMultiplicator)
+        shape1!.position = CGPoint(x:self.frame.width * shape1Multiplicator, y:self.frame.height * heightMultiplicator)
+//        shape1!.anchorPoint = anchorPoint
+        shape1!.name = "Pos1"
+        self.addChild(shape1!)
+        ws2 = WordTrisShape(type: .Z_Shape_2, parent: self, blockSize: blockSize, letters: ["A", "B", "C", "D"])
+        shape2 = ws2!.sprite()
+        shape2!.position = CGPoint(x:self.frame.width * shape2Multiplicator, y:self.frame.height * heightMultiplicator)
+//        shape2!.anchorPoint = anchorPoint
+        shape2!.name = "Pos2"
+        self.addChild(shape2!)
+        ws3 = WordTrisShape(type: .L_Shape_1, parent: self, blockSize: blockSize, letters: ["A", "B", "C", "D"])
+        shape3 = ws3!.sprite()
+        shape3!.position = CGPoint(x:self.frame.width * shape3Multiplicator, y:self.frame.height * heightMultiplicator)
+//        shape3!.anchorPoint = anchorPoint
+        shape3!.name = "Pos3"
+        self.addChild(shape3!)
 
     }
     
@@ -124,12 +146,24 @@ class WordTrisScene: SKScene {
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
         if nodes.count > 0 {
-            if let name = nodes.first!.name {
+            for node in nodes {
+                guard let name = node.name else {
+                    continue
+                }
                 switch name {
                 case String(TextConstants.tcBack.rawValue):
                     wordTrisSceneDelegate!.gameFinished()
 
-                default: break
+                case String("Pos1"):
+                    ws1!.rotate()
+                    break
+                case String("Pos2"):
+                    ws2!.rotate()
+                    break
+                case String("Pos3"):
+                    ws3!.rotate()
+                    break
+                default: continue
                 }
             }
         }
