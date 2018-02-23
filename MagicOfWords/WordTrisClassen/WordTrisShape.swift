@@ -9,30 +9,49 @@
 import Foundation
 import GameplayKit
 enum MyShapes: Int {
-    case Grid_Shape = 0,
-    Z_Shape_1,
-    Z_Shape_2,
-    L_Shape_1,
-    L_Shape_2,
-    L_Shape_3,
-    T_Shape,
-    Q_Shape,
-    I_Shape_1,
-    I_Shape_2,
-    I_Shape_3,
-    I_Shape_4
+    case
+        Z_Shape_1,
+        Z_Shape_2,
+        L_Shape_1,
+        L_Shape_2,
+        L_Shape_3,
+        L_Shape_4,
+        T_Shape_1,
+        T_Shape_2,
+        O_Shape,
+        I_Shape_1,
+        I_Shape_2,
+        I_Shape_3,
+        Not_Used
+    static var count: Int { return MyShapes.Not_Used.hashValue + 1}
+
 }
+let myForms: [MyShapes : [Int]] = [
+    .Z_Shape_1 : [02, 01, 11, 10], //OK
+    .Z_Shape_2 : [00, 01, 11, 12], //OK
+    .L_Shape_1 : [11, 10, 00], // OK
+    .L_Shape_2 : [21, 20, 10, 00], // OK
+    .L_Shape_3 : [20, 21, 11, 01], // OK
+    .L_Shape_4 : [00, 10, 20, 21, 22], // OK
+    .T_Shape_1 : [12, 11, 10, 01],  //OK
+    .T_Shape_2 : [22, 21, 20, 11, 01], //OK
+    .O_Shape   : [10, 11, 01, 00], // OK
+    .I_Shape_1 : [11], // OK
+    .I_Shape_2 : [11, 01],
+    .I_Shape_3 : [21, 11, 01]
+]
+
 
 
 class WordTrisShape {
-    let sizeOfShape = 3
+    let countRows: CGFloat = 3
     var mySprite: SKSpriteNode
     var myShape: SKSpriteNode
     let parent: SKScene
     let blockSize: CGFloat
     let letters: [String]
     var rotateIndex: Int = 0
-    var origPosition: [CGPoint] = [CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0)]
+    var origPosition: [CGPoint] = [CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0)]
     var myType: MyShapes
     // Shape Form
     // y:  x:   0   1   2   3
@@ -41,46 +60,51 @@ class WordTrisShape {
     // 1        x   x   x   x
     // 0        x   x   x   x
     
-    let myForms: [MyShapes : [[Int]]] = [
-        .Z_Shape_1 : [[10, 11, 01, 02], [00, 10, 11, 21], [02, 01, 11, 10], [21, 11, 10, 00]],
-        .Z_Shape_2 : [[00, 01, 11, 12], [20, 10, 11, 01], [12, 11, 01, 00], [01, 11, 10, 20]],
-        .L_Shape_1 : [[11, 10, 00], [10, 00, 01], [00, 01, 11], [01, 11, 10]]
-//        .L_Shape_2 : [10, 00, 01, 02], [20, 10, 11, 01], [21, 11, 10, 00], [00, 01, 11, 12]],
-//        .L_Shape_3 : [00, 01, 02, 12], [20, 10, 11, 01], [21, 11, 10, 00], [00, 01, 11, 12]]
-    ]
+    init() {
+        self.parent = SKScene()
+        self.blockSize = 0
+        self.letters = []
+        self.myType = MyShapes.Not_Used
+        self.mySprite = SKSpriteNode()
+        self.myShape = SKSpriteNode()
+
+    }
     init(type: MyShapes, parent: SKScene, blockSize: CGFloat, letters: [String]) {
         self.parent = parent
         self.blockSize = blockSize
         self.letters = letters
         self.myType = type
-        self.mySprite = SKSpriteNode()
         self.myShape = SKSpriteNode()
+        self.mySprite = SKSpriteNode()
         mySprite.size = CGSize(width: blockSize * 3, height: blockSize * 3)
         let texture = gridTexture(type: type, blockSize: blockSize)
         self.myShape = SKSpriteNode(texture: texture, size: texture!.size())
         mySprite.addChild(myShape)
         myShape.position = CGPoint(x: mySprite.frame.midX, y: mySprite.frame.midY)
-        myShape.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+//        myShape.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         addLettersToPositions()
     }
     
     private func addLettersToPositions() {
         let form = myForms[myType]
-        for index in 0..<form![rotateIndex].count {
-            let col = form![rotateIndex][index] / 10
-            let row = form![rotateIndex][index] % 10
+        for index in 0..<form!.count {
+            let col = form![index] / 10
+            let row = form![index] % 10
             let position = gridPosition(col: col, row: row)
-            let label = SKLabelNode(fontNamed: "Noteworthy")
+//            let frameForLetter = SKSpriteNode()
+//            frameForLetter.position = position
+            let label = SKLabelNode(fontNamed: "TimesNw10ewRoman")
             label.position = position
             label.text = letters[index]
             label.fontColor = .black
-            label.fontSize = parent.frame.width / 20
+            label.fontSize = parent.frame.width / 25
             label.horizontalAlignmentMode = .center
             let searchName = "label\(index)"
             label.name = searchName
-            if mySprite.childNode(withName: searchName) != nil {
-                mySprite.childNode(withName: searchName)!.removeFromParent()
-            }
+//            frameForLetter.addChild(label)
+//            if mySprite.childNode(withName: searchName) != nil {
+//                mySprite.childNode(withName: searchName)!.removeFromParent()
+//            }
             mySprite.addChild(label)
 
         }
@@ -89,16 +113,24 @@ class WordTrisShape {
         return mySprite
     }
     
+    public func getLengthOfShape(type: MyShapes)->Int {
+        return myForms[type]!.count
+    }
+    
     public func rotate() {
         var moveLetterAction: SKAction?
         rotateIndex = (rotateIndex + 1) % 4
-        let vectors: [CGVector] = [CGVector(dx: 12, dy: -10), CGVector(dx: 8, dy: 10), CGVector(dx:-10, dy: 10), CGVector(dx: -10, dy: -5)]
+        let corr = parent.frame.width / 65
+        let vectors: [CGVector] = [CGVector(dx: 0, dy: 0), // this is not used, because the orig Value will be set
+                                   CGVector(dx: 1.5 * corr, dy: 1.0 * corr),
+                                   CGVector(dx:-1.0 * corr, dy: 1.3 * corr),
+                                   CGVector(dx: -1.5 * corr, dy: -1.8 * corr)]
         let rotateAction = SKAction.rotate(byAngle: -90 * GV.oneGrad, duration: 0.1)
         let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
         mySprite.run(rotateAction)
 //        addLettersToPositions()
         let form = myForms[myType]
-        for index in 0..<form![rotateIndex].count {
+        for index in 0..<form!.count {
             let searchName = "label\(index)"
             guard let child = mySprite.childNode(withName: searchName) else {
                 continue
@@ -128,8 +160,8 @@ class WordTrisShape {
         }
         func generatePoints(type: MyShapes)->[CGPoint] {
             let form = myForms[type]!
-            for index in 0..<form[rotateIndex].count {
-                let formItem = form[rotateIndex][index]
+            for index in 0..<form.count {
+                let formItem = form[index]
                 let xValue = formItem % 10
                 let yValue = formItem / 10
                 addPoint(point: CGPoint(x: xValue + 0, y: yValue + 0))
@@ -141,8 +173,8 @@ class WordTrisShape {
         }
         
         // Add 1 to the height and width to ensure the borders are within the sprite
-        let count = type == .I_Shape_4 ? 4 : 3
-        let size = CGSize(width: CGFloat(count)*blockSize+1.0, height: CGFloat(count)*blockSize+1.0)
+        let count = myForms[type]?.count
+        let size = CGSize(width: CGFloat(count!)*blockSize+2.0, height: CGFloat(count!)*blockSize+2.0)
         UIGraphicsBeginImageContext(size)
         guard let context = UIGraphicsGetCurrentContext() else {
             return nil
@@ -188,7 +220,7 @@ class WordTrisShape {
         bezierPath.move(to: CGPoint(x: startPoint.x, y: startPoint.y  + offset))
         bezierPath.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y  + offset))
         SKColor.gray.setStroke()
-        bezierPath.lineWidth = 1.0
+        bezierPath.lineWidth = 0.5
         bezierPath.stroke()
         context.addPath(bezierPath.cgPath)
         
@@ -198,12 +230,14 @@ class WordTrisShape {
         
         return SKTexture(image: image!)
     }
+    
     func gridPosition(col:Int, row:Int) -> CGPoint {
-        let offset = blockSize / 2.0 + 0.5
-        let x = CGFloat(row) * blockSize - (blockSize * CGFloat(sizeOfShape)) / 2.0 + offset
-        let y = CGFloat(sizeOfShape - col - 1) * blockSize - (blockSize * CGFloat(sizeOfShape)) / 1.6  + offset
+        let offset = blockSize * 0.5 + 0.5
+        let x = myShape.frame.minX + (CGFloat(row) * blockSize - 1) + offset
+        let y = myShape.frame.maxY - (CGFloat(col + 1) * blockSize - 1) + offset / 2.2
         return CGPoint(x:x, y:y)
     }
+
 }
 
 

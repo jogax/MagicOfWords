@@ -18,25 +18,20 @@ class WordTrisScene: SKScene {
     var wordTrisSceneDelegate: WordTrisSceneDelegate?
     var wordTrisGameboard: WordTrisGameboard?
     var wordsToPlay = Array<GameDataModel>()
-    var lettersToPlay = [String]()
+    var allWords = String()
+    var piecesOfWordsToPlay = [String]()
     var grid: Grid?
-    let heightMultiplicator = CGFloat(0.305)//CGFloat(0.12)
+    let heightMultiplicator = CGFloat(0.08)
     var random: MyRandom?
-    var ws1: WordTrisShape?
-    var shape1: SKSpriteNode?
-    let shape1Multiplicator = CGFloat(0.19)
-    var ws2: WordTrisShape?
-    var shape2: SKSpriteNode?
-    let shape2Multiplicator = CGFloat(0.52)
-    var ws3: WordTrisShape?
-    var shape3: SKSpriteNode?
-    let shape3Multiplicator = CGFloat(0.81)
+    var ws = [WordTrisShape]()
+    let shapeMultiplicator = [CGFloat(0.19), CGFloat(0.52), CGFloat(0.81)]
+    
     override func didMove(to view: SKView) {
-        self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1)
+       self.name = "WordTrisScene"
+       self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
 //        createMenuItem(menuInt: .tcPackage, firstLine: true)
         createMenuItem(menuInt: .tcBack)
         showWordsToCollect()
-        self.name = "WordTrisScene"
         play()
    }
 
@@ -64,7 +59,7 @@ class WordTrisScene: SKScene {
         createLabel(word: GV.language.getText(.tcWordsToCollect), counter: 0)
         var counter = 1
         for wordRecord in wordsToPlay {
-            createLabel(word: wordRecord.word, counter: counter)
+            createLabel(word: wordRecord.word.uppercased(), counter: counter)
             counter += 1
         }
         
@@ -82,60 +77,92 @@ class WordTrisScene: SKScene {
         label.text = word
         self.addChild(label)
     }
-
-//    private func createGridShape(type: MyShapes, cols: Int = 0, position: CGPoint) {
-//        let path = CGMutablePath()
-//        path.move(to: CGPoint(x: self.frame.midX, y: self.frame.midY))
-//        path.addLine(to: CGPoint(x: self.frame.origin.x + self.frame.width / 2, y: self.frame.origin.y))
-//        let myShape = SKShapeNode(path: path)
-//        myShape.fillColor = .green
-//
-//        self.addChild(myShape)
-//    }
     
     private func play() {
-//        let anchorPoint = CGPoint(x: 0.5, y: 0.5)
+//        var allWordsUsing = Array(repeating: 0, count: allWords.count)
         random = MyRandom(gameType: GV.gameType, gameNumber: GV.gameNumber)
+        generateArrayOfWordPieces()
+        ws = Array(repeating: WordTrisShape(), count: 3)
         wordTrisGameboard = WordTrisGameboard(size: 10, parentScene: self)
-        generateLettersForThisGame()
-        let blockSize = self.frame.width / 11.0
-        ws1 = WordTrisShape(type: .Z_Shape_1, parent: self, blockSize: blockSize, letters: ["L", "A", "K", "K"])
-        shape1 = ws1!.sprite()
-//        shape1!.position = CGPoint(x:self.frame.width * shape1Multiplicator, y:self.frame.height * heightMultiplicator)
-        shape1!.position = CGPoint(x:self.frame.width * shape1Multiplicator, y:self.frame.height * heightMultiplicator)
-//        shape1!.anchorPoint = anchorPoint
-        shape1!.name = "Pos1"
-        self.addChild(shape1!)
-        ws2 = WordTrisShape(type: .Z_Shape_2, parent: self, blockSize: blockSize, letters: ["A", "B", "C", "D"])
-        shape2 = ws2!.sprite()
-        shape2!.position = CGPoint(x:self.frame.width * shape2Multiplicator, y:self.frame.height * heightMultiplicator)
-//        shape2!.anchorPoint = anchorPoint
-        shape2!.name = "Pos2"
-        self.addChild(shape2!)
-        ws3 = WordTrisShape(type: .L_Shape_1, parent: self, blockSize: blockSize, letters: ["A", "B", "C", "D"])
-        shape3 = ws3!.sprite()
-        shape3!.position = CGPoint(x:self.frame.width * shape3Multiplicator, y:self.frame.height * heightMultiplicator)
-//        shape3!.anchorPoint = anchorPoint
-        shape3!.name = "Pos3"
-        self.addChild(shape3!)
+        let blockSize = self.frame.width / 16.0
+        for index in 0..<3 {
+            var type: MyShapes
+//            guard let type = MyShapes(rawValue: random!.getRandomInt(1, max: MyShapes.count - 1)) else {
+//                return
+//            }
+            switch index {
+//            case 0: type = .L_Shape_1  // NOK 3
+//            case 1: type = .L_Shape_2   // OK 4
+//            case 2: type = .L_Shape_3  // OK 4
+            case 0: type = .L_Shape_4  // OK 4
+//            case 1: type = .Z_Shape_1  // OK 4
+//            case 2: type = .Z_Shape_2  // NOK 5
+//            case 0: type = .O_Shape // OK 4
+            case 1: type = .T_Shape_1 // OK
+            case 2: type = .T_Shape_2 // NOK - 5
+//            case 0: type = .I_Shape_1 // NOK - 1
+//            case 0: type = .I_Shape_2 // NOK - 2
+//            case 1: type = .I_Shape_3 // NOK - 3
+           default: continue
+            }
+            let length = myForms[type]!.count
+            var letters = [String]()
+            repeat {
+                var actPos = random!.getRandomInt(0, max: allWords.count - 1)
+                let actMaxValue = allWords.count - actPos < 3 ? allWords.count - actPos : 3
+                let calculatedLength = random!.getRandomInt(1, max: actMaxValue)
+                var actLength = calculatedLength > length - letters.count ? length - letters.count : calculatedLength
+//                for index in actPos..<actPos + actLength {
+//                    allWordsUsing[index] += 1
+//                }
+                repeat {
+                    letters.append(String(allWords.mySubString(startPos: actPos, length: 1)))
+                    actPos += 1
+                    actLength -= 1
+                } while actLength > 0
+            } while letters.count < length
+            ws[index] = WordTrisShape(type: type, parent: self, blockSize: blockSize, letters: letters)
+            ws[index].sprite().position = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
+            ws[index].sprite().name = "Pos\(index )"
+            self.addChild(ws[index].sprite())
+        }
 
     }
     
-    private func generateLettersForThisGame() {
-        var allWords = ""
+    private func generateArrayOfWordPieces() {
         for record in wordsToPlay {
-            allWords += record.word
-            print(allWords)
+            allWords += record.word.uppercased()
         }
+        var allWordsUsing = Array(repeating: 0, count: allWords.count)
+        var counterOfPieces = allWords.count * 5
         repeat {
-            var actLength = random!.getRandomInt(1, max: 3)
-            actLength = actLength > allWords.count ? allWords.count : actLength
-            let endIndex = allWords.index(allWords.startIndex, offsetBy: actLength)
-            let word = String(allWords[..<endIndex])
-            allWords = String(allWords.mySubString(startPos: actLength))
-            lettersToPlay.append(word)
-        } while allWords.count > 0
+            let actPos = random!.getRandomInt(0, max: allWords.count - 1)
+            let actMaxValue = allWords.count - actPos < 3 ? allWords.count - actPos : 3
+            let actLength = random!.getRandomInt(1, max: actMaxValue)
+            for index in actPos..<actPos + actLength {
+                allWordsUsing[index] += 1
+            }
+            let word = String(allWords.mySubString(startPos: actPos, length: actLength))
+            piecesOfWordsToPlay.append(word)
+            counterOfPieces -= 1
+        } while counterOfPieces > 0 && allWordsUsing.contains(0)
     }
+
+    
+//    private func generateLettersForThisGame() {
+//        var allWords = ""
+//        for record in wordsToPlay {
+//            allWords += record.word
+//        }
+//        repeat {
+//            var actLength = random!.getRandomInt(1, max: 3)
+//            actLength = actLength > allWords.count ? allWords.count : actLength
+//            let endIndex = allWords.index(allWords.startIndex, offsetBy: actLength)
+//            let word = String(allWords[..<endIndex])
+//            allWords = String(allWords.mySubString(startPos: actLength))
+//            lettersToPlay.append(word)
+//        } while allWords.count > 0
+//    }
     
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -154,14 +181,14 @@ class WordTrisScene: SKScene {
                 case String(TextConstants.tcBack.rawValue):
                     wordTrisSceneDelegate!.gameFinished()
 
+                case String("Pos0"):
+                    ws[0].rotate()
+                    break
                 case String("Pos1"):
-                    ws1!.rotate()
+                    ws[1].rotate()
                     break
                 case String("Pos2"):
-                    ws2!.rotate()
-                    break
-                case String("Pos3"):
-                    ws3!.rotate()
+                    ws[2].rotate()
                     break
                 default: continue
                 }
