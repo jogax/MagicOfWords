@@ -36,9 +36,9 @@ let myForms: [MyShapes : [Int]] = [
     .T_Shape_1 : [12, 11, 10, 01],  //OK
     .T_Shape_2 : [22, 21, 20, 11, 01], //OK
     .O_Shape   : [10, 11, 01, 00], // OK
-    .I_Shape_1 : [11], // OK
-    .I_Shape_2 : [11, 01],
-    .I_Shape_3 : [21, 11, 01]
+    .I_Shape_1 : [00], // OK
+    .I_Shape_2 : [10, 00],
+    .I_Shape_3 : [20, 10, 00]
 ]
 
 
@@ -81,7 +81,6 @@ class WordTrisShape {
         self.myShape = SKSpriteNode(texture: texture, size: texture!.size())
         mySprite.addChild(myShape)
         myShape.position = CGPoint(x: mySprite.frame.midX, y: mySprite.frame.midY)
-//        myShape.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         addLettersToPositions()
     }
     
@@ -127,6 +126,7 @@ class WordTrisShape {
                                    CGVector(dx: -1.5 * corr, dy: -1.8 * corr)]
         let rotateAction = SKAction.rotate(byAngle: -90 * GV.oneGrad, duration: 0.1)
         let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
+        mySprite.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         mySprite.run(rotateAction)
 //        addLettersToPositions()
         let form = myForms[myType]
@@ -174,7 +174,25 @@ class WordTrisShape {
         
         // Add 1 to the height and width to ensure the borders are within the sprite
         let count = myForms[type]?.count
-        let size = CGSize(width: CGFloat(count!)*blockSize+2.0, height: CGFloat(count!)*blockSize+2.0)
+        var minPoint = CGPoint(x: 0, y: 0)
+        var maxPoint = CGPoint(x: 0, y: 0)
+        for index in 0..<count! {
+            let x = CGFloat(myForms[type]![index] % 10)
+            let y = CGFloat(myForms[type]![index] / 10)
+            if x < minPoint.x {
+                minPoint.x = x
+            }
+            if x > maxPoint.x {
+                maxPoint.x = x
+            }
+            if y < minPoint.y {
+                minPoint.y = y
+            }
+            if y > maxPoint.y {
+                maxPoint.y = y
+            }
+        }
+        let size = CGSize(width: (maxPoint.x - minPoint.x + 1)*blockSize+1.0, height:(maxPoint.y - minPoint.y + 1)*blockSize+1.0)
         UIGraphicsBeginImageContext(size)
         guard let context = UIGraphicsGetCurrentContext() else {
             return nil
@@ -184,11 +202,6 @@ class WordTrisShape {
         let points = generatePoints(type: type)
         let pointsSortedX = points.sorted(by: {$0.x < $1.x || ($0.x == $1.x && $0.y < $1.y) })
         let pointsSortedY = points.sorted(by: {$0.y < $1.y || ($0.y == $1.y && $0.x < $1.x) })
-//        for i in 0..<myForms[type]!.count {
-//            let actPoint = CGPoint(x: count - myForms[type]![i] / 10, y: myForms[type]![i] % 10)
-//            pointsSortedX.append(actPoint)
-//        }
-//        let pointsSortedY = pointsSortedX.sorted(by: {$0.y < $1.y})
         var startPoint = pointsSortedX[0] * blockSize
         var endPoint = CGPoint(x: 0, y: 0)
         // Draw Vertical lines
@@ -220,7 +233,7 @@ class WordTrisShape {
         bezierPath.move(to: CGPoint(x: startPoint.x, y: startPoint.y  + offset))
         bezierPath.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y  + offset))
         SKColor.gray.setStroke()
-        bezierPath.lineWidth = 0.5
+        bezierPath.lineWidth = 1.0
         bezierPath.stroke()
         context.addPath(bezierPath.cgPath)
         

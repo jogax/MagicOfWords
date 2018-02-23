@@ -91,18 +91,18 @@ class WordTrisScene: SKScene {
 //                return
 //            }
             switch index {
-//            case 0: type = .L_Shape_1  // NOK 3
+//            case 0: type = .L_Shape_1  // OK 3
 //            case 1: type = .L_Shape_2   // OK 4
 //            case 2: type = .L_Shape_3  // OK 4
-            case 0: type = .L_Shape_4  // OK 4
+//            case 0: type = .L_Shape_4  // OK 4
 //            case 1: type = .Z_Shape_1  // OK 4
-//            case 2: type = .Z_Shape_2  // NOK 5
-//            case 0: type = .O_Shape // OK 4
-            case 1: type = .T_Shape_1 // OK
-            case 2: type = .T_Shape_2 // NOK - 5
-//            case 0: type = .I_Shape_1 // NOK - 1
-//            case 0: type = .I_Shape_2 // NOK - 2
-//            case 1: type = .I_Shape_3 // NOK - 3
+//            case 2: type = .Z_Shape_2  // OK 5
+//                    case 0: type = .O_Shape // OK 4
+//                    case 1: type = .T_Shape_1 // OK
+//                    case 2: type = .T_Shape_2 // OK - 5
+            case 0: type = .I_Shape_1 // NOK - 1
+            case 1: type = .I_Shape_2 // NOK - 2
+            case 2: type = .I_Shape_3 // NOK - 3
            default: continue
             }
             let length = myForms[type]!.count
@@ -182,6 +182,8 @@ class WordTrisScene: SKScene {
                     wordTrisSceneDelegate!.gameFinished()
 
                 case String("Pos0"):
+//                    let newPosition = ws[0].sprite().position + CGPoint(x: 10, y: 50)
+//                    ws[0].sprite().position = newPosition
                     ws[0].rotate()
                     break
                 case String("Pos1"):
