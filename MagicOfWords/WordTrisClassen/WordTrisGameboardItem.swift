@@ -14,8 +14,9 @@ class WordTrisGameboardItem: SKLabelNode {
     init(letter: String) {
         self.letter = letter
         super.init()
-        self.fontName = "Noteworthy"
+        self.fontName = "Courier"
         self.fontColor = .black
+        self.verticalAlignmentMode = .center
         self.text = letter
     }
     

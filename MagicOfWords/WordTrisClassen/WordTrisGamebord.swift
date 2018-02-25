@@ -24,10 +24,11 @@ class WordTrisGameboard: SKShapeNode {
         gameArray = createNewGameArray(size: size)
         for col in 0..<size {
             for row in 0..<size {
-                gameArray![col][row].position = grid!.gridPosition(col: col, row: row) +
-                    CGPoint (x:parentScene.frame.midX, y:parentScene.frame.midY * 0.874)
+                gameArray![col][row].position = grid!.gridPosition(col: col, row: row) //+
+//                    CGPoint (x:parentScene.frame.midX, y:parentScene.frame.midY * 0.874)
                 gameArray![col][row].fontSize = parentScene.frame.width / 20
-                parentScene.addChild(gameArray![col][row])
+                gameArray![col][row].name = "col\(col)-row\(row)"
+                grid!.addChild(gameArray![col][row])
             }
         }
         parentScene.addChild(self)
@@ -40,7 +41,7 @@ class WordTrisGameboard: SKShapeNode {
             gameArray.append( [WordTrisGameboardItem]() )
             
             for _ in 0..<size {
-                gameArray[i].append( WordTrisGameboardItem(letter: " ") )
+                gameArray[i].append( WordTrisGameboardItem(letter: "") )
             }
         }
         
@@ -51,7 +52,7 @@ class WordTrisGameboard: SKShapeNode {
         //        let myShape =
 
         grid = Grid(blockSize: blockSize!, rows:size, cols:size)
-        grid!.position = CGPoint (x:parentScene.frame.midX, y:parentScene.frame.midY * 0.9)
+        grid!.position = CGPoint (x:parentScene.frame.midX, y:parentScene.frame.maxY * 0.5)
         grid!.name = "Gameboard"
         self.addChild(grid!)
         

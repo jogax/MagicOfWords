@@ -90,21 +90,24 @@ class WordTrisShape {
             let col = form![index] / 10
             let row = form![index] % 10
             let position = gridPosition(col: col, row: row)
-//            let frameForLetter = SKSpriteNode()
-//            frameForLetter.position = position
-            let label = SKLabelNode(fontNamed: "TimesNw10ewRoman")
-            label.position = position
+            let frameForLetter = SKSpriteNode()
+            frameForLetter.position = position
+//            frameForLetter.fillColor = .yellow
+            let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+//            label.position = position
             label.text = letters[index]
             label.fontColor = .black
             label.fontSize = parent.frame.width / 25
             label.horizontalAlignmentMode = .center
+            label.color = .blue
+            label.name = "Label"
             let searchName = "label\(index)"
-            label.name = searchName
-//            frameForLetter.addChild(label)
-//            if mySprite.childNode(withName: searchName) != nil {
-//                mySprite.childNode(withName: searchName)!.removeFromParent()
-//            }
-            mySprite.addChild(label)
+            frameForLetter.name = searchName
+            frameForLetter.addChild(label)
+            if mySprite.childNode(withName: searchName) != nil {
+                mySprite.childNode(withName: searchName)!.removeFromParent()
+            }
+            mySprite.addChild(frameForLetter)
 
         }
     }
@@ -114,6 +117,10 @@ class WordTrisShape {
     
     public func getLengthOfShape(type: MyShapes)->Int {
         return myForms[type]!.count
+    }
+    
+    public func changeSize(by: CGFloat) {
+        mySprite.setScale(by)
     }
     
     public func rotate() {
@@ -233,10 +240,11 @@ class WordTrisShape {
         bezierPath.move(to: CGPoint(x: startPoint.x, y: startPoint.y  + offset))
         bezierPath.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y  + offset))
         SKColor.gray.setStroke()
-        bezierPath.lineWidth = 1.0
+
+        bezierPath.lineWidth = 1.5
         bezierPath.stroke()
         context.addPath(bezierPath.cgPath)
-        
+
         let image = UIGraphicsGetImageFromCurrentImageContext()
         
         UIGraphicsEndImageContext()
@@ -251,6 +259,11 @@ class WordTrisShape {
         return CGPoint(x:x, y:y)
     }
 
+    public func copy()->WordTrisShape {
+        let copy = WordTrisShape(type: myType, parent: parent, blockSize: blockSize, letters: letters)
+
+        return copy
+    }
 }
 
 

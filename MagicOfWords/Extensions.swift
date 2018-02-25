@@ -358,11 +358,23 @@ extension String {
         return self[indexStartOfText...]
     }
 
-    func mySubString(startPos: Int, length: Int) -> String.SubSequence {
+    mutating func subString(startPos: Int, length: Int, remove: Bool) -> String.SubSequence {
         let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
         let indexEndOfText = self.index(self.startIndex, offsetBy: startPos + length)
-        return self[indexStartOfText..<indexEndOfText]
+        let returnString = self[indexStartOfText..<indexEndOfText]
+        if remove {
+            self.removeSubrange(indexStartOfText..<indexEndOfText)
+        }
+        return returnString
     }
+    
+    func subString(startPos: Int, length: Int) -> String.SubSequence {
+        let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
+        let indexEndOfText = self.index(self.startIndex, offsetBy: startPos + length)
+        let returnString = self[indexStartOfText..<indexEndOfText]
+        return returnString
+    }
+
 
     
 }

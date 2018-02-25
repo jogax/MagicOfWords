@@ -17,8 +17,8 @@ func - (left: CGSize, right: CGSize) -> CGSize {
     return CGSize(width: left.width - right.width, height: left.height - right.height)
 }
 
-func * (point: CGSize, scalar: CGFloat) -> CGSize {
-    return CGSize(width: point.width * scalar, height: point.height * scalar)
+func * (size: CGSize, scalar: CGFloat) -> CGSize {
+    return CGSize(width: size.width * scalar, height: size.height * scalar)
 }
 
 func / (point: CGSize, scalar: CGFloat) -> CGSize {
