@@ -22,7 +22,7 @@ class WordTrisScene: SKScene {
     var workingLetters = String()
     var piecesOfWordsToPlay = [String]()
     var grid: Grid?
-    let heightMultiplicator = CGFloat((GV.onIpad ? 0.10 : 0.12))
+    let heightMultiplicator = CGFloat((GV.onIpad ? 0.10 : 0.15))
     var random: MyRandom?
     var ws = [WordTrisShape]()
     var origPosition: [CGPoint] = Array(repeating: CGPoint(x:0, y: 0), count: 3)
@@ -45,6 +45,7 @@ class WordTrisScene: SKScene {
     }
 
     var line = 0
+
     private func createMenuItem(menuInt: TextConstants, firstLine: Bool = false) {
         line = firstLine ? 1 : line + 1
         let menuItem = SKLabelNode(fontNamed: "Noteworthy")// Snell Roundhand")
@@ -100,6 +101,7 @@ class WordTrisScene: SKScene {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
             origSize[index] = ws[index].sprite().size
             ws[index].sprite().position = origPosition[index]
+//            ws[index].sprite().anchorPoint = CGPoint(x: 0.5, y: 0.5)
             ws[index].sprite().name = "Pos\(index )"
             self.addChild(ws[index].sprite())
         }
