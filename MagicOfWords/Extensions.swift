@@ -368,11 +368,11 @@ extension String {
         return returnString
     }
     
-    func subString(startPos: Int, length: Int) -> String.SubSequence {
+    func subString(startPos: Int, length: Int) -> String {
         let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
         let indexEndOfText = self.index(self.startIndex, offsetBy: startPos + length)
         let returnString = self[indexStartOfText..<indexEndOfText]
-        return returnString
+        return String(returnString)
     }
     
     func ends(with: String)->Bool {

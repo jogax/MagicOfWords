@@ -111,13 +111,13 @@ class WordTrisScene: SKScene {
     }
     
     private func generateShape(horizontalPosition: Int)->WordTrisShape {
-//        guard let type = MyShapes(rawValue: random!.getRandomInt(1, max: MyShapes.count - 1)) else {
-//            return WordTrisShape()
-//        }
-        let x = 0
-        guard let type = MyShapes(rawValue: horizontalPosition + x) else {
+        guard let type = MyShapes(rawValue: random!.getRandomInt(1, max: MyShapes.count - 2)) else {
             return WordTrisShape()
         }
+//        let x = 0
+//        guard let type = MyShapes(rawValue: horizontalPosition + x) else {
+//            return WordTrisShape()
+//        }
         blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
 //        let blockSize = self.frame.width / (GV.onIpad ? 18.0 : 15)
         let length = myForms[type]![0].count
@@ -217,13 +217,20 @@ class WordTrisScene: SKScene {
             let fixed = wordTrisGameboard!.fixSpriteOnGameboardIfNecessary(shape: ws[movedIndex])
             if fixed {
                 if movedIndex == ws.count - 1 {
-                    print ("last")
+
                 } else {
                     for index in movedIndex..<ws.count - 1 {
                         ws[index] = ws[index + 1]
-                        ws[index].sprite().name = "Pos \(String(index))"
+                        ws[index].sprite().name = "Pos\(String(index))"
+                        ws[index].sprite().position = origPosition[index]
+                        origSize[index] = ws[index].sprite().size
                     }
                 }
+                ws[ws.count - 1] = generateShape(horizontalPosition: ws.count - 1)
+                ws[ws.count - 1].sprite().position = origPosition[ws.count - 1]
+                ws[ws.count - 1].sprite().name = "Pos\(ws.count - 1)"
+                self.addChild(ws[ws.count - 1].sprite())
+
             } else {
                 ws[movedIndex].sprite().position = origPosition[movedIndex]
                 ws[movedIndex].sprite().scale(to: origSize[movedIndex])
