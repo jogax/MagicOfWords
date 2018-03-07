@@ -32,10 +32,19 @@ class WordTrisScene: SKScene {
     var movedIndex = 0
     var startShape = WordTrisShape()
     let shapeMultiplicator = [CGFloat(0.20), CGFloat(0.50), CGFloat(0.80)]
+    let letterCounts: [Int:[Int]] = [
+        1: [1],
+        2: [11, 2],
+        3: [3, 21, 111],
+        4: [31, 22],
+        5: [32, 221]
+    ]
+    
     
     override func didMove(to view: SKView) {
-       self.name = "WordTrisScene"
-       self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
+        self.name = "WordTrisScene"
+        self.view!.isMultipleTouchEnabled = false
+        self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
 //        createMenuItem(menuInt: .tcPackage, firstLine: true)
         createMenuItem(menuInt: .tcBack)
         showWordsToCollect()
@@ -114,8 +123,9 @@ class WordTrisScene: SKScene {
         guard let type = MyShapes(rawValue: random!.getRandomInt(1, max: MyShapes.count - 2)) else {
             return WordTrisShape()
         }
-//        let x = 0
-//        guard let type = MyShapes(rawValue: horizontalPosition + x) else {
+//        let x = 5
+//        var y = 0
+//        guard let type = MyShapes(rawValue: /*horizontalPosition*/ x) else {
 //            return WordTrisShape()
 //        }
         blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
@@ -136,7 +146,8 @@ class WordTrisScene: SKScene {
                 actLength -= 1
             } while actLength > 0
         } while letters.count < length
-        return WordTrisShape(type: type, parent: self, blockSize: blockSize, letters: letters)
+        let rotateIndex = random!.getRandomInt(0, max: 3)
+        return WordTrisShape(type: type, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
 
     }
     
@@ -161,6 +172,7 @@ class WordTrisScene: SKScene {
                         continue
                     }
                     startShape = ws[index]
+                    wordTrisGameboard!.clear()
                 }
             }
         }
@@ -175,9 +187,13 @@ class WordTrisScene: SKScene {
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
         if moved {
-            ws[movedIndex].sprite().position = touchLocation + CGPoint(x: 0, y: blockSize * 2)
-//            ws[movedIndex].sprite().alpha = 0.1
-            wordTrisGameboard!.showSpriteOnGameboard(shape: ws[movedIndex])
+            let sprite = ws[movedIndex].sprite()
+            sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * 3)
+            sprite.alpha = 0.0
+            sprite.colorBlendFactor = 1
+//            sprite.color = SKColor(red: 204/255, green: 255/255, blue: 255/255, alpha: 1.0)
+//            wordTrisGameboard!.showSpriteOnGameboard(shape: ws[movedIndex])
+            wordTrisGameboard!.moveSpriteOnGameboard(touchLocation: touchLocation)
         } else if nodes.count > 0 {
             for node in nodes {
                 guard let name = node.name else {
@@ -191,9 +207,10 @@ class WordTrisScene: SKScene {
                         continue
                     }
                     let delta = origPosition[index] - touchLocation
-                    if !moved && (abs(delta.x) > 10 || abs(delta.y) > 10 ){
+                    if !moved && (abs(delta.x) > 10 || abs(delta.y) > 10 ) {
                         origSize[index] = ws[index].sprite().size
                         moved = true
+                        wordTrisGameboard!.startShowingSpriteOnGameboard(touchLocation: touchLocation, shape: ws[index])
                         ws[index].changeSize(by: 1.2)
                         movedIndex = index
                         break
@@ -213,23 +230,24 @@ class WordTrisScene: SKScene {
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
+        let lastPosition = ws.count - 1
         if moved {
-            let fixed = wordTrisGameboard!.fixSpriteOnGameboardIfNecessary(shape: ws[movedIndex])
+            let fixed = wordTrisGameboard!.stopShowingSpriteOnGameboard(touchLocation: touchLocation)
             if fixed {
-                if movedIndex == ws.count - 1 {
-
-                } else {
-                    for index in movedIndex..<ws.count - 1 {
+                let fixedName = "Pos\(movedIndex)"
+                removeNodesWith(name: fixedName)
+                if movedIndex < lastPosition {
+                    for index in movedIndex..<lastPosition {
                         ws[index] = ws[index + 1]
                         ws[index].sprite().name = "Pos\(String(index))"
                         ws[index].sprite().position = origPosition[index]
                         origSize[index] = ws[index].sprite().size
                     }
                 }
-                ws[ws.count - 1] = generateShape(horizontalPosition: ws.count - 1)
-                ws[ws.count - 1].sprite().position = origPosition[ws.count - 1]
-                ws[ws.count - 1].sprite().name = "Pos\(ws.count - 1)"
-                self.addChild(ws[ws.count - 1].sprite())
+                ws[lastPosition] = generateShape(horizontalPosition: lastPosition)
+                ws[lastPosition].sprite().position = origPosition[lastPosition]
+                ws[lastPosition].sprite().name = "Pos\(lastPosition)"
+                self.addChild(ws[lastPosition].sprite())
 
             } else {
                 ws[movedIndex].sprite().position = origPosition[movedIndex]
@@ -253,6 +271,13 @@ class WordTrisScene: SKScene {
             }
         }
     }
+    
+    func removeNodesWith(name: String) {
+        while self.childNode(withName: name) != nil {
+            self.childNode(withName: name)!.removeFromParent()
+        }
+    }
+
     
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")

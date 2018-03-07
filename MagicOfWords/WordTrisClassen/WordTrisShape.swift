@@ -10,19 +10,19 @@ import Foundation
 import GameplayKit
 enum MyShapes: Int {
     case
-        Z_Shape_1,
-        Z_Shape_2,
-        L_Shape_1,
-        L_Shape_2,
-        L_Shape_3,
-        L_Shape_4,
-        T_Shape_1,
-        T_Shape_2,
-        O_Shape,
-        I_Shape_1,
-        I_Shape_2,
-        I_Shape_3,
-        I_Shape_4,
+        Z_Shape_1, // 0
+        Z_Shape_2, // 1
+        L_Shape_1, // 2
+        L_Shape_2, // 3
+        L_Shape_3, // 4
+        L_Shape_4, // 5
+        T_Shape_1, // 7
+        T_Shape_2, // 8
+        O_Shape,   // 9
+        I_Shape_1, // 10
+        I_Shape_2, // 11
+        I_Shape_3, // 12
+        I_Shape_4, // 13
         Not_Used
     static var count: Int { return MyShapes.Not_Used.hashValue + 1}
 
@@ -33,19 +33,19 @@ struct LetterCoordinates {
     var row: Int = 0
 }
 let myForms: [MyShapes : [[Int]]] = [
-    .Z_Shape_1 : [[00, 01, 11, 12]], //OK
-    .Z_Shape_2 : [[10, 11, 01, 02]], //OK
-    .L_Shape_1 : [[11, 10, 00]], // OK
-    .L_Shape_2 : [[21, 20, 10, 00]], // OK
-    .L_Shape_3 : [[20, 21, 11, 01]], // OK
-    .L_Shape_4 : [[02, 01, 00, 10, 20]], // OK
-    .T_Shape_1 : [[12, 11, 10, 01]],  //OK
-    .T_Shape_2 : [[22, 21, 20, 11, 01]], //OK
-    .O_Shape   : [[00, 01, 11, 10]], // OK
-    .I_Shape_1 : [[00]], // OK
-    .I_Shape_2 : [[10, 00]],
-    .I_Shape_3 : [[20, 10, 00]],
-    .I_Shape_4 : [[30, 20, 10, 00]]
+    .Z_Shape_1 : [[00, 01, 11, 12], [20, 10, 11, 01], [12, 11, 01, 00], [01, 11, 10, 20]], //OK
+    .Z_Shape_2 : [[10, 11, 01, 02], [21, 11, 10, 00], [02, 01, 11, 10], [00, 10, 11, 21]], //OK
+    .L_Shape_1 : [[00, 01, 11], [10, 00, 01], [11, 10, 00], [01, 11, 10]], // OK
+    .L_Shape_2 : [[21, 20, 10, 00], [02, 12, 11, 10], [00, 01, 11, 21], [10, 00, 01, 02]], // OK
+    .L_Shape_3 : [[20, 21, 11, 01], [12, 02, 01, 00], [01, 00, 10, 20], [00, 10, 11, 12]], // OK
+    .L_Shape_4 : [[20, 10, 00, 01, 02], [22, 21, 20, 10, 00], [02, 12, 22, 21, 20], [00, 01, 02, 12, 22]], // OK
+    .T_Shape_1 : [[12, 11, 10, 01], [01, 11, 21, 10], [00, 01, 02, 11], [20, 10, 00, 11]],  // OK
+    .T_Shape_2 : [[22, 21, 20, 11, 01], [02, 12, 22, 11, 10], [00, 01, 02, 11, 21], [20, 10, 00, 11, 12]], // OK
+    .O_Shape   : [[00, 01, 11, 10], [10, 00, 01, 11], [11, 10, 00, 01], [01, 11, 10, 00]], // OK
+    .I_Shape_1 : [[00], [00], [00], [00]], // OK
+    .I_Shape_2 : [[00, 10], [00, 01], [10, 00], [01, 00]], // OK
+    .I_Shape_3 : [[00, 10, 20], [00, 01, 02], [20, 10, 00], [02, 01, 00]], // OK
+    .I_Shape_4 : [[00, 10, 20, 30], [00, 01, 02, 03], [30, 20, 10, 00], [03, 02, 01, 00]] // OK
 ]
 
 
@@ -75,11 +75,12 @@ class WordTrisShape {
 //        self.myShape = SKSpriteNode()
 
     }
-    init(type: MyShapes, parent: SKScene, blockSize: CGFloat, letters: [String]) {
+    init(type: MyShapes, rotateIndex: Int, parent: SKScene, blockSize: CGFloat, letters: [String]) {
         self.parent = parent
         self.blockSize = blockSize
         self.letters = letters
         self.myType = type
+        self.rotateIndex = rotateIndex
         self.mySprite = SKSpriteNode()
         mySprite.size = calculateSize()
         addLettersToPositions()
@@ -139,34 +140,19 @@ class WordTrisShape {
     }
     
     public func rotate() {
-        var moveLetterAction: SKAction?
         rotateIndex = (rotateIndex + 1) % 4
-        let corr = parent.frame.width / 65
-        let vectors: [CGVector] = [CGVector(dx: 0, dy: 0), // this is not used, because the orig Value will be set
-                                   CGVector(dx: 1.5 * corr, dy: 1.0 * corr),
-                                   CGVector(dx:-1.0 * corr, dy: 1.3 * corr),
-                                   CGVector(dx: -1.5 * corr, dy: -1.8 * corr)]
         let rotateAction = SKAction.rotate(byAngle: -90 * GV.oneGrad, duration: 0.1)
-        let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
 //        mySprite.anchorPoint = CGPoint(x: 0.1, y: 0.1)
         mySprite.run(rotateAction)
 //        addLettersToPositions()
         let form = myForms[myType]
-        for index in 0..<form!.count {
+        for index in 0..<form![rotateIndex].count {
             let searchName = "label\(index)"
             guard let child = mySprite.childNode(withName: searchName) else {
                 continue
             }
-            if rotateIndex == 1 {
-                origPosition[index] = child.position
-            }
-            
-            if rotateIndex == 0 {
-                moveLetterAction = SKAction.move(to: origPosition[index], duration: 0.1)
-            } else {
-                moveLetterAction = SKAction.move(by: vectors[rotateIndex], duration: 0.1)
-            }
-            child.run(SKAction.group([moveLetterAction!, rotateLetterAction]))
+            let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
+            child.run(rotateLetterAction)
          }
 
     }
@@ -194,9 +180,13 @@ class WordTrisShape {
     }
 
     public func copy()->WordTrisShape {
-        let copy = WordTrisShape(type: myType, parent: parent, blockSize: blockSize, letters: letters)
+        let copy = WordTrisShape(type: myType, rotateIndex: rotateIndex, parent: parent, blockSize: blockSize, letters: letters)
         return copy
     }
+    deinit {
+        print("\n WordtrisShape \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
+    }
+
 }
 
 

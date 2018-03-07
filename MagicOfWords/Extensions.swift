@@ -561,6 +561,16 @@ extension UIBezierPath {
     
 }
 
+extension CGPoint {
+    func length() -> CGFloat {
+        return sqrt(x*x + y*y)
+    }
+    
+    func normalized() -> CGPoint {
+        return self / length()
+    }
+}
+
 //extension GCHelper {
 //    
 //    /// CommandFormat:
