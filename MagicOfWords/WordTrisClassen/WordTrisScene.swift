@@ -21,6 +21,7 @@ class WordTrisScene: SKScene {
     var allWords = String()
     var workingLetters = String()
     var piecesOfWordsToPlay = [String]()
+    var playingWords = [String]()
     var grid: Grid?
     let heightMultiplicator = CGFloat((GV.onIpad ? 0.10 : 0.15))
     var blockSize: CGFloat = 0
@@ -76,6 +77,7 @@ class WordTrisScene: SKScene {
         createLabel(word: GV.language.getText(.tcWordsToCollect), counter: 0)
         var counter = 1
         for wordRecord in wordsToPlay {
+            playingWords.append(wordRecord.word.uppercased())
             createLabel(word: wordRecord.word.uppercased(), counter: counter)
             counter += 1
         }
@@ -232,7 +234,7 @@ class WordTrisScene: SKScene {
         let nodes = self.nodes(at: touchLocation)
         let lastPosition = ws.count - 1
         if moved {
-            let fixed = wordTrisGameboard!.stopShowingSpriteOnGameboard(touchLocation: touchLocation)
+            let fixed = wordTrisGameboard!.stopShowingSpriteOnGameboard(touchLocation: touchLocation, wordsToCheck: playingWords)
             if fixed {
                 let fixedName = "Pos\(movedIndex)"
                 removeNodesWith(name: fixedName)

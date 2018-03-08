@@ -10,14 +10,15 @@ import Foundation
 import GameplayKit
 
 enum ItemStatus: Int {
-    case empty = 0, temporary, used
+    case empty = 0, temporary, used, wholeWord
 }
 class WordTrisGameboardItem: SKSpriteNode {
     public var status: ItemStatus = .empty
+    private var origLetter: String = ""
+    private var origColor: SKColor = .white
     private var doubleUsed = false
     private var blockSize:CGFloat = 0
     private var label: SKLabelNode
-    private var origLetter: String = ""
     public var letter = ""
     private var usedColor = SKColor(red:255/255, green: 153/255, blue: 153/255, alpha: 1)
     init(blockSize: CGFloat, fontSize: CGFloat) {
@@ -36,24 +37,32 @@ class WordTrisGameboardItem: SKSpriteNode {
     }
     
     public func setLetter(letter: String, status: ItemStatus, color: SKColor)->Bool {
-        if self.status != .used {
-            self.colorBlendFactor = 1
-            label.text = letter
-            self.letter = letter
-            self.status = status
-            self.color = color
-            return true
-        } else {
+        switch self.status {
+        case .used, .wholeWord:
+            self.origColor = self.color
             self.color = .red
             self.origLetter = label.text!
             label.text = letter
             self.letter = letter
             doubleUsed = true
             return false
+        default:
+            self.colorBlendFactor = 1
+            label.text = letter
+            self.letter = letter
+            self.status = status
+            self.color = color
+            return true
+
         }
     }
     public func setRedColor() {
         self.color = .red
+    }
+    
+    public func setFoundedWord() {
+        self.color = .green
+        self.status = .wholeWord
     }
     
     public func clearIfTemporary() {
@@ -62,10 +71,10 @@ class WordTrisGameboardItem: SKSpriteNode {
             self.letter = ""
             self.status = .empty
             self.color = .white
-        } else if status == .used && doubleUsed {
+        } else if (status == .used || status == .wholeWord) && doubleUsed {
             label.text = self.origLetter
             self.letter = self.origLetter
-            self.color = usedColor
+            self.color = self.origColor
             self.doubleUsed = false
         }
     }
@@ -74,9 +83,9 @@ class WordTrisGameboardItem: SKSpriteNode {
         if status == .temporary {
             self.status = .used
             self.color = usedColor
-        } else if status == .used && doubleUsed {
+        } else if (status == .used || status == .wholeWord) && doubleUsed {
             label.text = self.origLetter
-            self.color = usedColor
+            self.color = self.origColor
             doubleUsed = false
         }
     }
