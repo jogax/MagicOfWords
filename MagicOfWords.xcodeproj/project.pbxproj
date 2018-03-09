@@ -29,6 +29,7 @@
 		201FB1E7202891C900EC9F36 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E5202891C900EC9F36 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
 		204A8ADA2029EE6000E9C11F /* WordTrisScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WordTrisScene.swift */; };
+		20531F6C20518C8400B3F097 /* SaveGameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20531F6B20518C8400B3F097 /* SaveGameModel.swift */; };
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
 		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */; };
@@ -87,6 +88,7 @@
 		201FB1E5202891C900EC9F36 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
 		204A8AD92029EE6000E9C11F /* WordTrisScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTrisScene.swift; sourceTree = "<group>"; };
+		20531F6B20518C8400B3F097 /* SaveGameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveGameModel.swift; sourceTree = "<group>"; };
 		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2057BA292029F591000DF337 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePackageScene.swift; sourceTree = "<group>"; };
@@ -198,6 +200,7 @@
 				20842DE52031EA910078FFDA /* ruWords.txt */,
 				20819321202B484D00406D9A /* gameData.txt */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
+				20531F6B20518C8400B3F097 /* SaveGameModel.swift */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -315,6 +318,7 @@
 				2087AC0E202C86FF008DEF26 /* LoadingScene.swift in Sources */,
 				201FB1DF20288CEA00EC9F36 /* de.swift in Sources */,
 				201FB1DC20288CEA00EC9F36 /* GameTypeScene.swift in Sources */,
+				20531F6C20518C8400B3F097 /* SaveGameModel.swift in Sources */,
 				20819320202B472900406D9A /* GameDataModel.swift in Sources */,
 				201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */,
 				201FB1E020288CEA00EC9F36 /* Language.swift in Sources */,

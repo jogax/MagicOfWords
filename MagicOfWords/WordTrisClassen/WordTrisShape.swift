@@ -23,8 +23,8 @@ enum MyShapes: Int {
         I_Shape_2, // 11
         I_Shape_3, // 12
         I_Shape_4, // 13
-        Not_Used
-    static var count: Int { return MyShapes.Not_Used.hashValue + 1}
+        NotUsed
+    static var count: Int { return MyShapes.NotUsed.hashValue + 1}
 
 }
 struct LetterCoordinates {
@@ -70,7 +70,7 @@ class WordTrisShape {
         self.parent = SKScene()
         self.blockSize = 0
         self.letters = []
-        self.myType = MyShapes.Not_Used
+        self.myType = MyShapes.NotUsed
         self.mySprite = SKSpriteNode()
 //        self.myShape = SKSpriteNode()
 

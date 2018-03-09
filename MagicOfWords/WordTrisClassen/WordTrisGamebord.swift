@@ -237,16 +237,15 @@ class WordTrisGameboard: SKShapeNode {
         }
     }
     var OKPositions = [(col: Int, row: Int)]()
+    
     private func flyOverWord(compare: String, col: Int, row: Int, fromCol: Int, fromRow: Int, withWord: String)->Bool {
-        var myWord = compare
-        if withWord == "HAJHAB" {
-            print("\(myWord)")
-        }
+        let myWord = compare
+        var returnBool = false
         if myWord.count == withWord.count {
-            print("myWord: \(myWord)")
             if myWord != withWord {
                 return false
             } else {
+                print("myWord: \(myWord)")
                 OKPositions.append((col:col, row: row))
                 return true
             }
@@ -257,7 +256,7 @@ class WordTrisGameboard: SKShapeNode {
                 if new != "" {
                     if flyOverWord(compare: myWord + new, col: col - 1, row: row, fromCol: col, fromRow: row, withWord: withWord) {
                         OKPositions.append((col:col, row: row))
-                        return true
+                        returnBool = true
                     }
                 }
             }
@@ -266,7 +265,7 @@ class WordTrisGameboard: SKShapeNode {
                 if new != "" {
                     if flyOverWord(compare: myWord + new, col: col + 1, row: row, fromCol: col, fromRow: row, withWord: withWord) {
                         OKPositions.append((col:col, row: row))
-                        return true
+                        returnBool = true
                     }
                 }
             }
@@ -275,7 +274,7 @@ class WordTrisGameboard: SKShapeNode {
                 if new != "" {
                     if flyOverWord(compare: myWord + new, col: col, row: row - 1, fromCol: col, fromRow: row, withWord: withWord) {
                         OKPositions.append((col:col, row: row))
-                        return true
+                        returnBool = true
                     }
                 }
             }
@@ -284,12 +283,12 @@ class WordTrisGameboard: SKShapeNode {
                 if new != "" {
                     if flyOverWord(compare: myWord + new, col: col, row: row + 1, fromCol: col, fromRow: row, withWord: withWord) {
                         OKPositions.append((col:col, row: row))
-                        return true
+                        returnBool = true
                     }
                 }
             }
         }
-        return false
+        return returnBool
     }
     
     private func getLetter(col: Int, row: Int)->String {
