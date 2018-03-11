@@ -27,7 +27,7 @@ class WordTrisGameboard: SKShapeNode {
     let blockSize: CGFloat?
     let tileColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha: 1.0)
     var gameArray: [[WordTrisGameboardItem]]?
-    var shape: WordTrisShape?
+    var shape: WordTrisShape = WordTrisShape()
     private var lastCol: Int = 0
     private var lastRow: Int = 0
     private var startCol: Int = 0
@@ -35,10 +35,10 @@ class WordTrisGameboard: SKShapeNode {
     private var startLocation = CGPoint(x: 0, y: 0)
     private var usedItems = [UsedItems]()
     private var usedItemsOK = true
-    private var origArrayCol: Int = 0
-    private var origArrayRow: Int = 9
-    private var oldRowChange: Int = 0
-    private var oldColChange: Int = 0
+//    private var origArrayCol: Int = 0
+//    private var origArrayRow: Int = 9
+//    private var oldRowChange: Int = 0
+//    private var oldColChange: Int = 0
     private var wordsToCheck = [String]()
 
     init(size: Int, parentScene: SKScene) {
@@ -58,8 +58,31 @@ class WordTrisGameboard: SKShapeNode {
             }
         }
         parentScene.addChild(self)
+        generateNetOfColsAndRows()
     }
     
+    private func generateNetOfColsAndRows() {
+        for col in 0..<size {
+            let colSprite = SKSpriteNode()
+            colSprite.position = grid!.gridPosition(col: col, row: 0) + CGPoint(x: grid!.frame.midX, y: grid!.frame.minY)
+            colSprite.size = CGSize(width: blockSize!, height: parentScene.frame.height)
+//            if col % 2 == 1 {
+//                colSprite.color = .yellow
+//            }
+            colSprite.name = "Row\(col)"
+            parentScene.addChild(colSprite)
+        }
+        for row in 0..<size {
+            let rowSprite = SKSpriteNode()
+            rowSprite.position = CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row)  - CGPoint(x: 0, y: 2.5 * blockSize!)
+            rowSprite.size = CGSize(width: parentScene.frame.width * 1.1, height: blockSize!)
+//            if row % 2 == 1 {
+//                rowSprite.color = .green
+//            }
+            rowSprite.name = "Col\(size - 1 - row)"
+            parentScene.addChild(rowSprite)
+        }
+    }
     private func createNewGameArray(size: Int) -> [[WordTrisGameboardItem]] {
         var gameArray: [[WordTrisGameboardItem]] = []
         
@@ -101,9 +124,13 @@ class WordTrisGameboard: SKShapeNode {
     }
     
     
-    public func startShowingSpriteOnGameboard(touchLocation: CGPoint, shape: WordTrisShape) {
+    public func startShowingSpriteOnGameboard(shape: WordTrisShape, col: Int, row: Int) {
+        if col < 0 || row < 0 {
+            return
+        }
+        
         self.shape = shape
-        startLocation = touchLocation //+ CGPoint(x: 0, y: shape.sprite().frame.height)
+//        startLocation = touchLocation //+ CGPoint(x: 0, y: shape.sprite().frame.height)
         var colDistance: CGFloat = 10000
         var searchPosition: CGPoint
         var actCol = 0
@@ -117,8 +144,9 @@ class WordTrisGameboard: SKShapeNode {
                 break
             }
         }
-        origArrayCol = actCol
-        origArrayRow = 9
+//        origArrayCol = actCol
+//        origArrayCol = col
+//        origArrayRow = row
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
         var maxX = 0
         var maxY = 0
@@ -130,10 +158,10 @@ class WordTrisGameboard: SKShapeNode {
         }
         var adder = 0
         for index in 0..<shape.sprite().children.count {
-            if origArrayCol + formOfShape[index] % 10 > size - 1 {
+            if col + formOfShape[index] % 10 > size - 1 {
                 adder += 1
             }
-            if origArrayCol + formOfShape[index] % 10  < 0 {
+            if row + formOfShape[index] % 10  < 0 {
                 adder -= 1
             }
         }
@@ -141,67 +169,63 @@ class WordTrisGameboard: SKShapeNode {
             let letter = shape.letters[index]
             let itemRow = formOfShape[index] / 10
             let itemCol = formOfShape[index] % 10
-            let calculatedCol = origArrayCol + itemCol - adder
-            let calculatedRow = origArrayRow - itemRow
+            let calculatedCol = col + itemCol - adder
+            let calculatedRow = row - itemRow
             gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, color: tileColor)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: gameArray![calculatedCol][calculatedRow])
             usedItems.append(usedItem)
         }
     }
     
-    public func moveSpriteOnGameboard(touchLocation: CGPoint) {
-        let myLocation = touchLocation // + CGPoint(x: 0, y: shape!.sprite().frame.height)
-//        if ( myLocation.y - grid!.frame.minY ) > 0 {
-            let distance = startLocation - myLocation
-            let colChange = Int(distance.x / blockSize!)
-            let rowChange = Int(distance.y / blockSize!)
-            if oldColChange != colChange || oldRowChange != rowChange {
-                let colDelta = oldColChange - colChange
-                let rowDelta = oldRowChange - rowChange
-                oldColChange = colChange
-                oldRowChange = rowChange
-                var OK = true
-                for index in 0..<usedItems.count {
-                    var item = usedItems[index]
-                    item.row -= rowDelta
-                    item.col += colDelta
-                    if item.col < 0 || item.col > size - 1 || item.row > size - 1 || item.row < 0 {
-                        OK = false
-                    }
-                }
-                if OK {
-                    for index in 0..<usedItems.count {
-                        usedItems[index].item!.clearIfTemporary()
-                    }
-                    var setToRed = false
-                    for index in 0..<usedItems.count {
-                        usedItems[index].row -= rowDelta
-                        usedItems[index].col += colDelta
-                        let row = usedItems[index].row
-                        let col = usedItems[index].col
-                        let letter = shape!.letters[index]
-                        if !gameArray![col][row].setLetter(letter: letter, status: .temporary, color: tileColor) {
-                            setToRed = true
-                        }
-                        usedItems[index].item = gameArray![col][row]
-                    }
-                    if setToRed {
-                        for index in 0..<usedItems.count {
-                            usedItems[index].item!.setRedColor()
-                        }
-                    }
-                }
+    public func moveSpriteOnGameboard(col: Int, row: Int) -> Bool {
+        let formOfShape = myForms[shape.myType]![shape.rotateIndex]
+        var maxCol = 0
+        var maxRow = 0
+        for actItem in formOfShape {
+            let actCol = actItem % 10
+            let actRow = actItem / 10
+            maxCol = maxCol < actCol ? actCol : maxCol
+            maxRow = maxRow < actRow ? actRow : maxRow
+        }
+
+        if row == size {
+            for index in 0..<usedItems.count {
+                usedItems[index].item!.clearIfTemporary()
             }
-//        } else {
-//            for index in 0..<usedItems.count {
-//                usedItems[index].item!.clearIfTemporary()
-//            }
-//        }
+            return true
+        }
+        if col < 0 || col + maxCol >= size || row - maxRow  < 0 { // left || right || up
+            return false
+        }
+        var adder = 0
+        for index in 0..<shape.sprite().children.count {
+            if col + formOfShape[index] % 10 > size - 1 {
+                adder += 1
+            }
+            if col + formOfShape[index] % 10  < 0 {
+                adder -= 1
+            }
+        }
+        
+        for index in 0..<usedItems.count {
+            usedItems[index].item!.clearIfTemporary()
+        }
+
+        for index in 0..<shape.sprite().children.count {
+            let letter = shape.letters[index]
+            let itemRow = formOfShape[index] / 10
+            let itemCol = formOfShape[index] % 10
+            let calculatedCol = col + itemCol - adder
+            let calculatedRow = row - itemRow
+            gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, color: tileColor)
+            let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: gameArray![calculatedCol][calculatedRow])
+            usedItems.append(usedItem)
+        }
+        return false
     }
-    
     public func stopShowingSpriteOnGameboard(touchLocation: CGPoint, wordsToCheck: [String])->Bool {
         self.wordsToCheck = wordsToCheck
-        if touchLocation.y + shape!.sprite().frame.height - grid!.frame.minY < 0 {
+        if touchLocation.y + shape.sprite().frame.height - grid!.frame.minY < 0 {
             for index in 0..<usedItems.count {
                 usedItems[index].item!.clearIfTemporary()
             }

@@ -37,8 +37,10 @@ class WordTrisScene: SKScene {
     var origSize: [CGSize] = Array(repeating: CGSize(width:0, height: 0), count: 3)
     var moved = false
     var movedIndex = 0
-    var startShape = WordTrisShape()
+    var lastOKRow = -1
+    var startShapeIndex = 0
     let shapeMultiplicator = [CGFloat(0.20), CGFloat(0.50), CGFloat(0.80)]
+    let sizeOfGrid = 10
     let letterCounts: [Int:[Int]] = [
         1: [1],
         2: [11, 2],
@@ -109,7 +111,7 @@ class WordTrisScene: SKScene {
         indexOfTilesForGame = 0
 
         ws = Array(repeating: WordTrisShape(), count: 3)
-        wordTrisGameboard = WordTrisGameboard(size: 10, parentScene: self)
+        wordTrisGameboard = WordTrisGameboard(size: sizeOfGrid, parentScene: self)
         for record in wordsToPlay {
             allWords += record.word.uppercased()
         }
@@ -174,11 +176,10 @@ class WordTrisScene: SKScene {
             default: break
             }
         }
-        let lengths = [1,1,1,1,1,1,2,2,3,3,3,3,3,3,4,4,4,4,4,5,5,1,1]
+        let lengths = [1,1,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,1,1]
         var generateLength = 0
         repeat {
             let tileLength = lengths[random!.getRandomInt(0, max: lengths.count - 1)]
-            print("tileLength: \(tileLength)")
             var tileType = MyShapes.NotUsed
             var letters = [String]()
             switch tileLength {
@@ -208,35 +209,7 @@ class WordTrisScene: SKScene {
     }
     
     private func generateShape(horizontalPosition: Int)->WordTrisShape {
-//        guard let type = MyShapes(rawValue: random!.getRandomInt(1, max: MyShapes.count - 2)) else {
-//            return WordTrisShape()
-//        }
-//        let x = 5
-//        var y = 0
-//        guard let type = MyShapes(rawValue: /*horizontalPosition*/ x) else {
-//            return WordTrisShape()
-//        }
         blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
-//        let blockSize = self.frame.width / (GV.onIpad ? 18.0 : 15)
-//        let length = myForms[type]![0].count
-        
-//        var letters = [String]()
-//        repeat {
-//            if workingLetters.count == 0 {
-//                workingLetters = allWords
-//            }
-//            let actPos = random!.getRandomInt(0, max: workingLetters.count - 1)
-//            let actMaxValue = workingLetters.count - actPos < 3 ? workingLetters.count - actPos : 3
-//            let calculatedLength = random!.getRandomInt(1, max: actMaxValue)
-//            var actLength = calculatedLength > length - letters.count ? length - letters.count : calculatedLength
-//            repeat {
-//                letters.append(String(workingLetters.subString(startPos: actPos, length: 1, remove: true)))
-////                actPos += 1
-//                actLength -= 1
-//            } while actLength > 0
-//        } while letters.count < length
-//        let rotateIndex = random!.getRandomInt(0, max: 3)
-//        return WordTrisShape(type: type, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
         let tileForGame = tilesForGame[indexOfTilesForGame]
         indexOfTilesForGame += 1
         indexOfTilesForGame = indexOfTilesForGame >= tilesForGame.count ? 0 : indexOfTilesForGame
@@ -248,7 +221,6 @@ class WordTrisScene: SKScene {
                 letters.append(String(letter))
             }
         }
-//        let letters = tilesForGame[indexOfTilesForGame].letters
         return WordTrisShape(type: type, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
 
     }
@@ -261,6 +233,7 @@ class WordTrisScene: SKScene {
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
+        
         if nodes.count > 0 {
             for node in nodes {
                 guard let name = node.name else {
@@ -273,7 +246,7 @@ class WordTrisScene: SKScene {
                     guard let index = Int(name.subString(startPos:3, length:1)) else {
                         continue
                     }
-                    startShape = ws[index]
+                    startShapeIndex = index
                     wordTrisGameboard!.clear()
                 }
             }
@@ -288,6 +261,7 @@ class WordTrisScene: SKScene {
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
+        let (row, col, shapeIndex, goBack) = analyzeNodes(nodes: nodes)
         if moved {
             let sprite = ws[movedIndex].sprite()
             sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * 3)
@@ -295,35 +269,56 @@ class WordTrisScene: SKScene {
             sprite.colorBlendFactor = 1
 //            sprite.color = SKColor(red: 204/255, green: 255/255, blue: 255/255, alpha: 1.0)
 //            wordTrisGameboard!.showSpriteOnGameboard(shape: ws[movedIndex])
-            wordTrisGameboard!.moveSpriteOnGameboard(touchLocation: touchLocation)
-        } else if nodes.count > 0 {
-            for node in nodes {
-                guard let name = node.name else {
-                    continue
-                }
-                if name == String(TextConstants.tcBack.rawValue) {
-                    continue
-                }
-                if name.subString(startPos:0, length: 3) == "Pos" && startShape.sprite().name == name {
-                    guard let index = Int(name.subString(startPos:3, length:1)) else {
-                        continue
-                    }
-                    let delta = origPosition[index] - touchLocation
-                    if !moved && (abs(delta.x) > 10 || abs(delta.y) > 10 ) {
-                        origSize[index] = ws[index].sprite().size
-                        moved = true
-                        wordTrisGameboard!.startShowingSpriteOnGameboard(touchLocation: touchLocation, shape: ws[index])
-                        ws[index].changeSize(by: 1.2)
-                        movedIndex = index
-                        break
-                    }
+            let calculatedRow = row >= 0 ? row : lastOKRow == 9 ? 10 : row
+            print("lastOKRow: \(lastOKRow), row: \(row), calculatedRow: \(calculatedRow)")
+            if wordTrisGameboard!.moveSpriteOnGameboard(col: col, row: calculatedRow) {  // true says moving finished
+                if lastOKRow == sizeOfGrid - 1 { // when at bottom
+                    sprite.alpha = 1.0
                 }
             }
+            if row >= 0 {
+                lastOKRow = row
+            }
+
+        } else {
+            if shapeIndex >= 0 {
+                ws[shapeIndex].sprite().position = touchLocation
+            }
+            if row >= 0 {
+//                origSize[shapeindex] = ws[index].sprite().size
+                moved = true
+                lastOKRow = row
+                if shapeIndex >= 0 {
+                    wordTrisGameboard!.startShowingSpriteOnGameboard(shape: ws[shapeIndex], col: col, row: row)
+                    movedIndex = shapeIndex
+                }
+            } else {
+//                ws[shapeIndex].sprite().position = touchLocation
+                print("in touchesMoved else zweig: col: \(col), row: \(row)")
+            }
         }
-        
+    
     }
 
-    
+    private func analyzeNodes(nodes: [SKNode])->(col: Int, row: Int, shapeIndex: Int, goBack: Bool) {
+        var values = (col: -1, row: -1, shapeIndex: -1, goBack: false)
+        for node in nodes {
+            guard let name = node.name else {
+                continue
+            }
+            guard let number = Int(name.subString(startPos: 3, length: 1)) else {
+                continue
+            }
+            switch name.subString(startPos: 0, length: 3) {
+            case "Col": values.col = number
+            case "Row": values.row = number
+            case "Pos": values.shapeIndex = number
+            case String(TextConstants.tcBack.rawValue): values.goBack = true
+            default: continue
+            }
+        }
+        return values
+    }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if wordTrisSceneDelegate == nil {
