@@ -37,7 +37,6 @@ class WordTrisScene: SKScene {
     var origSize: [CGSize] = Array(repeating: CGSize(width:0, height: 0), count: 3)
     var moved = false
     var movedIndex = 0
-    var lastOKRow = -1
     var startShapeIndex = 0
     let shapeMultiplicator = [CGFloat(0.20), CGFloat(0.50), CGFloat(0.80)]
     let sizeOfGrid = 10
@@ -233,23 +232,10 @@ class WordTrisScene: SKScene {
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
-        
-        if nodes.count > 0 {
-            for node in nodes {
-                guard let name = node.name else {
-                    continue
-                }
-                if name == String(TextConstants.tcBack.rawValue) {
-                    continue
-                }
-                if name.subString(startPos:0, length: 3) == "Pos" {
-                    guard let index = Int(name.subString(startPos:3, length:1)) else {
-                        continue
-                    }
-                    startShapeIndex = index
-                    wordTrisGameboard!.clear()
-                }
-            }
+        let (row, col, shapeIndex, goBack) = analyzeNodes(nodes: nodes)
+        if shapeIndex > -1 {
+            startShapeIndex = shapeIndex
+            wordTrisGameboard!.clear()
         }
 
     }
@@ -264,38 +250,26 @@ class WordTrisScene: SKScene {
         let (row, col, shapeIndex, goBack) = analyzeNodes(nodes: nodes)
         if moved {
             let sprite = ws[movedIndex].sprite()
-            sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * 3)
+            sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * 2.5)
             sprite.alpha = 0.0
-            sprite.colorBlendFactor = 1
-//            sprite.color = SKColor(red: 204/255, green: 255/255, blue: 255/255, alpha: 1.0)
-//            wordTrisGameboard!.showSpriteOnGameboard(shape: ws[movedIndex])
-            let calculatedRow = row >= 0 ? row : lastOKRow == 9 ? 10 : row
-            print("lastOKRow: \(lastOKRow), row: \(row), calculatedRow: \(calculatedRow)")
-            if wordTrisGameboard!.moveSpriteOnGameboard(col: col, row: calculatedRow) {  // true says moving finished
-                if lastOKRow == sizeOfGrid - 1 { // when at bottom
+            if wordTrisGameboard!.moveSpriteOnGameboard(col: col, row: row) {  // true says moving finished
+                if row == sizeOfGrid { // when at bottom
                     sprite.alpha = 1.0
                 }
-            }
-            if row >= 0 {
-                lastOKRow = row
             }
 
         } else {
             if shapeIndex >= 0 {
                 ws[shapeIndex].sprite().position = touchLocation
             }
-            if row >= 0 {
+            if row >= 0 && row < 10 {
 //                origSize[shapeindex] = ws[index].sprite().size
-                moved = true
-                lastOKRow = row
+//                moved = true
                 if shapeIndex >= 0 {
-                    wordTrisGameboard!.startShowingSpriteOnGameboard(shape: ws[shapeIndex], col: col, row: row)
+                    moved = wordTrisGameboard!.startShowingSpriteOnGameboard(shape: ws[shapeIndex], col: col, row: row)
                     movedIndex = shapeIndex
                 }
-            } else {
-//                ws[shapeIndex].sprite().position = touchLocation
-                print("in touchesMoved else zweig: col: \(col), row: \(row)")
-            }
+            } 
         }
     
     }
@@ -306,14 +280,17 @@ class WordTrisScene: SKScene {
             guard let name = node.name else {
                 continue
             }
-            guard let number = Int(name.subString(startPos: 3, length: 1)) else {
+            if name == String(TextConstants.tcBack.rawValue) {
+                values.goBack = true
+                return values
+            }
+            guard let number = Int(name.subString(startPos: 3, length: name.count - 3)) else {
                 continue
             }
             switch name.subString(startPos: 0, length: 3) {
             case "Col": values.col = number
             case "Row": values.row = number
             case "Pos": values.shapeIndex = number
-            case String(TextConstants.tcBack.rawValue): values.goBack = true
             default: continue
             }
         }
@@ -328,8 +305,9 @@ class WordTrisScene: SKScene {
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
         let lastPosition = ws.count - 1
+        let (row, col, shapeIndex, goBack) = analyzeNodes(nodes: nodes)
         if moved {
-            let fixed = wordTrisGameboard!.stopShowingSpriteOnGameboard(touchLocation: touchLocation, wordsToCheck: playingWords)
+            let fixed = wordTrisGameboard!.stopShowingSpriteOnGameboard(col: col, row: row, wordsToCheck: playingWords)
             if fixed {
                 let fixedName = "Pos\(movedIndex)"
                 removeNodesWith(name: fixedName)
@@ -348,7 +326,7 @@ class WordTrisScene: SKScene {
 
             } else {
                 ws[movedIndex].sprite().position = origPosition[movedIndex]
-                ws[movedIndex].sprite().scale(to: origSize[movedIndex])
+//                ws[movedIndex].sprite().scale(to: origSize[movedIndex])
                 ws[movedIndex].sprite().alpha = 1
             }
             moved = false
