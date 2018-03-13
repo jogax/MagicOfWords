@@ -141,35 +141,26 @@ class WordTrisGameboard: SKShapeNode {
     
     
     public func startShowingSpriteOnGameboard(shape: WordTrisShape, col: Int, row: Int)->Bool {
-        if col < 0 && row < 0 {
-            return false
-        }
+//        if col < 0 && row < 0 {
+//            return false
+//        }
         
         self.shape = shape
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
-        var maxX = 0
-        var maxY = 0
-        for actItem in formOfShape {
-            let actX = actItem % 10
-            let actY = actItem / 10
-            maxX = maxX < actX ? actX : maxX
-            maxY = maxY < actY ? actY : maxY
-        }
-        var adder = 0
-        for index in 0..<shape.sprite().children.count {
-            if col + formOfShape[index] / 10 > size - 1 {
-                adder += 1
+        let (myCol, myRow) = analyseColAndRow(col: col, row: row, formOfShape: formOfShape)
+        if myRow == size {
+            for index in 0..<usedItems.count {
+                usedItems[index].item!.clearIfTemporary()
             }
-            if row + formOfShape[index] % 10  < 0 {
-                adder -= 1
-            }
+            return true
         }
+
        for index in 0..<shape.sprite().children.count {
             let letter = shape.letters[index]
             let itemRow = formOfShape[index] / 10
             let itemCol = formOfShape[index] % 10
-            let calculatedCol = col + itemCol - adder
-            let calculatedRow = row - itemRow
+            let calculatedCol = myCol + itemCol //- colAdder
+            let calculatedRow = myRow - itemRow //- rowAdder
             if calculatedRow < 0 {return false}
             gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, color: tileColor)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: gameArray![calculatedCol][calculatedRow])
@@ -180,19 +171,7 @@ class WordTrisGameboard: SKShapeNode {
     
     public func moveSpriteOnGameboard(col: Int, row: Int) -> Bool {
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
-        var myRow = row
-        var myCol = col
-        var maxCol = 0
-        var maxRow = 0
-        if myCol == 4 {
-            print("myRow: \(myRow)")
-        }
-        for actItem in formOfShape {
-            let actCol = actItem % 10
-            let actRow = actItem / 10
-            maxCol = maxCol < actCol ? actCol : maxCol
-            maxRow = maxRow < actRow ? actRow : maxRow
-        }
+        let (myCol, myRow) = analyseColAndRow(col: col, row: row, formOfShape: formOfShape)
 
         if myRow == size {
             for index in 0..<usedItems.count {
@@ -200,17 +179,7 @@ class WordTrisGameboard: SKShapeNode {
             }
             return true
         }
-        if myRow < maxRow {
-            myRow = maxRow
-        }
         
-        if myCol + maxCol > size - 1 {
-            myCol = size - maxCol - 1
-        }
-        
-        if myCol < maxCol {
-            myCol = maxCol - 1
-        }
         for index in 0..<usedItems.count {
             usedItems[index].item!.clearIfTemporary()
         }
@@ -226,6 +195,32 @@ class WordTrisGameboard: SKShapeNode {
             usedItems.append(usedItem)
         }
         return false
+    }
+    
+    private func analyseColAndRow(col: Int, row: Int, formOfShape: [Int])->(Int, Int) {
+        var maxCol = 0
+        var maxRow = 0
+        var myCol = col
+        var myRow = row
+        for actItem in formOfShape {
+            let actCol = actItem % 10
+            let actRow = actItem / 10
+            maxCol = maxCol < actCol ? actCol : maxCol
+            maxRow = maxRow < actRow ? actRow : maxRow
+        }
+        if myRow < maxRow {
+            myRow = maxRow
+        }
+        
+        if myCol + maxCol > size - 1 {
+            myCol = size - maxCol - 1
+        }
+        
+        if myCol < 0 {
+            myCol = 0
+        }
+        return (myCol, myRow)
+
     }
     
     public func stopShowingSpriteOnGameboard(col: Int, row: Int, wordsToCheck: [String])->Bool {
