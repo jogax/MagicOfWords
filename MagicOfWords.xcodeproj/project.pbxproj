@@ -33,6 +33,7 @@
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
 		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */; };
+		20587FAE205A6D94008C018A /* magus.png in Resources */ = {isa = PBXBuildFile; fileRef = 20587FAD205A6D93008C018A /* magus.png */; };
 		2060036E20347FF400023E10 /* WordTrisGameboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036D20347FF400023E10 /* WordTrisGameboardItem.swift */; };
 		2060037020348A8800023E10 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036F20348A8800023E10 /* Grid.swift */; };
 		20819320202B472900406D9A /* GameDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081931F202B472900406D9A /* GameDataModel.swift */; };
@@ -92,6 +93,7 @@
 		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2057BA292029F591000DF337 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePackageScene.swift; sourceTree = "<group>"; };
+		20587FAD205A6D93008C018A /* magus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = magus.png; sourceTree = "<group>"; };
 		2060036D20347FF400023E10 /* WordTrisGameboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTrisGameboardItem.swift; sourceTree = "<group>"; };
 		2060036F20348A8800023E10 /* Grid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
 		2081931F202B472900406D9A /* GameDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDataModel.swift; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 				201FB1C320288C2B00EC9F36 /* Info.plist */,
 				20A6913E20309B2200AB47C0 /* WordTrisClassen */,
 				201FB1E92028940D00EC9F36 /* Scenes */,
+				20587FAF205A6D9F008C018A /* Pictures */,
 				201FB1E8202893E500EC9F36 /* Language */,
 				201FB1EA20289CEC00EC9F36 /* RealmModels */,
 			);
@@ -212,6 +215,14 @@
 				2057BA272029F57B000DF337 /* StoreKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		20587FAF205A6D9F008C018A /* Pictures */ = {
+			isa = PBXGroup;
+			children = (
+				20587FAD205A6D93008C018A /* magus.png */,
+			);
+			path = Pictures;
 			sourceTree = "<group>";
 		};
 		20A6913E20309B2200AB47C0 /* WordTrisClassen */ = {
@@ -295,6 +306,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20587FAE205A6D94008C018A /* magus.png in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
 				20842DE62031EA910078FFDA /* ruWords.txt in Resources */,
 				20B28AE020330C64001682B2 /* deWords.txt in Resources */,

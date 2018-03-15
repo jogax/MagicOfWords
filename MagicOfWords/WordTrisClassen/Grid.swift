@@ -22,6 +22,11 @@ class Grid:SKSpriteNode {
         self.blockSize = blockSize
         self.rows = rows
         self.cols = cols
+        let bgPicture = SKSpriteNode(imageNamed: "magus.png")
+        bgPicture.size = self.size
+        bgPicture.alpha = 0.3
+        bgPicture.zPosition = 2.0
+        self.addChild(bgPicture)
     }
     
     class func gridTexture(blockSize:CGFloat,rows:Int,cols:Int) -> SKTexture? {

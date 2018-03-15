@@ -60,8 +60,8 @@ class WordTrisGameboardItem: SKSpriteNode {
         self.color = .red
     }
     
-    public func setFoundedWord() {
-        self.color = .green
+    public func setFoundedWord(toColor: SKColor) {
+        self.color = toColor
         self.status = .wholeWord
     }
     
@@ -79,15 +79,18 @@ class WordTrisGameboardItem: SKSpriteNode {
         }
     }
     
-    public func fixIfTemporary() {
+    public func fixIfTemporary()->Bool {
         if status == .temporary {
             self.status = .used
             self.color = usedColor
+            return true
         } else if (status == .used || status == .wholeWord) && doubleUsed {
             label.text = self.origLetter
             self.color = self.origColor
             doubleUsed = false
+            return false
         }
+        return true
     }
 
     required init?(coder aDecoder: NSCoder) {

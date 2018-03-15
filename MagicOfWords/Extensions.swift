@@ -375,6 +375,9 @@ extension String {
         return String(returnString)
     }
     
+    func begins(with: String)->Bool {
+        return self.subString(startPos: 0, length: with.count) == with
+    }
     func ends(with: String)->Bool {
         let indexStartOfText = self.index(self.endIndex, offsetBy: -with.count)
         if self[indexStartOfText..<endIndex] == with {

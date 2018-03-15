@@ -8,8 +8,31 @@
 
 import Foundation
 import GameplayKit
+public protocol WordTrisGameboardDelegate: class {
+    
+    /// Method called when a word is founded
+    func showFoundedWord(foundedWord: String, counter: Int)
+    /// method is called when an own word is chosed
+    func addOwnWord(word: String)
+}
+
+
+
+let WSGameboardSizeMultiplier:CGFloat = 2.0
+func == (left: WordTrisGameboard.UsedLetters, right: WordTrisGameboard.UsedLetters) -> Bool {
+    return left.col == right.col && left.row == right.row && left.letter == right.letter
+}
 
 class WordTrisGameboard: SKShapeNode {
+    struct FoundedWordsWithCounter {
+        var word: String = ""
+        var counter: Int
+        init(word: String, counter: Int) {
+            self.word = word
+            self.counter = counter
+        }
+    }
+    
     struct UsedItems {
         var col: Int = 0
         var row: Int = 0
@@ -20,7 +43,22 @@ class WordTrisGameboard: SKShapeNode {
         var col: Int = 0
         var row: Int = 0
         var letter: String = ""
+        init(col: Int, row: Int, letter: String) {
+            self.col = col
+            self.row = row
+            self.letter = letter
+        }
     }
+    struct FoundedWords {
+        var word: String = ""
+        var usedLetters = [UsedLetters]()
+        init(word: String, usedLetters: [UsedLetters]) {
+            self.word = word
+            self.usedLetters = usedLetters
+        }
+        
+    }
+    var delegate: WordTrisGameboardDelegate
     var parentScene: SKScene
     var size: Int
     var grid: Grid?
@@ -35,16 +73,16 @@ class WordTrisGameboard: SKShapeNode {
     private var startLocation = CGPoint(x: 0, y: 0)
     private var usedItems = [UsedItems]()
     private var usedItemsOK = true
-//    private var origArrayCol: Int = 0
-//    private var origArrayRow: Int = 9
-//    private var oldRowChange: Int = 0
-//    private var oldColChange: Int = 0
     private var wordsToCheck = [String]()
+    private var ownWords = [String]()
+    private var choosedWord = [UsedLetters]()
+    private var foundedWords = [FoundedWords]()
 
-    init(size: Int, parentScene: SKScene) {
+    init(size: Int, parentScene: SKScene, delegate: WordTrisGameboardDelegate) {
         self.size = size
         self.parentScene = parentScene
         self.blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(size)
+        self.delegate = delegate
         super.init()
         createBackgroundShape(size: size)
         gameArray = createNewGameArray(size: size)
@@ -52,7 +90,7 @@ class WordTrisGameboard: SKShapeNode {
             for row in 0..<size {
                 gameArray![col][row].position = grid!.gridPosition(col: col, row: row) //+
 //                    CGPoint (x:parentScene.frame.midX, y:parentScene.frame.midY * 0.874)
-                gameArray![col][row].name = "col\(col)-row\(row)"
+                gameArray![col][row].name = "GBD/\(col)/\(row)"
 //                gameArray![col][row].setLetter(letter: "\(col)\(row)", status: .empty, color: .white)
                 grid!.addChild(gameArray![col][row])
             }
@@ -82,16 +120,16 @@ class WordTrisGameboard: SKShapeNode {
         
         let rowSprite = SKSpriteNode()
         let row10Height = grid!.frame.minY - parentScene.frame.minY
-        rowSprite.position = CGPoint(x: parentScene.frame.midX, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: 2.5 * blockSize!)
+        rowSprite.position = CGPoint(x: parentScene.frame.midX, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * blockSize!)
         rowSprite.size = CGSize(width: parentScene.frame.width, height: row10Height)
 //        rowSprite.color = .blue
         rowSprite.name = "Col\(size)"
         parentScene.addChild(rowSprite)
         for row in 0..<size {
             let rowSprite = SKSpriteNode()
-            rowSprite.position = CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row) - CGPoint(x: 0, y: 2.5 * blockSize!)
+            rowSprite.position = CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * blockSize!)
             rowSprite.size = CGSize(width: parentScene.frame.width * 1.1, height: blockSize!)
-//            if row % 2 == 1 {
+//            if row % 2 == 0 {
 //                rowSprite.alpha = 0.1
 //                rowSprite.color = .green
 //            }
@@ -109,7 +147,6 @@ class WordTrisGameboard: SKShapeNode {
                 gameArray[i].append( WordTrisGameboardItem(blockSize: blockSize!, fontSize: parentScene.frame.width / 20) )
             }
         }
-        
         return gameArray
     }
 
@@ -162,7 +199,7 @@ class WordTrisGameboard: SKShapeNode {
             let calculatedCol = myCol + itemCol //- colAdder
             let calculatedRow = myRow - itemRow //- rowAdder
             if calculatedRow < 0 {return false}
-            gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, color: tileColor)
+            _ = gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, color: tileColor)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: gameArray![calculatedCol][calculatedRow])
             usedItems.append(usedItem)
         }
@@ -190,7 +227,7 @@ class WordTrisGameboard: SKShapeNode {
             let itemRow = formOfShape[index] / 10
             let calculatedCol = myCol + itemCol // - adder
             let calculatedRow = myRow - itemRow
-            gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, color: tileColor)
+            _ = gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, color: tileColor)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: gameArray![calculatedCol][calculatedRow])
             usedItems.append(usedItem)
         }
@@ -224,6 +261,7 @@ class WordTrisGameboard: SKShapeNode {
     }
     
     public func stopShowingSpriteOnGameboard(col: Int, row: Int, wordsToCheck: [String])->Bool {
+        var fixed = true
         self.wordsToCheck = wordsToCheck
         if row == 10 {
             for index in 0..<usedItems.count {
@@ -232,25 +270,25 @@ class WordTrisGameboard: SKShapeNode {
             return false  // when shape not remaining on gameBoard, return false
         } else {
             for index in 0..<usedItems.count {
-                usedItems[index].item!.fixIfTemporary()
+                fixed = fixed && usedItems[index].item!.fixIfTemporary()
             }
             checkReadyWords()
-            return true  // when shape remaining on gameBoard, return true
+            return fixed  // when shape remaining on gameBoard, return true
         }
-        return true
     }
 
-    private func checkReadyWords() {
-        for col in 0..<gameArray!.count - 1 {
-            for row in 0..<gameArray!.count - 1 {
+    public func checkReadyWords() {
+        foundedWords.removeAll()
+        for col in 0..<gameArray!.count {
+            for row in 0..<gameArray!.count {
                 let letter = getLetter(col: col, row: row)
                 if letter != "" {
                     for word in wordsToCheck {
                         if letter == word.subString(startPos: 0, length: 1) {
                             OKPositions.removeAll()
                             if flyOverWord(compare: letter, col: col, row: row, fromCol: col, fromRow: row, withWord: word) {
-                                for (col, row) in OKPositions {
-                                    gameArray![col][row].setFoundedWord()
+                                for position in OKPositions {  // set to green
+                                    gameArray![position.col][position.row].setFoundedWord(toColor: .green)
                                 }
                             } else {
                             }
@@ -258,10 +296,25 @@ class WordTrisGameboard: SKShapeNode {
                     }
                 }
             }
-        
+        }
+        var foundedWordsWithCount = [FoundedWordsWithCounter]()
+        for foundedWord in foundedWords {
+            var founded = false
+            for index in 0..<foundedWordsWithCount.count {
+                if foundedWord.word == foundedWordsWithCount[index].word {
+                    foundedWordsWithCount[index].counter += 1
+                    founded = true
+                }
+            }
+            if !founded {
+                foundedWordsWithCount.append(FoundedWordsWithCounter(word: foundedWord.word , counter: 1))
+            }
+        }
+        for foundedWord in foundedWordsWithCount {
+            delegate.showFoundedWord(foundedWord: foundedWord.word, counter: foundedWord.counter)
         }
     }
-    var OKPositions = [(col: Int, row: Int)]()
+    var OKPositions = [UsedLetters]()
     
     private func flyOverWord(compare: String, col: Int, row: Int, fromCol: Int, fromRow: Int, withWord: String)->Bool {
         let myWord = compare
@@ -270,8 +323,9 @@ class WordTrisGameboard: SKShapeNode {
             if myWord != withWord {
                 return false
             } else {
-                print("myWord: \(myWord)")
-                OKPositions.append((col:col, row: row))
+//                print("myWord: \(myWord)")
+                OKPositions.append(UsedLetters(col:col, row: row, letter: gameArray![col][row].letter))
+                foundedWords.append(FoundedWords(word: myWord, usedLetters: OKPositions))
                 return true
             }
         }
@@ -280,7 +334,7 @@ class WordTrisGameboard: SKShapeNode {
                 let new = getLetter(col: col - 1, row: row)
                 if new != "" {
                     if flyOverWord(compare: myWord + new, col: col - 1, row: row, fromCol: col, fromRow: row, withWord: withWord) {
-                        OKPositions.append((col:col, row: row))
+                        OKPositions.append(UsedLetters(col:col, row: row, letter: gameArray![col][row].letter))
                         returnBool = true
                     }
                 }
@@ -289,7 +343,7 @@ class WordTrisGameboard: SKShapeNode {
                 let new = getLetter(col: col + 1, row: row)
                 if new != "" {
                     if flyOverWord(compare: myWord + new, col: col + 1, row: row, fromCol: col, fromRow: row, withWord: withWord) {
-                        OKPositions.append((col:col, row: row))
+                        OKPositions.append(UsedLetters(col:col, row: row, letter: gameArray![col][row].letter))
                         returnBool = true
                     }
                 }
@@ -298,7 +352,7 @@ class WordTrisGameboard: SKShapeNode {
                 let new = getLetter(col: col, row: row - 1)
                 if new != "" {
                     if flyOverWord(compare: myWord + new, col: col, row: row - 1, fromCol: col, fromRow: row, withWord: withWord) {
-                        OKPositions.append((col:col, row: row))
+                        OKPositions.append(UsedLetters(col:col, row: row, letter: gameArray![col][row].letter))
                         returnBool = true
                     }
                 }
@@ -307,7 +361,7 @@ class WordTrisGameboard: SKShapeNode {
                 let new = getLetter(col: col, row: row + 1)
                 if new != "" {
                     if flyOverWord(compare: myWord + new, col: col, row: row + 1, fromCol: col, fromRow: row, withWord: withWord) {
-                        OKPositions.append((col:col, row: row))
+                        OKPositions.append(UsedLetters(col:col, row: row, letter: gameArray![col][row].letter))
                         returnBool = true
                     }
                 }
@@ -324,19 +378,32 @@ class WordTrisGameboard: SKShapeNode {
         }
     }
     
-//    private func getUsedLetters()->[UsedLetters] {
-//        var usedLetters = [UsedLetters]()
-//        for row in 0..<size {
-//            for col in 0..<size {
-//                if gameArray![col][row].status == .used {
-//                    let actLetter = UsedLetters(col: col, row: row, letter: letter(col: col, row: row))
-//                    usedLetters.append(actLetter)
-//                }
-//            }
-//        }
-//        return usedLetters
-//    }
+    public func startChooseOwnWord(col: Int, row: Int) {
+        choosedWord.removeAll()
+        choosedWord.append(UsedLetters(col: col, row: row, letter: gameArray![col][row].letter))
+    }
+    
+    public func moveChooseOwnWord(col: Int, row: Int) {
+        let actLetter = UsedLetters(col: col, row: row, letter: gameArray![col][row].letter)
+        if choosedWord.contains(where: {$0 == actLetter}) {
+            return
+        }
+        choosedWord.append(actLetter)
+    }
 
+    public func endChooseOwnWord(col: Int, row: Int) {
+        let actLetter = UsedLetters(col: col, row: row, letter: gameArray![col][row].letter)
+        var word = ""
+        for letter in choosedWord {
+            word.append(letter.letter)
+        }
+        delegate.addOwnWord(word: word)
+        print ("\(word)")
+    }
+    
+    public func addOwnWordToCheck(word: String) {
+        wordsToCheck.append(word)
+    }
 
     
     required init?(coder aDecoder: NSCoder) {
