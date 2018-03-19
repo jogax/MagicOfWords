@@ -299,6 +299,8 @@ public extension Float {
     }
 }
 
+
+
 extension String {
     func replace(_ what: String, values: [String])->String {
         let toArray = self.components(separatedBy: what)

@@ -12,13 +12,14 @@ import GameplayKit
 enum ItemStatus: Int {
     case empty = 0, temporary, used, wholeWord
 }
-class WordTrisGameboardItem: SKSpriteNode {
+class WTGameboardItem: SKSpriteNode {
     public var status: ItemStatus = .empty
     private var origLetter: String = ""
     private var origColor: SKColor = .white
     private var doubleUsed = false
     private var blockSize:CGFloat = 0
     private var label: SKLabelNode
+    private var countOccurencesInWords = 0
     public var letter = ""
     private var usedColor = SKColor(red:255/255, green: 153/255, blue: 153/255, alpha: 1)
     init(blockSize: CGFloat, fontSize: CGFloat) {
@@ -91,6 +92,27 @@ class WordTrisGameboardItem: SKSpriteNode {
             return false
         }
         return true
+    }
+    
+    public func clearIfUsed() {
+        if status == .wholeWord {
+            label.text = ""
+            self.letter = ""
+            self.status = .empty
+            self.color = .white
+        } 
+    }
+    
+    public func resetCountOccurences() {
+        countOccurencesInWords = 0
+    }
+    
+    public func incrementCountOccurences() {
+        self.countOccurencesInWords += 1
+    }
+    
+    public func getCountOccurences()->Int {
+        return countOccurencesInWords
     }
 
     required init?(coder aDecoder: NSCoder) {

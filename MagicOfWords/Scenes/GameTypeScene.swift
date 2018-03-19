@@ -11,7 +11,7 @@ import GameplayKit
 public protocol GameTypeSceneDelegate: class {
     
     /// Method called when Create Words choosed
-    func wordTrisGame()
+    func wtGame()
     /// Method called when Search Words choosed
     func findWords()
     /// Method called when Choose Game Type cancelled

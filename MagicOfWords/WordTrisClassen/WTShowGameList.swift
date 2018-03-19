@@ -9,6 +9,6 @@
 import Foundation
 import GameplayKit
 
-class WordTrisShowGameList: SKSpriteNode {
+class WTShowGameList: SKSpriteNode {
     
 }

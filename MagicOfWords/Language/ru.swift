@@ -23,5 +23,11 @@ let ruDictionary: [TextConstants: String] = [
     .tcLoadingInProgress: "Выпольнется загрузка русских слов",
     .tcChooseGameType:    "Bыбрать тип игры",
     .tcBack:              "< Назад",
-    .tcWordsToCollect:    "Слова для сбора:",
+    .tcWordsToCollect:    "Слова для сбора: (% / %)",
+    .tcOwnWords:          "Мои слова (% / %)",
+    .tcNoMoreSteps:       "Поздравляю, ты закончил игру!",
+    .tcScore:             "Очки:",
+    .tcCollectedRequiredWords: "Собранные обязательные слова",
+    .tcCollectedOwnWords:       "Собранные собственные слова",
+    .tcUsedLetters:             "Используемые буквы"
 ]

@@ -23,5 +23,11 @@ let enDictionary: [TextConstants: String] = [
     .tcLoadingInProgress: "Loading English Words in progress",
     .tcChooseGameType:    "Choose game type",
     .tcBack:              "< Back",
-    .tcWordsToCollect:    "Words to collect:",
+    .tcWordsToCollect:    "Words to collect: (% / %)",
+    .tcOwnWords:          "Own words (% / %)",
+    .tcNoMoreSteps:       "Congratulations, you've finished the game!",
+    .tcScore:             "Score:",
+    .tcCollectedRequiredWords: "Collected mandatory words:",
+    .tcCollectedOwnWords:   "Collected own words:",
+    .tcUsedLetters:         "Used letters:"
 ]

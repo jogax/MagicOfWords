@@ -11,7 +11,7 @@ import SpriteKit
 import GameplayKit
 import RealmSwift
 
-class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WordTrisSceneDelegate, LoadingSceneDelegate {
+class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WTSceneDelegate, LoadingSceneDelegate {
     func startChooseGameType() {
         print("Choose game type choosed")
         let gameTypeScene = GameTypeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
@@ -30,9 +30,9 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         startMenuScene()
     }
     
-    func wordTrisGame() {
+    func wtGame() {
         print("Collect Words choosed")
-        startWordTrisScene()
+        startWTScene()
     }
     
     func findWords() {
@@ -48,20 +48,20 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         return
     }
     
-    func startWordTrisScene() {
-        let wordTrisScene = WordTrisScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+    func startWTScene() {
+        let wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
-            wordTrisScene.setDelegate(delegate: self)
-            view.presentScene(wordTrisScene)
+            wtScene.setDelegate(delegate: self)
+            view.presentScene(wtScene)
         }
 
     }
     
     func startFindWordsScene() {
-//        let findWordsScene = WordTrisScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+//        let findWordsScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
 //        if let view = self.view as! SKView? {
-//            wordTrisScene.setDelegate(delegate: self)
-//            view.presentScene(wordTrisScene)
+//            wtScene.setDelegate(delegate: self)
+//            view.presentScene(wtScene)
 //        }
         
     }
@@ -71,7 +71,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         let gameType = GameType(rawValue: basicData.gameType)!
         switch gameType {
         case .WordTris:
-            startWordTrisScene()
+            startWTScene()
         case .SearchWords:
             startFindWordsScene()
         case .NoMoreGames:

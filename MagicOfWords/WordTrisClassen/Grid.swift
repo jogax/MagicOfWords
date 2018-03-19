@@ -22,7 +22,7 @@ class Grid:SKSpriteNode {
         self.blockSize = blockSize
         self.rows = rows
         self.cols = cols
-        let bgPicture = SKSpriteNode(imageNamed: "magus.png")
+        let bgPicture = SKSpriteNode(imageNamed: "magier.png")
         bgPicture.size = self.size
         bgPicture.alpha = 0.3
         bgPicture.zPosition = 2.0

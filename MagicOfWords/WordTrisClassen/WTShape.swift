@@ -49,7 +49,7 @@ let myForms: [MyShapes : [[Int]]] = [
 ]
 
 
-class WordTrisShape {
+class WTShape {
     let countRows: CGFloat = 3
     var mySprite: SKSpriteNode
 //    var myShape: SKSpriteNode
@@ -179,8 +179,8 @@ class WordTrisShape {
         return returnValue
     }
 
-    public func copy()->WordTrisShape {
-        let copy = WordTrisShape(type: myType, rotateIndex: rotateIndex, parent: parent, blockSize: blockSize, letters: letters)
+    public func copy()->WTShape {
+        let copy = WTShape(type: myType, rotateIndex: rotateIndex, parent: parent, blockSize: blockSize, letters: letters)
         return copy
     }
     deinit {

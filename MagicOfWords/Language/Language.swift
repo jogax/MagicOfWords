@@ -25,7 +25,13 @@ enum TextConstants: Int {
     tcLoadingInProgress,
     tcChooseGameType,
     tcBack,
-    tcWordsToCollect
+    tcWordsToCollect,
+    tcOwnWords,
+    tcNoMoreSteps,
+    tcScore,
+    tcCollectedRequiredWords,
+    tcCollectedOwnWords,
+    tcUsedLetters
 }
 
     let LanguageEN = "en" // index 0

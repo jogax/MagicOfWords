@@ -8,14 +8,39 @@
 
 import Foundation
 import GameplayKit
-public protocol WordTrisSceneDelegate: class {
+public protocol WTSceneDelegate: class {
     
     /// Method called when Game finished
     func gameFinished()
     
 }
-class WordTrisScene: SKScene, WordTrisGameboardDelegate {
-    
+
+struct WTResults {
+    var countMandatoryWords: Int
+    var scoreMandatoryWords: Int
+    var countOwnWords: Int
+    var scoreOwnWords: Int
+    var countUsedLetters: Int
+    var scoreUsedLetters: Int
+    var allAroundScore: Int
+    init(countMandatoryWords: Int,
+         scoreMandatoryWords: Int,
+         countOwnWords: Int,
+         scoreOwnWords: Int,
+         countUsedLetters: Int,
+         scoreUsedLetters: Int,
+         allAroundScore: Int) {
+        self.countMandatoryWords = countMandatoryWords
+        self.scoreMandatoryWords = scoreMandatoryWords
+        self.countOwnWords = countOwnWords
+        self.scoreOwnWords = scoreOwnWords
+        self.countUsedLetters = countUsedLetters
+        self.scoreUsedLetters = scoreUsedLetters
+        self.allAroundScore = allAroundScore
+    }
+
+}
+class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     struct TilesForGame {
         var type: MyShapes = .NotUsed
         var rotateIndex: Int = 0
@@ -37,8 +62,8 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
         }
     }
     
-    var wordTrisSceneDelegate: WordTrisSceneDelegate?
-    var wordTrisGameboard: WordTrisGameboard?
+    var wtSceneDelegate: WTSceneDelegate?
+    var wtGameboard: WTGameboard?
     var wordsToPlay = Array<GameDataModel>()
 //    var allWords = String()
     var ownWords = [String]()
@@ -46,15 +71,26 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
     var tilesForGame = [TilesForGame]()
     var indexOfTilesForGame = 0
     var playingWords = [String]()
+    var mandatoryWords = [String]()
     var grid: Grid?
     let heightMultiplicator = CGFloat((GV.onIpad ? 0.10 : 0.15))
     var blockSize: CGFloat = 0
     var random: MyRandom?
     var allWordsToShow = [AllWordsToShow]()
-    
-    var ws = [WordTrisShape]()
+    var time: Int = 0
+    var timer = Timer()
+    var timeLabel = SKLabelNode(fontNamed: "Noteworthy-Bold")
+    var testCounter = 0
+    var firstTouchLocation = CGPoint(x: 0, y: 0)
+    var scoreMandatoryWords = 0
+    var scoreOwnWords = 0
+    var countMandatoryWords = 0
+    var countOwnWords = 0
+
+    var ws = [WTShape]()
     var origPosition: [CGPoint] = Array(repeating: CGPoint(x:0, y: 0), count: 3)
     var origSize: [CGSize] = Array(repeating: CGSize(width:0, height: 0), count: 3)
+    var score: Int = 0
     var moved = false
     var inChoosingOwnWord = false
     var movedIndex = 0
@@ -68,10 +104,12 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
         4: [31, 22],
         5: [32, 221]
     ]
-    
+    let mandatoryWordsHeaderName = "mandatoryWords"
+    let ownWordsHeaderName = "ownWords"
+
     
     override func didMove(to view: SKView) {
-        self.name = "WordTrisScene"
+        self.name = "WTScene"
         self.view!.isMultipleTouchEnabled = false
         self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
 //        createMenuItem(menuInt: .tcPackage, firstLine: true)
@@ -79,17 +117,47 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
         showWordsToCollect()
         play()
    }
+    /// WTGameFinishedDelegate
+    func getResults() -> WTResults {
+        let wtResults = wtGameboard!.getResults()
+        return wtResults
+    }
+    
 
-    public func setDelegate(delegate: WordTrisSceneDelegate) {
-        wordTrisSceneDelegate = delegate
+    public func setDelegate(delegate: WTSceneDelegate) {
+        wtSceneDelegate = delegate
     }
 
-    func showFoundedWord(foundedWord: String, counter: Int) {
-        guard let label = self.childNode(withName: foundedWord)! as? SKLabelNode else {
-            return
+    func showFoundedWords(foundedWordsToShow: [FoundedWordsWithCounter]) {
+        self.scoreMandatoryWords = 0
+        self.scoreOwnWords = 0
+        self.countMandatoryWords = 0
+        self.countOwnWords = 0
+        
+        for foundedWordToShow in foundedWordsToShow {
+            print(foundedWordToShow.word)
+            if let label = self.childNode(withName: foundedWordToShow.word)! as? SKLabelNode {
+                label.text = foundedWordToShow.word + " (\(foundedWordToShow.counter)) "
+            }
+            if playingWords.contains(where: {$0 == foundedWordToShow.word}) {
+                self.scoreMandatoryWords += foundedWordToShow.score
+                self.countMandatoryWords += foundedWordToShow.counter
+            }
+            
+            if ownWords.contains(where: {$0 == foundedWordToShow.word}) {
+                self.scoreOwnWords += foundedWordToShow.score
+                self.countOwnWords += foundedWordToShow.counter
+            }
         }
-        label.text = foundedWord + " (\(counter))"
+        if let label = self.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
+            label.text = GV.language.getText(.tcWordsToCollect, values: String(countMandatoryWords), String(scoreMandatoryWords))
+        }
+        if let label = self.childNode(withName: ownWordsHeaderName)! as? SKLabelNode {
+            label.text = GV.language.getText(.tcOwnWords, values: String(countOwnWords), String(scoreOwnWords))
+        }
+
     }
+    
     
     func addOwnWord(word: String) {
         if realm.objects(WordListModel.self).filter("word = %@", word.lowercased()).count == 1 {
@@ -98,9 +166,9 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
                 playingWords.append(word)
                 var wordToShow = AllWordsToShow(word: word)
                 allWordsToShow.append(wordToShow)
-                createLabel(wordToShow: &wordToShow, counter: 9 + ownWords.count)
-                wordTrisGameboard!.addOwnWordToCheck(word: word)
-                wordTrisGameboard!.checkReadyWords()
+                createLabel(wordToShow: &wordToShow, counter: ownWords.count, own: true)
+                wtGameboard!.addOwnWordToCheck(word: word)
+                wtGameboard!.checkWholeWords()
             }
         } else {
             print ("Word \(word) not OK")
@@ -129,24 +197,33 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
     private func showWordsToCollect() {
         let wordListToShow = realm.objects(GameDataModel.self).filter("gameType = %d and gameNumber = %d", GV.gameType, GV.gameNumber)
         wordsToPlay = Array(wordListToShow)
-        createLabel(word: GV.language.getText(.tcWordsToCollect))
+        createLabel(word: GV.language.getText(.tcWordsToCollect, values: "0","0"), first: true, name: mandatoryWordsHeaderName)
         var counter = 1
         for wordRecord in wordsToPlay {
             let word = wordRecord.word.uppercased()
+            mandatoryWords.append(word)
             playingWords.append(word)
             var wordToShow = AllWordsToShow(word: word)
             allWordsToShow.append(wordToShow)
             createLabel(wordToShow: &wordToShow, counter: counter)
             counter += 1
         }
-        
+        createLabel(word: GV.language.getText(.tcOwnWords, values: "0", "0"), first: false, name: ownWordsHeaderName)
     }
     
-    private func createLabel(wordToShow: inout AllWordsToShow, counter: Int) {
+    private func createLabel(wordToShow: inout AllWordsToShow, counter: Int, own: Bool = false) {
         let xPositionMultiplier = [0.2, 0.5, 0.8]
-        let yPositionMultiplier = [0.9, 0.88, 0.86, 0.84, 0.82, 80, 78]
+        let mandatoryYPositionMultiplier:CGFloat = 0.89
+        let ownYPositionMultiplier:CGFloat = 0.81
+        let distance: CGFloat = 0.02
         wordToShow.wordLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
-        let yPosition = self.frame.height * CGFloat(yPositionMultiplier[(counter - 1) / 3])
+        let value = CGFloat((counter - 1) / 3) *  distance
+        var yPosition: CGFloat = 0
+        if !own {
+            yPosition = self.frame.height * (mandatoryYPositionMultiplier - value)
+        } else {
+            yPosition = self.frame.height * (ownYPositionMultiplier - value)
+        }
         let xPosition = self.frame.size.width * CGFloat(xPositionMultiplier[(counter - 1) % 3])
         wordToShow.wordLabel.position = CGPoint(x: xPosition, y: yPosition)
         wordToShow.wordLabel.fontSize = self.frame.size.height / (counter == 0 ? 50 : 50)
@@ -156,16 +233,32 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
         
         self.addChild(wordToShow.wordLabel)
     }
-    private func createLabel(word: String) {
-        let label = SKLabelNode(fontNamed: "Noteworthy-Bold") // Snell Roundhand")
-        let yPosition = self.frame.height * 0.95
+    
+    private func createLabel(word: String, first: Bool, name: String) {
+        let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
+        let yPosition = self.frame.height * (first ? 0.92 : 0.84)
         let xPosition = self.frame.size.width * 0.5
         label.position = CGPoint(x: xPosition, y: yPosition)
-        label.fontSize = self.frame.size.height / 50
+        label.fontSize = self.frame.size.height * 0.02
         label.fontColor = .black
         label.text = word
+        label.name = name
         self.addChild(label)
     }
+    
+    private func createTimeLabel() {
+        timeLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
+        let yPosition = self.frame.height * 0.94
+        let xPosition = self.frame.size.width * 0.8
+        timeLabel.position = CGPoint(x: xPosition, y: yPosition)
+        timeLabel.fontSize = self.frame.size.height * 0.015
+        timeLabel.fontColor = .black
+        timeLabel.text = 0.HourMinSec
+        timeLabel.name = "TimeLabel"
+        self.addChild(timeLabel)
+    }
+    
+
 
     
     private func play() {
@@ -173,8 +266,8 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
         generateArrayOfWordPieces()
         indexOfTilesForGame = 0
 
-        ws = Array(repeating: WordTrisShape(), count: 3)
-        wordTrisGameboard = WordTrisGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
+        ws = Array(repeating: WTShape(), count: 3)
+        wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self, mandatoryWords: mandatoryWords)
 //        for record in wordsToPlay {
 //            allWords += record.word.uppercased()
 //        }
@@ -189,7 +282,14 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
             ws[index].sprite().name = "Pos\(index )"
             self.addChild(ws[index].sprite())
         }
-
+        time = 0
+        createTimeLabel()
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
+    }
+    
+    @objc private func countTime(timerX: Timer) {
+        time += 1
+        timeLabel.text = time.HourMinSec
     }
     
     private func generateArrayOfWordPieces() {
@@ -271,7 +371,7 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
 
     }
     
-    private func generateShape(horizontalPosition: Int)->WordTrisShape {
+    private func generateShape(horizontalPosition: Int)->WTShape {
         blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
         let tileForGame = tilesForGame[indexOfTilesForGame]
         indexOfTilesForGame += 1
@@ -284,32 +384,32 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
                 letters.append(String(letter))
             }
         }
-        return WordTrisShape(type: type, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
+        return WTShape(type: type, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
 
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if wordTrisSceneDelegate == nil {
+        if wtSceneDelegate == nil {
             return
         }
         moved = false
         inChoosingOwnWord = false
         let firstTouch = touches.first
-        let touchLocation = firstTouch!.location(in: self)
-        let nodes = self.nodes(at: touchLocation)
+        firstTouchLocation = firstTouch!.location(in: self)
+        let nodes = self.nodes(at: firstTouchLocation)
         let (GCol, GRow, _, _, shapeIndex, _) = analyzeNodes(nodes: nodes)
         if shapeIndex > -1 {
             startShapeIndex = shapeIndex
-            wordTrisGameboard!.clear()
+            wtGameboard!.clear()
         } else if GCol.between(min: 0, max: sizeOfGrid - 1) && GRow.between(min:0, max: sizeOfGrid - 1){
             inChoosingOwnWord = true
-            wordTrisGameboard?.startChooseOwnWord(col: GCol, row: GRow)
+            wtGameboard?.startChooseOwnWord(col: GCol, row: GRow)
         }
 
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if wordTrisSceneDelegate == nil {
+        if wtSceneDelegate == nil {
             return
         }
         let firstTouch = touches.first
@@ -320,7 +420,7 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
             let sprite = ws[movedIndex].sprite()
             sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * WSGameboardSizeMultiplier)
             sprite.alpha = 0.0
-            if wordTrisGameboard!.moveSpriteOnGameboard(col: col, row: row) {  // true says moving finished
+            if wtGameboard!.moveSpriteOnGameboard(col: col, row: row) {  // true says moving finished
                 if row == sizeOfGrid { // when at bottom
                     sprite.alpha = 1.0
                 }
@@ -328,17 +428,18 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
 
         } else if inChoosingOwnWord {
             if GCol >= 0 && GCol < sizeOfGrid && GRow >= 0 && GRow < sizeOfGrid {
-                wordTrisGameboard?.moveChooseOwnWord(col: GCol, row: GRow)
+                wtGameboard?.moveChooseOwnWord(col: GCol, row: GRow)
             }
         } else {
             if shapeIndex >= 0 {
                 ws[shapeIndex].sprite().position = touchLocation
             }
-            if row >= 0 && row < sizeOfGrid {
+            let yDistance = (touchLocation - firstTouchLocation).y
+            if yDistance > blockSize && row >= 0 && row < sizeOfGrid {
 //                origSize[shapeindex] = ws[index].sprite().size
 //                moved = true
                 if shapeIndex >= 0 {
-                    moved = wordTrisGameboard!.startShowingSpriteOnGameboard(shape: ws[shapeIndex], col: col, row: row)
+                    moved = wtGameboard!.startShowingSpriteOnGameboard(shape: ws[shapeIndex], col: col, row: row)
                     movedIndex = shapeIndex
                 }
             } 
@@ -374,7 +475,7 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if wordTrisSceneDelegate == nil {
+        if wtSceneDelegate == nil {
             return
         }
         let firstTouch = touches.first
@@ -383,9 +484,9 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
         let lastPosition = ws.count - 1
         let (GCol, GRow, row, col, _, _) = analyzeNodes(nodes: nodes)
         if inChoosingOwnWord {
-            wordTrisGameboard?.endChooseOwnWord(col: GCol, row: GRow)
+            wtGameboard?.endChooseOwnWord(col: GCol, row: GRow)
         } else if moved {
-            let fixed = wordTrisGameboard!.stopShowingSpriteOnGameboard(col: col, row: row, wordsToCheck: playingWords)
+            let fixed = wtGameboard!.stopShowingSpriteOnGameboard(col: col, row: row, wordsToCheck: playingWords)
             if fixed {
                 let fixedName = "Pos\(movedIndex)"
                 removeNodesWith(name: fixedName)
@@ -401,7 +502,27 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
                 ws[lastPosition].sprite().position = origPosition[lastPosition]
                 ws[lastPosition].sprite().name = "Pos\(lastPosition)"
                 self.addChild(ws[lastPosition].sprite())
-
+                let freePlaceFound = checkFreePlace()
+                
+//                for piece in ws {
+//                    for rotateIndex in 0..<4 {
+//                        freePlaceFound = wtGameboard!.checkFreePlaceForPiece(piece: piece, rotateIndex: rotateIndex)
+//                        if freePlaceFound {break}
+//                    }
+//                    if freePlaceFound {break}
+//                }
+                if !freePlaceFound || testCounter >= 10000 {
+                    wtGameboard!.clearGreenFieldsForNextRound()
+                    if !checkFreePlace() || testCounter >= 10000 {
+                        print("game is finished!")
+                        let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.8)
+                        let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+                        let gameFinishedSprite = WTGameFinished(size: size, position: position, delegate: self)
+                        self.addChild(gameFinishedSprite)
+                        gameFinishedSprite.showFinish()
+                    }
+                }
+                testCounter += 1
             } else {
                 ws[movedIndex].sprite().position = origPosition[movedIndex]
 //                ws[movedIndex].sprite().scale(to: origSize[movedIndex])
@@ -409,20 +530,29 @@ class WordTrisScene: SKScene, WordTrisGameboardDelegate {
             }
             moved = false
         } else if nodes.count > 0 {
-            for node in nodes {
-                guard let name = node.name else {
-                    continue
-                }
-                if name == String(TextConstants.tcBack.rawValue) {
-                    wordTrisSceneDelegate!.gameFinished()
-                } else if name.subString(startPos:0, length: 3) == "Pos" {
-                    guard let index = Int(name.subString(startPos:3, length:1)) else {
-                        continue
-                    }
-                    ws[index].rotate()
-                }
+            let (_, _, _, _, shapeIndex, goBack) = analyzeNodes(nodes: nodes)
+            if goBack {
+                wtSceneDelegate!.gameFinished()
+                return
             }
+            if shapeIndex >= 0 && startShapeIndex == shapeIndex {
+                    ws[shapeIndex].rotate()
+                    ws[shapeIndex].sprite().position = origPosition[shapeIndex]
+            }
+            
         }
+    }
+    
+    private func checkFreePlace()->Bool {
+        var placeFound = true
+        for piece in ws {
+            for rotateIndex in 0..<4 {
+                placeFound = wtGameboard!.checkFreePlaceForPiece(piece: piece, rotateIndex: rotateIndex)
+                if placeFound {break}
+            }
+            if placeFound {break}
+        }
+        return placeFound
     }
     
     func removeNodesWith(name: String) {
