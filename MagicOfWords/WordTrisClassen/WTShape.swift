@@ -15,14 +15,12 @@ enum MyShapes: Int {
         L_Shape_1, // 2
         L_Shape_2, // 3
         L_Shape_3, // 4
-        L_Shape_4, // 5
-        T_Shape_1, // 7
-        T_Shape_2, // 8
-        O_Shape,   // 9
-        I_Shape_1, // 10
-        I_Shape_2, // 11
-        I_Shape_3, // 12
-        I_Shape_4, // 13
+        T_Shape_1, // 5
+        O_Shape,   // 6
+        I_Shape_1, // 7
+        I_Shape_2, // 8
+        I_Shape_3, // 9
+        I_Shape_4, // 10
         NotUsed
     static var count: Int { return MyShapes.NotUsed.hashValue + 1}
 
@@ -38,9 +36,7 @@ let myForms: [MyShapes : [[Int]]] = [
     .L_Shape_1 : [[00, 01, 11], [10, 00, 01], [11, 10, 00], [01, 11, 10]], // OK
     .L_Shape_2 : [[21, 20, 10, 00], [02, 12, 11, 10], [00, 01, 11, 21], [10, 00, 01, 02]], // OK
     .L_Shape_3 : [[20, 21, 11, 01], [12, 02, 01, 00], [01, 00, 10, 20], [00, 10, 11, 12]], // OK
-    .L_Shape_4 : [[20, 10, 00, 01, 02], [22, 21, 20, 10, 00], [02, 12, 22, 21, 20], [00, 01, 02, 12, 22]], // OK
     .T_Shape_1 : [[12, 11, 10, 01], [01, 11, 21, 10], [00, 01, 02, 11], [20, 10, 00, 11]],  // OK
-    .T_Shape_2 : [[22, 21, 20, 11, 01], [02, 12, 22, 11, 10], [00, 01, 02, 11, 21], [20, 10, 00, 11, 12]], // OK
     .O_Shape   : [[00, 01, 11, 10], [10, 00, 01, 11], [11, 10, 00, 01], [01, 11, 10, 00]], // OK
     .I_Shape_1 : [[00], [00], [00], [00]], // OK
     .I_Shape_2 : [[00, 10], [00, 01], [10, 00], [01, 00]], // OK
@@ -56,8 +52,9 @@ class WTShape {
     let parent: SKScene
     let blockSize: CGFloat
     let letters: [String]
+    var GameArrayPositions = [Int]()
     public var rotateIndex: Int = 0
-    var origPosition: [CGPoint] = [CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0)]
+//    var origPosition: [CGPoint] = [CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0)]
     var myType: MyShapes
     // Shape Form
     // y:  x:   0   1   2   3
@@ -182,6 +179,10 @@ class WTShape {
     public func copy()->WTShape {
         let copy = WTShape(type: myType, rotateIndex: rotateIndex, parent: parent, blockSize: blockSize, letters: letters)
         return copy
+    }
+    
+    public func toString() {
+        var myString = ""
     }
     deinit {
         print("\n WordtrisShape \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")

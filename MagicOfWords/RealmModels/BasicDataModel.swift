@@ -12,7 +12,8 @@ import RealmSwift
 class BasicDataModel: Object {
     @objc dynamic var ID = 0
     @objc dynamic var actLanguage = ""
-    @objc dynamic var actVersion = ""
+    @objc dynamic var wordListVersion = ""
+    @objc dynamic var gameDataVersion = ""
     @objc dynamic var gameType = 1
     override  class func primaryKey() -> String {
         return "ID"

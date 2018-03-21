@@ -110,7 +110,7 @@ class LoadingScene: SKScene {
             wordLabel.fontSize = CGFloat.random(min: self.frame.size.height * 0.020, max: self.frame.size.height * 0.04)
             wordLabel.position = CGPoint(x: self.frame.size.width * xProcent, y: self.frame.size.height * yProcent)
             wordLabel.text = GV.lastSavedWord
-            let actionFadeAlpha = SKAction.fadeAlpha(to: 0, duration: 2)
+            let actionFadeAlpha = SKAction.fadeAlpha(to: 0, duration: 1)
             wordLabel.run(actionFadeAlpha)
             self.addChild(wordLabel)
             self.procentLabel!.text = String(describing: Int(procent * 100)) + " %"

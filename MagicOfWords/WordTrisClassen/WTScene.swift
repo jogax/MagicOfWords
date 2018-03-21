@@ -195,12 +195,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func showWordsToCollect() {
-        let wordListToShow = realm.objects(GameDataModel.self).filter("gameType = %d and gameNumber = %d", GV.gameType, GV.gameNumber)
-        wordsToPlay = Array(wordListToShow)
+        let wordListToShow = realm.objects(GameDataModel.self).filter("gameType = %d and gameNumber = %d", GV.gameType, GV.gameNumber)[0]
         createLabel(word: GV.language.getText(.tcWordsToCollect, values: "0","0"), first: true, name: mandatoryWordsHeaderName)
         var counter = 1
-        for wordRecord in wordsToPlay {
-            let word = wordRecord.word.uppercased()
+        let wordList = wordListToShow.words.uppercased().components(separatedBy: "°")
+        for word in wordList {
             mandatoryWords.append(word)
             playingWords.append(word)
             var wordToShow = AllWordsToShow(word: word)
@@ -335,11 +334,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             case 2: typesWithLen2.append(type)
             case 3: typesWithLen3.append(type)
             case 4: typesWithLen4.append(type)
-            case 5: typesWithLen5.append(type)
             default: break
             }
         }
-        let lengths = [1,1,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,1,1]
+        let lengths = [1,1,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,1,1]
         var generateLength = 0
         repeat {
             let tileLength = lengths[random!.getRandomInt(0, max: lengths.count - 1)]
@@ -356,10 +354,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
            case 4: tileType = typesWithLen4[random!.getRandomInt(0, max: typesWithLen4.count - 1)]
                letters.append(getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv))
                letters.append(getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv))
-            case 5: tileType = typesWithLen5[random!.getRandomInt(0, max: typesWithLen5.count - 1)]
-                letters.append(getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv))
-                letters.append(getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv))
-                letters.append(getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv))
             default: break
             }
             let rotateIndex = random!.getRandomInt(0, max: 3)
