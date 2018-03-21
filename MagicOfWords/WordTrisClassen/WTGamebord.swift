@@ -69,7 +69,7 @@ class WTGameboard: SKShapeNode {
     let blockSize: CGFloat?
     let tileColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha: 1.0)
     var gameArray: [[WTGameboardItem]]?
-    var shape: WTShape = WTShape()
+    var shape: WTPiece = WTPiece()
     private var lastCol: Int = 0
     private var lastRow: Int = 0
     private var startCol: Int = 0
@@ -190,7 +190,7 @@ class WTGameboard: SKShapeNode {
     }
     
     
-    public func startShowingSpriteOnGameboard(shape: WTShape, col: Int, row: Int)->Bool {
+    public func startShowingSpriteOnGameboard(shape: WTPiece, col: Int, row: Int)->Bool {
 //        if col < 0 && row < 0 {
 //            return false
 //        }
@@ -203,7 +203,7 @@ class WTGameboard: SKShapeNode {
             return true
         }
 
-       for index in 0..<shape.sprite().children.count {
+       for index in 0..<shape.children.count {
             let letter = shape.letters[index]
             let itemRow = formOfShape[index] / 10
             let itemCol = formOfShape[index] % 10
@@ -226,7 +226,7 @@ class WTGameboard: SKShapeNode {
             return true
         }
         
-        for index in 0..<shape.sprite().children.count {
+        for index in 0..<shape.children.count {
             let letter = shape.letters[index]
             let itemCol = formOfShape[index] % 10
             let itemRow = formOfShape[index] / 10
@@ -451,7 +451,7 @@ class WTGameboard: SKShapeNode {
         wordsToCheck.append(word)
     }
     
-    public func checkFreePlaceForPiece(piece: WTShape, rotateIndex: Int)->Bool {
+    public func checkFreePlaceForPiece(piece: WTPiece, rotateIndex: Int)->Bool {
         let form = myForms[piece.myType]![rotateIndex]
         for col in 0..<size {
             for row in 0..<size {

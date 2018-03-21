@@ -16,13 +16,17 @@ enum MyShapes: Int {
         L_Shape_2, // 3
         L_Shape_3, // 4
         T_Shape_1, // 5
-        O_Shape,   // 6
+        O_Shape_1, // 6
         I_Shape_1, // 7
         I_Shape_2, // 8
         I_Shape_3, // 9
         I_Shape_4, // 10
         NotUsed
     static var count: Int { return MyShapes.NotUsed.hashValue + 1}
+    func toString()->String {
+        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "T1", "O1", "I1", "I2", "I3", "I4", "NotUsed"]
+        return stringType[self.rawValue]
+    }
 
 }
 struct LetterCoordinates {
@@ -37,7 +41,7 @@ let myForms: [MyShapes : [[Int]]] = [
     .L_Shape_2 : [[21, 20, 10, 00], [02, 12, 11, 10], [00, 01, 11, 21], [10, 00, 01, 02]], // OK
     .L_Shape_3 : [[20, 21, 11, 01], [12, 02, 01, 00], [01, 00, 10, 20], [00, 10, 11, 12]], // OK
     .T_Shape_1 : [[12, 11, 10, 01], [01, 11, 21, 10], [00, 01, 02, 11], [20, 10, 00, 11]],  // OK
-    .O_Shape   : [[00, 01, 11, 10], [10, 00, 01, 11], [11, 10, 00, 01], [01, 11, 10, 00]], // OK
+    .O_Shape_1  : [[00, 01, 11, 10], [10, 00, 01, 11], [11, 10, 00, 01], [01, 11, 10, 00]], // OK
     .I_Shape_1 : [[00], [00], [00], [00]], // OK
     .I_Shape_2 : [[00, 10], [00, 01], [10, 00], [01, 00]], // OK
     .I_Shape_3 : [[00, 10, 20], [00, 01, 02], [20, 10, 00], [02, 01, 00]], // OK
@@ -45,14 +49,14 @@ let myForms: [MyShapes : [[Int]]] = [
 ]
 
 
-class WTShape {
+class WTPiece: SKSpriteNode {
     let countRows: CGFloat = 3
-    var mySprite: SKSpriteNode
+//    var mySprite: SKSpriteNode
 //    var myShape: SKSpriteNode
-    let parent: SKScene
+    let myParent: SKScene
     let blockSize: CGFloat
     let letters: [String]
-    var GameArrayPositions = [Int]()
+    var gameArrayPositions = [Int]()
     public var rotateIndex: Int = 0
 //    var origPosition: [CGPoint] = [CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0)]
     var myType: MyShapes
@@ -63,24 +67,27 @@ class WTShape {
     // 1        x   x   x   x
     // 0        x   x   x   x
     
-    init() {
-        self.parent = SKScene()
-        self.blockSize = 0
-        self.letters = []
-        self.myType = MyShapes.NotUsed
-        self.mySprite = SKSpriteNode()
-//        self.myShape = SKSpriteNode()
-
-    }
-    init(type: MyShapes, rotateIndex: Int, parent: SKScene, blockSize: CGFloat, letters: [String]) {
-        self.parent = parent
+    init(type: MyShapes = .NotUsed, rotateIndex: Int = 0, parent: SKScene = SKScene(), blockSize: CGFloat = 0, letters: [String] = [""]) {
+        let texture = SKTexture()
+        let color:SKColor = .clear
+        self.myParent = parent
         self.blockSize = blockSize
         self.letters = letters
         self.myType = type
+        super.init(texture: texture, color: .clear, size: CGSize(width: 10, height: 10))
+        self.zPosition = -1
+        self.colorBlendFactor = 1.0
+        self.color = .clear
         self.rotateIndex = rotateIndex
-        self.mySprite = SKSpriteNode()
-        mySprite.size = calculateSize()
-        addLettersToPositions()
+//        self.mySprite = SKSpriteNode()
+        if myType != .NotUsed {
+            self.size = calculateSize()
+            addLettersToPositions()
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func calculateSize()->CGSize {
@@ -102,14 +109,14 @@ class WTShape {
             let col = form[index] / 10
             let row = form[index] % 10
             let position = gridPosition(col: col, row: row)
-            let frameForLetter = SKSpriteNode(color: .white, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
+            let frameForLetter = SKSpriteNode(color: .clear, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
             frameForLetter.position = position
-//            frameForLetter.fillColor = .yellow
+            frameForLetter.color = .white
             let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
 //            label.position = position
             label.text = letters[index]
             label.fontColor = .black
-            label.fontSize = parent.frame.width / 25
+            label.fontSize = myParent.frame.width / 25
             label.horizontalAlignmentMode = .center
             label.verticalAlignmentMode = .center
             label.color = .blue
@@ -120,32 +127,32 @@ class WTShape {
 //            if mySprite.childNode(withName: searchName) != nil {
 //                mySprite.childNode(withName: searchName)!.removeFromParent()
 //            }
-            mySprite.addChild(frameForLetter)
+            self.addChild(frameForLetter)
 
         }
     }
-    public func sprite()->SKSpriteNode {
-        return mySprite
-    }
-    
+//    public func sprite()->SKSpriteNode {
+//        return mySprite
+//    }
+//
     public func getLengthOfShape(type: MyShapes)->Int {
         return myForms[type]!.count
     }
     
     public func changeSize(by: CGFloat) {
-        mySprite.setScale(by)
+        self.setScale(by)
     }
     
     public func rotate() {
         rotateIndex = (rotateIndex + 1) % 4
         let rotateAction = SKAction.rotate(byAngle: -90 * GV.oneGrad, duration: 0.1)
 //        mySprite.anchorPoint = CGPoint(x: 0.1, y: 0.1)
-        mySprite.run(rotateAction)
+        self.run(rotateAction)
 //        addLettersToPositions()
         let form = myForms[myType]
         for index in 0..<form![rotateIndex].count {
             let searchName = "label\(index)"
-            guard let child = mySprite.childNode(withName: searchName) else {
+            guard let child = self.childNode(withName: searchName) else {
                 continue
             }
             let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
@@ -157,8 +164,8 @@ class WTShape {
     
     private func gridPosition(col:Int, row:Int) -> CGPoint {
         let offset = blockSize * 0.5 + 0.5
-        let x = mySprite.frame.minX + (CGFloat(row) * blockSize - 1) + offset
-        let y = mySprite.frame.minY + (CGFloat(col) * blockSize - 1) + offset * 0.8 // / 2.2
+        let x = self.frame.minX + (CGFloat(row) * blockSize - 1) + offset
+        let y = self.frame.minY + (CGFloat(col) * blockSize - 1) + offset * 0.8 // / 2.2
         return CGPoint(x:x, y:y)
     }
     
@@ -166,9 +173,9 @@ class WTShape {
         let coordinates = myForms[myType]![rotateIndex]
         print("\(coordinates)")
         var returnValue = [LetterCoordinates]()
-        for index in 0..<mySprite.children.count {
+        for index in 0..<self.children.count {
             var letterCoordinates = LetterCoordinates()
-            letterCoordinates.letter = (mySprite.children[index].children[0] as! SKLabelNode).text!
+            letterCoordinates.letter = (self.children[index].children[0] as! SKLabelNode).text!
             letterCoordinates.col = coordinates[index] / 10
             letterCoordinates.row = coordinates[index] % 10
             returnValue.append(letterCoordinates)
@@ -176,13 +183,28 @@ class WTShape {
         return returnValue
     }
 
-    public func copy()->WTShape {
-        let copy = WTShape(type: myType, rotateIndex: rotateIndex, parent: parent, blockSize: blockSize, letters: letters)
+    public func copy()->WTPiece {
+        let copy = WTPiece(type: myType, rotateIndex: rotateIndex, parent: myParent, blockSize: blockSize, letters: letters)
         return copy
     }
     
-    public func toString() {
-        var myString = ""
+    public func toString()->String {
+        let sType = myType.toString()
+        var sLetters = String()
+        for letter in letters {
+            sLetters.append(letter)
+        }
+        var sGameArrayPositions = String()
+        for gameArrayPosition in gameArrayPositions {
+            let col = String(gameArrayPosition / 10)
+            let row = String(gameArrayPosition % 10)
+            sGameArrayPositions.append(col + row + "-")
+        }
+        if sGameArrayPositions.count > 0 {
+            sGameArrayPositions.removeLast()
+        }
+        let myString = sType + "/" + sLetters + "/" + sGameArrayPositions
+        return myString
     }
     deinit {
         print("\n WordtrisShape \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")

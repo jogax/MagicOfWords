@@ -41,11 +41,11 @@ struct WTResults {
 
 }
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
-    struct TilesForGame {
-        var type: MyShapes = .NotUsed
-        var rotateIndex: Int = 0
-        var letters: [String] = [String]()
-    }
+//    struct TilesForGame {
+//        var type: MyShapes = .NotUsed
+//        var rotateIndex: Int = 0
+//        var letters: [String] = [String]()
+//    }
     
     struct AllWordsToShow {
         var word: String
@@ -68,7 +68,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 //    var allWords = String()
     var ownWords = [String]()
     var workingLetters = String()
-    var tilesForGame = [TilesForGame]()
+//    var tilesForGame = [TilesForGame]()
+    var tilesForGame = [WTPiece]()
     var indexOfTilesForGame = 0
     var playingWords = [String]()
     var mandatoryWords = [String]()
@@ -87,7 +88,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     var countMandatoryWords = 0
     var countOwnWords = 0
 
-    var ws = [WTShape]()
+    var ws = [WTPiece]()
     var origPosition: [CGPoint] = Array(repeating: CGPoint(x:0, y: 0), count: 3)
     var origSize: [CGSize] = Array(repeating: CGSize(width:0, height: 0), count: 3)
     var score: Int = 0
@@ -111,6 +112,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     override func didMove(to view: SKView) {
         self.name = "WTScene"
         self.view!.isMultipleTouchEnabled = false
+        self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+
         self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
 //        createMenuItem(menuInt: .tcPackage, firstLine: true)
         createMenuItem(menuInt: .tcBack)
@@ -265,7 +268,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         generateArrayOfWordPieces()
         indexOfTilesForGame = 0
 
-        ws = Array(repeating: WTShape(), count: 3)
+        ws = Array(repeating: WTPiece(), count: 3)
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self, mandatoryWords: mandatoryWords)
 //        for record in wordsToPlay {
 //            allWords += record.word.uppercased()
@@ -275,11 +278,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         for index in 0..<3 {
             ws[index] = generateShape(horizontalPosition: index)
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
-            origSize[index] = ws[index].sprite().size
-            ws[index].sprite().position = origPosition[index]
-//            ws[index].sprite().anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            ws[index].sprite().name = "Pos\(index )"
-            self.addChild(ws[index].sprite())
+            origSize[index] = ws[index].size
+            ws[index].position = origPosition[index]
+//            ws[index].anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            ws[index].name = "Pos\(index )"
+            self.addChild(ws[index])
         }
         time = 0
         createTimeLabel()
@@ -292,7 +295,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func generateArrayOfWordPieces() {
-        func getLetters( from: inout [String], archiv: inout [String])->String {
+        func getLetters( from: inout [String], archiv: inout [String])->[String] {
+            
             if from.count == 0 {
                 for item in archiv {
                     from.append(item)
@@ -300,8 +304,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 archiv.removeAll()
             }
             let index = random!.getRandomInt(0, max: from.count - 1)
-            let piece = from[index]
-            archiv.append(piece)
+            let temp = from[index]
+            var piece = [String]()
+            piece.append(temp.subString(startPos:0, length: 1))
+            if temp.count == 2 {
+                piece.append(temp.subString(startPos:1, length: 1))
+            }
+            archiv.append(temp)
             from.remove(at: index)
             return piece
         }
@@ -322,7 +331,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         var typesWithLen2 = [MyShapes]()
         var typesWithLen3 = [MyShapes]()
         var typesWithLen4 = [MyShapes]()
-        var typesWithLen5 = [MyShapes]()
 
         for index in 0..<MyShapes.count - 2 {
             guard let type = MyShapes(rawValue: index) else {
@@ -345,40 +353,41 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             var letters = [String]()
             switch tileLength {
             case 1: tileType = typesWithLen1[0]
-                letters.append(getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv))
+                letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
             case 2: tileType = typesWithLen2[0]
-                letters.append(getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv))
+                letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
             case 3: tileType = typesWithLen3[random!.getRandomInt(0, max: typesWithLen3.count - 1)]
-                letters.append(getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv))
-                letters.append(getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv))
+                letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+                letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
            case 4: tileType = typesWithLen4[random!.getRandomInt(0, max: typesWithLen4.count - 1)]
-               letters.append(getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv))
-               letters.append(getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv))
+               letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+               letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
             default: break
             }
             let rotateIndex = random!.getRandomInt(0, max: 3)
             
-            let tileForGameItem = TilesForGame(type: tileType, rotateIndex: rotateIndex, letters: letters)
+//            let tileForGameItem = TilesForGame(type: tileType, rotateIndex: rotateIndex, letters: letters)
+            let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
             tilesForGame.append(tileForGameItem)
             generateLength += tileLength
         } while generateLength < 150
 
     }
     
-    private func generateShape(horizontalPosition: Int)->WTShape {
-        blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+    private func generateShape(horizontalPosition: Int)->WTPiece {
+//        blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
         let tileForGame = tilesForGame[indexOfTilesForGame]
         indexOfTilesForGame += 1
         indexOfTilesForGame = indexOfTilesForGame >= tilesForGame.count ? 0 : indexOfTilesForGame
-        let type = tileForGame.type
-        let rotateIndex = tileForGame.rotateIndex
-        var letters = [String]()
-        for tiles in tileForGame.letters {
-            for letter in tiles {
-                letters.append(String(letter))
-            }
-        }
-        return WTShape(type: type, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
+//        let type = tileForGame.type
+//        let rotateIndex = tileForGame.rotateIndex
+//        var letters = [String]()
+//        for tiles in tileForGame.letters {
+//            for letter in tiles {
+//                letters.append(String(letter))
+//            }
+//        }
+        return tileForGame
 
     }
     
@@ -411,7 +420,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         let nodes = self.nodes(at: touchLocation)
         let (GCol, GRow, row, col, shapeIndex, _) = analyzeNodes(nodes: nodes)
         if moved {
-            let sprite = ws[movedIndex].sprite()
+            let sprite = ws[movedIndex]
             sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * WSGameboardSizeMultiplier)
             sprite.alpha = 0.0
             if wtGameboard!.moveSpriteOnGameboard(col: col, row: row) {  // true says moving finished
@@ -426,11 +435,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
         } else {
             if shapeIndex >= 0 {
-                ws[shapeIndex].sprite().position = touchLocation
+                ws[shapeIndex].position = touchLocation
             }
             let yDistance = (touchLocation - firstTouchLocation).y
             if yDistance > blockSize && row >= 0 && row < sizeOfGrid {
-//                origSize[shapeindex] = ws[index].sprite().size
+//                origSize[shapeindex] = ws[index].size
 //                moved = true
                 if shapeIndex >= 0 {
                     moved = wtGameboard!.startShowingSpriteOnGameboard(shape: ws[shapeIndex], col: col, row: row)
@@ -487,15 +496,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 if movedIndex < lastPosition {
                     for index in movedIndex..<lastPosition {
                         ws[index] = ws[index + 1]
-                        ws[index].sprite().name = "Pos\(String(index))"
-                        ws[index].sprite().position = origPosition[index]
-                        origSize[index] = ws[index].sprite().size
+                        ws[index].name = "Pos\(String(index))"
+                        ws[index].position = origPosition[index]
+                        origSize[index] = ws[index].size
                     }
                 }
                 ws[lastPosition] = generateShape(horizontalPosition: lastPosition)
-                ws[lastPosition].sprite().position = origPosition[lastPosition]
-                ws[lastPosition].sprite().name = "Pos\(lastPosition)"
-                self.addChild(ws[lastPosition].sprite())
+                ws[lastPosition].position = origPosition[lastPosition]
+                ws[lastPosition].name = "Pos\(lastPosition)"
+                self.addChild(ws[lastPosition])
                 let freePlaceFound = checkFreePlace()
                 
 //                for piece in ws {
@@ -518,9 +527,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 }
                 testCounter += 1
             } else {
-                ws[movedIndex].sprite().position = origPosition[movedIndex]
-//                ws[movedIndex].sprite().scale(to: origSize[movedIndex])
-                ws[movedIndex].sprite().alpha = 1
+                ws[movedIndex].position = origPosition[movedIndex]
+//                ws[movedIndex].scale(to: origSize[movedIndex])
+                ws[movedIndex].alpha = 1
             }
             moved = false
         } else if nodes.count > 0 {
@@ -531,7 +540,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
             if shapeIndex >= 0 && startShapeIndex == shapeIndex {
                     ws[shapeIndex].rotate()
-                    ws[shapeIndex].sprite().position = origPosition[shapeIndex]
+                    ws[shapeIndex].position = origPosition[shapeIndex]
             }
             
         }
