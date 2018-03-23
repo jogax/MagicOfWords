@@ -13,11 +13,13 @@ class GameDataModel: Object {
     
     @objc dynamic var gameType = 0
     @objc dynamic var gameNumber = 0
-    @objc dynamic var words = ""
+    @objc dynamic var gameStatus = 0 // 0: new, 1: playing, 2: finished
+    @objc dynamic var mandatoryWords = ""
+    @objc dynamic var ownWords = ""
     @objc dynamic var pieces = ""
-    @objc dynamic var indexes = ""
+    @objc dynamic var onGameboardIndexes = ""
     override  class func primaryKey() -> String {
-        return "words"
+        return "gameNumber"
     }
     
     

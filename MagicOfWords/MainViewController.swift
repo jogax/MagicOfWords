@@ -31,8 +31,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     }
     
     func wtGame() {
-        print("Collect Words choosed")
-        startWTScene()
+        startWTScene(new: true)
     }
     
     func findWords() {
@@ -48,10 +47,11 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         return
     }
     
-    func startWTScene() {
+    func startWTScene(new: Bool) {
         let wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
             wtScene.setDelegate(delegate: self)
+            wtScene.setGameArt(new: new)
             view.presentScene(wtScene)
         }
 
@@ -71,18 +71,25 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         let gameType = GameType(rawValue: basicData.gameType)!
         switch gameType {
         case .WordTris:
-            startWTScene()
+            startWTScene(new: true)
         case .SearchWords:
             startFindWordsScene()
         case .NoMoreGames:
             break
         }
-        print("Start new game")
-        
     }
     
     func continueGame() {
-        print("Continue a game")
+        let basicData = realm.objects(BasicDataModel.self).first!
+        let gameType = GameType(rawValue: basicData.gameType)!
+        switch gameType {
+        case .WordTris:
+            startWTScene(new: false)
+        case .SearchWords:
+            startFindWordsScene()
+        case .NoMoreGames:
+            break
+        }
     }
     
     func startSettings() {

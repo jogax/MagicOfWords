@@ -35,7 +35,7 @@ class LoadingScene: SKScene {
         createLoadingProcessShape()
         createLabels()
         
-        _ = GenerateGameData()
+        _ = GenerateGameData(parentScene: self)
     }
     
     func createLabels() {

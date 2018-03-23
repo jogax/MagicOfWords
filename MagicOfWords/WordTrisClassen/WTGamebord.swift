@@ -20,6 +20,11 @@ public struct FoundedWordsWithCounter {
     }
 }
 
+public struct GameArrayPositions {
+    var col: Int
+    var row: Int
+}
+
 
 
 public protocol WTGameboardDelegate: class {
@@ -117,7 +122,7 @@ class WTGameboard: SKShapeNode {
 //            if col % 2 == 1 {
 //                colSprite.color = .yellow
 //            }
-            colSprite.name = "Row\(col)"
+            colSprite.name = "Col\(col)"
             parentScene.addChild(colSprite)
         }
         let colSprite = SKSpriteNode()
@@ -125,7 +130,7 @@ class WTGameboard: SKShapeNode {
         colSprite.position = CGPoint(x: grid!.frame.maxX + col10Width / 2, y: grid!.frame.midY)
         colSprite.size = CGSize(width: col10Width, height: parentScene.frame.height)
 //        colSprite.color = .green
-        colSprite.name = "Row\(size)"
+        colSprite.name = "Col\(size)"
         parentScene.addChild(colSprite)
         
         let rowSprite = SKSpriteNode()
@@ -133,7 +138,7 @@ class WTGameboard: SKShapeNode {
         rowSprite.position = CGPoint(x: parentScene.frame.midX, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * blockSize!)
         rowSprite.size = CGSize(width: parentScene.frame.width, height: row10Height)
 //        rowSprite.color = .blue
-        rowSprite.name = "Col\(size)"
+        rowSprite.name = "Row\(size)"
         parentScene.addChild(rowSprite)
         for row in 0..<size {
             let rowSprite = SKSpriteNode()
@@ -143,7 +148,7 @@ class WTGameboard: SKShapeNode {
 //                rowSprite.alpha = 0.1
 //                rowSprite.color = .green
 //            }
-            rowSprite.name = "Col\(size - 1 - row)"
+            rowSprite.name = "Row\(size - 1 - row)"
             parentScene.addChild(rowSprite)
         }
     }
@@ -190,7 +195,7 @@ class WTGameboard: SKShapeNode {
     }
     
     
-    public func startShowingSpriteOnGameboard(shape: WTPiece, col: Int, row: Int)->Bool {
+    public func startShowingSpriteOnGameboard(shape: WTPiece, col: Int, row: Int, shapePos: Int)->Bool {
 //        if col < 0 && row < 0 {
 //            return false
 //        }
@@ -265,6 +270,20 @@ class WTGameboard: SKShapeNode {
 
     }
     
+    public func showPieceOnGameArray(piece: WTPiece) {
+        if piece.isOnGameboard {
+            for index in 0..<piece.letters.count {
+                let letter = piece.letters[index]
+                if let col = Int(piece.gameArrayPositions[index].subString(startPos: 0, length:1)) {
+                    if let row = Int(piece.gameArrayPositions[index].subString(startPos: 1, length:1)) {
+                        _ = gameArray![col][row].setLetter(letter: letter, status: .used, color: usedColor)
+                    }
+                }
+            }
+            piece.alpha = 0
+        }
+    }
+    
     public func stopShowingSpriteOnGameboard(col: Int, row: Int, wordsToCheck: [String])->Bool {
         var fixed = true
         self.wordsToCheck = wordsToCheck
@@ -289,12 +308,19 @@ class WTGameboard: SKShapeNode {
                     fixed = fixed && usedItems[index].item!.fixIfTemporary()
                 }
             }
-            checkWholeWords()
+            if fixed {
+                checkWholeWords(wordsToCheck: wordsToCheck)
+                var gameArrayPositions = [GameArrayPositions]()
+                for index in 0..<usedItems.count {
+                    gameArrayPositions.append(GameArrayPositions(col:usedItems[index].col,row: usedItems[index].row))
+                }
+                shape.setGameArrayPositions(gameArrayPositions: gameArrayPositions)
+            }
             return fixed  // when shape remaining on gameBoard, return true
         }
     }
 
-    public func checkWholeWords() {
+    public func checkWholeWords(wordsToCheck: [String]) {
         foundedWords.removeAll()
         for col in 0..<size {
             for row in 0..<size {
@@ -528,6 +554,17 @@ class WTGameboard: SKShapeNode {
                              scoreUsedLetters: 0,
                              allAroundScore: 0)
 
+    }
+    
+    public func removeFromGameboard(sprite: WTPiece) {
+        let gameboardIndexes = sprite.gameArrayPositions
+        for gbIndex in gameboardIndexes {
+            if let col = Int(gbIndex.subString(startPos: 0, length: 1)) {
+                if let row = Int(gbIndex.subString(startPos: 1, length: 1)) {
+                    gameArray![col][row].remove()
+                }
+            }
+        }
     }
 
     required init?(coder aDecoder: NSCoder) {

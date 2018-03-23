@@ -28,8 +28,12 @@ class MenuScene: SKScene {
     var menuSceneDelegate: MenuSceneDelegate?
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
-        createMenuItem(menuInt: .tcNewGame, firstLine: true)
-        createMenuItem(menuInt: .tcContinue)
+        if realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GameStatusNew).count > 0 {
+            createMenuItem(menuInt: .tcNewGame, firstLine: true)
+        }
+        if realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GameStatusPlaying).count > 0 {
+            createMenuItem(menuInt: .tcContinue)
+        }
         createMenuItem(menuInt: .tcChooseGameType)
         createMenuItem(menuInt: .tcSettings)
     }
@@ -44,7 +48,7 @@ class MenuScene: SKScene {
         menuItem.text = GV.language.getText(menuInt)
         menuItem.name = String(menuInt.rawValue)
         menuItem.fontSize = self.frame.size.height / 30
-        menuItem.position = CGPoint(x: self.frame.size.width / 2, y: startYPosition - (CGFloat(line) * 45) )
+        menuItem.position = CGPoint(x: self.frame.size.width / 2, y: startYPosition - (CGFloat(line) * 50) )
         menuItem.fontColor = SKColor.blue
         menuItem.color = UIColor.brown
         self.addChild(menuItem)

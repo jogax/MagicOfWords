@@ -11,10 +11,14 @@ import AVFoundation
 import UIKit
 
 let exclamationMark = "!"
+let GameStatusNew = 0
+let GameStatusPlaying = 1
+let GameStatusFinished = 2
 
 enum GameType: Int {
     case WordTris = 1, SearchWords, NoMoreGames
 }
+let NoValue = -1
 struct GV {
     static let language = Language()
     static var maxRecordCount = 0
@@ -26,6 +30,7 @@ struct GV {
     static var gameType = 0
     static let onIpad = UIDevice.current.model.hasSuffix("iPad")
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
+    static var activated = false
 }
 
 

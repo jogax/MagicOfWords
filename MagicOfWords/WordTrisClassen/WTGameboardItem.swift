@@ -12,6 +12,8 @@ import GameplayKit
 enum ItemStatus: Int {
     case empty = 0, temporary, used, wholeWord
 }
+let usedColor = SKColor(red:255/255, green: 153/255, blue: 153/255, alpha: 1)
+
 class WTGameboardItem: SKSpriteNode {
     public var status: ItemStatus = .empty
     private var origLetter: String = ""
@@ -21,7 +23,6 @@ class WTGameboardItem: SKSpriteNode {
     private var label: SKLabelNode
     private var countOccurencesInWords = 0
     public var letter = ""
-    private var usedColor = SKColor(red:255/255, green: 153/255, blue: 153/255, alpha: 1)
     init(blockSize: CGFloat, fontSize: CGFloat) {
 //        self.mySprite = SKSpriteNode(color: .white, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
         label = SKLabelNode()
@@ -57,10 +58,10 @@ class WTGameboardItem: SKSpriteNode {
 
         }
     }
-    public func setRedColor() {
-        self.color = .red
-    }
-    
+//    public func setColor(color: SKColor) {
+//        self.color = color
+//    }
+//    
     public func setFoundedWord(toColor: SKColor) {
         self.color = toColor
         self.status = .wholeWord
@@ -101,6 +102,13 @@ class WTGameboardItem: SKSpriteNode {
             self.status = .empty
             self.color = .white
         } 
+    }
+    
+    public func remove() {
+        self.status = .empty
+        label.text = ""
+        self.letter = ""
+        self.color = .white
     }
     
     public func resetCountOccurences() {

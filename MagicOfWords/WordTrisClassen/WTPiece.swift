@@ -27,6 +27,10 @@ enum MyShapes: Int {
         let stringType = ["Z1", "Z2", "L1", "L2", "L3", "T1", "O1", "I1", "I2", "I3", "I4", "NotUsed"]
         return stringType[self.rawValue]
     }
+    static func toValue(name: String)->MyShapes {
+        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "T1", "O1", "I1", "I2", "I3", "I4", "NotUsed"]
+        return MyShapes(rawValue: stringType.index{$0 == name}!)!
+    }
 
 }
 struct LetterCoordinates {
@@ -56,7 +60,10 @@ class WTPiece: SKSpriteNode {
     let myParent: SKScene
     let blockSize: CGFloat
     let letters: [String]
-    var gameArrayPositions = [Int]()
+    var gameArrayPositions = [String]()
+    var arrayIndex: Int = 0
+    var pieceFromPosition = NoValue
+    var isOnGameboard = false
     public var rotateIndex: Int = 0
 //    var origPosition: [CGPoint] = [CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0)]
     var myType: MyShapes
@@ -67,9 +74,14 @@ class WTPiece: SKSpriteNode {
     // 1        x   x   x   x
     // 0        x   x   x   x
     
-    init(type: MyShapes = .NotUsed, rotateIndex: Int = 0, parent: SKScene = SKScene(), blockSize: CGFloat = 0, letters: [String] = [""]) {
+    init(type: MyShapes = .NotUsed,
+         rotateIndex: Int = 0,
+         parent: SKScene = SKScene(),
+         blockSize: CGFloat = 0,
+         letters: [String] = [""],
+         pieceFromPosition: Int = NoValue,
+         isOnGameboard: Bool = false) {
         let texture = SKTexture()
-        let color:SKColor = .clear
         self.myParent = parent
         self.blockSize = blockSize
         self.letters = letters
@@ -79,11 +91,33 @@ class WTPiece: SKSpriteNode {
         self.colorBlendFactor = 1.0
         self.color = .clear
         self.rotateIndex = rotateIndex
+        self.isOnGameboard = isOnGameboard
+        self.pieceFromPosition = pieceFromPosition
+        
 //        self.mySprite = SKSpriteNode()
         if myType != .NotUsed {
             self.size = calculateSize()
             addLettersToPositions()
+            self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
         }
+    }
+    
+    convenience init(from: String, parent: SKScene = SKScene(), blockSize: CGFloat = 0) {
+//        let myString = sType + "/" + sRotateIndex + "/" + sLetters + "/" + sGameArrayPositions
+        let myValues = from.components(separatedBy: "/")
+        let type = MyShapes.toValue(name: myValues[0])
+        let rotateIndex = Int(myValues[1])
+        var letters = [String]()
+        for letter in myValues[2] {
+            letters.append(String(letter))
+        }
+        var tempPieceFromPosition = NoValue
+        if let position = Int(myValues[4]) {
+            tempPieceFromPosition = position
+        }
+        let isOnGameboard = myValues[5] == "1"
+        self.init(type: type, rotateIndex: rotateIndex!, parent: parent, blockSize: blockSize, letters: letters, pieceFromPosition: tempPieceFromPosition, isOnGameboard: isOnGameboard)
+        gameArrayPositions = myValues[3].components(separatedBy: "-")
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -135,6 +169,18 @@ class WTPiece: SKSpriteNode {
 //        return mySprite
 //    }
 //
+    public func setPieceFromPosition(index: Int) {
+        pieceFromPosition = index
+    }
+
+    public func setGameArrayPositions(gameArrayPositions: [GameArrayPositions]) {
+        if gameArrayPositions.count == myForms[myType]![0].count {
+            for index in 0..<gameArrayPositions.count {
+                self.gameArrayPositions[index] = String(gameArrayPositions[index].col) + String(gameArrayPositions[index].row)
+            }
+            isOnGameboard = true
+        }
+    }
     public func getLengthOfShape(type: MyShapes)->Int {
         return myForms[type]!.count
     }
@@ -188,26 +234,47 @@ class WTPiece: SKSpriteNode {
         return copy
     }
     
+    public func reset() {
+        self.resetGameArrayPositions()
+        self.pieceFromPosition = NoValue
+    }
+    
+    public func addArrayIndex(index: Int) {
+        arrayIndex = index
+    }
+    
+    public func getArrayIndex() ->String {
+        return String(arrayIndex)
+    }
+    
+    public func resetGameArrayPositions() {
+        self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
+        self.isOnGameboard = false
+    }
+    
     public func toString()->String {
         let sType = myType.toString()
         var sLetters = String()
         for letter in letters {
-            sLetters.append(letter)
+            sLetters.append(letter.uppercased())
         }
         var sGameArrayPositions = String()
         for gameArrayPosition in gameArrayPositions {
-            let col = String(gameArrayPosition / 10)
-            let row = String(gameArrayPosition % 10)
-            sGameArrayPositions.append(col + row + "-")
+            sGameArrayPositions.append(gameArrayPosition + "-")
         }
         if sGameArrayPositions.count > 0 {
             sGameArrayPositions.removeLast()
         }
-        let myString = sType + "/" + sLetters + "/" + sGameArrayPositions
+        let sRotateIndex = String(rotateIndex)
+        let sPositionIndex = String(pieceFromPosition)
+        let sIsOnGameboard = isOnGameboard ? "1" : "0"
+        let myString = sType + "/" + sRotateIndex + "/" + sLetters + "/" + sGameArrayPositions + "/" + sPositionIndex + "/" + sIsOnGameboard
+        
         return myString
     }
+    
     deinit {
-        print("\n WordtrisShape \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
+//        print("\n WordtrisShape \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
     }
 
 }

@@ -30,6 +30,7 @@
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
 		204A8ADA2029EE6000E9C11F /* WTScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WTScene.swift */; };
 		204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204AEB38205D1F47004D2ECD /* WTGameFinished.swift */; };
+		204BB45D2063E9E000CDF085 /* undo.png in Resources */ = {isa = PBXBuildFile; fileRef = 204BB45C2063E9E000CDF085 /* undo.png */; };
 		205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F4206150AC00E7FAF4 /* ruGameData.txt */; };
 		205184F72061525C00E7FAF4 /* huGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F62061525C00E7FAF4 /* huGameData.txt */; };
 		205184F920615B3100E7FAF4 /* deGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F820615B3100E7FAF4 /* deGameData.txt */; };
@@ -95,6 +96,7 @@
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
 		204A8AD92029EE6000E9C11F /* WTScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTScene.swift; sourceTree = "<group>"; };
 		204AEB38205D1F47004D2ECD /* WTGameFinished.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameFinished.swift; sourceTree = "<group>"; };
+		204BB45C2063E9E000CDF085 /* undo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = undo.png; path = MagicOfWords/Pictures/undo.png; sourceTree = SOURCE_ROOT; };
 		205184F4206150AC00E7FAF4 /* ruGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruGameData.txt; sourceTree = "<group>"; };
 		205184F62061525C00E7FAF4 /* huGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huGameData.txt; sourceTree = "<group>"; };
 		205184F820615B3100E7FAF4 /* deGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deGameData.txt; sourceTree = "<group>"; };
@@ -235,6 +237,7 @@
 			isa = PBXGroup;
 			children = (
 				2098BB8D20601B0B00C3641B /* magier.png */,
+				204BB45C2063E9E000CDF085 /* undo.png */,
 			);
 			path = Pictures;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
 				205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
+				204BB45D2063E9E000CDF085 /* undo.png in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
 			);
