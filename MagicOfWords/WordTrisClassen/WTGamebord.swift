@@ -325,6 +325,7 @@ class WTGameboard: SKShapeNode {
         for col in 0..<size {
             for row in 0..<size {
                 gameArray![col][row].resetCountOccurences()
+                gameArray![col][row].setGreenToUsedColor()
             }
         }
         for col in 0..<gameArray!.count {

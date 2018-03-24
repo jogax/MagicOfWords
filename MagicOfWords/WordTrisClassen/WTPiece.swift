@@ -61,7 +61,7 @@ class WTPiece: SKSpriteNode {
     let blockSize: CGFloat
     let letters: [String]
     var gameArrayPositions = [String]()
-    var arrayIndex: Int = 0
+    var arrayIndex: Int
     var pieceFromPosition = NoValue
     var isOnGameboard = false
     public var rotateIndex: Int = 0
@@ -80,12 +80,14 @@ class WTPiece: SKSpriteNode {
          blockSize: CGFloat = 0,
          letters: [String] = [""],
          pieceFromPosition: Int = NoValue,
-         isOnGameboard: Bool = false) {
+         isOnGameboard: Bool = false,
+         arrayIndex: Int = 0) {
         let texture = SKTexture()
         self.myParent = parent
         self.blockSize = blockSize
         self.letters = letters
         self.myType = type
+        self.arrayIndex = arrayIndex
         super.init(texture: texture, color: .clear, size: CGSize(width: 10, height: 10))
         self.zPosition = -1
         self.colorBlendFactor = 1.0
@@ -102,7 +104,7 @@ class WTPiece: SKSpriteNode {
         }
     }
     
-    convenience init(from: String, parent: SKScene = SKScene(), blockSize: CGFloat = 0) {
+    convenience init(from: String, parent: SKScene = SKScene(), blockSize: CGFloat = 0, arrayIndex: Int) {
 //        let myString = sType + "/" + sRotateIndex + "/" + sLetters + "/" + sGameArrayPositions
         let myValues = from.components(separatedBy: "/")
         let type = MyShapes.toValue(name: myValues[0])
@@ -116,7 +118,7 @@ class WTPiece: SKSpriteNode {
             tempPieceFromPosition = position
         }
         let isOnGameboard = myValues[5] == "1"
-        self.init(type: type, rotateIndex: rotateIndex!, parent: parent, blockSize: blockSize, letters: letters, pieceFromPosition: tempPieceFromPosition, isOnGameboard: isOnGameboard)
+        self.init(type: type, rotateIndex: rotateIndex!, parent: parent, blockSize: blockSize, letters: letters, pieceFromPosition: tempPieceFromPosition, isOnGameboard: isOnGameboard, arrayIndex: arrayIndex)
         gameArrayPositions = myValues[3].components(separatedBy: "-")
     }
     
@@ -229,11 +231,11 @@ class WTPiece: SKSpriteNode {
         return returnValue
     }
 
-    public func copy()->WTPiece {
-        let copy = WTPiece(type: myType, rotateIndex: rotateIndex, parent: myParent, blockSize: blockSize, letters: letters)
-        return copy
-    }
-    
+//    public func copy()->WTPiece {
+//        let copy = WTPiece(type: myType, rotateIndex: rotateIndex, parent: myParent, blockSize: blockSize, letters: letters, )
+//        return copy
+//    }
+//    
     public func reset() {
         self.resetGameArrayPositions()
         self.pieceFromPosition = NoValue

@@ -124,6 +124,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     let ownWordsHeaderName = "ownWords"
     let undoName = "undo"
     let goBackName = "goBack"
+    let gameNumberName = "gameNumber"
 
     
     override func didMove(to view: SKView) {
@@ -212,7 +213,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 
     private func createMenuItem(menuInt: TextConstants, firstLine: Bool = false) {
         line = firstLine ? 1 : line + 1
-        let menuItem = SKLabelNode(fontNamed: "Noteworthy")// Snell Roundhand")
+        let menuItem = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
         let startYPosition = self.frame.height * 0.98
         menuItem.text = GV.language.getText(menuInt)
         menuItem.name = String(goBackName)
@@ -223,9 +224,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         self.addChild(menuItem)
     }
     
-    private func createUndo() {
+    private func createGameNumberLabel(text: String) {
+        let gameNumberLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
+        let startYPosition = self.frame.height * 0.98
+        gameNumberLabel.text = text
+        gameNumberLabel.name = String(gameNumberName)
+        gameNumberLabel.fontSize = self.frame.size.height / 50
+        gameNumberLabel.position = CGPoint(x: self.frame.size.width * 0.25, y: startYPosition - (CGFloat(line) * 45) )
+        gameNumberLabel.fontColor = SKColor.black
+        self.addChild(gameNumberLabel)
+    }
+    
+ private func createUndo() {
         undoSprite = SKSpriteNode(imageNamed: "undo.png")
-        let yPosition = self.frame.height * 0.05
+        let yPosition = self.frame.height * 0.93
         let xPosition = self.frame.width * 0.9
         undoSprite.position = CGPoint(x:xPosition, y:yPosition)
         undoSprite.alpha = 0.2
@@ -251,8 +263,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     private func createLabel(wordToShow: inout AllWordsToShow, counter: Int, own: Bool = false) {
         let xPositionMultiplier = [0.2, 0.5, 0.8]
-        let mandatoryYPositionMultiplier:CGFloat = 0.89
-        let ownYPositionMultiplier:CGFloat = 0.81
+        let mandatoryYPositionMultiplier:CGFloat = 0.88
+        let ownYPositionMultiplier:CGFloat = 0.80
         let distance: CGFloat = 0.02
         wordToShow.wordLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
         let value = CGFloat((counter - 1) / 3) *  distance
@@ -274,7 +286,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     private func createLabel(word: String, first: Bool, name: String) {
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
-        let yPosition = self.frame.height * (first ? 0.92 : 0.84)
+        let yPosition = self.frame.height * (first ? 0.90 : 0.82)
         let xPosition = self.frame.size.width * 0.5
         label.position = CGPoint(x: xPosition, y: yPosition)
         label.fontSize = self.frame.size.height * 0.02
@@ -286,8 +298,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     private func createTimeLabel() {
         timeLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
-        let yPosition = self.frame.height * 0.94
-        let xPosition = self.frame.size.width * 0.8
+        let yPosition = self.frame.height * 0.98
+        let xPosition = self.frame.size.width * 0.7
         timeLabel.position = CGPoint(x: xPosition, y: yPosition)
         timeLabel.fontSize = self.frame.size.height * 0.015
         timeLabel.fontColor = .black
@@ -323,6 +335,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
         }
         time = 0
+        createGameNumberLabel(text: "#\(playingRecord.gameNumber)")
         createTimeLabel()
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
     }
@@ -333,15 +346,22 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func generateArrayOfWordPieces(new: Bool) {
+        if new {
+            realm.beginWrite()
+            playingRecord.pieces = generateArrayOfWordPieces()
+            try! realm.commitWrite()
+        }
+        tilesForGame.removeAll()
         let piecesToPlay = playingRecord.pieces.components(separatedBy: "°")
         for index in 0..<piecesToPlay.count {
             let piece = piecesToPlay[index]
             if piece.count > 0 {
-                tilesForGame.append(WTPiece(from: piece, parent: self, blockSize: blockSize))
+                let tile = WTPiece(from: piece, parent: self, blockSize: blockSize, arrayIndex: index)
+                tilesForGame.append(tile)
                 tilesForGame.last!.addArrayIndex(index: index)
-                if new {
-                    tilesForGame.last!.reset()
-                }
+//                if new {
+//                    tilesForGame.last!.reset()
+//                }
             }
         }
 //        let playingWords = playingRecord.pieces.components(separatedBy: "°")
@@ -365,7 +385,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         let firstTouch = touches.first
         firstTouchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: firstTouchLocation)
-        let touchedNodes = analyzeNodes(nodes: nodes)
+        let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .start)
         if touchedNodes.undo {
             undoTouched = true
         }
@@ -386,7 +406,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
-        let touchedNodes = analyzeNodes(nodes: nodes)
+        let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .move)
         if moved {
             let sprite = ws[movedIndex]
             sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * WSGameboardSizeMultiplier)
@@ -417,8 +437,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
     
     }
+    
+    enum CalledFrom: Int {
+        case start = 0, move, stop
+    }
 
-    private func analyzeNodes(nodes: [SKNode])->TouchedNodes {
+    private func analyzeNodes(nodes: [SKNode], calledFrom: CalledFrom)->TouchedNodes {
         var touchedNodes = TouchedNodes()
         for node in nodes {
             guard let name = node.name else {
@@ -435,7 +459,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 switch name.subString(startPos: 0, length: 3) {
                 case "Col": touchedNodes.col = number
                 case "Row": touchedNodes.row = number
-                case "Pos": touchedNodes.shapeIndex = number
+                case "Pos":
+                    if calledFrom == .start || startShapeIndex == number {
+                        touchedNodes.shapeIndex = number
+                    }
                 default: continue
                 }
             }
@@ -451,7 +478,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
         let lastPosition = ws.count - 1
-        let touchedNodes = analyzeNodes(nodes: nodes)
+        let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .stop)
         if touchedNodes.undo {
             startUndo()
         }
@@ -521,7 +548,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
             moved = false
         } else if nodes.count > 0 {
-            let touchedNodes = analyzeNodes(nodes: nodes)
             if touchedNodes.goBack {
                 wtSceneDelegate!.gameFinished()
                 return
@@ -571,6 +597,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                     wtGameboard!.removeFromGameboard(sprite: tileForGame)
                     wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
                     tileForGame.resetGameArrayPositions()
+                    indexOfTilesForGame -= 1
                     switch tileForGame.pieceFromPosition {
                     case 0:
                         movePieceToPosition(from: ws[1], to: 2, remove: true)
@@ -623,6 +650,95 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             undoSprite.alpha = 1.0
         }
         wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
+    }
+    
+    private func generateArrayOfWordPieces()->String {
+        let gameType = playingRecord.gameType
+        let gameNumber =  playingRecord.gameNumber
+        let words = playingRecord.mandatoryWords.components(separatedBy: "°")
+        let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+        let random = MyRandom(gameType: gameType, gameNumber: gameNumber)
+        func getLetters( from: inout [String], archiv: inout [String])->[String] {
+            
+            if from.count == 0 {
+                for item in archiv {
+                    from.append(item)
+                }
+                archiv.removeAll()
+            }
+            let index = random.getRandomInt(0, max: from.count - 1)
+            let temp = from[index]
+            var piece = [String]()
+            piece.append(temp.subString(startPos:0, length: 1))
+            if temp.count == 2 {
+                piece.append(temp.subString(startPos:1, length: 1))
+            }
+            archiv.append(temp)
+            from.remove(at: index)
+            return piece
+        }
+        tilesForGame.removeAll()
+        var oneLetterPieces = [String]()
+        var oneLetterPiecesArchiv = [String]()
+        var twoLetterPieces = [String]()
+        var twoLetterPiecesArchiv = [String]()
+        for word in words {
+            for letter in word {
+                oneLetterPieces.append(String(letter).uppercased())
+            }
+            for index in 0..<word.count - 1 {
+                twoLetterPieces.append(word.subString(startPos: index, length: 2).uppercased())
+            }
+        }
+        var typesWithLen1 = [MyShapes]()
+        var typesWithLen2 = [MyShapes]()
+        var typesWithLen3 = [MyShapes]()
+        var typesWithLen4 = [MyShapes]()
+        
+        for index in 0..<MyShapes.count - 1 {
+            guard let type = MyShapes(rawValue: index) else {
+                return ""
+            }
+            let length = myForms[type]![0].count
+            switch length {
+            case 1: typesWithLen1.append(type)
+            case 2: typesWithLen2.append(type)
+            case 3: typesWithLen3.append(type)
+            case 4: typesWithLen4.append(type)
+            default: break
+            }
+        }
+        let lengths = [1,1,1,1,2,2,2,3,3,4]
+        var generateLength = 0
+        repeat {
+            let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
+            var tileType = MyShapes.NotUsed
+            var letters = [String]()
+            switch tileLength {
+            case 1: tileType = typesWithLen1[0]
+            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
+            case 2: tileType = typesWithLen2[0]
+            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+            case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
+            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
+            case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
+            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+            default: break
+            }
+            let rotateIndex = random.getRandomInt(0, max: 3)
+            
+            //            let tileForGameItem = TilesForGame(type: tileType, rotateIndex: rotateIndex, letters: letters)
+            let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
+            tilesForGame.append(tileForGameItem)
+            generateLength += tileLength
+        } while generateLength < 500
+        var generatedArrayInStringForm = ""
+        for tile in tilesForGame {
+            generatedArrayInStringForm += tile.toString() + "°"
+        }
+        return generatedArrayInStringForm
     }
     
 

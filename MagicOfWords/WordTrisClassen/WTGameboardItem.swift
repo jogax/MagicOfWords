@@ -104,6 +104,11 @@ class WTGameboardItem: SKSpriteNode {
         } 
     }
     
+    public func setGreenToUsedColor() {
+        if status == .wholeWord {
+            self.color = usedColor
+        }
+    }
     public func remove() {
         self.status = .empty
         label.text = ""

@@ -157,7 +157,7 @@ class GenerateGameData {
                 gameData.gameNumber = gameNumber
                 gameData.mandatoryWords = words
                 let wordTable = words.components(separatedBy: "°")
-                gameData.pieces = generateArrayOfWordPieces(gameType: gameType, gameNumber: gameNumber, words: wordTable)
+//                gameData.pieces = generateArrayOfWordPieces(gameType: gameType, gameNumber: gameNumber, words: wordTable)
                 realm.add(gameData)
                 GV.lastSavedWord = wordTable[0]
                 try! realm.commitWrite()
@@ -175,92 +175,92 @@ class GenerateGameData {
         }
     }
     
-    private func generateArrayOfWordPieces(gameType: Int, gameNumber: Int, words: [String])->String {
-        let blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
-        let random = MyRandom(gameType: gameType, gameNumber: gameNumber)
-        func getLetters( from: inout [String], archiv: inout [String])->[String] {
-            
-            if from.count == 0 {
-                for item in archiv {
-                    from.append(item)
-                }
-                archiv.removeAll()
-            }
-            let index = random.getRandomInt(0, max: from.count - 1)
-            let temp = from[index]
-            var piece = [String]()
-            piece.append(temp.subString(startPos:0, length: 1))
-            if temp.count == 2 {
-                piece.append(temp.subString(startPos:1, length: 1))
-            }
-            archiv.append(temp)
-            from.remove(at: index)
-            return piece
-        }
-        tilesForGame.removeAll()
-        var oneLetterPieces = [String]()
-        var oneLetterPiecesArchiv = [String]()
-        var twoLetterPieces = [String]()
-        var twoLetterPiecesArchiv = [String]()
-        for word in words {
-            for letter in word {
-                oneLetterPieces.append(String(letter))
-            }
-            for index in 0..<word.count - 1 {
-                twoLetterPieces.append(word.subString(startPos: index, length: 2))
-            }
-        }
-        var typesWithLen1 = [MyShapes]()
-        var typesWithLen2 = [MyShapes]()
-        var typesWithLen3 = [MyShapes]()
-        var typesWithLen4 = [MyShapes]()
-        
-        for index in 0..<MyShapes.count - 1 {
-            guard let type = MyShapes(rawValue: index) else {
-                return ""
-            }
-            let length = myForms[type]![0].count
-            switch length {
-            case 1: typesWithLen1.append(type)
-            case 2: typesWithLen2.append(type)
-            case 3: typesWithLen3.append(type)
-            case 4: typesWithLen4.append(type)
-            default: break
-            }
-        }
-        let lengths = [1,1,1,1,2,2,2,3,3,4]
-        var generateLength = 0
-        repeat {
-            let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
-            var tileType = MyShapes.NotUsed
-            var letters = [String]()
-            switch tileLength {
-            case 1: tileType = typesWithLen1[0]
-            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
-            case 2: tileType = typesWithLen2[0]
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
-            case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            default: break
-            }
-            let rotateIndex = random.getRandomInt(0, max: 3)
-            
-            //            let tileForGameItem = TilesForGame(type: tileType, rotateIndex: rotateIndex, letters: letters)
-            let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: parentScene, blockSize: blockSize, letters: letters)
-            tilesForGame.append(tileForGameItem)
-            generateLength += tileLength
-        } while generateLength < 500
-        var generatedArrayInStringForm = ""
-        for tile in tilesForGame {
-            generatedArrayInStringForm += tile.toString() + "°"
-        }
-        return generatedArrayInStringForm
-    }
-
+//    private func generateArrayOfWordPieces(gameType: Int, gameNumber: Int, words: [String])->String {
+//        let blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+//        let random = MyRandom(gameType: gameType, gameNumber: gameNumber)
+//        func getLetters( from: inout [String], archiv: inout [String])->[String] {
+//
+//            if from.count == 0 {
+//                for item in archiv {
+//                    from.append(item)
+//                }
+//                archiv.removeAll()
+//            }
+//            let index = random.getRandomInt(0, max: from.count - 1)
+//            let temp = from[index]
+//            var piece = [String]()
+//            piece.append(temp.subString(startPos:0, length: 1))
+//            if temp.count == 2 {
+//                piece.append(temp.subString(startPos:1, length: 1))
+//            }
+//            archiv.append(temp)
+//            from.remove(at: index)
+//            return piece
+//        }
+//        tilesForGame.removeAll()
+//        var oneLetterPieces = [String]()
+//        var oneLetterPiecesArchiv = [String]()
+//        var twoLetterPieces = [String]()
+//        var twoLetterPiecesArchiv = [String]()
+//        for word in words {
+//            for letter in word {
+//                oneLetterPieces.append(String(letter))
+//            }
+//            for index in 0..<word.count - 1 {
+//                twoLetterPieces.append(word.subString(startPos: index, length: 2))
+//            }
+//        }
+//        var typesWithLen1 = [MyShapes]()
+//        var typesWithLen2 = [MyShapes]()
+//        var typesWithLen3 = [MyShapes]()
+//        var typesWithLen4 = [MyShapes]()
+//
+//        for index in 0..<MyShapes.count - 1 {
+//            guard let type = MyShapes(rawValue: index) else {
+//                return ""
+//            }
+//            let length = myForms[type]![0].count
+//            switch length {
+//            case 1: typesWithLen1.append(type)
+//            case 2: typesWithLen2.append(type)
+//            case 3: typesWithLen3.append(type)
+//            case 4: typesWithLen4.append(type)
+//            default: break
+//            }
+//        }
+//        let lengths = [1,1,1,1,2,2,2,3,3,4]
+//        var generateLength = 0
+//        repeat {
+//            let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
+//            var tileType = MyShapes.NotUsed
+//            var letters = [String]()
+//            switch tileLength {
+//            case 1: tileType = typesWithLen1[0]
+//            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
+//            case 2: tileType = typesWithLen2[0]
+//            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+//            case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
+//            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+//            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
+//            case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
+//            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+//            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+//            default: break
+//            }
+//            let rotateIndex = random.getRandomInt(0, max: 3)
+//
+//            //            let tileForGameItem = TilesForGame(type: tileType, rotateIndex: rotateIndex, letters: letters)
+//            let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: parentScene, blockSize: blockSize, letters: letters)
+//            tilesForGame.append(tileForGameItem)
+//            generateLength += tileLength
+//        } while generateLength < 500
+//        var generatedArrayInStringForm = ""
+//        for tile in tilesForGame {
+//            generatedArrayInStringForm += tile.toString() + "°"
+//        }
+//        return generatedArrayInStringForm
+//    }
+//
 }
 
 

@@ -1,4 +1,4 @@
-{Version: 1.1}
+{Version: 1.2}
 0/0/arany°próba°műtős°nüansz°hónap°színfa
 0/1/gyogyó°nyirok°kaviár°mixer°géptan°dongó
 0/2/család°boka°dobogó°levegő°szelet°felár
