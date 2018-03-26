@@ -333,13 +333,12 @@ class WTGameboard: SKShapeNode {
                 let letter = getLetter(col: col, row: row)
                 if letter != "" {
                     for word in wordsToCheck {
-                        if letter == word.subString(startPos: 0, length: 1) {
-                            OKPositions.removeAll()
-                            if flyOverWord(compare: letter, col: col, row: row, fromCol: col, fromRow: row, withWord: word) {
-//                                for position in OKPositions {  // set to green
-//                                    gameArray![position.col][position.row].setFoundedWord(toColor: .green)
-//                                }
-                            } else {
+                        if word.count > 0 {
+                            if letter == word.subString(startPos: 0, length: 1) {
+                                OKPositions.removeAll()
+                                if flyOverWord(compare: letter, col: col, row: row, fromCol: col, fromRow: row, withWord: word) {
+                                } else {
+                                }
                             }
                         }
                     }
@@ -384,6 +383,9 @@ class WTGameboard: SKShapeNode {
     var OKPositions = [UsedLetters]()
     
     private func flyOverWord(compare: String, col: Int, row: Int, fromCol: Int, fromRow: Int, withWord: String)->Bool {
+//        if withWord == "НАКЛОН" {
+//            print("Stopped")
+//        }
         let myWord = compare
         var returnBool = false
         if myWord.count == withWord.count {
@@ -399,9 +401,7 @@ class WTGameboard: SKShapeNode {
         if myWord == withWord.subString(startPos: 0, length: myWord.count) {
             OKPositions.append(UsedLetters(col:col, row: row, letter: gameArray![col][row].letter))
             if col > 0 && col - 1 != fromCol {
-                let actCol = col - 1
-                let actRow = row
-                let new = getLetter(col: actCol, row: actRow)
+                let new = getLetter(col: col - 1, row: row)
                 if new != "" {
                     if flyOverWord(compare: myWord + new, col: col - 1, row: row, fromCol: col, fromRow: row, withWord: withWord) {
                         OKPositions.removeLast()
@@ -435,6 +435,9 @@ class WTGameboard: SKShapeNode {
                         returnBool = true
                     }
                 }
+            }
+            if !returnBool && OKPositions.count > 0 {
+                OKPositions.removeLast()
             }
         }
         return returnBool

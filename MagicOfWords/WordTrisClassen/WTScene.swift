@@ -193,6 +193,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         if realm.objects(WordListModel.self).filter("word = %@", word.lowercased()).count == 1 {
             if !ownWords.contains(where: {$0 == word}) && !playingWords.contains(where: {$0 == word}) {
                 ownWords.append(word)
+                showOwnWord(word: word)
+                wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
                 playingWords.append(word)
                 var wordToShow = AllWordsToShow(word: word)
                 allWordsToShow.append(wordToShow)
@@ -205,10 +207,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
     }
     
-
-    
-    
-
     var line = 0
 
     private func createMenuItem(menuInt: TextConstants, firstLine: Bool = false) {
@@ -322,7 +320,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
         }
         if !new {
-            ownWords = playingRecord.ownWords.components(separatedBy: "°")
+            let words = playingRecord.ownWords.components(separatedBy: "°")
+            for word in words {
+                addOwnWord(word: word)
+            }
             restoreGameArray()
         } else {
             ws = Array(repeating: WTPiece(), count: 3)
@@ -481,6 +482,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .stop)
         if touchedNodes.undo {
             startUndo()
+            saveActualState()
         }
         if inChoosingOwnWord {
             wtGameboard?.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
@@ -488,6 +490,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             for word in ownWords {
                 tempOwnWords += word + "°"
             }
+            tempOwnWords.removeLast()
             realm.beginWrite()
             playingRecord.ownWords = tempOwnWords
             try! realm.commitWrite()
@@ -515,19 +518,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 ws[lastPosition].setPieceFromPosition(index: lastPosition)
                 self.addChild(ws[lastPosition])
                 let freePlaceFound = checkFreePlace()
-                var pieces = ""
-                for tile in tilesForGame {
-                    pieces += tile.toString() + "°"
-                }
-                var tempOwnWords = ""
-                for word in ownWords {
-                    tempOwnWords += word + "°"
-                }
-                realm.beginWrite()
-                playingRecord.ownWords = tempOwnWords
-                playingRecord.pieces = pieces
-                playingRecord.gameStatus = GameStatusPlaying
-                try! realm.commitWrite()
+                saveActualState()
 
                 if !freePlaceFound || testCounter >= 10000 {
                     wtGameboard!.clearGreenFieldsForNextRound()
@@ -558,6 +549,22 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
             
         }
+    }
+    
+    private func saveActualState() {
+        var pieces = ""
+        for tile in tilesForGame {
+            pieces += tile.toString() + "°"
+        }
+        var tempOwnWords = ""
+        for word in ownWords {
+            tempOwnWords += word + "°"
+        }
+        realm.beginWrite()
+        playingRecord.ownWords = tempOwnWords
+        playingRecord.pieces = pieces
+        playingRecord.gameStatus = GameStatusPlaying
+        try! realm.commitWrite()
     }
     
     private func checkFreePlace()->Bool {
@@ -626,6 +633,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     func restoreGameArray() {
+        func addPieceAsChild(pieceIndex: Int, piece: WTPiece) {
+            ws[pieceIndex] = piece
+            ws[pieceIndex].position = origPosition[pieceIndex]
+            origSize[pieceIndex] = piece.size
+            ws[pieceIndex].name = "Pos\(pieceIndex )"
+            self.addChild(ws[pieceIndex])
+
+        }
         onGameboardIndexes.removeAll()
         for index in 0..<tilesForGame.count {
             let tileForGame = tilesForGame[index]
@@ -635,11 +650,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             } else {
                 if tileForGame.pieceFromPosition >= 0 {
                     let pieceIndex = tileForGame.pieceFromPosition
-                    ws[pieceIndex] = tileForGame
-                    ws[pieceIndex].position = origPosition[pieceIndex]
-                    origSize[pieceIndex] = tileForGame.size
-                    ws[pieceIndex].name = "Pos\(pieceIndex )"
-                    self.addChild(ws[pieceIndex])
+                    addPieceAsChild(pieceIndex: pieceIndex, piece: tileForGame)
                 } else {
                     indexOfTilesForGame = index
                     break

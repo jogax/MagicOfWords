@@ -250,8 +250,10 @@ class WTPiece: SKSpriteNode {
     }
     
     public func resetGameArrayPositions() {
-        self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
-        self.isOnGameboard = false
+        if myType != .NotUsed {
+            self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
+            self.isOnGameboard = false
+        }
     }
     
     public func toString()->String {
