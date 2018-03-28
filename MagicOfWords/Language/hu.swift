@@ -23,6 +23,8 @@ let huDictionary: [TextConstants: String] = [
     .tcLoadingInProgress: "A magyar szavak betöltése folyamatban",
     .tcChooseGameType:    "Játéktípus választás",
     .tcBack:              "< Vissza",
+    .tcHeader:             "Játék: %, Kör: %, Pontszám: %",
+    .tcTime:               "Idő: %",
     .tcWordsToCollect:    "Kirakandó szavak: (% / %)",
     .tcOwnWords:          "Saját szavak (% / %)",
     .tcNoMoreSteps:       "Gratulálok, befejezted a játékot!",

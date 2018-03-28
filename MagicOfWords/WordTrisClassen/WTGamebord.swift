@@ -32,7 +32,7 @@ public protocol WTGameboardDelegate: class {
     /// Method called when a word is founded
     func showFoundedWords(foundedWordsToShow: [FoundedWordsWithCounter])
     /// method is called when an own word is chosed
-    func addOwnWord(word: String)
+    func addOwnWord(word: String, index: Int)
 }
 
 
@@ -40,6 +40,11 @@ let WSGameboardSizeMultiplier:CGFloat = 2.0
 func == (left: WTGameboard.UsedLetters, right: WTGameboard.UsedLetters) -> Bool {
     return left.col == right.col && left.row == right.row && left.letter == right.letter
 }
+
+func == (left: WTGameboard.FoundedWords, right: WTGameboard.FoundedWords) -> Bool {
+    return left.word == right.word
+}
+
 
 class WTGameboard: SKShapeNode {
     struct UsedItems {
@@ -345,6 +350,8 @@ class WTGameboard: SKShapeNode {
                 }
             }
         }
+        // analyze the repeated words: in 2 identical words my be only 1 letter with the same position
+        analyzeFoundedWords()
         for foundedWord in foundedWords {
             for letter in foundedWord.usedLetters {
                 gameArray![letter.col][letter.row].setFoundedWord(toColor: .green)
@@ -383,9 +390,6 @@ class WTGameboard: SKShapeNode {
     var OKPositions = [UsedLetters]()
     
     private func flyOverWord(compare: String, col: Int, row: Int, fromCol: Int, fromRow: Int, withWord: String)->Bool {
-//        if withWord == "НАКЛОН" {
-//            print("Stopped")
-//        }
         let myWord = compare
         var returnBool = false
         if myWord.count == withWord.count {
@@ -394,8 +398,22 @@ class WTGameboard: SKShapeNode {
             } else {
                 
                 OKPositions.append(UsedLetters(col:col, row: row, letter: gameArray![col][row].letter))
-                foundedWords.append(FoundedWords(word: myWord, usedLetters: OKPositions))
-                return true
+                var positionOnce = true
+//                if withWord == "КАТОК" {
+//                    print("Stopped at \(withWord)")
+//                }
+                for index0 in 0..<OKPositions.count - 1 {
+                    for index1 in index0 + 1..<OKPositions.count {
+                        if OKPositions[index0].col == OKPositions[index1].col && OKPositions[index0].row == OKPositions[index1].row {
+                            positionOnce = false
+                        }
+                    }
+                    
+                }
+                if positionOnce {
+                    foundedWords.append(FoundedWords(word: myWord, usedLetters: OKPositions))
+                }
+                return positionOnce
             }
         }
         if myWord == withWord.subString(startPos: 0, length: myWord.count) {
@@ -443,6 +461,39 @@ class WTGameboard: SKShapeNode {
         return returnBool
     }
     
+    private func analyzeFoundedWords() {
+        if foundedWords.count > 0 {
+            var indexesToRemove = [Int]()
+            for index in 0..<foundedWords.count - 1 {
+                let foundedWord1 = foundedWords[index]
+                for index1 in index + 1..<foundedWords.count {
+                    let foundedWord2 = foundedWords[index1]
+                    var countEqualPositions = 0
+                    if foundedWord1.word == foundedWord2.word {
+                        for checkIndex in 0..<foundedWord1.word.count {
+                            if foundedWord1.usedLetters[checkIndex].col == foundedWord2.usedLetters[checkIndex].col &&
+                                foundedWord1.usedLetters[checkIndex].row == foundedWord2.usedLetters[checkIndex].row {
+                                countEqualPositions += 1
+                            }
+                        }
+                    }
+                    if countEqualPositions > 1 {
+                        if !indexesToRemove.contains(where: {$0 == index1}) {
+                            indexesToRemove.append(index1)
+                        }
+                    }
+                }
+            }
+            if indexesToRemove.count > 0 {
+                let indexes = indexesToRemove.sorted(by: {$0 > $1})
+                for index in indexes {
+                    foundedWords.remove(at: index)
+                }
+            }
+        }
+    }
+
+    
     private func getLetter(col: Int, row: Int)->String {
         if gameArray![col][row].status == .used || gameArray![col][row].status == .wholeWord {
             return (gameArray![col][row].children[0] as! SKLabelNode).text!
@@ -473,14 +524,22 @@ class WTGameboard: SKShapeNode {
         for letter in choosedWord {
             word.append(letter.letter)
         }
-        delegate.addOwnWord(word: word)
-        clear()
+        if word.count > 3 {
+            delegate.addOwnWord(word: word, index: NoValue)
+            clear()
+        }
     }
     
     public func addOwnWordToCheck(word: String) {
         wordsToCheck.append(word)
     }
-    
+
+    public func removeOwnWordToCheck(word: String) {
+        if let index = wordsToCheck.index(where: {$0 == word}) {
+            wordsToCheck.remove(at: index)
+        }
+    }
+
     public func checkFreePlaceForPiece(piece: WTPiece, rotateIndex: Int)->Bool {
         let form = myForms[piece.myType]![rotateIndex]
         for col in 0..<size {

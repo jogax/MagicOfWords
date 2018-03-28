@@ -23,6 +23,8 @@ let deDictionary: [TextConstants: String] = [
     .tcLoadingInProgress: "Deutsche Wörter werden gerade geladen",
     .tcChooseGameType:    "Spieltyp wählen",
     .tcBack:              "< Zurück",
+    .tcHeader:             "Spiel: %, Runde: %, Ergebnis: %",
+    .tcTime:               "Zeit: %",
     .tcWordsToCollect:    "Zu sammelnde Wörter: (% / %)",
     .tcOwnWords:          "Eigene Wörter (% / %)",
     .tcNoMoreSteps:       "Herzlichen Glückwunsch, du hast das Spiel beendet!",

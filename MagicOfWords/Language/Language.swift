@@ -25,6 +25,8 @@ enum TextConstants: Int {
     tcLoadingInProgress,
     tcChooseGameType,
     tcBack,
+    tcHeader,
+    tcTime,
     tcWordsToCollect,
     tcOwnWords,
     tcNoMoreSteps,
