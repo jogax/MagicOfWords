@@ -22,7 +22,7 @@ let enDictionary: [TextConstants: String] = [
     .tcCancel:            "Cancel",
     .tcLoadingInProgress: "Loading English Words in progress",
     .tcChooseGameType:    "Choose game type",
-    .tcBack:              "< Back",
+    .tcBack:              "<<< Back",
     .tcHeader:             "Game: %, Round: %, Score: %",
     .tcTime:               "Time: %",
     .tcWordsToCollect:    "Words to collect: (% / %)",

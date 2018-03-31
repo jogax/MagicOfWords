@@ -11,7 +11,7 @@ import GameplayKit
 public protocol WTSceneDelegate: class {
     
     /// Method called when Game finished
-    func gameFinished()
+    func gameFinished(start: Int)
     
 }
 
@@ -81,6 +81,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     struct TouchedNodes {
         var goBack = false
+        var goPreviousGame = false
+        var goNextGame = false
         var undo = false
         var GCol = NoValue
         var GRow = NoValue
@@ -112,6 +114,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     var timeLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
     var headerLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
     var goBackLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+    var goToPreviousGameLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+    var goToNextGameLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
     var testCounter = 0
     var firstTouchLocation = CGPoint(x: 0, y: 0)
     var scoreMandatoryWords = 0
@@ -122,6 +126,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     var onGameboardIndexes = [String]()
     var roundIndexes = [String]()
     var new: Bool = true
+    var nextGame: Int = NoMore
+    var startTouchedNodes = TouchedNodes()
 
     var ws = [WTPiece]()
     var origPosition: [CGPoint] = Array(repeating: CGPoint(x:0, y: 0), count: 3)
@@ -146,8 +152,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     let undoName = "undo"
     let goBackName = "goBack"
     let headerName = "header"
-    let timeName = "time"
+    let timeName = "timeName"
     let gameNumberName = "gameNumber"
+    let previousName = "previousGame"
+    let nextName = "nextGame"
 
     
     override func didMove(to view: SKView) {
@@ -156,11 +164,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
 
         self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
-        let searchStatus = new ? GameStatusNew : GameStatusPlaying
-        let games = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, searchStatus)
-        if games.count > 0 {
-            playingRecord = games[0]
-        }
+        getPlayingRecord(new: new, next: nextGame)
 //        createHeader()
         createUndo()
         showWordsToCollect()
@@ -172,56 +176,156 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         return wtResults
     }
     
+    private func getPlayingRecord(new: Bool, next: Int) {
+        var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
+        print("actGames.count: \(actGames.count)")
+        if new {
+            let games = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GameStatusNew)
+            /// reset all records with nowPlaying status
+            if actGames.count > 0 {
+                for actGame in actGames {
+                    realm.beginWrite()
+                    actGame.nowPlaying = false
+                    try! realm.commitWrite()
+                }
+            }
+            if games.count > 0 {
+                playingRecord = games[0]
+                realm.beginWrite()
+                playingRecord.nowPlaying = true
+                try! realm.commitWrite()
+            }
+        } else {
+            var first = true
+            if actGames.count > 0 {
+                for actGame in actGames {
+                    if !first {
+                        realm.beginWrite()
+                        actGame.nowPlaying = false
+                        try! realm.commitWrite()
+                    }
+                    first = false
+                }
+            } else {
+                actGames = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GameStatusPlaying)
+                realm.beginWrite()
+                actGames[0].nowPlaying = true
+                try! realm.commitWrite()
+            }
+            let playedNowGame = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
+            if playedNowGame.count > 0 {
+                let actGameNumber = playedNowGame.first!.gameNumber
+                switch nextGame {
+                case NoMore:
+                    playingRecord = playedNowGame[0]
+                case PreviousGame:
+                    let previousRecords = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber < %d",
+                                                                                  GV.gameType, GameStatusPlaying, actGameNumber)
+                    if previousRecords.count == 1 {
+                        playingRecord = previousRecords[0]
+                    } else if let record = Array(previousRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).last {
+                        playingRecord = record
+                    } else {
+                        playingRecord = playedNowGame.first!
+                    }
+                case NextGame:
+                    let nextRecords = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber > %d",
+                                                                                   GV.gameType, GameStatusPlaying, actGameNumber)
+                    if nextRecords.count == 1 {
+                        playingRecord = nextRecords[0]
+                    } else if let record = Array(nextRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).first {
+                        playingRecord = record
+                    } else {
+                        playingRecord = playedNowGame.first!
+                    }
+
+                default:
+                    break
+                }
+                realm.beginWrite()
+                playedNowGame.first!.nowPlaying = false
+                playingRecord.nowPlaying = true
+                try! realm.commitWrite()
+            }
+            
+        }
+    }
 
     public func setDelegate(delegate: WTSceneDelegate) {
         wtSceneDelegate = delegate
     }
     
-    public func setGameArt(new: Bool) {
+    public func setGameArt(new: Bool, next: Int) {
         self.new = new
+        self.nextGame = next
     }
     
     private func createHeader() {
         if self.childNode(withName: goBackName) == nil {
-            let startYPosition = self.frame.height * 0.94
+            let YPosition: CGFloat = self.frame.height * 0.92
             let fontSize = self.frame.size.height * 0.0175
             goBackLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
             goBackLabel.text = GV.language.getText(.tcBack)
             goBackLabel.name = String(goBackName)
             goBackLabel.fontSize = fontSize
-            goBackLabel.position = CGPoint(x: self.frame.size.width * 0.1, y: startYPosition )
-            headerLabel.horizontalAlignmentMode = .left
+            goBackLabel.position = CGPoint(x: self.frame.size.width * 0.1, y: YPosition )
+            goBackLabel.horizontalAlignmentMode = .left
             goBackLabel.fontColor = SKColor.blue
             self.addChild(goBackLabel)
         }
 
+        if self.childNode(withName: timeName) == nil {
+            timeLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
+            let YPosition: CGFloat = self.frame.height * 0.92
+            let xPosition = self.frame.size.width * 0.8
+            timeLabel.position = CGPoint(x: xPosition, y: YPosition)
+            timeLabel.fontSize = self.frame.size.height * 0.0175
+            timeLabel.fontColor = .black
+            timeLabel.text = GV.language.getText(.tcTime, values: time.HourMinSec)
+            timeLabel.horizontalAlignmentMode = .right
+            timeLabel.name = timeName
+            self.addChild(timeLabel)
+        }
+
         if self.childNode(withName: headerName) == nil {
-            let startYPosition = self.frame.height * 0.92
             let fontSize = self.frame.size.height * 0.0175
+            let YPosition: CGFloat = self.frame.height * 0.90
             let text = GV.language.getText(.tcHeader, values: String(playingRecord.gameNumber + 1), String(0), String(0))
             headerLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
             headerLabel.name = String(headerName)
             headerLabel.fontSize = fontSize
-            headerLabel.position = CGPoint(x: self.frame.size.width * 0.5, y: startYPosition)
+            headerLabel.position = CGPoint(x: self.frame.size.width * 0.5, y: YPosition)
             headerLabel.horizontalAlignmentMode = .center
             headerLabel.fontColor = SKColor.black
             self.addChild(headerLabel)
         }
         
-        if self.childNode(withName: timeName) == nil {
-            timeLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
-            let yPosition = self.frame.height * 0.94
-            let xPosition = self.frame.size.width * 0.8
-            timeLabel.position = CGPoint(x: xPosition, y: yPosition)
-            timeLabel.fontSize = self.frame.size.height * 0.0175
-            timeLabel.fontColor = .black
-            timeLabel.text = GV.language.getText(.tcTime, values: time.HourMinSec)
-            headerLabel.horizontalAlignmentMode = .right
-            timeLabel.name = "TimeLabel"
-            self.addChild(timeLabel)
+        if self.childNode(withName: previousName) == nil {
+            goToPreviousGameLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
+            let yPosition = self.frame.height * 0.04
+            let xPosition = self.frame.size.width * 0.1
+            goToPreviousGameLabel.position = CGPoint(x: xPosition, y: yPosition)
+            goToPreviousGameLabel.fontSize = self.frame.size.height * 0.04
+            goToPreviousGameLabel.fontColor = .blue
+            goToPreviousGameLabel.text = "<"
+            goToPreviousGameLabel.horizontalAlignmentMode = .left
+            goToPreviousGameLabel.name = previousName
+            self.addChild(goToPreviousGameLabel)
         }
-    }
+        if self.childNode(withName: nextName) == nil {
+            goToNextGameLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
+            let yPosition = self.frame.height * 0.04
+            let xPosition = self.frame.size.width * 0.85
+            goToNextGameLabel.position = CGPoint(x: xPosition, y: yPosition)
+            goToNextGameLabel.fontSize = self.frame.size.height * 0.04
+            goToNextGameLabel.fontColor = .blue
+            goToNextGameLabel.text = ">"
+            goToNextGameLabel.horizontalAlignmentMode = .left
+            goToNextGameLabel.name = nextName
+            self.addChild(goToNextGameLabel)
+        }
+   }
     
     private func modifyHeader() {
         let text = GV.language.getText(.tcHeader, values: String(playingRecord.gameNumber + 1), String(roundIndexes.count), String(totalScore))
@@ -296,7 +400,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 
  private func createUndo() {
         undoSprite = SKSpriteNode(imageNamed: "undo.png")
-        let yPosition = self.frame.height * 0.95
+        let yPosition = self.frame.height * 0.92
         let xPosition = self.frame.width * 0.95
         undoSprite.position = CGPoint(x:xPosition, y:yPosition)
         undoSprite.alpha = 0.2
@@ -322,8 +426,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     private func createLabel(wordToShow: inout AllWordsToShow, counter: Int, own: Bool = false) {
         let xPositionMultiplier = [0.2, 0.5, 0.8]
-        let mandatoryYPositionMultiplier:CGFloat = 0.88
-        let ownYPositionMultiplier:CGFloat = 0.80
+        let mandatoryYPositionMultiplier:CGFloat = 0.86
+        let ownYPositionMultiplier:CGFloat = 0.78
         let distance: CGFloat = 0.02
         wordToShow.wordLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
         let value = CGFloat((counter - 1) / 3) *  distance
@@ -345,7 +449,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     private func createLabel(word: String, first: Bool, name: String) {
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
-        let yPosition = self.frame.height * (first ? 0.90 : 0.82)
+        let yPosition = self.frame.height * (first ? 0.88 : 0.80)
         let xPosition = self.frame.size.width * 0.5
         label.position = CGPoint(x: xPosition, y: yPosition)
         label.fontSize = self.frame.size.height * 0.0175
@@ -385,9 +489,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
         }
         modifyHeader()
+        goToPreviousGameLabel.alpha = hasPreviousRecords(playingRecord: playingRecord) ? 1.0 : 0.1
+        goToNextGameLabel.alpha = hasNextRecords(playingRecord: playingRecord) ? 1.0 : 0.1
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
     }
     
+    private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
+        return realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber < %d",
+            GV.gameType, GameStatusPlaying, playingRecord.gameNumber).count > 0
+    }
+    
+    private func hasNextRecords(playingRecord: GameDataModel)->Bool {
+    return realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber > %d",
+    GV.gameType, GameStatusPlaying, playingRecord.gameNumber).count > 0
+    
+    }
     @objc private func countTime(timerX: Timer) {
         time += 1
         timeLabel.text = GV.language.getText(.tcTime, values: time.HourMinSec)
@@ -501,6 +617,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
             if name == goBackName {
                 touchedNodes.goBack = true
+            }
+            if name == previousName {
+                touchedNodes.goPreviousGame = true
+            }
+            if name == nextName {
+                touchedNodes.goNextGame = true
             } else if name == undoName {
                 touchedNodes.undo = true
             } else if name.begins(with: "GBD") {
@@ -533,6 +655,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         if touchedNodes.undo {
             startUndo()
             saveActualState()
+        }
+        if touchedNodes.goPreviousGame {
+            wtSceneDelegate!.gameFinished(start: PreviousGame)
+            return
+        }
+        if touchedNodes.goNextGame {
+            wtSceneDelegate!.gameFinished(start: NextGame)
+            return
         }
         if inChoosingOwnWord {
             wtGameboard?.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
@@ -574,7 +704,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                         playingRecord.gameStatus = GameStatusFinished
                         try! realm.commitWrite()
                     } else {
-                        roundIndexes.append(String(indexOfTilesForGame))
+                        roundIndexes.append(String(onGameboardIndexes.last!))
                         modifyHeader()
                     }
                 }
@@ -588,7 +718,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             moved = false
         } else if nodes.count > 0 {
             if touchedNodes.goBack {
-                wtSceneDelegate!.gameFinished()
+                wtSceneDelegate!.gameFinished(start: NoMore)
                 return
             }
             if touchedNodes.shapeIndex >= 0 && startShapeIndex == touchedNodes.shapeIndex {
@@ -618,6 +748,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
         roundIndexesString.removeLast()
         playingRecord.roundIndexes = roundIndexesString
+        
+        var onGameboardIndexesString = ""
+        for index in 0..<onGameboardIndexes.count {
+            onGameboardIndexesString += onGameboardIndexes[index] + "°"
+        }
+        onGameboardIndexesString.removeLast()
+        playingRecord.onGameboardIndexes = onGameboardIndexesString
+
         try! realm.commitWrite()
     }
     
@@ -653,6 +791,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
         if onGameboardIndexes.count > 0 {
             if let indexOfLastPiece = Int(onGameboardIndexes.last!) {
+                if Int(roundIndexes.last!) == indexOfLastPiece {
+                    roundIndexes.removeLast()
+                }
                 let tileForGame = tilesForGame[indexOfLastPiece]
                 if tileForGame.isOnGameboard {
                     wtGameboard!.removeFromGameboard(sprite: tileForGame)
@@ -703,27 +844,58 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             self.addChild(ws[pieceIndex])
 
         }
-        roundIndexes.removeAll()
-        onGameboardIndexes.removeAll()
+        onGameboardIndexes = playingRecord.onGameboardIndexes.components(separatedBy: "°")
         roundIndexes = playingRecord.roundIndexes.components(separatedBy: "°")
-        for index in 0..<tilesForGame.count {
-            if roundIndexes.contains(String(index)) {
-                print("hier resetgreens!")
-                wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
-                wtGameboard!.clearGreenFieldsForNextRound()
-            }
-            let tileForGame = tilesForGame[index]
-            if tileForGame.isOnGameboard {
-                onGameboardIndexes.append(String(index))
+        
+        for index in onGameboardIndexes {
+            if let iIndex = Int(index) {
+                if roundIndexes.contains(index) {
+                    print("hier resetgreens!")
+                    wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
+                    wtGameboard!.clearGreenFieldsForNextRound()
+                }
+                let tileForGame = tilesForGame[iIndex]
                 wtGameboard!.showPieceOnGameArray(piece: tileForGame)
-            } else {
+            }
+        }
+        for index in 0..<tilesForGame.count {
+            let tileForGame = tilesForGame[index]
+            if !tileForGame.isOnGameboard {
                 if tileForGame.pieceFromPosition >= 0 {
                     let pieceIndex = tileForGame.pieceFromPosition
                     addPieceAsChild(pieceIndex: pieceIndex, piece: tileForGame)
                 } else {
                     indexOfTilesForGame = index
                     break
+
                 }
+            }
+        }
+//        for index in 0..<tilesForGame.count {
+//            if roundIndexes.contains(String(index)) {
+//                print("hier resetgreens!")
+//                wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
+//                wtGameboard!.clearGreenFieldsForNextRound()
+//            }
+//            let tileForGame = tilesForGame[index]
+//            if tileForGame.isOnGameboard {
+//                onGameboardIndexes.append(String(index))
+//                wtGameboard!.showPieceOnGameArray(piece: tileForGame)
+//            } else {
+//                if tileForGame.pieceFromPosition >= 0 {
+//                    let pieceIndex = tileForGame.pieceFromPosition
+//                    addPieceAsChild(pieceIndex: pieceIndex, piece: tileForGame)
+//                } else {
+//                    indexOfTilesForGame = index
+//                    break
+//                }
+//            }
+//        }
+        for index in 0..<ws.count {
+            if ws[index].name == nil {
+                let tileForGame = tilesForGame[indexOfTilesForGame]
+                addPieceAsChild(pieceIndex: index, piece: tileForGame)
+                indexOfTilesForGame += 1
             }
         }
         if onGameboardIndexes.count > 0 {

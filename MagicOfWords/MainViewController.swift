@@ -11,6 +11,10 @@ import SpriteKit
 import GameplayKit
 import RealmSwift
 
+let NoMore = 0
+let PreviousGame = 1
+let NextGame = 2
+
 class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WTSceneDelegate, LoadingSceneDelegate {
     func startChooseGameType() {
         print("Choose game type choosed")
@@ -26,12 +30,16 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         startMenuScene()
     }
     
-    func gameFinished() {
-        startMenuScene()
+    func gameFinished(start: Int) {
+        if start == NoMore {
+            startMenuScene(showMenu: true)
+        } else {
+            startWTScene(new: false, next: start)
+        }
     }
     
     func wtGame() {
-        startWTScene(new: true)
+        startWTScene(new: true, next: NoMore)
     }
     
     func findWords() {
@@ -47,11 +55,11 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         return
     }
     
-    func startWTScene(new: Bool) {
+    func startWTScene(new: Bool, next: Int) {
         let wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
             wtScene.setDelegate(delegate: self)
-            wtScene.setGameArt(new: new)
+            wtScene.setGameArt(new: new, next: next)
             view.presentScene(wtScene)
         }
 
@@ -71,7 +79,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         let gameType = GameType(rawValue: basicData.gameType)!
         switch gameType {
         case .WordTris:
-            startWTScene(new: true)
+            startWTScene(new: true, next: NoMore)
         case .SearchWords:
             startFindWordsScene()
         case .NoMoreGames:
@@ -84,7 +92,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         let gameType = GameType(rawValue: basicData.gameType)!
         switch gameType {
         case .WordTris:
-            startWTScene(new: false)
+            startWTScene(new: false, next: NoMore)
         case .SearchWords:
             startFindWordsScene()
         case .NoMoreGames:
@@ -109,16 +117,16 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
             // Get the SKScene from the loaded GKScene
     }
     
-    func startMenuScene() {
+    func startMenuScene(showMenu: Bool = false) {
         let menuScene = MenuScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
-            menuScene.setDelegate(delegate: self)
-            view.presentScene(menuScene)
-            
-            //            view.ignoresSiblingOrder = true
-            
-            //            view.showsFPS = true
-            //            view.showsNodeCount = true
+            let actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
+            if showMenu || actGames.count == 0 {
+                menuScene.setDelegate(delegate: self)
+                view.presentScene(menuScene)
+            } else {
+                continueGame()
+            }
         }
     }
 

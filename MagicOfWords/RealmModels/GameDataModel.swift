@@ -11,6 +11,7 @@ import RealmSwift
 
 class GameDataModel: Object {
     
+    @objc dynamic var nowPlaying = false
     @objc dynamic var gameType = 0
     @objc dynamic var gameNumber = 0
     @objc dynamic var gameStatus = 0 // 0: new, 1: playing, 2: finished

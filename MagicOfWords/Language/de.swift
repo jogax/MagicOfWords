@@ -22,7 +22,7 @@ let deDictionary: [TextConstants: String] = [
     .tcCancel:           "Abbrechen",
     .tcLoadingInProgress: "Deutsche Wörter werden gerade geladen",
     .tcChooseGameType:    "Spieltyp wählen",
-    .tcBack:              "< Zurück",
+    .tcBack:              "<<< Zurück",
     .tcHeader:             "Spiel: %, Runde: %, Ergebnis: %",
     .tcTime:               "Zeit: %",
     .tcWordsToCollect:    "Zu sammelnde Wörter: (% / %)",
