@@ -464,23 +464,21 @@ class WTGameboard: SKShapeNode {
     private func analyzeFoundedWords() {
         if foundedWords.count > 0 {
             var indexesToRemove = [Int]()
-            for index in 0..<foundedWords.count - 1 {
-                let foundedWord1 = foundedWords[index]
-                for index1 in index + 1..<foundedWords.count {
-                    let foundedWord2 = foundedWords[index1]
-                    var countEqualPositions = 0
-                    if foundedWord1.word == foundedWord2.word {
-                        for checkIndex in 0..<foundedWord1.word.count {
-                            if foundedWord1.usedLetters[checkIndex].col == foundedWord2.usedLetters[checkIndex].col &&
-                                foundedWord1.usedLetters[checkIndex].row == foundedWord2.usedLetters[checkIndex].row {
-                                countEqualPositions += 1
-                            }
+//            foundedWords = foundedWords.sorted(by:{$0.word < $1.word})
+            var wordTable = [String: [UsedLetters]]()
+            for (index, foundedWord) in foundedWords.enumerated() {
+                if wordTable[foundedWord.word] == nil {
+                    wordTable[foundedWord.word] = foundedWord.usedLetters
+                } else {
+                    var appended = false
+                    for usedLetter in foundedWord.usedLetters {
+                        if !wordTable[foundedWord.word]!.contains(where: {$0 == usedLetter}) {
+                            wordTable[foundedWord.word]!.append(usedLetter)
+                            appended = true
                         }
                     }
-                    if countEqualPositions > 1 {
-                        if !indexesToRemove.contains(where: {$0 == index1}) {
-                            indexesToRemove.append(index1)
-                        }
+                    if !appended {
+                        indexesToRemove.append(index)
                     }
                 }
             }
@@ -492,7 +490,6 @@ class WTGameboard: SKShapeNode {
             }
         }
     }
-
     
     private func getLetter(col: Int, row: Int)->String {
         if gameArray![col][row].status == .used || gameArray![col][row].status == .wholeWord {
@@ -563,6 +560,21 @@ class WTGameboard: SKShapeNode {
         }
         return false
     }
+    
+    public func setGameArrayPositionsToGreenIfNeeded(piece: WTPiece) {
+        if piece.myType != .NotUsed {
+            for (index, gameArrayPosition) in piece.gameArrayPositions.enumerated() {
+                let col = Int(gameArrayPosition)! / 10
+                let row = Int(gameArrayPosition)! % 10
+                if gameArray![col][row].status == .empty {                    
+                    _ = gameArray![col][row].setLetter(letter: piece.letters[index], status: .used, color: usedColor)
+                }
+            }
+        }
+    }
+    
+    
+
     
     public func clearGreenFieldsForNextRound() {
         for foundedWord in foundedWordsWithCount {

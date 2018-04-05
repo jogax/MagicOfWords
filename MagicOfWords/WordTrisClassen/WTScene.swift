@@ -178,7 +178,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     private func getPlayingRecord(new: Bool, next: Int) {
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
-        print("actGames.count: \(actGames.count)")
         if new {
             let games = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GameStatusNew)
             /// reset all records with nowPlaying status
@@ -303,7 +302,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         
         if self.childNode(withName: previousName) == nil {
             goToPreviousGameLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
-            let yPosition = self.frame.height * 0.04
+            let yPosition = self.frame.height * 0.03
             let xPosition = self.frame.size.width * 0.1
             goToPreviousGameLabel.position = CGPoint(x: xPosition, y: yPosition)
             goToPreviousGameLabel.fontSize = self.frame.size.height * 0.04
@@ -315,7 +314,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
         if self.childNode(withName: nextName) == nil {
             goToNextGameLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
-            let yPosition = self.frame.height * 0.04
+            let yPosition = self.frame.height * 0.03
             let xPosition = self.frame.size.width * 0.85
             goToNextGameLabel.position = CGPoint(x: xPosition, y: yPosition)
             goToNextGameLabel.fontSize = self.frame.size.height * 0.04
@@ -746,16 +745,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         for index in 0..<roundIndexes.count {
             roundIndexesString += roundIndexes[index] + "°"
         }
-        roundIndexesString.removeLast()
+        if roundIndexesString.count > 0 {
+            roundIndexesString.removeLast()
+        } else {
+            roundIndexesString.append("0")
+        }
         playingRecord.roundIndexes = roundIndexesString
         
         var onGameboardIndexesString = ""
-        for index in 0..<onGameboardIndexes.count {
-            onGameboardIndexesString += onGameboardIndexes[index] + "°"
+        if onGameboardIndexes.count > 0 {
+            for index in 0..<onGameboardIndexes.count {
+                onGameboardIndexesString += onGameboardIndexes[index] + "°"
+            }
+            onGameboardIndexesString.removeLast()
+            playingRecord.onGameboardIndexes = onGameboardIndexesString
         }
-        onGameboardIndexesString.removeLast()
-        playingRecord.onGameboardIndexes = onGameboardIndexesString
-
         try! realm.commitWrite()
     }
     
@@ -791,8 +795,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
         if onGameboardIndexes.count > 0 {
             if let indexOfLastPiece = Int(onGameboardIndexes.last!) {
-                if Int(roundIndexes.last!) == indexOfLastPiece {
-                    roundIndexes.removeLast()
+                if roundIndexes.count > 0 {
+                    if Int(roundIndexes.last!)! == indexOfLastPiece && Int(roundIndexes.last!)! > 0{
+                        roundIndexes.removeLast()
+                        for index in Int(roundIndexes.last!)!...Int(onGameboardIndexes.last!)! {
+                            wtGameboard!.setGameArrayPositionsToGreenIfNeeded(piece: tilesForGame[index])
+                        }
+                        
+                    }
                 }
                 let tileForGame = tilesForGame[indexOfLastPiece]
                 if tileForGame.isOnGameboard {
@@ -845,7 +855,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 
         }
         onGameboardIndexes = playingRecord.onGameboardIndexes.components(separatedBy: "°")
-        roundIndexes = playingRecord.roundIndexes.components(separatedBy: "°")
+        if onGameboardIndexes.count < 10 {
+            roundIndexes = ["0"]
+        } else {
+            roundIndexes = playingRecord.roundIndexes.components(separatedBy: "°")
+        }
         
         for index in onGameboardIndexes {
             if let iIndex = Int(index) {
