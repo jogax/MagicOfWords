@@ -23,13 +23,13 @@ struct WTResults {
     var countUsedLetters: Int
     var scoreUsedLetters: Int
     var allAroundScore: Int
-    init(countMandatoryWords: Int,
-         scoreMandatoryWords: Int,
-         countOwnWords: Int,
-         scoreOwnWords: Int,
-         countUsedLetters: Int,
-         scoreUsedLetters: Int,
-         allAroundScore: Int) {
+    init(countMandatoryWords: Int = 0,
+         scoreMandatoryWords: Int = 0,
+         countOwnWords: Int = 0,
+         scoreOwnWords: Int = 0,
+         countUsedLetters: Int = 0,
+         scoreUsedLetters: Int = 0,
+         allAroundScore: Int = 0) {
         self.countMandatoryWords = countMandatoryWords
         self.scoreMandatoryWords = scoreMandatoryWords
         self.countOwnWords = countOwnWords
@@ -364,18 +364,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     
-    func addOwnWord(word: String, index: Int) {
+    func addOwnWord(word: String, index: Int, check: Bool) {
         if realm.objects(WordListModel.self).filter("word = %@", word.lowercased()).count == 1 {
             if !ownWords.contains(where: {$0.word == word}) && !playingWords.contains(where: {$0 == word}) {
                 let myIndex = (index == NoValue ? indexOfTilesForGame : index)
                 ownWords.append(OwnWord(word: word, creationIndex: myIndex))
-                wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
+//                wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
                 playingWords.append(word)
                 var wordToShow = AllWordsToShow(word: word)
                 allWordsToShow.append(wordToShow)
                 createLabel(wordToShow: &wordToShow, counter: ownWords.count, own: true)
                 wtGameboard!.addOwnWordToCheck(word: word)
-                wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
+                if check {
+                    wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
+                }
             }
         }
     }
@@ -392,7 +394,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
 
     private func addOwnWord(ownWord: OwnWord) {
-        addOwnWord(word: ownWord.word, index: ownWord.creationIndex)
+        addOwnWord(word: ownWord.word, index: ownWord.creationIndex, check: false)
     }
     
     var line = 0
@@ -459,7 +461,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func play() {
-        time = 0
+        if let iTime = Int(playingRecord.time) {
+            time = iTime
+        } else {
+            time = 0
+        }
         createHeader()
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self, mandatoryWords: mandatoryWords)
         generateArrayOfWordPieces(new: new)
@@ -469,6 +475,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
         }
         if !new {
+            wtGameboard!.setRoundInfos(infos: playingRecord.roundInfos)
             let words = playingRecord.ownWords.components(separatedBy: "°")
             for item in words {
                 if item.count > 0 {
@@ -476,6 +483,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 }
             }
             restoreGameArray()
+            wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
         } else {
             ws = Array(repeating: WTPiece(), count: 3)
             roundIndexes.append("0")
@@ -690,9 +698,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 self.addChild(ws[lastPosition])
                 let freePlaceFound = checkFreePlace()
 
-                if !freePlaceFound || testCounter >= 10000 {
+                if !freePlaceFound {
                     wtGameboard!.clearGreenFieldsForNextRound()
-                    if !checkFreePlace() || testCounter >= 10000 {
+                    if !checkFreePlace() {
                         print("game is finished!")
                         let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.8)
                         let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
@@ -704,6 +712,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                         try! realm.commitWrite()
                     } else {
                         roundIndexes.append(String(onGameboardIndexes.last!))
+                        GV.actRound = roundIndexes.count - 1
                         modifyHeader()
                     }
                 }
@@ -751,6 +760,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             roundIndexesString.append("0")
         }
         playingRecord.roundIndexes = roundIndexesString
+        playingRecord.roundInfos = wtGameboard!.getRoundInfos()
         
         var onGameboardIndexesString = ""
         if onGameboardIndexes.count > 0 {
@@ -798,12 +808,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 if roundIndexes.count > 0 {
                     if Int(roundIndexes.last!)! == indexOfLastPiece && Int(roundIndexes.last!)! > 0{
                         roundIndexes.removeLast()
-                        for index in Int(roundIndexes.last!)!...Int(onGameboardIndexes.last!)! {
-                            wtGameboard!.setGameArrayPositionsToGreenIfNeeded(piece: tilesForGame[index])
-                        }
-                        
+                        GV.actRound = roundIndexes.count - 1
+                        wtGameboard!.pullLastGreenLetters()
                     }
+                    wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
                 }
+                
                 let tileForGame = tilesForGame[indexOfLastPiece]
                 if tileForGame.isOnGameboard {
                     wtGameboard!.removeFromGameboard(sprite: tileForGame)
@@ -855,16 +865,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 
         }
         onGameboardIndexes = playingRecord.onGameboardIndexes.components(separatedBy: "°")
+        if onGameboardIndexes.count > 1 {
+            if onGameboardIndexes[0] == "" {
+                onGameboardIndexes.removeFirst()
+            }
+        }
         if onGameboardIndexes.count < 10 {
             roundIndexes = ["0"]
+            GV.actRound = 0
         } else {
             roundIndexes = playingRecord.roundIndexes.components(separatedBy: "°")
+            if Int(roundIndexes.last!) != nil {
+                GV.actRound = roundIndexes.count - 1
+            } else {
+                GV.actRound = 0
+            }
         }
         
         for index in onGameboardIndexes {
             if let iIndex = Int(index) {
                 if roundIndexes.contains(index) {
-                    print("hier resetgreens!")
+//                    print("hier resetgreens!")
                     wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
                     wtGameboard!.clearGreenFieldsForNextRound()
                 }
@@ -885,26 +906,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 }
             }
         }
-//        for index in 0..<tilesForGame.count {
-//            if roundIndexes.contains(String(index)) {
-//                print("hier resetgreens!")
-//                wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
-//                wtGameboard!.clearGreenFieldsForNextRound()
-//            }
-//            let tileForGame = tilesForGame[index]
-//            if tileForGame.isOnGameboard {
-//                onGameboardIndexes.append(String(index))
-//                wtGameboard!.showPieceOnGameArray(piece: tileForGame)
-//            } else {
-//                if tileForGame.pieceFromPosition >= 0 {
-//                    let pieceIndex = tileForGame.pieceFromPosition
-//                    addPieceAsChild(pieceIndex: pieceIndex, piece: tileForGame)
-//                } else {
-//                    indexOfTilesForGame = index
-//                    break
-//                }
-//            }
-//        }
         for index in 0..<ws.count {
             if ws[index].name == nil {
                 let tileForGame = tilesForGame[indexOfTilesForGame]

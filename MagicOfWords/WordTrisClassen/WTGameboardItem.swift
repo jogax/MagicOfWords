@@ -16,6 +16,7 @@ let usedColor = SKColor(red:255/255, green: 153/255, blue: 153/255, alpha: 1)
 
 class WTGameboardItem: SKSpriteNode {
     public var status: ItemStatus = .empty
+    private var letterStack = [String]()
     private var origLetter: String = ""
     private var origColor: SKColor = .white
     private var doubleUsed = false
@@ -97,11 +98,21 @@ class WTGameboardItem: SKSpriteNode {
     
     public func clearIfUsed() {
         if status == .wholeWord {
+            letterStack.append(letter)
             label.text = ""
             self.letter = ""
             self.status = .empty
             self.color = .white
         } 
+    }
+    
+    public func pull() {
+        if letterStack.count > 0 {
+            self.letter = letterStack.last!
+            self.letterStack.removeLast()
+            self.status = .wholeWord
+            self.label.text = letter
+        }
     }
     
     public func setGreenToUsedColor() {

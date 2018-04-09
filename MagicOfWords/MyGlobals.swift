@@ -31,6 +31,7 @@ struct GV {
     static let onIpad = UIDevice.current.model.hasSuffix("iPad")
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static var activated = false
+    static var actRound = 0
 }
 
 

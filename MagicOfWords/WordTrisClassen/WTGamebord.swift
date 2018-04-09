@@ -12,7 +12,7 @@ import GameplayKit
 public struct FoundedWordsWithCounter {
     var word: String = ""
     var score: Int = 0
-    var counter: Int
+    var counter: Int = 0
     init(word: String, counter: Int, score: Int) {
         self.word = word
         self.counter = counter
@@ -25,6 +25,10 @@ public struct GameArrayPositions {
     var row: Int
 }
 
+public struct RoundInfos {
+    var words = [FoundedWordsWithCounter]()
+}
+
 
 
 public protocol WTGameboardDelegate: class {
@@ -32,7 +36,7 @@ public protocol WTGameboardDelegate: class {
     /// Method called when a word is founded
     func showFoundedWords(foundedWordsToShow: [FoundedWordsWithCounter])
     /// method is called when an own word is chosed
-    func addOwnWord(word: String, index: Int)
+    func addOwnWord(word: String, index: Int, check: Bool)
 }
 
 
@@ -92,8 +96,9 @@ class WTGameboard: SKShapeNode {
     private var ownWords = [String]()
     private var choosedWord = [UsedLetters]()
     private var foundedWords = [FoundedWords]()
+    private var roundInfos = [RoundInfos]()
     private var foundedWordsWithCount = [FoundedWordsWithCounter]()
-    private var foundedWordsWithCountArchiv = [FoundedWordsWithCounter]()
+//    private var foundedWordsWithCountArchiv = [FoundedWordsWithCounter]()
     private let scoreProWord = 50
     private let scoreProLetter = 10
 
@@ -115,6 +120,7 @@ class WTGameboard: SKShapeNode {
                 grid!.addChild(gameArray![col][row])
             }
         }
+//        roundInfos.append(RoundInfos())
         parentScene.addChild(self)
         generateNetOfColsAndRows()
     }
@@ -365,10 +371,22 @@ class WTGameboard: SKShapeNode {
             }
             foundedWords[index].score = scoreProWord + countLetterUsing * scoreProLetter
         }
-
+        if roundInfos.count == GV.actRound {
+            roundInfos.append(RoundInfos())
+        }
+        if roundInfos[GV.actRound].words.count > 0 {
+            roundInfos[GV.actRound].words.removeAll()
+        }
         foundedWordsWithCount.removeAll()
         for foundedWord in foundedWords {
             var founded = false
+            for index in 0..<roundInfos[GV.actRound].words.count {
+                if foundedWord.word == roundInfos[GV.actRound].words[index].word {
+                    roundInfos[GV.actRound].words[index].counter += 1
+                    roundInfos[GV.actRound].words[index].score += foundedWord.score
+                    founded = true
+                }
+            }
             for index in 0..<foundedWordsWithCount.count {
                 if foundedWord.word == foundedWordsWithCount[index].word {
                     foundedWordsWithCount[index].counter += 1
@@ -378,15 +396,51 @@ class WTGameboard: SKShapeNode {
             }
             if !founded {
                 foundedWordsWithCount.append(FoundedWordsWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
+                roundInfos[GV.actRound].words.append(FoundedWordsWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
             }
         }
+        
+        
+//        var wordDictionary = [String: FoundedWordsWithCounter]()
+        var wordDictionary = calculateCountersAndCores()
+//        for index in 0..<roundInfos.count {
+//            for wordInfos in roundInfos[index].words {
+//                if wordDictionary[wordInfos.word] == nil {
+//                    wordDictionary[wordInfos.word] = wordInfos
+//                } else {
+//                    wordDictionary[wordInfos.word] = FoundedWordsWithCounter(
+//                        word: wordInfos.word,
+//                        counter: wordInfos.counter + wordDictionary[wordInfos.word]!.counter,
+//                        score: wordInfos.score + wordDictionary[wordInfos.word]!.score
+//                    )
+//                }
+//            }
+//        }
         var foundedWordsToShow = [FoundedWordsWithCounter]()
-        for foundedWord in foundedWordsWithCount {
-            let archivCounter = calculateCounter(word: foundedWord.word, firstArray: false)
-            foundedWordsToShow.append(FoundedWordsWithCounter(word: foundedWord.word, counter: foundedWord.counter + archivCounter, score: foundedWord.score))
+        for (key, _) in wordDictionary {
+            foundedWordsToShow.append(wordDictionary[key]!)
         }
         delegate.showFoundedWords(foundedWordsToShow: foundedWordsToShow)
     }
+    
+    private func calculateCountersAndCores()->[String : FoundedWordsWithCounter] {
+        var wordDictionary = [String: FoundedWordsWithCounter]()
+        for index in 0..<roundInfos.count {
+            for wordInfos in roundInfos[index].words {
+                if wordDictionary[wordInfos.word] == nil {
+                    wordDictionary[wordInfos.word] = wordInfos
+                } else {
+                    wordDictionary[wordInfos.word] = FoundedWordsWithCounter(
+                        word: wordInfos.word,
+                        counter: wordInfos.counter + wordDictionary[wordInfos.word]!.counter,
+                        score: wordInfos.score + wordDictionary[wordInfos.word]!.score
+                    )
+                }
+            }
+        }
+        return wordDictionary
+    }
+    
     var OKPositions = [UsedLetters]()
     
     private func flyOverWord(compare: String, col: Int, row: Int, fromCol: Int, fromRow: Int, withWord: String)->Bool {
@@ -511,7 +565,58 @@ class WTGameboard: SKShapeNode {
         }
         choosedWord.append(actLetter)
     }
+    
+    private let roundSeparator = "/"
+    private let itemSeparator = "°"
+    private let itemDataSeparator = "^"
 
+    public func setRoundInfos(infos: String) {
+        roundInfos.removeAll()
+        var index = 0
+        let rounds = infos.components(separatedBy: roundSeparator)
+        for round in rounds {
+            roundInfos.append(RoundInfos())
+            let items = round.components(separatedBy: itemSeparator)
+            for item in items {
+                let itemData = item.components(separatedBy: itemDataSeparator)
+                if itemData.count == 3 {
+                    if let score = Int(itemData[1]) {
+                        if let counter = Int(itemData[2]) {
+                            let foundedWordWithCounter = FoundedWordsWithCounter(word: itemData[0], counter: counter, score: score)
+                            roundInfos[index].words.append(foundedWordWithCounter)
+                        }
+                    }
+                }
+            }
+            index += 1
+        }
+    }
+    
+    public func getRoundInfos()->String {
+        var infoString = ""
+        for info in roundInfos {
+            for item in info.words {
+                infoString += item.word + itemDataSeparator + String(item.score) + itemDataSeparator + String(item.counter) + itemSeparator
+             }
+            if infoString.count > 0 {
+                infoString.removeLast()
+                infoString += roundSeparator
+            }
+        }
+        if infoString.count > 0 {
+            infoString.removeLast()
+        }
+//        print("InfoString: \(infoString)")
+        return infoString
+    }
+
+    public func pullLastGreenLetters() {
+        for col in 0..<size {
+            for row in 0..<size {
+                gameArray![col][row].pull()
+            }
+        }
+    }
     public func endChooseOwnWord(col: Int, row: Int) {
         if col < 0 || col >= size || row < 0 || row >= size {
             return
@@ -522,7 +627,7 @@ class WTGameboard: SKShapeNode {
             word.append(letter.letter)
         }
         if word.count > 3 {
-            delegate.addOwnWord(word: word, index: NoValue)
+            delegate.addOwnWord(word: word, index: NoValue, check: true)
             clear()
         }
     }
@@ -561,13 +666,16 @@ class WTGameboard: SKShapeNode {
         return false
     }
     
-    public func setGameArrayPositionsToGreenIfNeeded(piece: WTPiece) {
+    public func setGameArrayPositionsToGreenIfNeeded(piece: WTPiece, pieceIndex: Int) {
         if piece.myType != .NotUsed {
             for (index, gameArrayPosition) in piece.gameArrayPositions.enumerated() {
                 let col = Int(gameArrayPosition)! / 10
                 let row = Int(gameArrayPosition)! % 10
                 if gameArray![col][row].status == .empty {                    
                     _ = gameArray![col][row].setLetter(letter: piece.letters[index], status: .used, color: usedColor)
+                    print("restored at piece: index: \(pieceIndex) col: \(col) row: \(row) letter: \(piece.letters[index])")
+                } else {
+                    print("not restored at piece: index: \(pieceIndex) col: \(col) row: \(row) letter: \(piece.letters[index])")
                 }
             }
         }
@@ -577,58 +685,27 @@ class WTGameboard: SKShapeNode {
 
     
     public func clearGreenFieldsForNextRound() {
-        for foundedWord in foundedWordsWithCount {
-            if foundedWordsWithCountArchiv.contains(where: {$0.word == foundedWord.word}) {
-                for index in 0..<foundedWordsWithCountArchiv.count {
-                    if foundedWordsWithCountArchiv[index].word == foundedWord.word {
-                        foundedWordsWithCountArchiv[index].counter += foundedWord.counter
-                    }
-                }
-            } else {
-                foundedWordsWithCountArchiv.append(foundedWord)
-            }
-        }
         foundedWordsWithCount.removeAll()
         for col in 0..<size {
             for row in 0..<size {
+//                print("col: \(col), row: \(row), letter: \(gameArray![col][row].letter) ")
                 gameArray![col][row].clearIfUsed()
             }
         }
     }
     
-    private func calculateCounter(word: String, firstArray: Bool = true, secondArray: Bool = true)->Int {
-        var counter = 0
-        if firstArray {
-            if let foundedWord = foundedWordsWithCount.first(where: {$0.word == word}) {
-                counter += foundedWord.counter
-            }
-        }
-        if secondArray {
-            if let foundedWordArchiv = foundedWordsWithCountArchiv.first(where: {$0.word == word}) {
-                counter += foundedWordArchiv.counter
-            }
-        }
-        return counter
-    }
-
     public func getResults()->WTResults {
-        var mandatoryCounter = 0
-        var ownCounter = 0
-        let countLetters = 0
+        var results = WTResults()
+        let wordDictionary = calculateCountersAndCores()
         for word in mandatoryWords {
-            mandatoryCounter += calculateCounter(word: word)
+            results.countMandatoryWords += wordDictionary[word]!.counter
+            results.scoreMandatoryWords += wordDictionary[word]!.score
         }
         for word in ownWords {
-            ownCounter += calculateCounter(word: word)
+            results.countOwnWords += wordDictionary[word]!.counter
+            results.scoreOwnWords += wordDictionary[word]!.score
         }
-        return WTResults(countMandatoryWords: mandatoryCounter,
-                             scoreMandatoryWords: 0,
-                             countOwnWords:ownCounter,
-                             scoreOwnWords: 0,
-                             countUsedLetters: countLetters,
-                             scoreUsedLetters: 0,
-                             allAroundScore: 0)
-
+        return results
     }
     
     public func removeFromGameboard(sprite: WTPiece) {
@@ -640,6 +717,19 @@ class WTGameboard: SKShapeNode {
                 }
             }
         }
+    }
+    
+    public func printGameArray() {
+        let line = "____________________________________________"
+        for row in 0..<10 {
+            var infoLine = "|"
+            for col in 0..<10 {
+                let char = gameArray![col][row].letter
+                infoLine += " " + (char == "" ? " " : char) + " " + "|"
+            }
+            print(infoLine)
+        }
+        print(line)
     }
 
     required init?(coder aDecoder: NSCoder) {
