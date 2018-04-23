@@ -8,8 +8,44 @@
 
 import Foundation
 import GameplayKit
+public struct UsedItems {
+    var col: Int = 0
+    var row: Int = 0
+    var item: WTGameboardItem?
+}
 
-public struct FoundedWordsWithCounter {
+public struct UsedLetter {
+    var col: Int = 0
+    var row: Int = 0
+    var letter: String = ""
+    init(col: Int, row: Int, letter: String) {
+        self.col = col
+        self.row = row
+        self.letter = letter
+    }
+    func toString()->String {
+        return String(col) + String(row) + String(letter)
+    }
+}
+public struct FoundedWord {
+    var word: String = ""
+    var score: Int = 0
+    var usedLetters = [UsedLetter]()
+    init(word: String = "", usedLetters: [UsedLetter] = [UsedLetter]()) {
+        self.word = word
+        self.usedLetters = usedLetters
+    }
+    func toString()->String {
+        var returnValue = word
+        for usedLetter in usedLetters {
+            returnValue += usedLetter.toString() + itemInnerSeparator
+        }
+        returnValue.removeLast()
+        return returnValue
+    }
+}
+
+public struct FoundedWordWithCounter {
     var word: String = ""
     var score: Int = 0
     var counter: Int = 0
@@ -26,56 +62,109 @@ public struct GameArrayPositions {
 }
 
 public struct RoundInfos {
-    var words = [FoundedWordsWithCounter]()
+    var words = [FoundedWordWithCounter]()
 }
+
+struct ActivityItem {
+    enum ActivityType: Int {
+        case FromBottom = 0, Moving, Choosing
+        var description : String {
+            switch self {
+            // Use Internationalization, as appropriate.
+            case .FromBottom: return "0"
+            case .Moving: return "1"
+            case .Choosing: return "2"
+            }
+        }
+    }
+    var type: ActivityType = .FromBottom
+    var fromBottomIndex: Int
+    var firstMovingItemColRow: Int
+    var lastMovingItemColRow: Int
+    var countSteps: Int
+    var choosedWord: FoundedWord
+    init(type: ActivityType, fromBottomIndex: Int = 0, firstMovingItemColRow: Int = 0, lastMovingItemColRow: Int = 0, countSteps: Int = 0, choosedWord: FoundedWord = FoundedWord()) {
+        self.type = type
+        self.fromBottomIndex = fromBottomIndex
+        self.firstMovingItemColRow = firstMovingItemColRow
+        self.lastMovingItemColRow = lastMovingItemColRow
+        self.countSteps = countSteps
+        self.choosedWord = choosedWord
+    }
+    init(fromString: String) {
+        let itemValues = fromString.components(separatedBy: itemInnerSeparator)
+        let type: ActivityType = itemValues[0] == "0" ? .FromBottom : itemValues[0] == "1" ? .Moving : .Choosing
+        switch type { // type of item
+        case .FromBottom:
+            var bottomIndex = 0
+            if let from = Int(itemValues[1]) {
+                bottomIndex = from
+            }
+            self.init(type: .FromBottom, fromBottomIndex: bottomIndex)
+        case .Moving:
+            var firstMovingItemColRow = 0
+            var lastMovingItemColRow = 0
+            var countSteps = 0
+            if let first = Int(itemValues[1]) {
+                if let last = Int(itemValues[2]) {
+                    if let count = Int(itemValues[3]) {
+                        firstMovingItemColRow = first
+                        lastMovingItemColRow = last
+                        countSteps = count
+                    }
+                }
+            }
+            self.init(type: .Moving, firstMovingItemColRow: firstMovingItemColRow, lastMovingItemColRow: lastMovingItemColRow, countSteps: countSteps)
+
+        case .Choosing:
+            let values = itemValues[1].components(separatedBy: itemInnerSeparator)
+            var choosedWord = FoundedWord()
+            if values.count > 0 {
+                let word = values[0]
+                var usedLetters = [UsedLetter]()
+                for index in 1..<values.count {
+                    let item = values[index]
+                    if item.count == 3 {
+                        if let col = Int(item.subString(startPos: 0, length: 1)) {
+                            if let row = Int(item.subString(startPos: 1, length: 1)) {
+                                let letter = item.subString(startPos: 2, length: 1)
+                                usedLetters.append(UsedLetter(col: col, row: row, letter: letter))
+                            }
+                        }
+                    }
+                }
+                choosedWord = FoundedWord(word: word, usedLetters: usedLetters)
+            }
+            self.init(type: .Choosing, choosedWord: choosedWord)
+
+        }
+    }
+}
+
+
 
 
 
 public protocol WTGameboardDelegate: class {
     
     /// Method called when a word is founded
-    func showFoundedWords(foundedWordsToShow: [FoundedWordsWithCounter])
+    func showFoundedWords(foundedWordsToShow: [FoundedWordWithCounter])
     /// method is called when an own word is chosed
     func addOwnWord(word: String, index: Int, check: Bool)
 }
 
 
 let WSGameboardSizeMultiplier:CGFloat = 2.0
-func == (left: WTGameboard.UsedLetters, right: WTGameboard.UsedLetters) -> Bool {
+func == (left: UsedLetter, right: UsedLetter) -> Bool {
     return left.col == right.col && left.row == right.row && left.letter == right.letter
 }
 
-func == (left: WTGameboard.FoundedWords, right: WTGameboard.FoundedWords) -> Bool {
+func == (left: FoundedWord, right: FoundedWord) -> Bool {
     return left.word == right.word
 }
 
 
 class WTGameboard: SKShapeNode {
-    struct UsedItems {
-        var col: Int = 0
-        var row: Int = 0
-        var item: WTGameboardItem?
-    }
-    
-    struct UsedLetters {
-        var col: Int = 0
-        var row: Int = 0
-        var letter: String = ""
-        init(col: Int, row: Int, letter: String) {
-            self.col = col
-            self.row = row
-            self.letter = letter
-        }
-    }
-    struct FoundedWords {
-        var word: String = ""
-        var score: Int = 0
-        var usedLetters = [UsedLetters]()
-        init(word: String, usedLetters: [UsedLetters]) {
-            self.word = word
-            self.usedLetters = usedLetters
-        }
-    }
     var delegate: WTGameboardDelegate
     var parentScene: SKScene
     var size: Int
@@ -91,23 +180,22 @@ class WTGameboard: SKShapeNode {
     private var startLocation = CGPoint(x: 0, y: 0)
     private var usedItems = [UsedItems]()
     private var usedItemsOK = true
-    private var mandatoryWords = [String]()
+//    private var mandatoryWords = [String]()
     private var wordsToCheck = [String]()
-    private var ownWords = [String]()
-    private var choosedWord = [UsedLetters]()
-    private var foundedWords = [FoundedWords]()
+//    private var ownWords = [String]()
+    private var choosedWord = [UsedLetter]()
+    private var foundedWords = [FoundedWord]()
     private var roundInfos = [RoundInfos]()
-    private var foundedWordsWithCount = [FoundedWordsWithCounter]()
+    private var foundedWordsWithCount = [FoundedWordWithCounter]()
 //    private var foundedWordsWithCountArchiv = [FoundedWordsWithCounter]()
     private let scoreProWord = 50
     private let scoreProLetter = 10
 
-    init(size: Int, parentScene: SKScene, delegate: WTGameboardDelegate, mandatoryWords: [String]) {
+    init(size: Int, parentScene: SKScene, delegate: WTGameboardDelegate) {
         self.size = size
         self.parentScene = parentScene
         self.blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(size)
         self.delegate = delegate
-        self.mandatoryWords = mandatoryWords
         super.init()
         createBackgroundShape(size: size)
         gameArray = createNewGameArray(size: size)
@@ -358,12 +446,28 @@ class WTGameboard: SKShapeNode {
         }
         // analyze the repeated words: in 2 identical words my be only 1 letter with the same position
         analyzeFoundedWords()
-        for foundedWord in foundedWords {
-            for letter in foundedWord.usedLetters {
-                gameArray![letter.col][letter.row].setFoundedWord(toColor: .green)
-                gameArray![letter.col][letter.row].incrementCountOccurences()
-            }
-        }
+//        GV.countFoundedMandatoryWords = 0
+//        for mandatoryWord in GV.mandatoryWords {
+//            if foundedWords.contains(where: {$0.word == mandatoryWord.word}) {
+//                GV.countFoundedMandatoryWords += 1
+//            }
+//        }
+//        GV.allMandatoryWordsFounded = GV.countFoundedMandatoryWords == GV.mandatoryWords.count
+//
+//        for foundedWord in foundedWords {
+//            var color:SKColor = GV.allMandatoryWordsFounded ? .green : SKColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
+//            if GV.mandatoryWords.contains(where: {$0.word == foundedWord.word}) {
+//                color = .green
+//            }
+//            for letter in foundedWord.usedLetters {
+//                var letterColor: SKColor = .green
+//                if gameArray![letter.col][letter.row].color != .green {
+//                    letterColor = color
+//                }
+//                gameArray![letter.col][letter.row].setFoundedWord(toColor: letterColor)
+//                gameArray![letter.col][letter.row].incrementCountOccurences()
+//            }
+//        }
         for index in 0..<foundedWords.count {
             var countLetterUsing = 0
             for letter in foundedWords[index].usedLetters {
@@ -373,6 +477,9 @@ class WTGameboard: SKShapeNode {
         }
         if roundInfos.count == GV.actRound {
             roundInfos.append(RoundInfos())
+        }
+        if GV.actRound > roundInfos.count - 1 {
+            GV.actRound = roundInfos.count - 1
         }
         if roundInfos[GV.actRound].words.count > 0 {
             roundInfos[GV.actRound].words.removeAll()
@@ -394,43 +501,66 @@ class WTGameboard: SKShapeNode {
                     founded = true
                 }
             }
+
             if !founded {
-                foundedWordsWithCount.append(FoundedWordsWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
-                roundInfos[GV.actRound].words.append(FoundedWordsWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
+                foundedWordsWithCount.append(FoundedWordWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
+                roundInfos[GV.actRound].words.append(FoundedWordWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
             }
         }
         
+        for index in 0..<GV.mandatoryWords.count {
+            GV.mandatoryWords[index].countFounded = 0
+        }
         
-//        var wordDictionary = [String: FoundedWordsWithCounter]()
-        var wordDictionary = calculateCountersAndCores()
-//        for index in 0..<roundInfos.count {
-//            for wordInfos in roundInfos[index].words {
-//                if wordDictionary[wordInfos.word] == nil {
-//                    wordDictionary[wordInfos.word] = wordInfos
-//                } else {
-//                    wordDictionary[wordInfos.word] = FoundedWordsWithCounter(
-//                        word: wordInfos.word,
-//                        counter: wordInfos.counter + wordDictionary[wordInfos.word]!.counter,
-//                        score: wordInfos.score + wordDictionary[wordInfos.word]!.score
-//                    )
-//                }
-//            }
-//        }
-        var foundedWordsToShow = [FoundedWordsWithCounter]()
+        for roundInfo in roundInfos {
+            for index in 0..<roundInfo.words.count {
+                for index1 in 0..<GV.mandatoryWords.count {
+                    if roundInfo.words[index].word == GV.mandatoryWords[index1].word {
+                        GV.mandatoryWords[index1].countFounded += roundInfo.words[index].counter
+                    }
+                }
+            }
+        }
+        GV.allMandatoryWordsFounded = false
+        GV.countFoundedMandatoryWords = 0
+        for mandatoryWord in GV.mandatoryWords {
+            if mandatoryWord.founded {
+                GV.countFoundedMandatoryWords += 1
+            }
+        }
+        GV.allMandatoryWordsFounded = GV.countFoundedMandatoryWords == GV.mandatoryWords.count
+        
+        for foundedWord in foundedWords {
+            var color:SKColor = GV.allMandatoryWordsFounded ? .green : SKColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
+            if GV.mandatoryWords.contains(where: {$0.word == foundedWord.word}) {
+                color = .green
+            }
+            for letter in foundedWord.usedLetters {
+                var letterColor: SKColor = .green
+                if gameArray![letter.col][letter.row].color != .green {
+                    letterColor = color
+                }
+                gameArray![letter.col][letter.row].setFoundedWord(toColor: letterColor)
+                gameArray![letter.col][letter.row].incrementCountOccurences()
+            }
+        }
+
+        var wordDictionary = calculateCountersAndScores()
+        var foundedWordsToShow = [FoundedWordWithCounter]()
         for (key, _) in wordDictionary {
             foundedWordsToShow.append(wordDictionary[key]!)
         }
         delegate.showFoundedWords(foundedWordsToShow: foundedWordsToShow)
     }
     
-    private func calculateCountersAndCores()->[String : FoundedWordsWithCounter] {
-        var wordDictionary = [String: FoundedWordsWithCounter]()
+    private func calculateCountersAndScores()->[String : FoundedWordWithCounter] {
+        var wordDictionary = [String: FoundedWordWithCounter]()
         for index in 0..<roundInfos.count {
             for wordInfos in roundInfos[index].words {
                 if wordDictionary[wordInfos.word] == nil {
                     wordDictionary[wordInfos.word] = wordInfos
                 } else {
-                    wordDictionary[wordInfos.word] = FoundedWordsWithCounter(
+                    wordDictionary[wordInfos.word] = FoundedWordWithCounter(
                         word: wordInfos.word,
                         counter: wordInfos.counter + wordDictionary[wordInfos.word]!.counter,
                         score: wordInfos.score + wordDictionary[wordInfos.word]!.score
@@ -441,7 +571,7 @@ class WTGameboard: SKShapeNode {
         return wordDictionary
     }
     
-    var OKPositions = [UsedLetters]()
+    var OKPositions = [UsedLetter]()
     
     private func flyOverWord(compare: String, col: Int, row: Int, fromCol: Int, fromRow: Int, withWord: String)->Bool {
         let myWord = compare
@@ -451,7 +581,7 @@ class WTGameboard: SKShapeNode {
                 return false
             } else {
                 
-                OKPositions.append(UsedLetters(col:col, row: row, letter: gameArray![col][row].letter))
+                OKPositions.append(UsedLetter(col:col, row: row, letter: gameArray![col][row].letter))
                 var positionOnce = true
 //                if withWord == "КАТОК" {
 //                    print("Stopped at \(withWord)")
@@ -465,13 +595,13 @@ class WTGameboard: SKShapeNode {
                     
                 }
                 if positionOnce {
-                    foundedWords.append(FoundedWords(word: myWord, usedLetters: OKPositions))
+                    foundedWords.append(FoundedWord(word: myWord, usedLetters: OKPositions))
                 }
                 return positionOnce
             }
         }
         if myWord == withWord.subString(startPos: 0, length: myWord.count) {
-            OKPositions.append(UsedLetters(col:col, row: row, letter: gameArray![col][row].letter))
+            OKPositions.append(UsedLetter(col:col, row: row, letter: gameArray![col][row].letter))
             if col > 0 && col - 1 != fromCol {
                 let new = getLetter(col: col - 1, row: row)
                 if new != "" {
@@ -519,7 +649,7 @@ class WTGameboard: SKShapeNode {
         if foundedWords.count > 0 {
             var indexesToRemove = [Int]()
 //            foundedWords = foundedWords.sorted(by:{$0.word < $1.word})
-            var wordTable = [String: [UsedLetters]]()
+            var wordTable = [String: [UsedLetter]]()
             for (index, foundedWord) in foundedWords.enumerated() {
                 if wordTable[foundedWord.word] == nil {
                     wordTable[foundedWord.word] = foundedWord.usedLetters
@@ -555,11 +685,11 @@ class WTGameboard: SKShapeNode {
     
     public func startChooseOwnWord(col: Int, row: Int) {
         choosedWord.removeAll()
-        choosedWord.append(UsedLetters(col: col, row: row, letter: gameArray![col][row].letter))
+        choosedWord.append(UsedLetter(col: col, row: row, letter: gameArray![col][row].letter))
     }
     
     public func moveChooseOwnWord(col: Int, row: Int) {
-        let actLetter = UsedLetters(col: col, row: row, letter: gameArray![col][row].letter)
+        let actLetter = UsedLetter(col: col, row: row, letter: gameArray![col][row].letter)
         if choosedWord.contains(where: {$0 == actLetter}) {
             return
         }
@@ -582,7 +712,7 @@ class WTGameboard: SKShapeNode {
                 if itemData.count == 3 {
                     if let score = Int(itemData[1]) {
                         if let counter = Int(itemData[2]) {
-                            let foundedWordWithCounter = FoundedWordsWithCounter(word: itemData[0], counter: counter, score: score)
+                            let foundedWordWithCounter = FoundedWordWithCounter(word: itemData[0], counter: counter, score: score)
                             roundInfos[index].words.append(foundedWordWithCounter)
                         }
                     }
@@ -610,13 +740,13 @@ class WTGameboard: SKShapeNode {
         return infoString
     }
 
-    public func pullLastGreenLetters() {
-        for col in 0..<size {
-            for row in 0..<size {
-                gameArray![col][row].pull()
-            }
-        }
-    }
+//    public func pullLastGreenLetters() {
+//        for col in 0..<size {
+//            for row in 0..<size {
+//                gameArray![col][row].pull()
+//            }
+//        }
+//    }
     public func endChooseOwnWord(col: Int, row: Int) {
         if col < 0 || col >= size || row < 0 || row >= size {
             return
@@ -626,7 +756,7 @@ class WTGameboard: SKShapeNode {
         for letter in choosedWord {
             word.append(letter.letter)
         }
-        if word.count > 3 {
+        if word.count > 4 {
             delegate.addOwnWord(word: word, index: NoValue, check: true)
             clear()
         }
@@ -694,18 +824,23 @@ class WTGameboard: SKShapeNode {
         }
     }
     
-    public func getResults()->WTResults {
+    public func getResults()->(WTResults, Bool) {
         var results = WTResults()
-        let wordDictionary = calculateCountersAndCores()
-        for word in mandatoryWords {
-            results.countMandatoryWords += wordDictionary[word]!.counter
-            results.scoreMandatoryWords += wordDictionary[word]!.score
+        var OK = true
+        let wordDictionary = calculateCountersAndScores()
+        for mandatoryWord in GV.mandatoryWords {
+            if wordDictionary[mandatoryWord.word] != nil {
+                results.countMandatoryWords += wordDictionary[mandatoryWord.word]!.counter
+                results.scoreMandatoryWords += wordDictionary[mandatoryWord.word]!.score
+            } else {
+                OK = false
+            }
         }
-        for word in ownWords {
-            results.countOwnWords += wordDictionary[word]!.counter
-            results.scoreOwnWords += wordDictionary[word]!.score
+        for ownWord in GV.ownWords {
+            results.countOwnWords += wordDictionary[ownWord.word]!.counter
+            results.scoreOwnWords += wordDictionary[ownWord.word]!.score
         }
-        return results
+        return (results, OK)
     }
     
     public func removeFromGameboard(sprite: WTPiece) {
@@ -719,13 +854,25 @@ class WTGameboard: SKShapeNode {
         }
     }
     
+    public func clearGameArray() {
+        for row in 0..<size {
+            for col in 0..<size {
+                gameArray![col][row].remove()
+            }
+        }
+    }
+    
     public func printGameArray() {
         let line = "____________________________________________"
         for row in 0..<10 {
             var infoLine = "|"
             for col in 0..<10 {
                 let char = gameArray![col][row].letter
-                infoLine += " " + (char == "" ? " " : char) + " " + "|"
+                var greenMark = " "
+                if gameArray![col][row].status == .wholeWord {
+                    greenMark = "*"
+                }
+                infoLine += greenMark + (char == "" ? " " : char) + greenMark + "|"
             }
             print(infoLine)
         }

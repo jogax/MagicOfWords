@@ -33,7 +33,8 @@ enum TextConstants: Int {
     tcScore,
     tcCollectedRequiredWords,
     tcCollectedOwnWords,
-    tcUsedLetters
+    tcUsedLetters,
+    tcTaskNotCompleted
 }
 
     let LanguageEN = "en" // index 0

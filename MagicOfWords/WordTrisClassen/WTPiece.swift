@@ -245,8 +245,8 @@ class WTPiece: SKSpriteNode {
         arrayIndex = index
     }
     
-    public func getArrayIndex() ->String {
-        return String(arrayIndex)
+    public func getArrayIndex() ->Int {
+        return arrayIndex
     }
     
     public func resetGameArrayPositions() {

@@ -18,7 +18,7 @@ class GameDataModel: Object {
     @objc dynamic var mandatoryWords = ""
     @objc dynamic var ownWords = ""
     @objc dynamic var pieces = ""
-    @objc dynamic var onGameboardIndexes = ""
+    @objc dynamic var activityItems = ""
     @objc dynamic var roundInfos = ""
     @objc dynamic var roundIndexes = ""
     @objc dynamic var time = ""
