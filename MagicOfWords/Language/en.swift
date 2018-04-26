@@ -25,12 +25,11 @@ let enDictionary: [TextConstants: String] = [
     .tcBack:              "<<< Back",
     .tcHeader:             "Game: %, Round: %, Score: %",
     .tcTime:               "Time: %",
-    .tcWordsToCollect:    "Words to collect: (% / % / %)",
+    .tcWordsToCollect:    "Words to collect: (% / % / % / %)",
     .tcOwnWords:          "Own words (% / % / %)",
     .tcNoMoreSteps:       "Congratulations, you've finished the game!",
     .tcScore:             "Score:",
     .tcCollectedRequiredWords: "Collected mandatory words:",
     .tcCollectedOwnWords:   "Collected own words:",
-    .tcUsedLetters:         "Used letters:",
     .tcTaskNotCompleted:    "Task not completed!",
 ]

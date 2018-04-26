@@ -33,7 +33,6 @@ enum TextConstants: Int {
     tcScore,
     tcCollectedRequiredWords,
     tcCollectedOwnWords,
-    tcUsedLetters,
     tcTaskNotCompleted
 }
 

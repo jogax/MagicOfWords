@@ -25,13 +25,12 @@ let deDictionary: [TextConstants: String] = [
     .tcBack:              "<<< Zurück",
     .tcHeader:             "Spiel: %, Runde: %, Ergebnis: %",
     .tcTime:               "Zeit: %",
-    .tcWordsToCollect:    "Zu sammelnde Wörter: (% / % / %)",
+    .tcWordsToCollect:    "Zu sammelnde Wörter: (% / % / % / %)",
     .tcOwnWords:          "Eigene Wörter (% / % / %)",
     .tcNoMoreSteps:       "Herzlichen Glückwunsch, du hast das Spiel beendet!",
     .tcScore:             "Punkte:",
     .tcCollectedRequiredWords: "Gesammelte Pflichtwörter",
     .tcCollectedOwnWords:      "Gesammelte eigene Wörter",
-    .tcUsedLetters:            "Gebrauchte Buchstaben",
     .tcTaskNotCompleted:    "Aufgabe nicht abgeschlossen!",
 ]
 

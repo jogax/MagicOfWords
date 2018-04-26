@@ -25,12 +25,11 @@ let huDictionary: [TextConstants: String] = [
     .tcBack:              "<<< Vissza",
     .tcHeader:             "Játék: %, Kör: %, Pontszám: %",
     .tcTime:               "Idő: %",
-    .tcWordsToCollect:    "Kirakandó szavak: (% / % / %)",
+    .tcWordsToCollect:    "Kirakandó szavak: (% / % / % / %)",
     .tcOwnWords:          "Saját szavak (% / % / %)",
     .tcNoMoreSteps:       "Gratulálok, befejezted a játékot!",
     .tcScore:             "Pontszám:",
     .tcCollectedRequiredWords:  "Összegyűjtött kötelező szavak:",
     .tcCollectedOwnWords:       "Összegyűjtött saját szavak:",
-    .tcUsedLetters:             "Felhasznált betük:",
     .tcTaskNotCompleted:    "Feladat nem teljesült!",
 ]

@@ -25,12 +25,11 @@ let ruDictionary: [TextConstants: String] = [
     .tcBack:              "<<< Назад",
     .tcHeader:             "Игра: %, Круг: %, Очки: %",
     .tcTime:               "Время: %",
-    .tcWordsToCollect:    "Слова для сбора: (% / % / %)",
+    .tcWordsToCollect:    "Слова для сбора: (% / % / % / %)",
     .tcOwnWords:          "Мои слова (% / % / %)",
     .tcNoMoreSteps:       "Поздравляю, ты закончил игру!",
     .tcScore:             "Очки:",
     .tcCollectedRequiredWords: "Собранные обязательные слова",
     .tcCollectedOwnWords:       "Собранные собственные слова",
-    .tcUsedLetters:             "Используемые буквы",
     .tcTaskNotCompleted:    "Задача не выполнена!",
 ]
