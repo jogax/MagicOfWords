@@ -32,4 +32,8 @@ let huDictionary: [TextConstants: String] = [
     .tcCollectedRequiredWords:  "Összegyűjtött kötelező szavak:",
     .tcCollectedOwnWords:       "Összegyűjtött saját szavak:",
     .tcTaskNotCompleted:    "Feladat nem teljesült!",
+    .tcNoMoreStepsQuestion: "Nincs több lépés!\r\n" +
+                            "Szeretne saját szavakat kijelölni?",
+    .tcNoMoreStepsAnswer1: "Kijelölés",
+    .tcNoMoreStepsAnswer2: "Következő kör",
 ]

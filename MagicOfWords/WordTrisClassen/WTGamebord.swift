@@ -746,7 +746,7 @@ class WTGameboard: SKShapeNode {
         for letter in choosedWord {
             word.append(letter.letter)
         }
-        if word.count > 4 {
+        if word.count > 2 {
             delegate.addOwnWord(word: word, creationIndex: NoValue, check: true)
             clear()
         }

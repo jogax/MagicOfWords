@@ -68,6 +68,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         var col = NoValue
         var row = NoValue
         var shapeIndex = NoValue
+        var answer1 = false
+        var answer2 = false
     }
     
     
@@ -604,6 +606,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     enum CalledFrom: Int {
         case start = 0, move, stop
     }
+    
+    var enabled = true
+    var gameboardEnabled = true
 
     private func analyzeNodes(nodes: [SKNode], calledFrom: CalledFrom)->TouchedNodes {
         var touchedNodes = TouchedNodes()
@@ -611,29 +616,38 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             guard let name = node.name else {
                 continue
             }
-            if name == goBackName {
-                touchedNodes.goBack = true
-            }
-            if name == previousName {
-                touchedNodes.goPreviousGame = true
-            }
-            if name == nextName {
-                touchedNodes.goNextGame = true
-            } else if name == undoName {
-                touchedNodes.undo = true
-            } else if name.begins(with: "GBD") {
-                touchedNodes.GCol = Int(name.subString(startPos: 4, length:1))!
-                touchedNodes.GRow = Int(name.subString(startPos: 6, length:1))!
-            } else if let number = Int(name.subString(startPos: 3, length: name.count - 3)) {
-                switch name.subString(startPos: 0, length: 3) {
-                case "Col": touchedNodes.col = number
-                case "Row": touchedNodes.row = number
-                case "Pos":
-                    if calledFrom == .start || startShapeIndex == number {
-                        touchedNodes.shapeIndex = number
-                    }
-                default: continue
+            if enabled || gameboardEnabled {
+                if name == goBackName {
+                    touchedNodes.goBack = enabled
                 }
+                if name == previousName {
+                    touchedNodes.goPreviousGame = enabled
+                }
+                if name == nextName {
+                    touchedNodes.goNextGame = enabled
+                } else if name == undoName {
+                    touchedNodes.undo = enabled
+                } else if name.begins(with: "GBD") {
+                    touchedNodes.GCol = Int(name.subString(startPos: 4, length:1))!
+                    touchedNodes.GRow = Int(name.subString(startPos: 6, length:1))!
+                } else if let number = Int(name.subString(startPos: 3, length: name.count - 3)) {
+                    if enabled {
+                        switch name.subString(startPos: 0, length: 3) {
+                        case "Col": touchedNodes.col = number
+                        case "Row": touchedNodes.row = number
+                        case "Pos":
+                            if calledFrom == .start || startShapeIndex == number {
+                                touchedNodes.shapeIndex = number
+                            }
+                        default: continue
+                        }
+                    }
+                }
+            }
+            if name == answer1Name {
+               touchedNodes.answer1 = true
+            } else if name == answer2Name {
+                touchedNodes.answer2 = true
             }
         }
         return touchedNodes
@@ -648,6 +662,33 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         let nodes = self.nodes(at: touchLocation)
         let lastPosition = ws.count - 1
         let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .stop)
+        if touchedNodes.answer1 {
+            gameboardEnabled = true
+            removeNodesWith(name: MyQuestionName)
+            self.addChild(createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer2), position:CGPoint(x: self.size.width * 0.5, y: self.size.height * 0.9), name: answer2Name))
+        }
+        if touchedNodes.answer2 {
+            wtGameboard!.clearGreenFieldsForNextRound()
+            if !checkFreePlace() {
+                print("game is finished!")
+                let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.5)
+                let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+                let gameFinishedSprite = WTGameFinished(size: size, position: position, delegate: self)
+                self.addChild(gameFinishedSprite)
+                gameFinishedSprite.showFinish()
+                realm.beginWrite()
+                playingRecord.gameStatus = GameStatusFinished
+                try! realm.commitWrite()
+            } else {
+                roundIndexes.append(activityItems.count - 1)
+                GV.actRound = roundIndexes.count - 1
+                modifyHeader()
+            }
+            enabled = true
+            gameboardEnabled = false
+            removeNodesWith(name: MyQuestionName)
+            removeNodesWith(name: answer2Name)
+       }
         if touchedNodes.undo {
             startUndo()
             saveActualState()
@@ -690,22 +731,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 let freePlaceFound = checkFreePlace()
 
                 if !freePlaceFound {
-                    wtGameboard!.clearGreenFieldsForNextRound()
-                    if !checkFreePlace() {
-                        print("game is finished!")
-                        let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.5)
-                        let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-                        let gameFinishedSprite = WTGameFinished(size: size, position: position, delegate: self)
-                        self.addChild(gameFinishedSprite)
-                        gameFinishedSprite.showFinish()
-                        realm.beginWrite()
-                        playingRecord.gameStatus = GameStatusFinished
-                        try! realm.commitWrite()
-                    } else {
-                        roundIndexes.append(activityItems.count - 1)
-                        GV.actRound = roundIndexes.count - 1
-                        modifyHeader()
-                    }
+                    let question = MyQuestion(question: .NoMoreSteps, parentSize: self.size)
+                    question.position = CGPoint(x:self.size.width * 0.5, y: self.size.height * 0.5)
+                    self.addChild(question)
+                    enabled = false
+                    gameboardEnabled = false
                 }
                saveActualState()
                testCounter += 1
@@ -727,6 +757,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             
         }
     }
+    
     
     private func saveActualState() {
         var pieces = ""
@@ -1015,7 +1046,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             default: break
             }
         }
-        let lengths = [1,1,1,2,2,2,2,3,3,4]
+//        let lengths = [1,1,1,2,2,2,2,3,3,4]
+        let lengths = [1,1,1,2,2,2,2]
         var generateLength = 0
         repeat {
             let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
@@ -1066,6 +1098,32 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
 
     }
+    
+    private func createButton(withText: String, position: CGPoint, name: String)->SKSpriteNode {
+        func createLabel(withText: String, position: CGPoint, fontSize: CGFloat, name: String)->SKLabelNode {
+            let label = SKLabelNode()
+            label.fontName = "TimesNewRoman"
+            label.fontColor = .black
+            label.numberOfLines = 0
+            label.verticalAlignmentMode = .center
+            label.horizontalAlignmentMode = .center
+            label.fontSize = self.size.width * 0.03
+            label.zPosition = self.zPosition + 1
+            label.text = withText
+            label.name = name
+            label.position = position
+            return label
+        }
+
+        let texture = SKTexture(imageNamed: "button.png")
+        let button = SKSpriteNode(texture: texture, color: .white, size: CGSize(width: self.size.width * 0.4, height: self.size.height * 0.1))
+        button.position = position
+        button.name = name
+        button.addChild(createLabel(withText: withText, position: CGPoint(x:0, y:10), fontSize: self.size.width * 0.03, name: name + "Label"))
+        return button
+        
+    }
+
     
 
     

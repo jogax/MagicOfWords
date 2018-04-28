@@ -32,4 +32,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcCollectedRequiredWords: "Собранные обязательные слова",
     .tcCollectedOwnWords:       "Собранные собственные слова",
     .tcTaskNotCompleted:    "Задача не выполнена!",
+    .tcNoMoreStepsQuestion: "Больше никаких шагов!\r\n" +
+                            "Хочешь указать собственные слова?",
+    .tcNoMoreStepsAnswer1: "Указать",
+    .tcNoMoreStepsAnswer2: "Следующий раунд",
 ]

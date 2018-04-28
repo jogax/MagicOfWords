@@ -32,6 +32,10 @@ let deDictionary: [TextConstants: String] = [
     .tcCollectedRequiredWords: "Gesammelte Pflichtwörter",
     .tcCollectedOwnWords:      "Gesammelte eigene Wörter",
     .tcTaskNotCompleted:    "Aufgabe nicht abgeschlossen!",
+    .tcNoMoreStepsQuestion: "Keine weiteren Schritte!\r\n" +
+                            "Möchtest du eigenen Wörter markieren?",
+    .tcNoMoreStepsAnswer1: "Markieren",
+    .tcNoMoreStepsAnswer2: "Nächste Runde",
 ]
 
 

@@ -125,7 +125,7 @@ class GenerateGameData {
         case .GenerateWordList:
             
             repeat {
-                let word = myWords[wordsPointer]
+                let word = myWords[wordsPointer].lowercased()
                 wordsPointer += 1
                 if word.count > 0 {
                     GV.lastSavedWord = word

@@ -32,4 +32,8 @@ let enDictionary: [TextConstants: String] = [
     .tcCollectedRequiredWords: "Collected mandatory words:",
     .tcCollectedOwnWords:   "Collected own words:",
     .tcTaskNotCompleted:    "Task not completed!",
+    .tcNoMoreStepsQuestion: "No more steps!\r\n" +
+                            "Would yue like to choose own words?",
+    .tcNoMoreStepsAnswer1: "Choose",
+    .tcNoMoreStepsAnswer2: "Next round",
 ]
