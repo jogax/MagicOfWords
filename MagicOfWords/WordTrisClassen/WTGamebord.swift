@@ -8,6 +8,8 @@
 
 import Foundation
 import GameplayKit
+public let gameboardName = "°°°GameboardName°°°"
+public let gridName = "°°°Grid°°°"
 public struct UsedItems {
     var col: Int = 0
     var row: Int = 0
@@ -209,6 +211,7 @@ class WTGameboard: SKShapeNode {
             }
         }
 //        roundInfos.append(RoundInfos())
+        self.name = gameboardName
         parentScene.addChild(self)
         generateNetOfColsAndRows()
     }
@@ -269,7 +272,7 @@ class WTGameboard: SKShapeNode {
 
         grid = Grid(blockSize: blockSize!, rows:size, cols:size)
         grid!.position = CGPoint (x:parentScene.frame.midX, y:parentScene.frame.maxY * 0.45)
-        grid!.name = "Gameboard"
+        grid!.name = gridName
         self.addChild(grid!)
     }
     

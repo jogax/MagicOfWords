@@ -43,21 +43,21 @@ struct WTResults {
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
-    struct AllWordsToShow {
-        var word: String
-        var countFounded: Int {
-            didSet {
-                wordLabel.text = self.word + " (\(self.countFounded))"
-            }
-        }
-        var wordLabel: SKLabelNode
-        init(word: String) {
-            self.word = word
-            countFounded = 0
-            wordLabel = SKLabelNode()
-        }
-    }
-    
+//    struct AllWordsToShow {
+//        var word: String
+//        var countFounded: Int {
+//            didSet {
+//                wordLabel.text = self.word + " (\(self.countFounded))"
+//            }
+//        }
+//        var wordLabel: SKLabelNode
+//        init(word: String) {
+//            self.word = word
+//            countFounded = 0
+//            wordLabel = SKLabelNode()
+//        }
+//    }
+//    
     struct TouchedNodes {
         var goBack = false
         var goPreviousGame = false
@@ -88,7 +88,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     let heightMultiplicator = CGFloat((GV.onIpad ? 0.10 : 0.15))
     var blockSize: CGFloat = 0
     var random: MyRandom?
-    var allWordsToShow = [AllWordsToShow]()
+//    var allWordsToShow = [AllWordsToShow]()
     var time: Int = 0
     var timer = Timer()
     var timeLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
@@ -127,15 +127,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         4: [31, 22],
         5: [32, 221]
     ]
-    let mandatoryWordsHeaderName = "mandatoryWords"
-    let ownWordsHeaderName = "ownWords"
-    let undoName = "undo"
-    let goBackName = "goBack"
-    let headerName = "header"
-    let timeName = "timeName"
-    let gameNumberName = "gameNumber"
-    let previousName = "previousGame"
-    let nextName = "nextGame"
+    let mandatoryWordsHeaderName = "°°°mandatoryWords°°°"
+    let ownWordsHeaderName = "°°°ownWords°°°"
+    let undoName = "°°°undo°°°"
+    let goBackName = "°°°goBack°°°"
+    let headerName = "°°°header°°°"
+    let timeName = "°°°timeName°°°"
+    let gameNumberName = "°°°gameNumber°°°"
+    let previousName = "°°°previousGame°°°"
+    let nextName = "°°°nextGame°°°"
 
     
     override func didMove(to view: SKView) {
@@ -318,19 +318,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         var scoreOwnWords = 0
         let ownWordAlpha:CGFloat = GV.allMandatoryWordsFounded() ? 1.0 : 0.4
         for actWord in GV.allWords {
-//            if let index = foundedWordsToShow.index(where: {$0.word == actWord.word}) {
-//                let foundedWordToShow = foundedWordsToShow[index]
-                if let label = self.childNode(withName: actWord.word)! as? SKLabelNode {
-                    label.text = actWord.word + " (\(actWord.countFounded)) "
-                    if actWord.mandatory {
-                        scoreMandatoryWords += actWord.score
-                    } else {
-                        scoreOwnWords += actWord.score
-                        label.alpha = ownWordAlpha
-                    }
+            let label = self.childNode(withName: actWord.word) as? SKLabelNode
+            if label != nil {
+                label!.text = actWord.word + " (\(actWord.countFounded)) "
+                if actWord.mandatory {
+                    scoreMandatoryWords += actWord.score
+                } else {
+                    scoreOwnWords += actWord.score
+                    label!.alpha = ownWordAlpha
                 }
-//            }
+            }
         }
+        
+        if GV.countFounded() >
         
         totalScore = scoreMandatoryWords + scoreOwnWords
         if let label = self.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
@@ -351,12 +351,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 let myIndex = (creationIndex == NoValue ? indexOfTilesForGame : creationIndex)
                 let ownWordToCheck = WordToCheck(word: word, countFounded: 1, mandatory: false, creationIndex: myIndex, score: 0)
                 GV.allWords.append(ownWordToCheck)
-//                wtGameboard!.checkWholeWords(wordsToCheck: playingWords)
-//                playingWords.append(word)
-                var wordToShow = AllWordsToShow(word: word)
-                allWordsToShow.append(wordToShow)
-                createLabel(wordToShow: &wordToShow, counter: GV.countWords(mandatory: false), own: true)
-//                wtGameboard!.addOwnWordToCheck(word: word)
+                createWordLabel(wordToShow: ownWordToCheck, counter: GV.countWords(mandatory: false), own: true)
                 if check {
                     wtGameboard!.checkWholeWords()
                 }
@@ -397,44 +392,55 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         let wordList = playingRecord.mandatoryWords.uppercased().components(separatedBy: "°")
         for word in wordList {
 //            GV.allWords.append(WordToCheck(word: word, mandatory: true, creationIndex: NoValue, countFounded: 0))
-            var wordToShow = AllWordsToShow(word: word)
-            allWordsToShow.append(wordToShow)
-            createLabel(wordToShow: &wordToShow, counter: counter)
+//            var wordToShow = AllWordsToShow(word: word)
+//            allWordsToShow.append(wordToShow)
+            let wordToShow = WordToCheck(word: word, countFounded: 0, mandatory: true, creationIndex: 0, score: 0)
+            createWordLabel(wordToShow: wordToShow, counter: counter, own: false)
             counter += 1
         }
         createLabel(word: GV.language.getText(.tcWordsToCollect, values: String(GV.countWords(mandatory: true)), "0","0", "0"), first: true, name: mandatoryWordsHeaderName)
         createLabel(word: GV.language.getText(.tcOwnWords, values: "0", "0", "0"), first: false, name: ownWordsHeaderName)
     }
     
-    private func createLabel(wordToShow: inout AllWordsToShow, counter: Int, own: Bool = false) {
+    private func createWordLabel(wordToShow: WordToCheck, counter: Int, own: Bool) {
         let xPositionMultiplier = [0.2, 0.5, 0.8]
         let mandatoryYPositionMultiplier:CGFloat = 0.86
-        let ownYPositionMultiplier:CGFloat = 0.78
+        let ownYPositionMultiplier:CGFloat = 0.80
         let distance: CGFloat = 0.02
-        wordToShow.wordLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
-        let value = CGFloat((counter - 1) / 3) *  distance
+        let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
+        let wordRow = CGFloat((counter - 1) / 3)
+        let wordColumn = (counter - 1) % 3
+        let value = wordRow * distance
         var yPosition: CGFloat = 0
+        var showWord = true
         if !own {
             yPosition = self.frame.height * (mandatoryYPositionMultiplier - value)
         } else {
+            let maxY = wtGameboard!.children[0].frame.maxY
             yPosition = self.frame.height * (ownYPositionMultiplier - value)
+            print("\(yPosition - maxY)")
+            if yPosition <= maxY {
+                showWord = false
+            }
         }
-        let xPosition = self.frame.size.width * CGFloat(xPositionMultiplier[(counter - 1) % 3])
-        wordToShow.wordLabel.position = CGPoint(x: xPosition, y: yPosition)
-        wordToShow.wordLabel.fontSize = self.frame.size.height * 0.0175
-        wordToShow.wordLabel.fontColor = .black
-        wordToShow.wordLabel.text = wordToShow.word + " (\(wordToShow.countFounded))"
-        wordToShow.wordLabel.name = wordToShow.word
-        
-        self.addChild(wordToShow.wordLabel)
+        let xPosition = self.frame.size.width * CGFloat(xPositionMultiplier[wordColumn])
+        label.position = CGPoint(x: xPosition, y: yPosition)
+        label.fontSize = self.frame.size.height * 0.0175
+        label.fontColor = .black
+        label.text = wordToShow.word + " (\(wordToShow.countFounded))"
+        label.name = wordToShow.word
+        self.addChild(label)
+        if !showWord {
+            label.isHidden = true
+        }
     }
     
     private func createLabel(word: String, first: Bool, name: String) {
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
-        let yPosition = self.frame.height * (first ? 0.88 : 0.80)
+        let yPosition = self.frame.height * (first ? 0.88 : 0.82)
         let xPosition = self.frame.size.width * 0.5
         label.position = CGPoint(x: xPosition, y: yPosition)
-        label.fontSize = self.frame.size.height * 0.0175
+        label.fontSize = self.frame.size.height * 0.018
         label.fontColor = .black
         label.text = word
         label.name = name
