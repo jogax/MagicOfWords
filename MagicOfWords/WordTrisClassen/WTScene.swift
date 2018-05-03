@@ -371,7 +371,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                     if node != nil {
                         if index >= showingOwnWordsIndex && index < showingOwnWordsIndex + countWordsInRow * countShowingRows {
                             node!.isHidden = false
-                            node!.position.y = firstLineYPosition + CGFloat((index - showingOwnWordsIndex) / 3) * heightOfLine
+                            node!.position.y = firstLineYPosition - CGFloat((index - showingOwnWordsIndex) / 3) * heightOfLine
                         } else {
                             node!.isHidden = true
                         }
