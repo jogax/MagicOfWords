@@ -55,40 +55,6 @@ struct WordToCheck {
         return word + "-" + String(creationIndex)
     }
 }
-//struct MandatoryWord {
-//    var word: String = ""
-//    var countFounded = 0
-//    var founded: Bool {
-//        get {
-//            return (countFounded > 0)
-//        }
-//    }
-//    init(word: String, countFounded: Int) {
-//        self.word = word
-//        self.countFounded = countFounded
-//    }
-//}
-//struct OwnWord {
-//    var word: String = ""
-//    var creationIndex: Int = 0
-//    init(word: String = "", creationIndex: Int = 0) {
-//        self.word = word
-//        self.creationIndex = creationIndex
-//    }
-//    init(from: String) {
-//        let valueTab = from.components(separatedBy: "-")
-//        if valueTab.count == 2 {
-//            word = valueTab[0]
-//            self.creationIndex = 0
-//            if let createIndex = Int(valueTab[1]) {
-//                self.creationIndex = createIndex
-//            }
-//        }
-//    }
-//    func toString()->String {
-//        return word + "-" + String(creationIndex)
-//    }
-//}
 
 
 struct GV {

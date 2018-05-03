@@ -70,6 +70,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         var shapeIndex = NoValue
         var answer1 = false
         var answer2 = false
+        var ownWordsBackground = false
     }
     
     
@@ -114,8 +115,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     var origSize: [CGSize] = Array(repeating: CGSize(width:0, height: 0), count: 3)
     var totalScore: Int = 0
     var moved = false
+    var ownWordsMoving = false
     var inChoosingOwnWord = false
     var movedIndex = 0
+    var countShowingOwnWords = 0
+    var ownWordsMovingStartPos = CGPoint(x:0, y:0)
+    var firstLineYPosition = CGFloat(0)
+    var heightOfLine = CGFloat(0)
+    var showingOwnWordsIndex = 0
+    let countWordsInRow = 3
+    var countShowingRows = 0
     var startShapeIndex = 0
     let shapeMultiplicator = [CGFloat(0.20), CGFloat(0.50), CGFloat(0.80)]
     let sizeOfGrid = 10
@@ -136,6 +145,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     let gameNumberName = "°°°gameNumber°°°"
     let previousName = "°°°previousGame°°°"
     let nextName = "°°°nextGame°°°"
+    let ownWordsBackgroundName = "°°°ownWordsBackgroundName°°°"
 
     
     override func didMove(to view: SKView) {
@@ -305,7 +315,33 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             goToNextGameLabel.name = nextName
             self.addChild(goToNextGameLabel)
         }
+        
    }
+    
+    private func createBackgroundForOwnWords() {
+        let ownYPositionMultiplier:CGFloat = 0.80
+        firstLineYPosition = self.frame.height * (ownYPositionMultiplier)
+        heightOfLine = self.size.height * 0.02
+        let minY: CGFloat? = wtGameboard!.children[0].frame.maxY
+        let maxY: CGFloat? = self.childNode(withName: ownWordsHeaderName)!.frame.maxY
+        var yPos: CGFloat = 0
+        var height: CGFloat = 0
+        if minY != nil && maxY != nil {
+            height = (maxY! - minY!) * 1.1
+            yPos = minY! + (maxY! - minY!) * 0.38
+            countShowingOwnWords = countWordsInRow * (Int(height / (self.size.height * 0.02)) - 1)
+            countShowingRows = countShowingOwnWords / countWordsInRow
+        }
+
+        if self.childNode(withName: ownWordsBackgroundName) == nil {
+            let texture = SKTexture(imageNamed: "menuBackground.png")
+            let ownWordsBackgroundSprite = SKSpriteNode(texture: texture, color: .red, size: CGSize(width: self.size.width, height: height))
+            ownWordsBackgroundSprite.position = CGPoint(x: self.size.width * 0.52, y: yPos)
+            ownWordsBackgroundSprite.alpha = 0.3
+            ownWordsBackgroundSprite.name = ownWordsBackgroundName
+            self.addChild(ownWordsBackgroundSprite)
+        }
+    }
     
     private func modifyHeader() {
         let text = GV.language.getText(.tcHeader, values: String(playingRecord.gameNumber + 1), String(roundIndexes.count), String(totalScore))
@@ -317,6 +353,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         var scoreMandatoryWords = 0
         var scoreOwnWords = 0
         let ownWordAlpha:CGFloat = GV.allMandatoryWordsFounded() ? 1.0 : 0.4
+        let countOwnWords = GV.countWords(mandatory: false)
+//        if countOwnWords > countShowingOwnWords {
+//            showingOwnWordsIndex = countOwnWords - (countOwnWords - countShowingOwnWords) / 3
+//        }
+        var index = 0
         for actWord in GV.allWords {
             let label = self.childNode(withName: actWord.word) as? SKLabelNode
             if label != nil {
@@ -326,11 +367,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 } else {
                     scoreOwnWords += actWord.score
                     label!.alpha = ownWordAlpha
+                    let node = self.childNode(withName: actWord.word)
+                    if node != nil {
+                        if index >= showingOwnWordsIndex && index < showingOwnWordsIndex + countWordsInRow * countShowingRows {
+                            node!.isHidden = false
+                            node!.position.y = firstLineYPosition + CGFloat((index - showingOwnWordsIndex) / 3) * heightOfLine
+                        } else {
+                            node!.isHidden = true
+                        }
+                    }
+                    index += 1
                 }
             }
         }
         
-        if GV.countFounded() >
+//        if GV.countFounded() >
         
         totalScore = scoreMandatoryWords + scoreOwnWords
         if let label = self.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
@@ -359,17 +410,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
     }
     
-//    func removeOwnWord(index: Int) {
-//        let word = GV.allWords[index].word
-//        wtGameboard!.removeOwnWordToCheck(word: word)
-//        if let playingIndex = playingWords.index(where: {$0 == word}) {
-//            playingWords.remove(at: playingIndex)
-//        }
-//        GV.ownWords.remove(at: index)
-//        removeNodesWith(name: word)
-//
-//    }
-//
     private func addOwnWord(ownWord: WordToCheck) {
         addOwnWord(word: ownWord.word, creationIndex: ownWord.creationIndex, check: false)
     }
@@ -408,8 +448,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         let ownYPositionMultiplier:CGFloat = 0.80
         let distance: CGFloat = 0.02
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
-        let wordRow = CGFloat((counter - 1) / 3)
-        let wordColumn = (counter - 1) % 3
+        let wordRow = CGFloat((counter - 1) / countWordsInRow)
+        let wordColumn = (counter - 1) % countWordsInRow
         let value = wordRow * distance
         var yPosition: CGFloat = 0
         var showWord = true
@@ -418,7 +458,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         } else {
             let maxY = wtGameboard!.children[0].frame.maxY
             yPosition = self.frame.height * (ownYPositionMultiplier - value)
-            print("\(yPosition - maxY)")
             if yPosition <= maxY {
                 showWord = false
             }
@@ -432,6 +471,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         self.addChild(label)
         if !showWord {
             label.isHidden = true
+        }
+        let countOwnWords = GV.countWords(mandatory: false)
+        if countOwnWords > countShowingOwnWords {
+            let countShowedRows = countShowingOwnWords / countWordsInRow
+            let startRow = countOwnWords / countWordsInRow - countShowedRows + 1
+            showingOwnWordsIndex =  startRow * countWordsInRow
+            print("showingOwnWordsIndex: \(showingOwnWordsIndex), countOwnWords: \(countOwnWords)")
         }
     }
     
@@ -456,6 +502,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         GV.countMandatoryWords = 0
         createHeader()
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
+        createBackgroundForOwnWords()
         generateArrayOfWordPieces(new: new)
         indexOfTilesForGame = 0
         ws = Array(repeating: WTPiece(), count: 3)
@@ -566,6 +613,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         } else if touchedNodes.GCol.between(min: 0, max: sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: sizeOfGrid - 1){
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
+        } else if touchedNodes.ownWordsBackground {
+            ownWordsMoving = true
+            ownWordsMovingStartPos = firstTouchLocation
         }
 
     }
@@ -591,6 +641,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         } else if inChoosingOwnWord {
             if touchedNodes.GCol >= 0 && touchedNodes.GCol < sizeOfGrid && touchedNodes.GRow >= 0 && touchedNodes.GRow < sizeOfGrid {
                 wtGameboard?.moveChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
+            }
+        } else if ownWordsMoving {
+            if abs(touchLocation.y - ownWordsMovingStartPos.y) > self.frame.height * 0.02 {
+                if GV.countWords(mandatory: false) > countShowingOwnWords {
+                    let adder = touchLocation.y - ownWordsMovingStartPos.y > 0 ? countWordsInRow : -countWordsInRow
+                    print("hier")
+                }
             }
         } else {
             if touchedNodes.shapeIndex >= 0 {
@@ -654,6 +711,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                touchedNodes.answer1 = true
             } else if name == answer2Name {
                 touchedNodes.answer2 = true
+            } else if name == ownWordsBackgroundName {
+                touchedNodes.ownWordsBackground = true
             }
         }
         return touchedNodes
