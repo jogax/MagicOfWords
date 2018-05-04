@@ -67,85 +67,6 @@ public struct RoundInfos {
     var words = [FoundedWordWithCounter]()
 }
 
-struct ActivityItem {
-    enum ActivityType: Int {
-        case FromBottom = 0, Moving, Choosing
-        var description : String {
-            switch self {
-            // Use Internationalization, as appropriate.
-            case .FromBottom: return "0"
-            case .Moving: return "1"
-            case .Choosing: return "2"
-            }
-        }
-    }
-    var type: ActivityType = .FromBottom
-    var fromBottomIndex: Int
-    var firstMovingItemColRow: Int
-    var lastMovingItemColRow: Int
-    var countSteps: Int
-    var choosedWord: FoundedWord
-    init(type: ActivityType, fromBottomIndex: Int = 0, firstMovingItemColRow: Int = 0, lastMovingItemColRow: Int = 0, countSteps: Int = 0, choosedWord: FoundedWord = FoundedWord()) {
-        self.type = type
-        self.fromBottomIndex = fromBottomIndex
-        self.firstMovingItemColRow = firstMovingItemColRow
-        self.lastMovingItemColRow = lastMovingItemColRow
-        self.countSteps = countSteps
-        self.choosedWord = choosedWord
-    }
-    init(fromString: String) {
-        let itemValues = fromString.components(separatedBy: itemInnerSeparator)
-        let type: ActivityType = itemValues[0] == "0" ? .FromBottom : itemValues[0] == "1" ? .Moving : .Choosing
-        switch type { // type of item
-        case .FromBottom:
-            var bottomIndex = 0
-            if let from = Int(itemValues[1]) {
-                bottomIndex = from
-            }
-            self.init(type: .FromBottom, fromBottomIndex: bottomIndex)
-        case .Moving:
-            var firstMovingItemColRow = 0
-            var lastMovingItemColRow = 0
-            var countSteps = 0
-            if let first = Int(itemValues[1]) {
-                if let last = Int(itemValues[2]) {
-                    if let count = Int(itemValues[3]) {
-                        firstMovingItemColRow = first
-                        lastMovingItemColRow = last
-                        countSteps = count
-                    }
-                }
-            }
-            self.init(type: .Moving, firstMovingItemColRow: firstMovingItemColRow, lastMovingItemColRow: lastMovingItemColRow, countSteps: countSteps)
-
-        case .Choosing:
-            let values = itemValues[1].components(separatedBy: itemInnerSeparator)
-            var choosedWord = FoundedWord()
-            if values.count > 0 {
-                let word = values[0]
-                var usedLetters = [UsedLetter]()
-                for index in 1..<values.count {
-                    let item = values[index]
-                    if item.count == 3 {
-                        if let col = Int(item.subString(startPos: 0, length: 1)) {
-                            if let row = Int(item.subString(startPos: 1, length: 1)) {
-                                let letter = item.subString(startPos: 2, length: 1)
-                                usedLetters.append(UsedLetter(col: col, row: row, letter: letter))
-                            }
-                        }
-                    }
-                }
-                choosedWord = FoundedWord(word: word, usedLetters: usedLetters)
-            }
-            self.init(type: .Choosing, choosedWord: choosedWord)
-
-        }
-    }
-}
-
-
-
-
 
 public protocol WTGameboardDelegate: class {
     
@@ -449,14 +370,18 @@ class WTGameboard: SKShapeNode {
         }
         // analyze the repeated words: in 2 identical words my be only 1 letter with the same position
         analyzeFoundedWords()
-        if roundInfos.count == GV.actRound {
+//        if roundInfos.count == GV.actRound {
+//            roundInfos.append(RoundInfos())
+//        }
+//        if GV.actRound > roundInfos.count - 1 {
+//            GV.actRound = roundInfos.count - 1
+//        }
+        if roundInfos.count > 0 {
+            if roundInfos.last!.words.count > 0 {
+                roundInfos[roundInfos.count - 1].words.removeAll()
+            }
+        } else {
             roundInfos.append(RoundInfos())
-        }
-        if GV.actRound > roundInfos.count - 1 {
-            GV.actRound = roundInfos.count - 1
-        }
-        if roundInfos[GV.actRound].words.count > 0 {
-            roundInfos[GV.actRound].words.removeAll()
         }
         for foundedWord in foundedWords {
             var color:SKColor = GV.allMandatoryWordsFounded() ? .green : SKColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
@@ -482,11 +407,13 @@ class WTGameboard: SKShapeNode {
         foundedWordsWithCount.removeAll()
         for foundedWord in foundedWords {
             var founded = false
-            for index in 0..<roundInfos[GV.actRound].words.count {
-                if foundedWord.word == roundInfos[GV.actRound].words[index].word {
-                    roundInfos[GV.actRound].words[index].counter += 1
-                    roundInfos[GV.actRound].words[index].score += foundedWord.score
-                    founded = true
+            if roundInfos.count > 0 {
+                for index in 0..<roundInfos.last!.words.count {
+                    if foundedWord.word == roundInfos.last!.words[index].word {
+                        roundInfos[roundInfos.count - 1].words[index].counter += 1
+                        roundInfos[roundInfos.count - 1].words[index].score += foundedWord.score
+                        founded = true
+                    }
                 }
             }
             for index in 0..<foundedWordsWithCount.count {
@@ -499,7 +426,7 @@ class WTGameboard: SKShapeNode {
 
             if !founded {
                 foundedWordsWithCount.append(FoundedWordWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
-                roundInfos[GV.actRound].words.append(FoundedWordWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
+                roundInfos[roundInfos.count - 1].words.append(FoundedWordWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
             }
         }
         
@@ -715,7 +642,7 @@ class WTGameboard: SKShapeNode {
         }
     }
     
-    public func getRoundInfos()->String {
+    public func toString()->String {
         var infoString = ""
         for info in roundInfos {
             for item in info.words {
@@ -815,6 +742,7 @@ class WTGameboard: SKShapeNode {
                 gameArray![col][row].clearIfUsed()
             }
         }
+        roundInfos.append(RoundInfos())
     }
     
     public func getResults()->(WTResults, Bool) {

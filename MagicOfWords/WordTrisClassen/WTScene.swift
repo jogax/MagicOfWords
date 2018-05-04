@@ -41,6 +41,82 @@ struct WTResults {
 
 }
 
+struct ActivityItem {
+    enum ActivityType: Int {
+        case FromBottom = 0, Moving, Choosing
+        var description : String {
+            switch self {
+            // Use Internationalization, as appropriate.
+            case .FromBottom: return "0"
+            case .Moving: return "1"
+            case .Choosing: return "2"
+            }
+        }
+    }
+    var type: ActivityType = .FromBottom
+    var fromBottomIndex: Int
+    var firstMovingItemColRow: Int
+    var lastMovingItemColRow: Int
+    var countSteps: Int
+    var choosedWord: FoundedWord
+    init(type: ActivityType, fromBottomIndex: Int = 0, firstMovingItemColRow: Int = 0, lastMovingItemColRow: Int = 0, countSteps: Int = 0, choosedWord: FoundedWord = FoundedWord(), roundIndex: Int = 0) {
+        self.type = type
+        self.fromBottomIndex = fromBottomIndex
+        self.firstMovingItemColRow = firstMovingItemColRow
+        self.lastMovingItemColRow = lastMovingItemColRow
+        self.countSteps = countSteps
+        self.choosedWord = choosedWord
+    }
+    init(fromString: String) {
+        let itemValues = fromString.components(separatedBy: itemInnerSeparator)
+        let type: ActivityType = itemValues[0] == "0" ? .FromBottom : itemValues[0] == "1" ? .Moving : .Choosing
+        switch type { // type of item
+        case .FromBottom:
+            var bottomIndex = 0
+            if let from = Int(itemValues[1]) {
+                bottomIndex = from
+            }
+            self.init(type: .FromBottom, fromBottomIndex: bottomIndex)
+        case .Moving:
+            var firstMovingItemColRow = 0
+            var lastMovingItemColRow = 0
+            var countSteps = 0
+            if let first = Int(itemValues[1]) {
+                if let last = Int(itemValues[2]) {
+                    if let count = Int(itemValues[3]) {
+                        firstMovingItemColRow = first
+                        lastMovingItemColRow = last
+                        countSteps = count
+                    }
+                }
+            }
+            self.init(type: .Moving, firstMovingItemColRow: firstMovingItemColRow, lastMovingItemColRow: lastMovingItemColRow, countSteps: countSteps)
+            
+        case .Choosing:
+            let values = itemValues[1].components(separatedBy: itemInnerSeparator)
+            var choosedWord = FoundedWord()
+            if values.count > 0 {
+                let word = values[0]
+                var usedLetters = [UsedLetter]()
+                for index in 1..<values.count {
+                    let item = values[index]
+                    if item.count == 3 {
+                        if let col = Int(item.subString(startPos: 0, length: 1)) {
+                            if let row = Int(item.subString(startPos: 1, length: 1)) {
+                                let letter = item.subString(startPos: 2, length: 1)
+                                usedLetters.append(UsedLetter(col: col, row: row, letter: letter))
+                            }
+                        }
+                    }
+                }
+                choosedWord = FoundedWord(word: word, usedLetters: usedLetters)
+            }
+            self.init(type: .Choosing, choosedWord: choosedWord)
+            
+        }
+    }
+}
+
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
 //    struct AllWordsToShow {
@@ -339,6 +415,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             ownWordsBackgroundSprite.position = CGPoint(x: self.size.width * 0.52, y: yPos)
             ownWordsBackgroundSprite.alpha = 0.3
             ownWordsBackgroundSprite.name = ownWordsBackgroundName
+            ownWordsBackgroundSprite.alpha = 0.0
+            ownWordsBackgroundSprite.isHidden = true
             self.addChild(ownWordsBackgroundSprite)
         }
     }
@@ -353,7 +431,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         var scoreMandatoryWords = 0
         var scoreOwnWords = 0
         let ownWordAlpha:CGFloat = GV.allMandatoryWordsFounded() ? 1.0 : 0.4
-        let countOwnWords = GV.countWords(mandatory: false)
+//        let countOwnWords = GV.countWords(mandatory: false)
 //        if countOwnWords > countShowingOwnWords {
 //            showingOwnWordsIndex = countOwnWords - (countOwnWords - countShowingOwnWords) / 3
 //        }
@@ -367,14 +445,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 } else {
                     scoreOwnWords += actWord.score
                     label!.alpha = ownWordAlpha
-                    let node = self.childNode(withName: actWord.word)
-                    if node != nil {
-                        if index >= showingOwnWordsIndex && index < showingOwnWordsIndex + countWordsInRow * countShowingRows {
-                            node!.isHidden = false
-                            node!.position.y = firstLineYPosition - CGFloat((index - showingOwnWordsIndex) / 3) * heightOfLine
-                        } else {
-                            node!.isHidden = true
-                        }
+                    if index >= showingOwnWordsIndex && index < showingOwnWordsIndex + countWordsInRow * countShowingRows - 1 {
+                        label!.isHidden = false
+                        label!.position.y = firstLineYPosition - CGFloat((index - showingOwnWordsIndex) / 3) * heightOfLine
+                    } else {
+                        label!.isHidden = true
                     }
                     index += 1
                 }
@@ -645,7 +720,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         } else if ownWordsMoving {
             if abs(touchLocation.y - ownWordsMovingStartPos.y) > self.frame.height * 0.02 {
                 if GV.countWords(mandatory: false) > countShowingOwnWords {
-                    let adder = touchLocation.y - ownWordsMovingStartPos.y > 0 ? countWordsInRow : -countWordsInRow
+//                    let adder = touchLocation.y - ownWordsMovingStartPos.y > 0 ? countWordsInRow : -countWordsInRow
                     print("hier")
                 }
             }
@@ -730,12 +805,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         if touchedNodes.answer1 {
             gameboardEnabled = true
             removeNodesWith(name: MyQuestionName)
-            self.addChild(createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer2), position:CGPoint(x: self.size.width * 0.5, y: self.size.height * 0.9), name: answer2Name))
+            self.addChild(createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer2), position:CGPoint(x: self.size.width * 0.5, y: self.size.height * 0.94), name: answer2Name))
         }
         if touchedNodes.answer2 {
             wtGameboard!.clearGreenFieldsForNextRound()
             if !checkFreePlace() {
-                print("game is finished!")
                 let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.5)
                 let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
                 let gameFinishedSprite = WTGameFinished(size: size, position: position, delegate: self)
@@ -746,7 +820,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 try! realm.commitWrite()
             } else {
                 roundIndexes.append(activityItems.count - 1)
-                GV.actRound = roundIndexes.count - 1
                 modifyHeader()
             }
             enabled = true
@@ -849,7 +922,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             roundIndexesString.append("0")
         }
         playingRecord.roundIndexes = roundIndexesString
-        playingRecord.roundInfos = wtGameboard!.getRoundInfos()
+        playingRecord.roundInfos = wtGameboard!.toString()
         
         var activityItemsString = ""
         if activityItems.count > 0 {
@@ -910,7 +983,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 if roundIndexes.count > 0 {
                     if roundIndexes.last! == activityItems.count - 1 {
                         roundIndexes.removeLast()
-                        GV.actRound = roundIndexes.count - 1
                         wtGameboard!.clearGameArray()
                         fillGameArrayFromActivityItems()
                     }
@@ -987,7 +1059,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 //        }
         if activityItemsArray.count < 1 {
             roundIndexes = [0]
-            GV.actRound = 0
         } else {
             activityItems.removeAll()
             for activityItem in activityItemsArray {
@@ -1014,11 +1085,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                     }
                 }
             }
-            if roundIndexes.count > 0 {
-                GV.actRound = roundIndexes.count - 1
-            } else {
-                GV.actRound = 0
-            }
+//            if roundIndexes.count > 0 {
+//                GV.actRound = roundIndexes.count - 1
+//            } else {
+//                GV.actRound = 0
+//            }
         }
         
         wtGameboard!.clearGameArray() // delete all contents from GameArray
