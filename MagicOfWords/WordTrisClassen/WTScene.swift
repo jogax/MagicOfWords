@@ -179,7 +179,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 //    var scoreOwnWords = 0
 //    var countMandatoryWords = 0
 //    var countOwnWords = 0
-    var playingRecord = GameDataModel()
     var activityItems = [ActivityItem]()
     var roundIndexes = [Int]()
     var new: Bool = true
@@ -256,9 +255,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 }
             }
             if games.count > 0 {
-                playingRecord = games[0]
+                GV.playingRecord = games[0]
                 realm.beginWrite()
-                playingRecord.nowPlaying = true
+                GV.playingRecord.nowPlaying = true
                 try! realm.commitWrite()
             }
         } else {
@@ -283,26 +282,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 let actGameNumber = playedNowGame.first!.gameNumber
                 switch nextGame {
                 case NoMore:
-                    playingRecord = playedNowGame[0]
+                    GV.playingRecord = playedNowGame[0]
                 case PreviousGame:
                     let previousRecords = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber < %d",
                                                                                   GV.gameType, GameStatusPlaying, actGameNumber)
                     if previousRecords.count == 1 {
-                        playingRecord = previousRecords[0]
+                        GV.playingRecord = previousRecords[0]
                     } else if let record = Array(previousRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).last {
-                        playingRecord = record
+                        GV.playingRecord = record
                     } else {
-                        playingRecord = playedNowGame.first!
+                        GV.playingRecord = playedNowGame.first!
                     }
                 case NextGame:
                     let nextRecords = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber > %d",
                                                                                    GV.gameType, GameStatusPlaying, actGameNumber)
                     if nextRecords.count == 1 {
-                        playingRecord = nextRecords[0]
+                        GV.playingRecord = nextRecords[0]
                     } else if let record = Array(nextRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).first {
-                        playingRecord = record
+                        GV.playingRecord = record
                     } else {
-                        playingRecord = playedNowGame.first!
+                        GV.playingRecord = playedNowGame.first!
                     }
 
                 default:
@@ -310,7 +309,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 }
                 realm.beginWrite()
                 playedNowGame.first!.nowPlaying = false
-                playingRecord.nowPlaying = true
+                GV.playingRecord.nowPlaying = true
                 try! realm.commitWrite()
             }
             
@@ -356,7 +355,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         if self.childNode(withName: headerName) == nil {
             let fontSize = self.frame.size.height * 0.0175
             let YPosition: CGFloat = self.frame.height * 0.90
-            let text = GV.language.getText(.tcHeader, values: String(playingRecord.gameNumber + 1), String(0), String(0))
+            let text = GV.language.getText(.tcHeader, values: String(GV.playingRecord.gameNumber + 1), String(0), String(0))
             headerLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
             headerLabel.name = String(headerName)
@@ -422,7 +421,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func modifyHeader() {
-        let text = GV.language.getText(.tcHeader, values: String(playingRecord.gameNumber + 1), String(roundIndexes.count), String(totalScore))
+        let text = GV.language.getText(.tcHeader, values: String(GV.playingRecord.gameNumber + 1), String(roundIndexes.count), String(totalScore))
         headerLabel.text = text
     }
     
@@ -504,7 +503,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     private func showWordsToCollect() {
         var counter = 1
-        let wordList = playingRecord.mandatoryWords.uppercased().components(separatedBy: "°")
+        let wordList = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: "°")
         for word in wordList {
 //            GV.allWords.append(WordToCheck(word: word, mandatory: true, creationIndex: NoValue, countFounded: 0))
 //            var wordToShow = AllWordsToShow(word: word)
@@ -569,7 +568,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func play() {
-        if let iTime = Int(playingRecord.time) {
+        if let iTime = Int(GV.playingRecord.time) {
             time = iTime
         } else {
             time = 0
@@ -584,7 +583,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
         }
-        let mandatoryWords = playingRecord.mandatoryWords.components(separatedBy: "°")
+        let mandatoryWords = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
         for item in mandatoryWords {
             if item.count > 0 {
                 GV.allWords.append(WordToCheck(word: item.uppercased(), countFounded: 0, mandatory: true, creationIndex: 0, score: 0))
@@ -592,9 +591,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
         }
         if !new {
-            wtGameboard!.setRoundInfos(infos: playingRecord.roundInfos)
+            wtGameboard!.setRoundInfos(infos: GV.playingRecord.roundInfos)
 
-            let ownWords = playingRecord.ownWords.components(separatedBy: "°")
+            let ownWords = GV.playingRecord.ownWords.components(separatedBy: "°")
             for item in ownWords {
                 if item.count > 0 {
                     addOwnWord(ownWord: WordToCheck(from: item))
@@ -614,8 +613,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
         }
         modifyHeader()
-        goToPreviousGameLabel.alpha = hasPreviousRecords(playingRecord: playingRecord) ? 1.0 : 0.1
-        goToNextGameLabel.alpha = hasNextRecords(playingRecord: playingRecord) ? 1.0 : 0.1
+        goToPreviousGameLabel.alpha = hasPreviousRecords(playingRecord: GV.playingRecord) ? 1.0 : 0.1
+        goToNextGameLabel.alpha = hasNextRecords(playingRecord: GV.playingRecord) ? 1.0 : 0.1
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
     }
     
@@ -633,18 +632,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         time += 1
         timeLabel.text = GV.language.getText(.tcTime, values: time.HourMinSec)
         realm.beginWrite()
-        playingRecord.time = String(time)
+        GV.playingRecord.time = String(time)
         try! realm.commitWrite()
     }
     
     private func generateArrayOfWordPieces(new: Bool) {
         if new {
             realm.beginWrite()
-            playingRecord.pieces = generateArrayOfWordPieces()
+            GV.playingRecord.pieces = generateArrayOfWordPieces()
             try! realm.commitWrite()
         }
         tilesForGame.removeAll()
-        let piecesToPlay = playingRecord.pieces.components(separatedBy: "°")
+        let piecesToPlay = GV.playingRecord.pieces.components(separatedBy: "°")
         for index in 0..<piecesToPlay.count {
             let piece = piecesToPlay[index]
             if piece.count > 0 {
@@ -816,7 +815,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 self.addChild(gameFinishedSprite)
                 gameFinishedSprite.showFinish()
                 realm.beginWrite()
-                playingRecord.gameStatus = GameStatusFinished
+                GV.playingRecord.gameStatus = GameStatusFinished
                 try! realm.commitWrite()
             } else {
                 roundIndexes.append(activityItems.count - 1)
@@ -909,9 +908,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
         }
         realm.beginWrite()
-        playingRecord.ownWords = tempOwnWords
-        playingRecord.pieces = pieces
-        playingRecord.gameStatus = GameStatusPlaying
+        GV.playingRecord.ownWords = tempOwnWords
+        GV.playingRecord.pieces = pieces
+        GV.playingRecord.gameStatus = GameStatusPlaying
         var roundIndexesString = ""
         for index in 0..<roundIndexes.count {
             roundIndexesString += String(roundIndexes[index]) + "°"
@@ -921,8 +920,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         } else {
             roundIndexesString.append("0")
         }
-        playingRecord.roundIndexes = roundIndexesString
-        playingRecord.roundInfos = wtGameboard!.toString()
+        GV.playingRecord.roundIndexes = roundIndexesString
+        GV.playingRecord.roundInfos = wtGameboard!.toString()
         
         var activityItemsString = ""
         if activityItems.count > 0 {
@@ -942,7 +941,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 activityItemsString += itemSeparator
             }
             activityItemsString.removeLast()
-            playingRecord.activityItems = activityItemsString
+            GV.playingRecord.activityItems = activityItemsString
         }
         try! realm.commitWrite()
     }
@@ -1051,7 +1050,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             self.addChild(ws[pieceIndex])
 
         }
-        let activityItemsArray = playingRecord.activityItems.components(separatedBy: itemSeparator)
+        let activityItemsArray = GV.playingRecord.activityItems.components(separatedBy: itemSeparator)
 //        if activityItemsArray.count > 1 {
 //            if activityItemsArray[0] == "" {
 //                activityItemsArray.removeFirst()
@@ -1067,7 +1066,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                     activityItems.append(itemValue)
                 }
             }
-            let roundIndexesArray = playingRecord.roundIndexes.components(separatedBy: itemSeparator)
+            let roundIndexesArray = GV.playingRecord.roundIndexes.components(separatedBy: itemSeparator)
             roundIndexes.removeAll()
             var first = true
             if roundIndexesArray.count > 0 {
@@ -1118,7 +1117,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         if activityItems.count > 0 {
             undoSprite.alpha = 1.0
         }
-        if let iTime = Int(playingRecord.time) {
+        if let iTime = Int(GV.playingRecord.time) {
             time = iTime
         } else {
             time = 0
@@ -1127,18 +1126,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func generateArrayOfWordPieces()->String {
-        let gameType = playingRecord.gameType
-        let gameNumber =  playingRecord.gameNumber
-        let words = playingRecord.mandatoryWords.components(separatedBy: "°")
+        let gameType = GV.playingRecord.gameType
+        let gameNumber =  GV.playingRecord.gameNumber
+        let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
         let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
         let random = MyRandom(gameType: gameType, gameNumber: gameNumber)
         func getLetters( from: inout [String], archiv: inout [String])->[String] {
             
             if from.count == 0 {
-                for item in archiv {
+                repeat {
+                    let archivIndex = random.getRandomInt(0, max: archiv.count - 1)
+                    let item = archiv[archivIndex]
+                    archiv.remove(at: archivIndex)
                     from.append(item)
-                }
-                archiv.removeAll()
+                } while archiv.count > 0
+//                for item in archiv {
+//                    from.append(item)
+//                }
+//                archiv.removeAll()
             }
             let index = random.getRandomInt(0, max: from.count - 1)
             let temp = from[index]
@@ -1160,8 +1165,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             for letter in word {
                 oneLetterPieces.append(String(letter).uppercased())
             }
-            for index in 0..<word.count - 1 {
-                twoLetterPieces.append(word.subString(startPos: index, length: 2).uppercased())
+//            for index in 0..<word.count - 1 {
+//                twoLetterPieces.append(word.subString(startPos: index, length: 2).uppercased())
+//            }
+//
+            for index in 0..<word.count / 2 {
+                if !twoLetterPieces.contains(where: {$0 == word.subString(startPos: index * 2, length: 2).uppercased()}) {
+                    twoLetterPieces.append(word.subString(startPos: index * 2, length: 2).uppercased())
+                }
+            }
+        }
+        for letter in String(GV.language.getText(.tcAlphabet)) {
+            if !oneLetterPieces.contains(where: {$0 == String(letter)}) {
+                oneLetterPieces.append(String(letter))
             }
         }
         var typesWithLen1 = [MyShapes]()
@@ -1183,7 +1199,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
         }
 //        let lengths = [1,1,1,2,2,2,2,3,3,4]
-        let lengths = [1,1,1,2,2,2,2]
+        let lengths = [1,1,1,2,2,2]
         var generateLength = 0
         repeat {
             let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
@@ -1208,7 +1224,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
             tilesForGame.append(tileForGameItem)
             generateLength += tileLength
-        } while generateLength < 500
+        } while generateLength < 1000
         var generatedArrayInStringForm = ""
         for tile in tilesForGame {
             generatedArrayInStringForm += tile.toString() + "°"

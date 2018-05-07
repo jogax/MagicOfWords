@@ -36,4 +36,5 @@ let ruDictionary: [TextConstants: String] = [
                             "Хочешь указать собственные слова?",
     .tcNoMoreStepsAnswer1: "Указать",
     .tcNoMoreStepsAnswer2: "Следующий раунд",
+    .tcAlphabet:           "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
 ]

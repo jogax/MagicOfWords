@@ -446,11 +446,11 @@ class WTGameboard: SKShapeNode {
             }
         }
 
-        var wordDictionary = calculateCountersAndScores()
-        var foundedWordsToShow = [FoundedWordWithCounter]()
-        for (key, _) in wordDictionary {
-            foundedWordsToShow.append(wordDictionary[key]!)
-        }
+//        var wordDictionary = calculateCountersAndScores()
+//        var foundedWordsToShow = [FoundedWordWithCounter]()
+//        for (key, _) in wordDictionary {
+//            foundedWordsToShow.append(wordDictionary[key]!)
+//        }
         delegate.showFoundedWords()
     }
     

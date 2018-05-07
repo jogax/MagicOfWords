@@ -58,6 +58,7 @@ struct WordToCheck {
 
 
 struct GV {
+    static var playingRecord = GameDataModel()
     static let language = Language()
     static var maxRecordCount = 0
     static var actRecordCount = 0

@@ -36,4 +36,5 @@ let enDictionary: [TextConstants: String] = [
                             "Would yue like to choose own words?",
     .tcNoMoreStepsAnswer1: "Choose",
     .tcNoMoreStepsAnswer2: "Next round",
+    .tcAlphabet:           "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 ]

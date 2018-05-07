@@ -36,4 +36,5 @@ let huDictionary: [TextConstants: String] = [
                             "Szeretne saját szavakat kijelölni?",
     .tcNoMoreStepsAnswer1: "Kijelölés",
     .tcNoMoreStepsAnswer2: "Következő kör",
+    .tcAlphabet:           "AÁBCDEÉFGHIÍJKLMNOÓÖŐPRSTUÚÜŰVZXY",
 ]

@@ -36,7 +36,8 @@ enum TextConstants: Int {
     tcTaskNotCompleted,
     tcNoMoreStepsQuestion,
     tcNoMoreStepsAnswer1,
-    tcNoMoreStepsAnswer2
+    tcNoMoreStepsAnswer2,
+    tcAlphabet
 
 }
 

@@ -36,6 +36,8 @@ let deDictionary: [TextConstants: String] = [
                             "Möchtest du eigenen Wörter markieren?",
     .tcNoMoreStepsAnswer1: "Markieren",
     .tcNoMoreStepsAnswer2: "Nächste Runde",
+    .tcAlphabet:           "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜẞ",
+
 ]
 
 
