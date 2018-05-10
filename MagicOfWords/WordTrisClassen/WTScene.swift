@@ -819,6 +819,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 try! realm.commitWrite()
             } else {
                 roundIndexes.append(activityItems.count - 1)
+                realm.beginWrite()
+                let newRound = RoundDataModel()
+                newRound.index = activityItems.count - 1
+                newRound.gameArray = wtGameboard!.gameArrayToString()
+                GV.playingRecord.rounds.append(newRound)
+                try! realm.commitWrite()
                 modifyHeader()
             }
             enabled = true
@@ -921,7 +927,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             roundIndexesString.append("0")
         }
         GV.playingRecord.roundIndexes = roundIndexesString
-        GV.playingRecord.roundInfos = wtGameboard!.toString()
+        GV.playingRecord.roundInfos = wtGameboard!.roundInfosToString(all:true)
+        var rounds: RoundDataModel
+        if GV.playingRecord.rounds.count == 0 {
+            rounds = RoundDataModel()
+            GV.playingRecord.rounds.append(rounds)
+        }
+        rounds = GV.playingRecord.rounds.last!
+        rounds.index = roundIndexes.last!
+        rounds.infos = wtGameboard!.roundInfosToString(all:false)
+        rounds.gameArray  = wtGameboard!.gameArrayToString()
+//        GV.playingRecord.roundGameArrays = wtGameboard!.gameArrayToString()
+        
         
         var activityItemsString = ""
         if activityItems.count > 0 {
@@ -979,6 +996,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         if activityItems.count > 0 {
             switch activityItems.last!.type {
             case .FromBottom:
+                if GV.playingRecord.rounds.count > 1 && GV.playingRecord.rounds.last!.index == activityItems.count - 1 {
+                    GV.playingRecord.rounds.removeLast()
+                    wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
+                }
                 if roundIndexes.count > 0 {
                     if roundIndexes.last! == activityItems.count - 1 {
                         roundIndexes.removeLast()
@@ -1091,8 +1112,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 //            }
         }
         
-        wtGameboard!.clearGameArray() // delete all contents from GameArray
-        fillGameArrayFromActivityItems()
+        wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
+//        wtGameboard!.clearGameArray() // delete all contents from GameArray
+//        fillGameArrayFromActivityItems()
         
         for index in 0..<tilesForGame.count {
             let tileForGame = tilesForGame[index]

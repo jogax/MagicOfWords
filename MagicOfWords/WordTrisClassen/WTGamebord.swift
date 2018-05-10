@@ -93,7 +93,6 @@ class WTGameboard: SKShapeNode {
     var size: Int
     var grid: Grid?
     let blockSize: CGFloat?
-    let tileColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha: 1.0)
     var gameArray: [[WTGameboardItem]]?
     var shape: WTPiece = WTPiece()
     private var lastCol: Int = 0
@@ -238,7 +237,7 @@ class WTGameboard: SKShapeNode {
             let calculatedCol = myCol + itemCol //- colAdder
             let calculatedRow = myRow - itemRow //- rowAdder
             if calculatedRow < 0 {return false}
-            _ = gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, color: tileColor)
+        _ = gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: gameArray![calculatedCol][calculatedRow])
             usedItems.append(usedItem)
         }
@@ -260,7 +259,7 @@ class WTGameboard: SKShapeNode {
             let itemRow = formOfShape[index] / 10
             let calculatedCol = myCol + itemCol // - adder
             let calculatedRow = myRow - itemRow
-            _ = gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, color: tileColor)
+            _ = gameArray![calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: gameArray![calculatedCol][calculatedRow])
             usedItems.append(usedItem)
         }
@@ -299,7 +298,7 @@ class WTGameboard: SKShapeNode {
                 let letter = piece.letters[index]
                 if let col = Int(piece.gameArrayPositions[index].subString(startPos: 0, length:1)) {
                     if let row = Int(piece.gameArrayPositions[index].subString(startPos: 1, length:1)) {
-                        _ = gameArray![col][row].setLetter(letter: letter, status: .used, color: usedColor)
+                        _ = gameArray![col][row].setLetter(letter: letter, status: .used, toColor: .myUsedColor)
                     }
                 }
             }
@@ -384,13 +383,13 @@ class WTGameboard: SKShapeNode {
             roundInfos.append(RoundInfos())
         }
         for foundedWord in foundedWords {
-            var color:SKColor = GV.allMandatoryWordsFounded() ? .green : SKColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
+            var color:MyColor = GV.allMandatoryWordsFounded() ? .myWholeWordColor : .myGoldColor
             if GV.allWords.contains(where: {$0.word == foundedWord.word}) {
-                color = .green
+                color = .myWholeWordColor
             }
             for letter in foundedWord.usedLetters {
-                var letterColor: SKColor = .green
-                if gameArray![letter.col][letter.row].color != .green {
+                var letterColor: MyColor = .myWholeWordColor
+                if gameArray![letter.col][letter.row].myColor != .myWholeWordColor {
                     letterColor = color
                 }
                 gameArray![letter.col][letter.row].setFoundedWord(toColor: letterColor)
@@ -597,7 +596,7 @@ class WTGameboard: SKShapeNode {
     
     private func getLetter(col: Int, row: Int)->String {
         if gameArray![col][row].status == .used || gameArray![col][row].status == .wholeWord {
-            return (gameArray![col][row].children[0] as! SKLabelNode).text!
+            return gameArray![col][row].letter //children[0] as! SKLabelNode).text!
         } else {
             return ""
         }
@@ -642,31 +641,50 @@ class WTGameboard: SKShapeNode {
         }
     }
     
-    public func toString()->String {
+    public func gameArrayToString()->String {
+        var gameArrayString = ""
+        for col in 0..<gameArray!.count {
+            for row in 0..<gameArray!.count {
+                gameArrayString += gameArray![col][row].toString() + itemInnerSeparator
+            }
+        }
+        gameArrayString.removeLast()
+        return gameArrayString
+    }
+    
+    public func stringToGameArray(string: String) {
+        let items = string.components(separatedBy: itemInnerSeparator)
+        for (index, item) in items.enumerated() {
+            let col = index / size
+            let row = index % size
+            gameArray![col][row].restore(from: item)
+        }
+    }
+    
+    public func roundInfosToString(all: Bool)->String {
         var infoString = ""
-        for info in roundInfos {
-            for item in info.words {
+        if all {
+            for info in roundInfos {
+                for item in info.words {
+                    infoString += item.word + itemDataSeparator + String(item.score) + itemDataSeparator + String(item.counter) + itemSeparator
+                 }
+                if infoString.count > 0 {
+                    infoString.removeLast()
+                    infoString += roundSeparator
+                }
+            }
+        } else {
+            let lastRound = roundInfos.last!
+            for item in lastRound.words {
                 infoString += item.word + itemDataSeparator + String(item.score) + itemDataSeparator + String(item.counter) + itemSeparator
-             }
-            if infoString.count > 0 {
-                infoString.removeLast()
-                infoString += roundSeparator
             }
         }
         if infoString.count > 0 {
             infoString.removeLast()
         }
-//        print("InfoString: \(infoString)")
         return infoString
     }
 
-//    public func pullLastGreenLetters() {
-//        for col in 0..<size {
-//            for row in 0..<size {
-//                gameArray![col][row].pull()
-//            }
-//        }
-//    }
     public func endChooseOwnWord(col: Int, row: Int) {
         if col < 0 || col >= size || row < 0 || row >= size {
             return
@@ -722,10 +740,10 @@ class WTGameboard: SKShapeNode {
                 let col = Int(gameArrayPosition)! / 10
                 let row = Int(gameArrayPosition)! % 10
                 if gameArray![col][row].status == .empty {                    
-                    _ = gameArray![col][row].setLetter(letter: piece.letters[index], status: .used, color: usedColor)
-                    print("restored at piece: index: \(pieceIndex) col: \(col) row: \(row) letter: \(piece.letters[index])")
+                    _ = gameArray![col][row].setLetter(letter: piece.letters[index], status: .used, toColor: .myUsedColor)
+//                    print("restored at piece: index: \(pieceIndex) col: \(col) row: \(row) letter: \(piece.letters[index])")
                 } else {
-                    print("not restored at piece: index: \(pieceIndex) col: \(col) row: \(row) letter: \(piece.letters[index])")
+//                    print("not restored at piece: index: \(pieceIndex) col: \(col) row: \(row) letter: \(piece.letters[index])")
                 }
             }
         }
