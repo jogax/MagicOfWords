@@ -40,7 +40,9 @@ let temporaryColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha:
 class WTGameboardItem: SKSpriteNode {
     public var status: ItemStatus = .empty
     public var myColor: MyColor = .myWhiteColor
-//    private var letterStack = [String]()
+    private var colorToStatus: [ItemStatus:MyColor] = [
+        .empty : .myWhiteColor, .temporary : .myTemporaryColor, .used : .myUsedColor, .wholeWord : .myWholeWordColor
+    ]
     private var origLetter: String = ""
     private var origColor: MyColor = .myWhiteColor
     private var doubleUsed = false
@@ -186,7 +188,7 @@ class WTGameboardItem: SKSpriteNode {
     }
     
     public func toString()->String {
-        return myColor.description + status.description + (letter == "" ? " " : letter)
+        return status.description + (letter == "" ? " " : letter)
     }
     
     public func restore(from: String) {
@@ -194,20 +196,16 @@ class WTGameboardItem: SKSpriteNode {
         var status: ItemStatus = .empty
         var letter = ""
         remove()
-        if from.count == 3 {
-            if let rawColor = Int(from.subString(startPos: 0, length: 1)) {
-                if let setColor = MyColor(rawValue: rawColor) {
-                    color = setColor
+        if let rawStatus = Int(from.subString(startPos: 0, length: 1)) {
+            if let itemStatus = ItemStatus(rawValue: rawStatus) {
+                status = itemStatus
+                if let toColor = colorToStatus[status] {
+                    color = toColor
                 }
             }
-            if let rawStatus = Int(from.subString(startPos: 1, length: 1)) {
-                if let itemStatus = ItemStatus(rawValue: rawStatus) {
-                    status = itemStatus
-                }
-            }
-            letter = from.subString(startPos: 2, length: 1)
-            _ = setLetter(letter: letter, status: status, toColor: color)
         }
+        letter = from.subString(startPos: 1, length: 1)
+        _ = setLetter(letter: letter, status: status, toColor: color)
         origLetter = ""
         origColor = .myWhiteColor
         doubleUsed = false

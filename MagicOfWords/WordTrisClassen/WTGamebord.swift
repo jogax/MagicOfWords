@@ -619,13 +619,12 @@ class WTGameboard: SKShapeNode {
     private let itemSeparator = "°"
     private let itemDataSeparator = "^"
 
-    public func setRoundInfos(infos: String) {
+    public func setRoundInfos() {
         roundInfos.removeAll()
         var index = 0
-        let rounds = infos.components(separatedBy: roundSeparator)
-        for round in rounds {
+        for round in GV.playingRecord.rounds {
             roundInfos.append(RoundInfos())
-            let items = round.components(separatedBy: itemSeparator)
+            let items = round.infos.components(separatedBy: itemSeparator)
             for item in items {
                 let itemData = item.components(separatedBy: itemDataSeparator)
                 if itemData.count == 3 {
@@ -645,19 +644,17 @@ class WTGameboard: SKShapeNode {
         var gameArrayString = ""
         for col in 0..<gameArray!.count {
             for row in 0..<gameArray!.count {
-                gameArrayString += gameArray![col][row].toString() + itemInnerSeparator
+                gameArrayString += gameArray![col][row].toString()
             }
         }
-        gameArrayString.removeLast()
         return gameArrayString
     }
     
     public func stringToGameArray(string: String) {
-        let items = string.components(separatedBy: itemInnerSeparator)
-        for (index, item) in items.enumerated() {
+        for index in 0..<size * size {
             let col = index / size
             let row = index % size
-            gameArray![col][row].restore(from: item)
+            gameArray![col][row].restore(from: string.subString(startPos: 2 * index, length: 2))
         }
     }
     

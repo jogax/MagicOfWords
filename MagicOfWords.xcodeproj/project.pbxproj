@@ -35,7 +35,6 @@
 		205184F72061525C00E7FAF4 /* huGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F62061525C00E7FAF4 /* huGameData.txt */; };
 		205184F920615B3100E7FAF4 /* deGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F820615B3100E7FAF4 /* deGameData.txt */; };
 		205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184FA20615B5C00E7FAF4 /* enGameData.txt */; };
-		20531F6C20518C8400B3F097 /* SaveGameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20531F6B20518C8400B3F097 /* SaveGameModel.swift */; };
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
 		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */; };
@@ -105,7 +104,6 @@
 		205184F62061525C00E7FAF4 /* huGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huGameData.txt; sourceTree = "<group>"; };
 		205184F820615B3100E7FAF4 /* deGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deGameData.txt; sourceTree = "<group>"; };
 		205184FA20615B5C00E7FAF4 /* enGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enGameData.txt; sourceTree = "<group>"; };
-		20531F6B20518C8400B3F097 /* SaveGameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveGameModel.swift; sourceTree = "<group>"; };
 		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2057BA292029F591000DF337 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePackageScene.swift; sourceTree = "<group>"; };
@@ -229,7 +227,6 @@
 				205184F62061525C00E7FAF4 /* huGameData.txt */,
 				205184F4206150AC00E7FAF4 /* ruGameData.txt */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
-				20531F6B20518C8400B3F097 /* SaveGameModel.swift */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -368,7 +365,6 @@
 				2087AC0E202C86FF008DEF26 /* LoadingScene.swift in Sources */,
 				201FB1DF20288CEA00EC9F36 /* de.swift in Sources */,
 				201FB1DC20288CEA00EC9F36 /* GameTypeScene.swift in Sources */,
-				20531F6C20518C8400B3F097 /* SaveGameModel.swift in Sources */,
 				20819320202B472900406D9A /* GameDataModel.swift in Sources */,
 				201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */,
 				201FB1E020288CEA00EC9F36 /* Language.swift in Sources */,

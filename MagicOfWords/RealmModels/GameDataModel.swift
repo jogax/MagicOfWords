@@ -19,8 +19,6 @@ class GameDataModel: Object {
     @objc dynamic var ownWords = ""
     @objc dynamic var pieces = ""
     @objc dynamic var activityItems = ""
-    @objc dynamic var roundInfos = ""
-    @objc dynamic var roundIndexes = ""
     @objc dynamic var time = ""
     let rounds = List<RoundDataModel>()
     override  class func primaryKey() -> String {

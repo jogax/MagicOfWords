@@ -421,7 +421,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func modifyHeader() {
-        let text = GV.language.getText(.tcHeader, values: String(GV.playingRecord.gameNumber + 1), String(roundIndexes.count), String(totalScore))
+        let text = GV.language.getText(.tcHeader, values: String(GV.playingRecord.gameNumber + 1), String(GV.playingRecord.rounds.count), String(totalScore))
         headerLabel.text = text
     }
     
@@ -444,7 +444,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 } else {
                     scoreOwnWords += actWord.score
                     label!.alpha = ownWordAlpha
-                    if index >= showingOwnWordsIndex && index < showingOwnWordsIndex + countWordsInRow * countShowingRows - 1 {
+                    if index >= showingOwnWordsIndex && index <= showingOwnWordsIndex + countWordsInRow * countShowingRows - 1 {
                         label!.isHidden = false
                         label!.position.y = firstLineYPosition - CGFloat((index - showingOwnWordsIndex) / 3) * heightOfLine
                     } else {
@@ -591,8 +591,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
         }
         if !new {
-            wtGameboard!.setRoundInfos(infos: GV.playingRecord.roundInfos)
-
+//            wtGameboard!.setRoundInfos(infos: GV.playingRecord.roundInfos)
+            wtGameboard!.setRoundInfos()
             let ownWords = GV.playingRecord.ownWords.components(separatedBy: "°")
             for item in ownWords {
                 if item.count > 0 {
@@ -602,6 +602,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             restoreGameArray()
             wtGameboard!.checkWholeWords()
         } else {
+            if GV.playingRecord.rounds.count == 0 {
+                realm.beginWrite()
+                let rounds = RoundDataModel()
+                GV.playingRecord.rounds.append(rounds)
+                try! realm.commitWrite()
+            }
+
             ws = Array(repeating: WTPiece(), count: 3)
             roundIndexes.append(0)
             for index in 0..<3 {
@@ -660,8 +667,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     private func getNextPiece(horizontalPosition: Int)->WTPiece {
 //        blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
-        let tileForGame = tilesForGame[indexOfTilesForGame]
-        indexOfTilesForGame += 1
+        var tileForGame: WTPiece
+        repeat {
+            tileForGame = tilesForGame[indexOfTilesForGame]
+            indexOfTilesForGame += 1
+        } while tileForGame.isOnGameboard
         indexOfTilesForGame = indexOfTilesForGame >= tilesForGame.count ? 0 : indexOfTilesForGame
         return tileForGame
 
@@ -917,22 +927,22 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         GV.playingRecord.ownWords = tempOwnWords
         GV.playingRecord.pieces = pieces
         GV.playingRecord.gameStatus = GameStatusPlaying
-        var roundIndexesString = ""
-        for index in 0..<roundIndexes.count {
-            roundIndexesString += String(roundIndexes[index]) + "°"
-        }
-        if roundIndexesString.count > 0 {
-            roundIndexesString.removeLast()
-        } else {
-            roundIndexesString.append("0")
-        }
-        GV.playingRecord.roundIndexes = roundIndexesString
-        GV.playingRecord.roundInfos = wtGameboard!.roundInfosToString(all:true)
+//        var roundIndexesString = ""
+//        for index in 0..<roundIndexes.count {
+//            roundIndexesString += String(roundIndexes[index]) + "°"
+//        }
+//        if roundIndexesString.count > 0 {
+//            roundIndexesString.removeLast()
+//        } else {
+//            roundIndexesString.append("0")
+//        }
+//        GV.playingRecord.roundIndexes = roundIndexesString
+//        GV.playingRecord.roundInfos = wtGameboard!.roundInfosToString(all:true)
         var rounds: RoundDataModel
-        if GV.playingRecord.rounds.count == 0 {
-            rounds = RoundDataModel()
-            GV.playingRecord.rounds.append(rounds)
-        }
+//        if GV.playingRecord.rounds.count == 0 {
+//            rounds = RoundDataModel()
+//            GV.playingRecord.rounds.append(rounds)
+//        }
         rounds = GV.playingRecord.rounds.last!
         rounds.index = roundIndexes.last!
         rounds.infos = wtGameboard!.roundInfosToString(all:false)
@@ -997,62 +1007,66 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             switch activityItems.last!.type {
             case .FromBottom:
                 if GV.playingRecord.rounds.count > 1 && GV.playingRecord.rounds.last!.index == activityItems.count - 1 {
+                    realm.beginWrite()
                     GV.playingRecord.rounds.removeLast()
+                    try! realm.commitWrite()
                     wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
-                }
-                if roundIndexes.count > 0 {
-                    if roundIndexes.last! == activityItems.count - 1 {
-                        roundIndexes.removeLast()
-                        wtGameboard!.clearGameArray()
-                        fillGameArrayFromActivityItems()
-                    }
-                    wtGameboard!.checkWholeWords()
-                }
-                
-                let indexOfLastPiece = activityItems.last!.fromBottomIndex
-                let tileForGame = tilesForGame[indexOfLastPiece]
-                if tileForGame.isOnGameboard {
-                    wtGameboard!.removeFromGameboard(sprite: tileForGame)
-                    tileForGame.resetGameArrayPositions()
-                    indexOfTilesForGame -= 1
-                    switch tileForGame.pieceFromPosition {
-                    case 0:
-                        movePieceToPosition(from: ws[1], to: 2, remove: true)
-                        movePieceToPosition(from: ws[0], to: 1)
-                        movePieceToPosition(from: tileForGame, to: 0)
-                        tileForGame.alpha = 1.0
-                        self.addChild(ws[0])
-                    case 1:
-                        movePieceToPosition(from: ws[1], to: 2, remove: true)
-                        movePieceToPosition(from: tileForGame, to: 1)
-                        tileForGame.alpha = 1.0
-                        self.addChild(ws[1])
-                    case 2:
-                        movePieceToPosition(from: tileForGame, to: 2, remove: true)
-                        tileForGame.alpha = 1.0
-                        self.addChild(ws[2])
-                    default: break
-                    }
-                }
-                var doing = true
-                repeat {
-                    if let index = GV.allWords.index(where: {$0.creationIndex > indexOfTilesForGame}) {
-                        if !GV.allWords[index].mandatory {
-                            let foundedOwnWord = GV.allWords[index].word
-                            GV.allWords.remove(at: index)
-                            if let label = self.childNode(withName: foundedOwnWord)! as? SKLabelNode {
-                                label.removeFromParent() // This word is no more known
-                            }
-
+                    modifyHeader()
+                } else {
+//                if roundIndexes.count > 0 {
+//                    if roundIndexes.last! == activityItems.count - 1 {
+//                        roundIndexes.removeLast()
+//                        wtGameboard!.clearGameArray()
+//                        fillGameArrayFromActivityItems()
+//                    }
+//                    wtGameboard!.checkWholeWords()
+//                }
+//
+                    let indexOfLastPiece = activityItems.last!.fromBottomIndex
+                    let tileForGame = tilesForGame[indexOfLastPiece]
+                    if tileForGame.isOnGameboard {
+                        wtGameboard!.removeFromGameboard(sprite: tileForGame)
+                        tileForGame.resetGameArrayPositions()
+                        indexOfTilesForGame -= 1
+                        switch tileForGame.pieceFromPosition {
+                        case 0:
+                            movePieceToPosition(from: ws[1], to: 2, remove: true)
+                            movePieceToPosition(from: ws[0], to: 1)
+                            movePieceToPosition(from: tileForGame, to: 0)
+                            tileForGame.alpha = 1.0
+                            self.addChild(ws[0])
+                        case 1:
+                            movePieceToPosition(from: ws[1], to: 2, remove: true)
+                            movePieceToPosition(from: tileForGame, to: 1)
+                            tileForGame.alpha = 1.0
+                            self.addChild(ws[1])
+                        case 2:
+                            movePieceToPosition(from: tileForGame, to: 2, remove: true)
+                            tileForGame.alpha = 1.0
+                            self.addChild(ws[2])
+                        default: break
                         }
-                    } else {
-                        doing = false
                     }
-                } while doing
-                wtGameboard!.checkWholeWords()
-                activityItems.removeLast()
-                if activityItems.count == 0 {
-                    undoSprite.alpha = 0.1
+                    var doing = true
+                    repeat {
+                        if let index = GV.allWords.index(where: {$0.creationIndex > indexOfTilesForGame}) {
+                            if !GV.allWords[index].mandatory {
+                                let foundedOwnWord = GV.allWords[index].word
+                                GV.allWords.remove(at: index)
+                                if let label = self.childNode(withName: foundedOwnWord)! as? SKLabelNode {
+                                    label.removeFromParent() // This word is no more known
+                                }
+
+                            }
+                        } else {
+                            doing = false
+                        }
+                    } while doing
+                    wtGameboard!.checkWholeWords()
+                    activityItems.removeLast()
+                    if activityItems.count == 0 {
+                        undoSprite.alpha = 0.1
+                    }
                 }
             case .Moving:
                 break
@@ -1087,35 +1101,41 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                     activityItems.append(itemValue)
                 }
             }
-            let roundIndexesArray = GV.playingRecord.roundIndexes.components(separatedBy: itemSeparator)
             roundIndexes.removeAll()
-            var first = true
-            if roundIndexesArray.count > 0 {
-                for roundIndexString in roundIndexesArray {
-                    if let roundIndex = Int(roundIndexString) {
-                        if first {
-                            if roundIndex != 0 {
-                                roundIndexes.append(0)
-                                first = false
-                            }
-                        }
-                        if !roundIndexes.contains(where: {$0 == roundIndex}) {
-                            roundIndexes.append(roundIndex)
-                        }
-                    }
-                }
+            let rounds = GV.playingRecord.rounds
+            for round in rounds {
+                roundIndexes.append(round.index)
             }
+//            let roundIndexesArray = GV.playingRecord.roundIndexes.components(separatedBy: itemSeparator)
+//            roundIndexes.removeAll()
+//            var first = true
+//            if roundIndexesArray.count > 0 {
+//                for roundIndexString in roundIndexesArray {
+//                    if let roundIndex = Int(roundIndexString) {
+//                        if first {
+//                            if roundIndex != 0 {
+//                                roundIndexes.append(0)
+//                                first = false
+//                            }
+//                        }
+//                        if !roundIndexes.contains(where: {$0 == roundIndex}) {
+//                            roundIndexes.append(roundIndex)
+//                        }
+//                    }
+//                }
+//            }
 //            if roundIndexes.count > 0 {
 //                GV.actRound = roundIndexes.count - 1
 //            } else {
 //                GV.actRound = 0
 //            }
         }
-        
-        wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
+        if GV.playingRecord.rounds.last!.gameArray.count > 0 {
+            wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
 //        wtGameboard!.clearGameArray() // delete all contents from GameArray
 //        fillGameArrayFromActivityItems()
-        
+//        var wsIndex = 0
+        }
         for index in 0..<tilesForGame.count {
             let tileForGame = tilesForGame[index]
             if !tileForGame.isOnGameboard {
@@ -1131,9 +1151,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
         for index in 0..<ws.count {
             if ws[index].name == nil {
-                let tileForGame = tilesForGame[indexOfTilesForGame]
+                var tileForGame: WTPiece
+                repeat {
+                    tileForGame = tilesForGame[indexOfTilesForGame]
+                    indexOfTilesForGame += 1
+                } while tileForGame.isOnGameboard
                 addPieceAsChild(pieceIndex: index, piece: tileForGame)
-                indexOfTilesForGame += 1
+                
             }
         }
         if activityItems.count > 0 {
