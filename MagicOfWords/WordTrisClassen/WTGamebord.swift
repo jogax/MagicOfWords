@@ -37,12 +37,22 @@ public struct FoundedWord {
         self.word = word
         self.usedLetters = usedLetters
     }
-    func toString()->String {
-        var returnValue = word
-        for usedLetter in usedLetters {
-            returnValue += usedLetter.toString() + itemInnerSeparator
+    public mutating func addLetter(letter: UsedLetter) {
+        word.append(letter.letter)
+        usedLetters.append(letter)
+    }
+    public mutating func removeLast() {
+        if word.count > 0 {
+            word.removeLast()
+            usedLetters.removeLast()
         }
-        returnValue.removeLast()
+    }
+
+    func toString()->String {
+        var returnValue = word + itemInnerSeparator
+        for usedLetter in usedLetters {
+            returnValue += usedLetter.toString()
+        }
         return returnValue
     }
 }
@@ -73,7 +83,7 @@ public protocol WTGameboardDelegate: class {
     /// Method called when a word is founded
     func showFoundedWords()
     /// method is called when an own word is chosed
-    func addOwnWord(word: String, creationIndex: Int, check: Bool)
+    func addOwnWord(word: String, creationIndex: Int, check: Bool)->Bool
 }
 
 
@@ -105,7 +115,7 @@ class WTGameboard: SKShapeNode {
 //    private var mandatoryWords = [String]()
 //    private var wordsToCheck = [String]()
 //    private var ownWords = [String]()
-    private var choosedWord = [UsedLetter]()
+    private var choosedWord = FoundedWord() //[UsedLetter]()
     private var foundedWords = [FoundedWord]()
     private var roundInfos = [RoundInfos]()
     private var foundedWordsWithCount = [FoundedWordWithCounter]()
@@ -603,16 +613,58 @@ class WTGameboard: SKShapeNode {
     }
     
     public func startChooseOwnWord(col: Int, row: Int) {
-        choosedWord.removeAll()
-        choosedWord.append(UsedLetter(col: col, row: row, letter: gameArray![col][row].letter))
+//        choosedWord.removeAll()
+        choosedWord = FoundedWord()
+        choosedWord.addLetter(letter: UsedLetter(col: col, row: row, letter: gameArray![col][row].letter))
+//        choosedWord.append(UsedLetter(col: col, row: row, letter: gameArray![col][row].letter))
+        gameArray![col][row].changeColor(toColor: .myBlueColor)
     }
     
     public func moveChooseOwnWord(col: Int, row: Int) {
         let actLetter = UsedLetter(col: col, row: row, letter: gameArray![col][row].letter)
-        if choosedWord.contains(where: {$0 == actLetter}) {
+        if choosedWord.usedLetters.last! == actLetter {
             return
         }
-        choosedWord.append(actLetter)
+        print("choosedWord: \(choosedWord)")
+        if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters[choosedWord.usedLetters.count - 2] == actLetter {
+            let last = choosedWord.usedLetters.last!
+            gameArray![last.col][last.row].changeColor(toColor: .myNoColor)
+            choosedWord.removeLast()
+        } else {
+            gameArray![col][row].changeColor(toColor: .myBlueColor)
+            choosedWord.addLetter(letter: actLetter)
+        }
+    }
+    
+    public func endChooseOwnWord(col: Int, row: Int)->FoundedWord? {
+//        for letter in choosedWord.usedLetters {
+//            gameArray![letter.col][letter.row].changeColor(toColor: .myNoColor)
+//        }
+        for col in 0..<size {
+            for row in 0..<size {
+                if gameArray![col][row].myColor == .myBlueColor {
+                    gameArray![col][row].changeColor(toColor: .myNoColor)
+                }
+            }
+        }
+        if col < 0 || col >= size || row < 0 || row >= size {
+            return nil
+        }
+        //        let actLetter = UsedLetters(col: col, row: row, letter: gameArray![col][row].letter)
+        var word = ""
+        var wordAdded = false
+        for letter in choosedWord.usedLetters {
+            word.append(letter.letter)
+        }
+        if word.count > 2 {
+            wordAdded = delegate.addOwnWord(word: word, creationIndex: NoValue, check: true)
+            clear()
+        }
+        if wordAdded {
+            return choosedWord
+        } else {
+            return nil
+        }
     }
     
     private let roundSeparator = "/"
@@ -682,21 +734,6 @@ class WTGameboard: SKShapeNode {
         return infoString
     }
 
-    public func endChooseOwnWord(col: Int, row: Int) {
-        if col < 0 || col >= size || row < 0 || row >= size {
-            return
-        }
-//        let actLetter = UsedLetters(col: col, row: row, letter: gameArray![col][row].letter)
-        var word = ""
-        for letter in choosedWord {
-            word.append(letter.letter)
-        }
-        if word.count > 2 {
-            delegate.addOwnWord(word: word, creationIndex: NoValue, check: true)
-            clear()
-        }
-    }
-    
 //    public func addOwnWordToCheck(word: String) {
 //        wordsToCheck.append(word)
 //    }

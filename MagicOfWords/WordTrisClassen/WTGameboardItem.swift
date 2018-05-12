@@ -17,7 +17,7 @@ enum ItemStatus: Int {
 }
 
 enum MyColor: Int {
-    case myWhiteColor = 0, myWholeWordColor, myUsedColor, myGoldColor, myBlueColor, myTemporaryColor, myRedColor
+    case myWhiteColor = 0, myWholeWordColor, myUsedColor, myGoldColor, myBlueColor, myTemporaryColor, myRedColor, myNoColor
     var description: String {
     return String(self.rawValue)
 //    switch self {
@@ -32,9 +32,10 @@ enum MyColor: Int {
     }
 }
 
-let usedColor = SKColor(red:255/255, green: 153/255, blue: 153/255, alpha: 1)
-let goldColor  = SKColor(red:255/255, green: 215/255, blue: 0/255, alpha: 1)
+let usedColor = SKColor(red:255/255, green: 153/255, blue: 153/255, alpha: 1.0)
+let goldColor  = SKColor(red:255/255, green: 215/255, blue: 0/255, alpha: 1.0)
 let temporaryColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha: 1.0)
+let turquoiseColor = SKColor(red: 64/255, green: 224/255, blue: 208/255, alpha: 1.0)
 
 
 class WTGameboardItem: SKSpriteNode {
@@ -71,8 +72,6 @@ class WTGameboardItem: SKSpriteNode {
         case .used, .wholeWord:
             self.origColor = self.myColor
             setColors(toColor: .myRedColor)
-//            self.myColor = .myRedColor
-//            self.color = .red
             self.origLetter = label.text!
             label.text = letter
             self.letter = letter
@@ -84,20 +83,12 @@ class WTGameboardItem: SKSpriteNode {
             self.letter = letter
             self.status = status
             setColors(toColor: toColor)
-//            self.myColor = color
-//            self.color = convertMyColorToSKColor(color: color)
             return true
 
         }
     }
-//    public func setColor(color: SKColor) {
-//        self.color = color
-//    }
-//    
     public func setFoundedWord(toColor: MyColor) {
         setColors(toColor: toColor)
-//        self.color = convertMyColorToSKColor(color: toColor)
-//        self.myColor = toColor
         self.status = .wholeWord
     }
     
@@ -107,8 +98,6 @@ class WTGameboardItem: SKSpriteNode {
             self.letter = ""
             self.status = .empty
             setColors(toColor: .myWhiteColor)
-//            self.myColor = .myWhiteColor
-//            self.color = .white
         } else if (status == .used || status == .wholeWord) && doubleUsed {
             label.text = self.origLetter
             self.letter = self.origLetter
@@ -177,14 +166,24 @@ class WTGameboardItem: SKSpriteNode {
         case .myWholeWordColor: return .green
         case .myUsedColor: return usedColor
         case .myGoldColor: return goldColor
-        case .myBlueColor: return .blue
+        case .myBlueColor: return turquoiseColor
         case .myTemporaryColor: return temporaryColor
+        case .myNoColor: return .white
         }
     }
     
     private func setColors(toColor: MyColor) {
         self.myColor = toColor
         self.color = convertMyColorToSKColor(color: toColor)
+    }
+    
+    public func changeColor(toColor: MyColor = .myNoColor) {
+        if toColor == .myNoColor {
+            setColors(toColor: self.origColor)
+        } else {
+            origColor = myColor
+            setColors(toColor: toColor)
+        }
     }
     
     public func toString()->String {
