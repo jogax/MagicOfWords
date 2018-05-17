@@ -37,6 +37,8 @@ let goldColor  = SKColor(red:255/255, green: 215/255, blue: 0/255, alpha: 1.0)
 let temporaryColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha: 1.0)
 let turquoiseColor = SKColor(red: 64/255, green: 224/255, blue: 208/255, alpha: 1.0)
 
+let emptyLetter = " "
+
 
 class WTGameboardItem: SKSpriteNode {
     public var status: ItemStatus = .empty
@@ -44,18 +46,15 @@ class WTGameboardItem: SKSpriteNode {
     private var colorToStatus: [ItemStatus:MyColor] = [
         .empty : .myWhiteColor, .temporary : .myTemporaryColor, .used : .myUsedColor, .wholeWord : .myWholeWordColor
     ]
-    private var origLetter: String = ""
+    private var origLetter: String = emptyLetter
     private var origColor: MyColor = .myWhiteColor
     private var doubleUsed = false
     private var blockSize:CGFloat = 0
     private var label: SKLabelNode
     private var countOccurencesInWords = 0
-    public var letter = ""
+    public var letter = emptyLetter
     init(blockSize: CGFloat, fontSize: CGFloat) {
-//        self.mySprite = SKSpriteNode(color: .white, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
         label = SKLabelNode()
-//        self.letter = letter
-//        super.init(color: .white, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
         let texture = SKTexture()
         super.init(texture: texture, color: .white, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
         label.fontName = "Courier"
@@ -63,13 +62,13 @@ class WTGameboardItem: SKSpriteNode {
         label.verticalAlignmentMode = .center
         label.fontSize = fontSize
         label.zPosition = self.zPosition + 1
+        letter = emptyLetter
         addChild(label)
     }
     
-    public func setLetter(letter: String, status: ItemStatus, toColor: MyColor)->Bool {
+    public func setLetter(letter: String, status: ItemStatus, toColor: MyColor, forcedChange: Bool = false)->Bool {
         
-        switch self.status {
-        case .used, .wholeWord:
+        if (self.status == .used || self.status == .wholeWord) && !forcedChange {
             self.origColor = self.myColor
             setColors(toColor: .myRedColor)
             self.origLetter = label.text!
@@ -77,14 +76,13 @@ class WTGameboardItem: SKSpriteNode {
             self.letter = letter
             doubleUsed = true
             return false
-        default:
+        } else {
             self.colorBlendFactor = 1
             label.text = letter
             self.letter = letter
             self.status = status
             setColors(toColor: toColor)
             return true
-
         }
     }
     public func setFoundedWord(toColor: MyColor) {
@@ -94,8 +92,8 @@ class WTGameboardItem: SKSpriteNode {
     
     public func clearIfTemporary() {
         if status == .temporary {
-            label.text = ""
-            self.letter = ""
+            label.text = emptyLetter
+            self.letter = emptyLetter
             self.status = .empty
             setColors(toColor: .myWhiteColor)
         } else if (status == .used || status == .wholeWord) && doubleUsed {
@@ -125,8 +123,8 @@ class WTGameboardItem: SKSpriteNode {
     public func clearIfUsed() {
         if status == .wholeWord {
 //            letterStack.append(letter)
-            label.text = ""
-            self.letter = ""
+            label.text = emptyLetter
+            self.letter = emptyLetter
             self.status = .empty
             setColors(toColor: .myWhiteColor)
 //            self.color = .white
@@ -141,8 +139,8 @@ class WTGameboardItem: SKSpriteNode {
     }
     public func remove() {
         self.status = .empty
-        label.text = ""
-        self.letter = ""
+        label.text = emptyLetter
+        self.letter = emptyLetter
         setColors(toColor: .myWhiteColor)
 //        self.color = .white
     }
@@ -181,19 +179,21 @@ class WTGameboardItem: SKSpriteNode {
         if toColor == .myNoColor {
             setColors(toColor: self.origColor)
         } else {
-            origColor = myColor
-            setColors(toColor: toColor)
+            if !(myColor == toColor) {
+                origColor = myColor
+                setColors(toColor: toColor)
+            }
         }
     }
     
     public func toString()->String {
-        return status.description + (letter == "" ? " " : letter)
+        return status.description + letter
     }
     
     public func restore(from: String) {
         var color: MyColor = .myWhiteColor
         var status: ItemStatus = .empty
-        var letter = ""
+        var letter = emptyLetter
         remove()
         if let rawStatus = Int(from.subString(startPos: 0, length: 1)) {
             if let itemStatus = ItemStatus(rawValue: rawStatus) {
@@ -205,7 +205,7 @@ class WTGameboardItem: SKSpriteNode {
         }
         letter = from.subString(startPos: 1, length: 1)
         _ = setLetter(letter: letter, status: status, toColor: color)
-        origLetter = ""
+        origLetter = emptyLetter
         origColor = .myWhiteColor
         doubleUsed = false
         countOccurencesInWords = 0

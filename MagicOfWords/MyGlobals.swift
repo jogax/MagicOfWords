@@ -11,9 +11,6 @@ import AVFoundation
 import UIKit
 
 let exclamationMark = "!"
-let GameStatusNew = 0
-let GameStatusPlaying = 1
-let GameStatusFinished = 2
 let itemSeparator = "°"
 let itemInnerSeparator = "^"
 
@@ -58,6 +55,9 @@ struct WordToCheck {
 
 
 struct GV {
+    static let GameStatusNew = 0
+    static let GameStatusPlaying = 1
+    static let GameStatusFinished = 2
     static var playingRecord = GameDataModel()
     static let language = Language()
     static var maxRecordCount = 0

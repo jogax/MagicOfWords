@@ -28,10 +28,10 @@ class MenuScene: SKScene {
     var menuSceneDelegate: MenuSceneDelegate?
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
-        if realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GameStatusNew).count > 0 {
+        if realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusNew).count > 0 {
             createMenuItem(menuInt: .tcNewGame, firstLine: true)
         }
-        if realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GameStatusPlaying).count > 0 {
+        if realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusPlaying).count > 0 {
             createMenuItem(menuInt: .tcContinue)
         }
         createMenuItem(menuInt: .tcChooseGameType)

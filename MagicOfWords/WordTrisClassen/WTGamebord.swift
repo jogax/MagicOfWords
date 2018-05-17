@@ -19,7 +19,7 @@ public struct UsedItems {
 public struct UsedLetter {
     var col: Int = 0
     var row: Int = 0
-    var letter: String = ""
+    var letter: String = emptyLetter
     init(col: Int, row: Int, letter: String) {
         self.col = col
         self.row = row
@@ -29,9 +29,89 @@ public struct UsedLetter {
         return String(col) + String(row) + String(letter)
     }
 }
+
+public struct MovingItem {
+    var colFrom: Int = 0
+    var rowFrom: Int = 0
+    var colTo: Int = 0
+    var rowTo: Int = 0
+    var length: Int = 0
+    var horizontal: Bool {
+        get {
+            if colFrom == colTo {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+    var multiplier: Int {
+        get {
+            if horizontal && colFrom < colTo || !horizontal && rowFrom < rowTo {
+                return 1
+                
+            } else {
+                return -1
+            }
+        }
+    }
+    init(){
+        self.colFrom = 0
+        self.rowFrom = 0
+        self.colTo = 0
+        self.rowTo = 0
+        self.length = 0
+    }
+    init(colFrom: Int, rowFrom: Int, colTo: Int, rowTo: Int, length: Int) {
+        self.colFrom = colFrom
+        self.rowFrom = rowFrom
+        self.colTo = colTo
+        self.rowTo = rowTo
+        self.length = length
+    }
+    init(from: String){
+        let colFrom: Int? = Int(from.subString(startPos: 0, length: 1))
+        let rowFrom: Int? = Int(from.subString(startPos: 1, length: 1))
+        let colTo: Int? = Int(from.subString(startPos: 2, length: 1))
+        let rowTo: Int? = Int(from.subString(startPos: 3, length: 1))
+        let length: Int? = Int(from.subString(startPos: 4, length: 1))
+        if colFrom != nil && rowFrom != nil && colTo != nil && rowTo != nil && length != nil {
+            self.init(colFrom: colFrom!, rowFrom: rowFrom!, colTo: colTo!, rowTo: rowTo!, length: length!)
+        } else {
+            self.init()
+        }
+    }
+    func toString()->String {
+        return String(colFrom) + String(rowFrom) + String(colTo) + String(rowTo) + String(length)
+    }
+    
+}
+
 public struct FoundedWord {
     var word: String = ""
     var score: Int = 0
+    var direction: Direction {
+        get {
+            let firstCol = usedLetters[0].col
+            let firstRow = usedLetters[0].row
+            var horizontal = true
+            var vertical = true
+            for index in 0..<usedLetters.count {
+                if usedLetters[index].col != firstCol {
+                    vertical = false
+                }
+                if usedLetters[index].row != firstRow {
+                    horizontal = false
+                }
+            }
+            switch (horizontal, vertical) {
+            case (false,false): return .none
+            case (true, false): return .horizontal
+            case (false, true): return .vertical
+            case (true, true): return .both
+            }
+        }
+    }
     var usedLetters = [UsedLetter]()
     init(word: String = "", usedLetters: [UsedLetter] = [UsedLetter]()) {
         self.word = word
@@ -41,6 +121,40 @@ public struct FoundedWord {
         word.append(letter.letter)
         usedLetters.append(letter)
     }
+    
+    public mutating func removeFirstLetter() {
+        for index in 1..<usedLetters.count {
+            usedLetters[index].col = usedLetters[index - 1].col
+            usedLetters[index].row = usedLetters[index - 1].row
+        }
+        usedLetters.remove(at: 0)
+        word.remove(at: word.startIndex)
+    }
+    
+    public mutating func addFirstLetter(letter: UsedLetter) {
+        let origCol = usedLetters[0].col
+        let origRow = usedLetters[0].row
+        let char = Character(letter.letter == "" ? emptyLetter : letter.letter)
+        word.insert(char, at: word.startIndex)
+        usedLetters.insert(letter, at: 0)
+        let myDirection = direction
+        switch myDirection {
+        case .horizontal:
+            let adder = letter.col < origCol ? -1 : 1
+            for index in 0..<usedLetters.count {
+                usedLetters[index].col += adder
+            }
+        case .vertical:
+            let adder = letter.row < origRow ? -1 : 1
+            for index in 0..<usedLetters.count {
+                usedLetters[index].row += adder
+            }
+        default: break
+        }
+        usedLetters[0].col = origCol
+        usedLetters[0].row = origRow
+    }
+    
     public mutating func removeLast() {
         if word.count > 0 {
             word.removeLast()
@@ -78,12 +192,19 @@ public struct RoundInfos {
 }
 
 
+enum Direction: Int {
+    case horizontal = 0, vertical, both, none
+}
+
+
 public protocol WTGameboardDelegate: class {
     
     /// Method called when a word is founded
     func showFoundedWords()
     /// method is called when an own word is chosed
     func addOwnWord(word: String, creationIndex: Int, check: Bool)->Bool
+    /// method is called when letters are moved on gameboard
+    func setLettersMoved(colFrom: Int, rowFrom: Int, colTo: Int, rowTo: Int, length: Int)
 }
 
 
@@ -131,6 +252,7 @@ class WTGameboard: SKShapeNode {
         super.init()
         createBackgroundShape(size: size)
         gameArray = createNewGameArray(size: size)
+//        printGameArray()
         for col in 0..<size {
             for row in 0..<size {
                 gameArray![col][row].position = grid!.gridPosition(col: col, row: row) //+
@@ -190,8 +312,9 @@ class WTGameboard: SKShapeNode {
         for i in 0..<size {
             gameArray.append( [WTGameboardItem]() )
             
-            for _ in 0..<size {
+            for j in 0..<size {
                 gameArray[i].append( WTGameboardItem(blockSize: blockSize!, fontSize: parentScene.frame.width / 20) )
+                gameArray[i][j].letter = emptyLetter
             }
         }
         return gameArray
@@ -612,34 +735,86 @@ class WTGameboard: SKShapeNode {
         }
     }
     
+    var moveModusStarted = false
+    var noMoreMove = false
+//    var lengthOfMovedItem = 0
+//    var colFrom = 0
+//    var rowFrom = 0
+//    var colTo = 0
+//    var rowTo = 0
+    
     public func startChooseOwnWord(col: Int, row: Int) {
-//        choosedWord.removeAll()
+        moveModusStarted = false
+        noMoreMove = false
         choosedWord = FoundedWord()
+//        colFrom = col
+//        rowFrom = row
+//        colTo = 0
+//        rowTo = 0
+//        lengthOfMovedItem = 0
         choosedWord.addLetter(letter: UsedLetter(col: col, row: row, letter: gameArray![col][row].letter))
 //        choosedWord.append(UsedLetter(col: col, row: row, letter: gameArray![col][row].letter))
         gameArray![col][row].changeColor(toColor: .myBlueColor)
     }
     
+    
     public func moveChooseOwnWord(col: Int, row: Int) {
         let actLetter = UsedLetter(col: col, row: row, letter: gameArray![col][row].letter)
+        let status = gameArray![col][row].status
         if choosedWord.usedLetters.last! == actLetter {
             return
         }
-        print("choosedWord: \(choosedWord)")
-        if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters[choosedWord.usedLetters.count - 2] == actLetter {
-            let last = choosedWord.usedLetters.last!
-            gameArray![last.col][last.row].changeColor(toColor: .myNoColor)
-            choosedWord.removeLast()
-        } else {
-            gameArray![col][row].changeColor(toColor: .myBlueColor)
-            choosedWord.addLetter(letter: actLetter)
+//        if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters.contains(where: {$0.col == actLetter.col && $0.row == actLetter.row}) {
+//            let last = choosedWord.usedLetters.last!
+//            gameArray![last.col][last.row].changeColor(toColor: .myNoColor)
+//            choosedWord.removeFirstLetter()
+//            return
+//        }
+
+        var onlyUsedLetters = true
+//        print("col: \(col), row: \(row), actLetter: \(actLetter.letter), NoMoreMove: \(noMoreMove)")
+        if (status == .empty) { // empty block
+            if !noMoreMove {
+                if !moveModusStarted {
+                    for letter in choosedWord.usedLetters {
+                        if gameArray![letter.col][letter.row].status == .wholeWord {
+                            onlyUsedLetters = false
+                        }
+                    }
+                }
+                if onlyUsedLetters {
+                    moveModusStarted = true
+//                    lengthOfMovedItem = choosedWord.word.count
+                    choosedWord.addFirstLetter(letter: actLetter)
+                    for letter in choosedWord.usedLetters {
+                        if letter.letter == emptyLetter {
+                            _ = gameArray![letter.col][letter.row].setLetter(letter: letter.letter, status: .empty, toColor: .myWhiteColor, forcedChange: true)
+                        } else {
+                            _ = gameArray![letter.col][letter.row].setLetter(letter: letter.letter, status: .used, toColor: .myUsedColor, forcedChange: true)
+                            gameArray![letter.col][letter.row].changeColor(toColor: .myBlueColor)
+                        }
+                    }
+                 }
+            }
+        } else { // Not empty field
+            if !moveModusStarted {
+               if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters[choosedWord.usedLetters.count - 2] == actLetter {
+                    let last = choosedWord.usedLetters.last!
+                    gameArray![last.col][last.row].changeColor(toColor: .myNoColor)
+                    choosedWord.removeLast()
+                } else {
+//                    colTo = actLetter.col
+//                    rowTo = actLetter.row
+                    gameArray![col][row].changeColor(toColor: .myBlueColor)
+                    choosedWord.addLetter(letter: actLetter)
+                }
+            } else {
+                noMoreMove = true
+            }
         }
     }
     
     public func endChooseOwnWord(col: Int, row: Int)->FoundedWord? {
-//        for letter in choosedWord.usedLetters {
-//            gameArray![letter.col][letter.row].changeColor(toColor: .myNoColor)
-//        }
         for col in 0..<size {
             for row in 0..<size {
                 if gameArray![col][row].myColor == .myBlueColor {
@@ -647,23 +822,38 @@ class WTGameboard: SKShapeNode {
                 }
             }
         }
-        if col < 0 || col >= size || row < 0 || row >= size {
+        if moveModusStarted {
+            var index = -1
+            repeat {
+                index += 1
+            } while choosedWord.usedLetters[index].letter == emptyLetter
+            let length = choosedWord.usedLetters.count - index
+            let colFrom = choosedWord.usedLetters[0].col
+            let rowFrom = choosedWord.usedLetters[0].row
+            let colTo = choosedWord.usedLetters[index].col
+            let rowTo = choosedWord.usedLetters[index].row
+            delegate.setLettersMoved(colFrom: colFrom, rowFrom: rowFrom, colTo: colTo, rowTo: rowTo, length: length)
+            checkWholeWords()
             return nil
-        }
-        //        let actLetter = UsedLetters(col: col, row: row, letter: gameArray![col][row].letter)
-        var word = ""
-        var wordAdded = false
-        for letter in choosedWord.usedLetters {
-            word.append(letter.letter)
-        }
-        if word.count > 2 {
-            wordAdded = delegate.addOwnWord(word: word, creationIndex: NoValue, check: true)
-            clear()
-        }
-        if wordAdded {
-            return choosedWord
         } else {
-            return nil
+            if col < 0 || col >= size || row < 0 || row >= size {
+                return nil
+            }
+            //        let actLetter = UsedLetters(col: col, row: row, letter: gameArray![col][row].letter)
+            var word = ""
+            var wordAdded = false
+            for letter in choosedWord.usedLetters {
+                word.append(letter.letter)
+            }
+            if word.count > 2 {
+                wordAdded = delegate.addOwnWord(word: word, creationIndex: NoValue, check: true)
+                clear()
+            }
+            if wordAdded {
+                return choosedWord
+            } else {
+                return nil
+            }
         }
     }
     
@@ -689,6 +879,32 @@ class WTGameboard: SKShapeNode {
                 }
             }
             index += 1
+        }
+    }
+    
+    public func moveItemToOrigPlace(movedItem: MovingItem) {
+        var colFrom = movedItem.colTo
+        var rowFrom = movedItem.rowTo
+        var colTo = movedItem.colFrom
+        var rowTo = movedItem.rowFrom
+        if movedItem.colFrom == movedItem.colTo {  //vertical moved
+            let adder = movedItem.rowFrom < movedItem.rowTo ? 1 : -1
+            for _ in 0..<movedItem.length {
+                let letter = gameArray![colFrom][rowFrom].letter
+                _ = gameArray![colTo][rowTo].setLetter(letter: letter, status: .used, toColor: .myUsedColor)
+                gameArray![colFrom][rowFrom].remove()
+                rowFrom += adder
+                rowTo += adder
+            }
+        } else {
+            let adder = movedItem.colFrom < movedItem.colTo ? 1 : -1
+            for _ in 0..<movedItem.length {
+                let letter = gameArray![colFrom][rowFrom].letter
+                _ = gameArray![colTo][rowTo].setLetter(letter: letter, status: .used, toColor: .myUsedColor)
+                gameArray![colFrom][rowFrom].remove()
+                colFrom += adder
+                colTo += adder
+            }
         }
     }
     
@@ -842,11 +1058,11 @@ class WTGameboard: SKShapeNode {
             var infoLine = "|"
             for col in 0..<10 {
                 let char = gameArray![col][row].letter
-                var greenMark = " "
+                var greenMark = emptyLetter
                 if gameArray![col][row].status == .wholeWord {
                     greenMark = "*"
                 }
-                infoLine += greenMark + (char == "" ? " " : char) + greenMark + "|"
+                infoLine += greenMark + (char == "" ? "!" : char) + greenMark + "|"
             }
             print(infoLine)
         }
@@ -871,7 +1087,7 @@ class WTGameboard: SKShapeNode {
         }
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
