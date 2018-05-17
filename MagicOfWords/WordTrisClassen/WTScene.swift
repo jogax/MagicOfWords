@@ -173,11 +173,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     var origSize: [CGSize] = Array(repeating: CGSize(width:0, height: 0), count: 3)
     var totalScore: Int = 0
     var moved = false
-    var ownWordsMoving = false
+    var ownWordsScrolling = false
     var inChoosingOwnWord = false
     var movedIndex = 0
     var countShowingOwnWords = 0
-    var ownWordsMovingStartPos = CGPoint(x:0, y:0)
+    var ownWordsScrollingStartPos = CGPoint(x:0, y:0)
     var firstLineYPosition = CGFloat(0)
     var heightOfLine = CGFloat(0)
     var showingOwnWordsIndex = 0
@@ -397,8 +397,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             ownWordsBackgroundSprite.position = CGPoint(x: self.size.width * 0.52, y: yPos)
             ownWordsBackgroundSprite.alpha = 0.3
             ownWordsBackgroundSprite.name = ownWordsBackgroundName
-            ownWordsBackgroundSprite.alpha = 0.0
-            ownWordsBackgroundSprite.isHidden = true
+            ownWordsBackgroundSprite.alpha = 0.01
+            ownWordsBackgroundSprite.isHidden = false
             self.addChild(ownWordsBackgroundSprite)
         }
     }
@@ -416,16 +416,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 
     }
     
-
+    func scrollOwnWords(up: Bool) {
+        print("at scrollOwnWords: up: \(up), count: \(1), showingOwnWordsIndex: \(showingOwnWordsIndex)")
+        if up {
+            showingOwnWordsIndex += countWordsInRow
+            let countOwnWords = GV.countWords(mandatory: false)
+            if showingOwnWordsIndex + countShowingOwnWords > countOwnWords {
+                let countShowedRows = countShowingOwnWords / countWordsInRow
+                let startRow = countOwnWords / countWordsInRow - countShowedRows + 1
+                showingOwnWordsIndex =  startRow * countWordsInRow
+            }
+        } else {
+            showingOwnWordsIndex -= countWordsInRow
+            if showingOwnWordsIndex < 0 {
+                showingOwnWordsIndex = 0
+            }
+        }
+        showFoundedWords()
+    }
 
     func showFoundedWords() {
         var scoreMandatoryWords = 0
         var scoreOwnWords = 0
-//        let ownWordAlpha:CGFloat = GV.allMandatoryWordsFounded() ? 1.0 : 0.4
-//        let countOwnWords = GV.countWords(mandatory: false)
-//        if countOwnWords > countShowingOwnWords {
-//            showingOwnWordsIndex = countOwnWords - (countOwnWords - countShowingOwnWords) / 3
-//        }
         var index = 0
         for actWord in GV.allWords {
             let label = self.childNode(withName: actWord.word) as? SKLabelNode
@@ -693,8 +705,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
         } else if touchedNodes.ownWordsBackground {
-            ownWordsMoving = true
-            ownWordsMovingStartPos = firstTouchLocation
+            ownWordsScrolling = true
+            ownWordsScrollingStartPos = firstTouchLocation
         }
 
     }
@@ -721,14 +733,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             if touchedNodes.GCol >= 0 && touchedNodes.GCol < sizeOfGrid && touchedNodes.GRow >= 0 && touchedNodes.GRow < sizeOfGrid {
                 wtGameboard?.moveChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
             }
-        } else if ownWordsMoving {
-            if abs(touchLocation.y - ownWordsMovingStartPos.y) > self.frame.height * 0.02 {
+        } else if ownWordsScrolling {
+            let movedBy = touchLocation.y - ownWordsScrollingStartPos.y
+            let multiplier = 0.02 * movedBy / abs(movedBy)
+            if abs(movedBy) > self.frame.height * abs(multiplier) {
+                ownWordsScrollingStartPos.y += self.frame.height * multiplier
                 if GV.countWords(mandatory: false) > countShowingOwnWords {
-//                    let adder = touchLocation.y - ownWordsMovingStartPos.y > 0 ? countWordsInRow : -countWordsInRow
-                    print("hier")
+                    scrollOwnWords(up: movedBy > 0)
                 }
             }
-        } else {
+        } else  {
             if touchedNodes.shapeIndex >= 0 {
                 ws[touchedNodes.shapeIndex].position = touchLocation
             }

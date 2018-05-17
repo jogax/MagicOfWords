@@ -124,8 +124,12 @@ public struct FoundedWord {
     
     public mutating func removeFirstLetter() {
         for index in 1..<usedLetters.count {
-            usedLetters[index].col = usedLetters[index - 1].col
-            usedLetters[index].row = usedLetters[index - 1].row
+            let reverseIndex = usedLetters.count - index
+            if usedLetters.first!.row == usedLetters.last!.row { // horizontal ??
+                usedLetters[reverseIndex].col = usedLetters[reverseIndex - 1].col
+            } else {
+                usedLetters[reverseIndex].row = usedLetters[reverseIndex - 1].row
+            }
         }
         usedLetters.remove(at: 0)
         word.remove(at: word.startIndex)
@@ -747,13 +751,7 @@ class WTGameboard: SKShapeNode {
         moveModusStarted = false
         noMoreMove = false
         choosedWord = FoundedWord()
-//        colFrom = col
-//        rowFrom = row
-//        colTo = 0
-//        rowTo = 0
-//        lengthOfMovedItem = 0
         choosedWord.addLetter(letter: UsedLetter(col: col, row: row, letter: gameArray![col][row].letter))
-//        choosedWord.append(UsedLetter(col: col, row: row, letter: gameArray![col][row].letter))
         gameArray![col][row].changeColor(toColor: .myBlueColor)
     }
     
@@ -761,15 +759,40 @@ class WTGameboard: SKShapeNode {
     public func moveChooseOwnWord(col: Int, row: Int) {
         let actLetter = UsedLetter(col: col, row: row, letter: gameArray![col][row].letter)
         let status = gameArray![col][row].status
+        // when in the same recteck
         if choosedWord.usedLetters.last! == actLetter {
             return
         }
-//        if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters.contains(where: {$0.col == actLetter.col && $0.row == actLetter.row}) {
-//            let last = choosedWord.usedLetters.last!
-//            gameArray![last.col][last.row].changeColor(toColor: .myNoColor)
-//            choosedWord.removeFirstLetter()
-//            return
-//        }
+        
+        if moveModusStarted {
+            // when going back
+            if choosedWord.usedLetters.contains(where: {$0.col == actLetter.col && $0.row == actLetter.row}) {
+                let last = choosedWord.usedLetters.last!
+                if choosedWord.usedLetters.first!.letter == emptyLetter {
+                    choosedWord.removeFirstLetter()
+                    gameArray![last.col][last.row].remove()
+                    for letter in choosedWord.usedLetters {
+                        if letter.letter != emptyLetter {
+                            _ = gameArray![letter.col][letter.row].setLetter(letter: letter.letter, status: .used, toColor: .myBlueColor, forcedChange: true)
+                        }
+                    }
+                    return
+                } else {
+                    var tempChoosedWord = FoundedWord()
+                    for index in 0..<choosedWord.word.count {
+                        let reverseIndex = choosedWord.word.count - index - 1
+                        tempChoosedWord.word.append(choosedWord.word.subString(startPos: reverseIndex, length: 1))
+                        tempChoosedWord.usedLetters.append(choosedWord.usedLetters[reverseIndex])
+                    }
+                    choosedWord = tempChoosedWord
+                    return
+//                    gameArray![col][row].changeColor(toColor: .myBlueColor)
+                }
+            }
+//            else {
+//                print("and hier? ActLetter: \(actLetter), status: \(status), noMoreMove: \(noMoreMove) ")
+//            }
+        }
 
         var onlyUsedLetters = true
 //        print("col: \(col), row: \(row), actLetter: \(actLetter.letter), NoMoreMove: \(noMoreMove)")
@@ -887,6 +910,9 @@ class WTGameboard: SKShapeNode {
         var rowFrom = movedItem.rowTo
         var colTo = movedItem.colFrom
         var rowTo = movedItem.rowFrom
+        if colFrom == colTo && rowFrom == rowTo {
+            return
+        }
         if movedItem.colFrom == movedItem.colTo {  //vertical moved
             let adder = movedItem.rowFrom < movedItem.rowTo ? 1 : -1
             for _ in 0..<movedItem.length {
