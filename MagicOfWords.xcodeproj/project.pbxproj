@@ -53,6 +53,7 @@
 		20A6913D203088FF00AB47C0 /* enWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20A6913C203088FF00AB47C0 /* enWords.txt */; };
 		20A6914020309B9F00AB47C0 /* WTPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6913F20309B9F00AB47C0 /* WTPiece.swift */; };
 		20A6914220309CC500AB47C0 /* WTGamebord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6914120309CC500AB47C0 /* WTGamebord.swift */; };
+		20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6E83420AEDB4B000F5950 /* MyTimer.swift */; };
 		20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 20B04BB120935CC2008F99A2 /* menuBackground.png */; };
 		20B28AE020330C64001682B2 /* deWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20B28ADF20330C64001682B2 /* deWords.txt */; };
 		20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE120330E73001682B2 /* BasicDataModel.swift */; };
@@ -122,6 +123,7 @@
 		20A6913C203088FF00AB47C0 /* enWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enWords.txt; sourceTree = "<group>"; };
 		20A6913F20309B9F00AB47C0 /* WTPiece.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTPiece.swift; sourceTree = "<group>"; };
 		20A6914120309CC500AB47C0 /* WTGamebord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGamebord.swift; sourceTree = "<group>"; };
+		20A6E83420AEDB4B000F5950 /* MyTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTimer.swift; sourceTree = "<group>"; };
 		20B04BB120935CC2008F99A2 /* menuBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menuBackground.png; sourceTree = "<group>"; };
 		20B28ADF20330C64001682B2 /* deWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deWords.txt; sourceTree = "<group>"; };
 		20B28AE120330E73001682B2 /* BasicDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicDataModel.swift; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 				20A6913F20309B9F00AB47C0 /* WTPiece.swift */,
 				20A6914120309CC500AB47C0 /* WTGamebord.swift */,
 				2060036D20347FF400023E10 /* WTGameboardItem.swift */,
+				20A6E83420AEDB4B000F5950 /* MyTimer.swift */,
 			);
 			path = WordTrisClassen;
 			sourceTree = "<group>";
@@ -378,6 +381,7 @@
 				201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */,
 				201FB1D720288CEA00EC9F36 /* ru.swift in Sources */,
 				204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */,
+				20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */,
 				20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */,
 				20B28AE620333273001682B2 /* WTShowGameList.swift in Sources */,
 				2060037020348A8800023E10 /* Grid.swift in Sources */,

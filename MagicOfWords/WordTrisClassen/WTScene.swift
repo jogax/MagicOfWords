@@ -15,31 +15,6 @@ public protocol WTSceneDelegate: class {
     
 }
 
-struct WTResults {
-    var countMandatoryWords: Int
-    var scoreMandatoryWords: Int
-    var countOwnWords: Int
-    var scoreOwnWords: Int
-    var countUsedLetters: Int
-    var scoreUsedLetters: Int
-    var allAroundScore: Int
-    init(countMandatoryWords: Int = 0,
-         scoreMandatoryWords: Int = 0,
-         countOwnWords: Int = 0,
-         scoreOwnWords: Int = 0,
-         countUsedLetters: Int = 0,
-         scoreUsedLetters: Int = 0,
-         allAroundScore: Int = 0) {
-        self.countMandatoryWords = countMandatoryWords
-        self.scoreMandatoryWords = scoreMandatoryWords
-        self.countOwnWords = countOwnWords
-        self.scoreOwnWords = scoreOwnWords
-        self.countUsedLetters = countUsedLetters
-        self.scoreUsedLetters = scoreUsedLetters
-        self.allAroundScore = allAroundScore
-    }
-
-}
 
 struct ActivityItem {
     enum ActivityType: Int {
@@ -115,7 +90,7 @@ struct ActivityItem {
 let trueString = "1"
 let falseString = "0"
 
-class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
+class WTScene: SKScene, WTGameboardDelegate {
     
     struct TouchedNodes {
         var goBack = false
@@ -145,11 +120,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 //    var playingWords = [String]()
 //    var mandatoryWords = [String]()
     var grid: Grid?
+    var myTimer: MyTimer?
+    var time: Int = 0
     let heightMultiplicator = CGFloat((GV.onIpad ? 0.10 : 0.15))
     var blockSize: CGFloat = 0
     var random: MyRandom?
 //    var allWordsToShow = [AllWordsToShow]()
-    var time: Int = 0
     var timer = Timer()
     var timeLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
     var headerLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
@@ -221,10 +197,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         play()
    }
     /// WTGameFinishedDelegate
-    func getResults() -> (WTResults, Bool) {
-        return wtGameboard!.getResults()
-    }
-    
+//    func getResults() -> (WTResults, Bool) {
+//        return wtGameboard!.getResults()
+//    }
+//    
     private func getPlayingRecord(new: Bool, next: Int) {
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
         if new {
@@ -582,6 +558,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
         GV.countMandatoryWords = 0
         createHeader()
+        myTimer = MyTimer(maxTime: 3600)
+        if myTimer!.update(time: time) {
+           showGameFinished()
+        }
+        addChild(myTimer!)
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
         createBackgroundForOwnWords()
         generateArrayOfWordPieces(new: new)
@@ -644,10 +625,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     @objc private func countTime(timerX: Timer) {
         time += 1
+        print("time: \(time)")
         timeLabel.text = GV.language.getText(.tcTime, values: time.HourMinSec)
         realm.beginWrite()
         GV.playingRecord.time = String(time)
         try! realm.commitWrite()
+        if myTimer!.update(time: time) {
+            showGameFinished()
+        }
     }
     
     private func generateArrayOfWordPieces(new: Bool) {
@@ -690,6 +675,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
         moved = false
         inChoosingOwnWord = false
+        ownWordsScrolling = false
         let firstTouch = touches.first
         firstTouchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: firstTouchLocation)
@@ -828,14 +814,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         if touchedNodes.answer2 {
             wtGameboard!.clearGreenFieldsForNextRound()
             if !checkFreePlace() {
-                let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.5)
-                let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-                let gameFinishedSprite = WTGameFinished(size: size, position: position, delegate: self)
-                self.addChild(gameFinishedSprite)
-                gameFinishedSprite.showFinish()
-                realm.beginWrite()
-                GV.playingRecord.gameStatus = GV.GameStatusFinished
-                try! realm.commitWrite()
+                showGameFinished()
             } else {
                 roundIndexes.append(activityItems.count - 1)
                 realm.beginWrite()
@@ -898,7 +877,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 if GV.allMandatoryWordsFounded() {
                     let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.5)
                     let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-                    let gameFinishedSprite = WTGameFinished(size: size, position: position, delegate: self)
+                    let gameFinishedSprite = WTGameFinished(size: size, position: position)
                     self.addChild(gameFinishedSprite)
                     gameFinishedSprite.showFinish()
                     realm.beginWrite()
@@ -934,6 +913,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
     }
     
+    private func showGameFinished() {
+        let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.5)
+        let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        let gameFinishedSprite = WTGameFinished(size: size, position: position)
+        self.addChild(gameFinishedSprite)
+        gameFinishedSprite.showFinish()
+        realm.beginWrite()
+        GV.playingRecord.gameStatus = GV.GameStatusFinished
+        try! realm.commitWrite()
+    }
     
     private func saveActualState() {
         var pieces = ""
@@ -1218,8 +1207,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             default: break
             }
         }
-//        let lengths = [1,1,1,2,2,2,2,3,3,4]
-        let lengths = [1,1,1,2,2,2]
+        let lengths = [1,1,1,2,2,2,2,2,3,3,4]
+//        let lengths = [1,1,1,2,2,2]
         var generateLength = 0
         repeat {
             let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]

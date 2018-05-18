@@ -21,6 +21,10 @@ func * (size: CGSize, scalar: CGFloat) -> CGSize {
     return CGSize(width: size.width * scalar, height: size.height * scalar)
 }
 
+func * (size: CGSize, multiplier: CGSize) -> CGSize {
+    return CGSize(width: size.width * multiplier.width, height: size.height * multiplier.height)
+}
+
 func / (point: CGSize, scalar: CGFloat) -> CGSize {
     return CGSize(width: point.width / scalar, height: point.height / scalar)
 }

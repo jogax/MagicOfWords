@@ -10,14 +10,28 @@
 import Foundation
 import GameplayKit
 
-protocol WTGameFinishedDelegate: class {
-    func getResults()->(WTResults, Bool)
+struct WTResults {
+    var countMandatoryWords: Int
+    var scoreMandatoryWords: Int
+    var countOwnWords: Int
+    var scoreOwnWords: Int
+    var countUsedLetters: Int
+    var allAroundScore: Int
+    init() {
+        self.countMandatoryWords = 0
+        self.scoreMandatoryWords = 0
+        self.countOwnWords = 0
+        self.scoreOwnWords = 0
+        self.countUsedLetters = 0
+        self.allAroundScore = 0
+    }
+    
 }
 
+
 class WTGameFinished: SKSpriteNode {
-    var delegate: WTGameFinishedDelegate
-    init(size: CGSize, position: CGPoint, delegate: WTGameFinishedDelegate) {
-        self.delegate = delegate
+    var results = WTResults()
+    init(size: CGSize, position: CGPoint) {
         let texture = SKTexture()
         let color:SKColor = SKColor(red:230/255, green: 210/255, blue: 120/255, alpha: 0.99)
         super.init(texture: texture, color: color, size: size)
@@ -29,7 +43,7 @@ class WTGameFinished: SKSpriteNode {
     }
     
     public func showFinish() {
-        let (results, OK) = delegate.getResults()
+        let OK = getResults()
         if !OK {
             createLabel(text: GV.language.getText(.tcTaskNotCompleted), positionIndex: 0, smallFont: false)
         } else {
@@ -48,6 +62,21 @@ class WTGameFinished: SKSpriteNode {
         createOKButton()
 
   }
+    
+    private func getResults()->Bool {
+        var OK = true
+        for word in GV.allWords {
+            if word.mandatory {
+                results.countMandatoryWords += word.countFounded
+                results.scoreMandatoryWords += word.score
+            } else {
+                results.countOwnWords += word.countFounded
+                results.scoreOwnWords += word.score
+            }
+            results.countUsedLetters += word.word.count
+        }
+        return OK
+    }
     
     private func createLabel(text: String, positionIndex: Int, smallFont: Bool = true) {
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
