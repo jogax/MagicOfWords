@@ -23,7 +23,7 @@ class MyTimer: SKSpriteNode {
         screenHeight = bounds.size.height
         screenWidth = bounds.size.width
         let texture = SKTexture()
-        let color:SKColor = .gray
+        let color:SKColor = SKColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1.0)
         mySize = CGSize(width: screenWidth * 0.02, height: screenHeight * 0.70)
         let position = CGPoint(x: screenWidth * 0.98, y: screenHeight * 0.40)
         super.init(texture: texture, color: color, size: mySize)
@@ -40,19 +40,23 @@ class MyTimer: SKSpriteNode {
     }
     
     public func update(time: Int)->Bool {
+        var color: SKColor = .green
+        var heightMultiplier = CGFloat(maxTime - time) / CGFloat(maxTime)
+        heightMultiplier = heightMultiplier < 0 ? 0 : heightMultiplier
+        switch Int(heightMultiplier * 100) {
+        case 5...10: color = .yellow
+        case 0...5: color = .red
+        default: color = .green
+        }
+        let greenHeight = mySize.height * heightMultiplier
+        timeBackgroundSprite!.size = mySize * CGSize(width: 0.98, height: heightMultiplier)
+        timeBackgroundSprite!.position = CGPoint(x: 0, y: -(mySize.height - greenHeight) / 2)
+        
+        timeBackgroundSprite!.color = color
+            
         if time >= maxTime {
             return true
         } else {
-            let heightMultiplier = CGFloat(maxTime - time) / CGFloat(maxTime)
-            let greenComponent = 255 * heightMultiplier
-            let redComponent = 255 - (255 * heightMultiplier)
-            let color = SKColor(red: redComponent / 255, green: greenComponent / 255, blue: 0, alpha: 1.0)
-            let greenHeight = mySize.height * heightMultiplier
-            timeBackgroundSprite!.size = mySize * CGSize(width: 0.98, height: heightMultiplier)
-            timeBackgroundSprite!.position = CGPoint(x: 0, y: -(mySize.height - greenHeight) / 2)
-            
-            timeBackgroundSprite!.color = color
-            
             return false
         }
     }
@@ -66,6 +70,10 @@ class MyTimer: SKSpriteNode {
             timeBackgroundSprite!.colorBlendFactor = 0.9
             self.addChild(timeBackgroundSprite!)
         }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+            return
     }
 
 }

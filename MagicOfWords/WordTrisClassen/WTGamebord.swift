@@ -789,9 +789,9 @@ class WTGameboard: SKShapeNode {
 //                    gameArray![col][row].changeColor(toColor: .myBlueColor)
                 }
             }
-//            else {
-//                print("and hier? ActLetter: \(actLetter), status: \(status), noMoreMove: \(noMoreMove) ")
-//            }
+            else {
+                print("and hier? ActLetter: \(actLetter), status: \(status), noMoreMove: \(noMoreMove) ")
+            }
         }
 
         var onlyUsedLetters = true
@@ -1039,26 +1039,6 @@ class WTGameboard: SKShapeNode {
         roundInfos.append(RoundInfos())
     }
     
-//    public func getResults()->(WTResults, Bool) {
-//        var results = WTResults()
-//        var countFoundedMandatoryWords = 0
-//        let wordDictionary = calculateCountersAndScores()
-//        for actWord in GV.allWords {
-//            if wordDictionary[actWord.word] != nil {
-//                if actWord.mandatory {
-//                    results.countMandatoryWords += wordDictionary[actWord.word]!.counter
-//                    results.scoreMandatoryWords += wordDictionary[actWord.word]!.score
-//                    countFoundedMandatoryWords += 1
-//                } else {
-//                    results.countOwnWords += wordDictionary[actWord.word]!.counter
-//                    results.scoreOwnWords += wordDictionary[actWord.word]!.score
-//                }
-//            }
-//        }
-//        let OK = countFoundedMandatoryWords == GV.countMandatoryWords
-//        return (results, OK)
-//    }
-//    
     public func removeFromGameboard(sprite: WTPiece) {
         let gameboardIndexes = sprite.gameArrayPositions
         for gbIndex in gameboardIndexes {

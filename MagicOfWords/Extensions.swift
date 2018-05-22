@@ -389,8 +389,15 @@ extension String {
         }
     }
 
-
-    
+    func fixLength(length: Int)->String {
+        var returnValue: String = self
+        if returnValue.count < length {
+            repeat {
+                returnValue = " " + returnValue
+            } while returnValue.count < length
+        }
+        return returnValue
+    }
 }
 
 extension UIColor {

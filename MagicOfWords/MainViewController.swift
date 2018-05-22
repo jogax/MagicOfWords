@@ -11,10 +11,6 @@ import SpriteKit
 import GameplayKit
 import RealmSwift
 
-let NoMore = 0
-let PreviousGame = 1
-let NextGame = 2
-
 class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WTSceneDelegate, LoadingSceneDelegate {
     func startChooseGameType() {
         print("Choose game type choosed")
@@ -30,16 +26,16 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         startMenuScene()
     }
     
-    func gameFinished(start: Int) {
-        if start == NoMore {
-            startMenuScene(showMenu: true)
-        } else {
-            startWTScene(new: false, next: start)
+    func gameFinished(start: StartType) {
+        switch start {
+        case .NoMore: startMenuScene(showMenu: true)
+        case .PreviousGame, .NextGame: startWTScene(new: false, next: start)
+        case .NewGame: startWTScene(new: true, next: .NoMore)
         }
     }
     
     func wtGame() {
-        startWTScene(new: true, next: NoMore)
+        startWTScene(new: true, next: .NoMore)
     }
     
     func findWords() {
@@ -55,7 +51,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         return
     }
     
-    func startWTScene(new: Bool, next: Int) {
+    func startWTScene(new: Bool, next: StartType) {
         let wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
             wtScene.setDelegate(delegate: self)
@@ -79,7 +75,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         let gameType = GameType(rawValue: basicData.gameType)!
         switch gameType {
         case .WordTris:
-            startWTScene(new: true, next: NoMore)
+            startWTScene(new: true, next: .NoMore)
         case .SearchWords:
             startFindWordsScene()
         case .NoMoreGames:
@@ -92,7 +88,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         let gameType = GameType(rawValue: basicData.gameType)!
         switch gameType {
         case .WordTris:
-            startWTScene(new: false, next: NoMore)
+            startWTScene(new: false, next: .NoMore)
         case .SearchWords:
             startFindWordsScene()
         case .NoMoreGames:

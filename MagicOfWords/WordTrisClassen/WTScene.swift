@@ -8,10 +8,16 @@
 
 import Foundation
 import GameplayKit
+
+public enum StartType: Int {
+    case NoMore = 0, PreviousGame, NextGame, NewGame
+}
+
+
 public protocol WTSceneDelegate: class {
     
     /// Method called when Game finished
-    func gameFinished(start: Int)
+    func gameFinished(start: StartType)
     
 }
 
@@ -90,7 +96,8 @@ struct ActivityItem {
 let trueString = "1"
 let falseString = "0"
 
-class WTScene: SKScene, WTGameboardDelegate {
+class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
+    
     
     struct TouchedNodes {
         var goBack = false
@@ -105,6 +112,7 @@ class WTScene: SKScene, WTGameboardDelegate {
         var answer1 = false
         var answer2 = false
         var ownWordsBackground = false
+        var gameFinishedOKButton = false
     }
     
     
@@ -126,13 +134,12 @@ class WTScene: SKScene, WTGameboardDelegate {
     var blockSize: CGFloat = 0
     var random: MyRandom?
 //    var allWordsToShow = [AllWordsToShow]()
-    var timer = Timer()
+    var timer: Timer? = Timer()
     var timeLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
     var headerLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
     var goBackLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
     var goToPreviousGameLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
     var goToNextGameLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
-    var testCounter = 0
     var firstTouchLocation = CGPoint(x: 0, y: 0)
 //    var scoreMandatoryWords = 0
 //    var scoreOwnWords = 0
@@ -141,8 +148,9 @@ class WTScene: SKScene, WTGameboardDelegate {
     var activityItems = [ActivityItem]()
     var roundIndexes = [Int]()
     var new: Bool = true
-    var nextGame: Int = NoMore
+    var nextGame: StartType = .NoMore
     var startTouchedNodes = TouchedNodes()
+    var wtGameFinishedSprite = WTGameFinished()
 
     var ws = [WTPiece]()
     var origPosition: [CGPoint] = Array(repeating: CGPoint(x:0, y: 0), count: 3)
@@ -186,22 +194,50 @@ class WTScene: SKScene, WTGameboardDelegate {
         self.name = "WTScene"
         self.view!.isMultipleTouchEnabled = false
         self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
-
+        self.wtGameFinishedSprite = WTGameFinished()
+        self.addChild(wtGameFinishedSprite)
         self.backgroundColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
         GV.allWords = [WordToCheck]()
-        getPlayingRecord(new: new, next: nextGame)
+        getPlayingRecord(new: new, next: .NextGame)
 //        createHeader()
         createUndo()
+        wtGameFinishedSprite.setDelegate(delegate: self)
         
         showWordsToCollect()
         play()
    }
-    /// WTGameFinishedDelegate
-//    func getResults() -> (WTResults, Bool) {
-//        return wtGameboard!.getResults()
+    
+    func startNewGame() {
+        wtSceneDelegate!.gameFinished(start: .NewGame)
+
+    }
+    
+    func restartThisGame() {
+        realm.beginWrite()
+        GV.playingRecord.ownWords = ""
+        GV.playingRecord.pieces = ""
+        GV.playingRecord.activityItems = ""
+        GV.playingRecord.time = "0"
+        GV.playingRecord.rounds.removeAll()
+        GV.playingRecord.gameStatus = GV.GameStatusNew
+        try! realm.commitWrite()
+        wtSceneDelegate!.gameFinished(start: .NewGame)
+    }
+    
+//    private func clearAllWords() {
+//        var indexesToRemove = [Int]()
+//        for index in 0..<GV.allWords.count {
+//            if !GV.allWords[index].mandatory {
+//                indexesToRemove.append(index)
+//            }
+//        }
+//        let indexesSorted = indexesToRemove.sorted(by: {$0 > $1})
+//        for index in indexesSorted {
+//            GV.allWords.remove(at:index)
+//        }
 //    }
-//    
-    private func getPlayingRecord(new: Bool, next: Int) {
+//
+    private func getPlayingRecord(new: Bool, next: StartType) {
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
         if new {
             let games = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusNew)
@@ -240,9 +276,9 @@ class WTScene: SKScene, WTGameboardDelegate {
             if playedNowGame.count > 0 {
                 let actGameNumber = playedNowGame.first!.gameNumber
                 switch nextGame {
-                case NoMore:
+                case .NoMore:
                     GV.playingRecord = playedNowGame[0]
-                case PreviousGame:
+                case .PreviousGame:
                     let previousRecords = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber < %d",
                                                                                   GV.gameType, GV.GameStatusPlaying, actGameNumber)
                     if previousRecords.count == 1 {
@@ -252,7 +288,7 @@ class WTScene: SKScene, WTGameboardDelegate {
                     } else {
                         GV.playingRecord = playedNowGame.first!
                     }
-                case NextGame:
+                case .NextGame:
                     let nextRecords = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber > %d",
                                                                                    GV.gameType, GV.GameStatusPlaying, actGameNumber)
                     if nextRecords.count == 1 {
@@ -279,7 +315,7 @@ class WTScene: SKScene, WTGameboardDelegate {
         wtSceneDelegate = delegate
     }
     
-    public func setGameArt(new: Bool, next: Int) {
+    public func setGameArt(new: Bool, next: StartType) {
         self.new = new
         self.nextGame = next
     }
@@ -393,7 +429,6 @@ class WTScene: SKScene, WTGameboardDelegate {
     }
     
     func scrollOwnWords(up: Bool) {
-        print("at scrollOwnWords: up: \(up), count: \(1), showingOwnWordsIndex: \(showingOwnWordsIndex)")
         if up {
             showingOwnWordsIndex += countWordsInRow
             let countOwnWords = GV.countWords(mandatory: false)
@@ -410,7 +445,15 @@ class WTScene: SKScene, WTGameboardDelegate {
         }
         showFoundedWords()
     }
-
+    private func showLastOwnWords() {
+        let countOwnWords = GV.countWords(mandatory: false)
+        let countRows = countOwnWords / countWordsInRow
+        var startRow = countRows - countShowingRows + 1
+        startRow = startRow >= 0 ? startRow : 0
+        showingOwnWordsIndex = startRow * countWordsInRow
+        showFoundedWords()
+    }
+    
     func showFoundedWords() {
         var scoreMandatoryWords = 0
         var scoreOwnWords = 0
@@ -423,7 +466,6 @@ class WTScene: SKScene, WTGameboardDelegate {
                     scoreMandatoryWords += actWord.score
                 } else {
                     scoreOwnWords += actWord.score
-//                    label!.alpha = ownWordAlpha
                     if index >= showingOwnWordsIndex && index <= showingOwnWordsIndex + countWordsInRow * countShowingRows - 1 {
                         label!.isHidden = false
                         label!.position.y = firstLineYPosition - CGFloat((index - showingOwnWordsIndex) / 3) * heightOfLine
@@ -435,7 +477,6 @@ class WTScene: SKScene, WTGameboardDelegate {
             }
         }
         
-//        if GV.countFounded() >
         
         totalScore = scoreMandatoryWords + scoreOwnWords
         if let label = self.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
@@ -443,7 +484,6 @@ class WTScene: SKScene, WTGameboardDelegate {
         }
         if let label = self.childNode(withName: ownWordsHeaderName)! as? SKLabelNode {
             label.text = GV.language.getText(.tcOwnWords, values: String(GV.countWords(mandatory: false)), String(GV.countWords(mandatory: false, countAll: true)), String(scoreOwnWords))
-//            label.alpha = ownWordAlpha
         }
         modifyHeader()
 
@@ -495,14 +535,14 @@ class WTScene: SKScene, WTGameboardDelegate {
             createWordLabel(wordToShow: wordToShow, counter: counter, own: false)
             counter += 1
         }
-        createLabel(word: GV.language.getText(.tcWordsToCollect, values: String(GV.countWords(mandatory: true)), "0","0", "0"), first: true, name: mandatoryWordsHeaderName)
+        createLabel(word: GV.language.getText(.tcWordsToCollect, values: String(GV.countMandatoryWords), "0","0", "0"), first: true, name: mandatoryWordsHeaderName)
         createLabel(word: GV.language.getText(.tcOwnWords, values: "0", "0", "0"), first: false, name: ownWordsHeaderName)
     }
     
     private func createWordLabel(wordToShow: WordToCheck, counter: Int, own: Bool) {
         let xPositionMultiplier = [0.2, 0.5, 0.8]
         let mandatoryYPositionMultiplier:CGFloat = 0.86
-        let ownYPositionMultiplier:CGFloat = 0.80
+        let ownYPositionMultiplier:CGFloat = 0.80 // orig
         let distance: CGFloat = 0.02
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
         let wordRow = CGFloat((counter - 1) / countWordsInRow)
@@ -513,9 +553,16 @@ class WTScene: SKScene, WTGameboardDelegate {
         if !own {
             yPosition = self.frame.height * (mandatoryYPositionMultiplier - value)
         } else {
-            let maxY = wtGameboard!.children[0].frame.maxY
+            let minY = wtGameboard!.children[0].frame.maxY
+            var maxY:CGFloat = 0
+            let ownHeader: SKNode? = self.childNode(withName: ownWordsHeaderName)
+            if ownHeader != nil {
+                let headerPosY = ownHeader!.position.y
+                maxY = headerPosY
+            }
+            
             yPosition = self.frame.height * (ownYPositionMultiplier - value)
-            if yPosition <= maxY {
+            if yPosition <= minY || yPosition >= maxY{
                 showWord = false
             }
         }
@@ -525,16 +572,20 @@ class WTScene: SKScene, WTGameboardDelegate {
         label.fontColor = .black
         label.text = wordToShow.word + " (\(wordToShow.countFounded))"
         label.name = wordToShow.word
+        label.zPosition = self.zPosition + 10
         self.addChild(label)
         if !showWord {
             label.isHidden = true
         }
+        setOwnWordsIndex()
+    }
+    
+    private func setOwnWordsIndex() {
         let countOwnWords = GV.countWords(mandatory: false)
         if countOwnWords > countShowingOwnWords {
             let countShowedRows = countShowingOwnWords / countWordsInRow
             let startRow = countOwnWords / countWordsInRow - countShowedRows + 1
             showingOwnWordsIndex =  startRow * countWordsInRow
-//            print("showingOwnWordsIndex: \(showingOwnWordsIndex), countOwnWords: \(countOwnWords)")
         }
     }
     
@@ -559,9 +610,6 @@ class WTScene: SKScene, WTGameboardDelegate {
         GV.countMandatoryWords = 0
         createHeader()
         myTimer = MyTimer(maxTime: 3600)
-        if myTimer!.update(time: time) {
-           showGameFinished()
-        }
         addChild(myTimer!)
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
         createBackgroundForOwnWords()
@@ -575,9 +623,10 @@ class WTScene: SKScene, WTGameboardDelegate {
         for item in mandatoryWords {
             if item.count > 0 {
                 GV.allWords.append(WordToCheck(word: item.uppercased(), countFounded: 0, mandatory: true, creationIndex: 0, score: 0))
-                GV.countMandatoryWords += 1
             }
         }
+        GV.countMandatoryWords = mandatoryWords.count
+//        showWordsToCollect()
         if !new {
 //            wtGameboard!.setRoundInfos(infos: GV.playingRecord.roundInfos)
             wtGameboard!.setRoundInfos()
@@ -588,7 +637,8 @@ class WTScene: SKScene, WTGameboardDelegate {
                 }
             }
             restoreGameArray()
-            wtGameboard!.checkWholeWords()
+//            wtGameboard!.checkWholeWords()
+            _ = checkIfGameFinished()
         } else {
             if GV.playingRecord.rounds.count == 0 {
                 realm.beginWrite()
@@ -610,6 +660,9 @@ class WTScene: SKScene, WTGameboardDelegate {
         modifyHeader()
         goToPreviousGameLabel.alpha = hasPreviousRecords(playingRecord: GV.playingRecord) ? 1.0 : 0.1
         goToNextGameLabel.alpha = hasNextRecords(playingRecord: GV.playingRecord) ? 1.0 : 0.1
+        if timer != nil {
+            timer!.invalidate()
+        }
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
     }
     
@@ -625,13 +678,15 @@ class WTScene: SKScene, WTGameboardDelegate {
     }
     @objc private func countTime(timerX: Timer) {
         time += 1
-        print("time: \(time)")
+//        print("time: \(time)")
         timeLabel.text = GV.language.getText(.tcTime, values: time.HourMinSec)
         realm.beginWrite()
         GV.playingRecord.time = String(time)
         try! realm.commitWrite()
         if myTimer!.update(time: time) {
-            showGameFinished()
+            timer!.invalidate()
+            timer = nil
+            showGameFinished(status: .TimeOut)
         }
     }
     
@@ -682,6 +737,9 @@ class WTScene: SKScene, WTGameboardDelegate {
         let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .start)
         if touchedNodes.undo {
             undoTouched = true
+        }
+        if touchedNodes.gameFinishedOKButton {
+            wtGameFinishedSprite.OKButtonPressed()
         }
         if touchedNodes.shapeIndex > NoValue {
             startShapeIndex = touchedNodes.shapeIndex
@@ -769,6 +827,8 @@ class WTScene: SKScene, WTGameboardDelegate {
                     touchedNodes.goNextGame = enabled
                 } else if name == undoName {
                     touchedNodes.undo = enabled
+                } else if name == GameFinishedOKName {
+                    touchedNodes.gameFinishedOKButton = true
                 } else if name.begins(with: "GBD") {
                     touchedNodes.GCol = Int(name.subString(startPos: 4, length:1))!
                     touchedNodes.GRow = Int(name.subString(startPos: 6, length:1))!
@@ -814,7 +874,7 @@ class WTScene: SKScene, WTGameboardDelegate {
         if touchedNodes.answer2 {
             wtGameboard!.clearGreenFieldsForNextRound()
             if !checkFreePlace() {
-                showGameFinished()
+                showGameFinished(status: .NoMoreSteps)
             } else {
                 roundIndexes.append(activityItems.count - 1)
                 realm.beginWrite()
@@ -834,12 +894,22 @@ class WTScene: SKScene, WTGameboardDelegate {
             startUndo()
             saveActualState()
         }
+        if touchedNodes.goBack {
+            timer!.invalidate()
+            timer = nil
+            wtSceneDelegate!.gameFinished(start: .NoMore)
+            return
+        }
         if touchedNodes.goPreviousGame {
-            wtSceneDelegate!.gameFinished(start: PreviousGame)
+            timer!.invalidate()
+            timer = nil
+            wtSceneDelegate!.gameFinished(start: .PreviousGame)
             return
         }
         if touchedNodes.goNextGame {
-            wtSceneDelegate!.gameFinished(start: NextGame)
+            timer!.invalidate()
+            timer = nil
+            wtSceneDelegate!.gameFinished(start: .NextGame)
             return
         }
         if inChoosingOwnWord {
@@ -849,6 +919,7 @@ class WTScene: SKScene, WTGameboardDelegate {
                 activityItems.append(activityItem)
                 saveActualState()
             }
+            _ = checkIfGameFinished()
         } else if moved {
             let fixed = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row)
             if fixed {
@@ -874,26 +945,16 @@ class WTScene: SKScene, WTGameboardDelegate {
                 ws[lastPosition].setPieceFromPosition(index: lastPosition)
                 self.addChild(ws[lastPosition])
                 let freePlaceFound = checkFreePlace()
-                if GV.allMandatoryWordsFounded() {
-                    let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.5)
-                    let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-                    let gameFinishedSprite = WTGameFinished(size: size, position: position)
-                    self.addChild(gameFinishedSprite)
-                    gameFinishedSprite.showFinish()
-                    realm.beginWrite()
-                    GV.playingRecord.gameStatus = GV.GameStatusFinished
-                    try! realm.commitWrite()
-
-                }
-                if !freePlaceFound {
-                    let question = MyQuestion(question: .NoMoreSteps, parentSize: self.size)
-                    question.position = CGPoint(x:self.size.width * 0.5, y: self.size.height * 0.5)
-                    self.addChild(question)
-                    enabled = false
-                    gameboardEnabled = false
+                if !checkIfGameFinished() {
+                    if !freePlaceFound {
+                        let question = MyQuestion(question: .NoMoreSteps, parentSize: self.size)
+                        question.position = CGPoint(x:self.size.width * 0.5, y: self.size.height * 0.5)
+                        self.addChild(question)
+                        enabled = false
+                        gameboardEnabled = false
+                    }
                 }
                saveActualState()
-               testCounter += 1
             } else {
                 ws[movedIndex].position = origPosition[movedIndex]
 //                ws[movedIndex].scale(to: origSize[movedIndex])
@@ -901,10 +962,6 @@ class WTScene: SKScene, WTGameboardDelegate {
             }
             moved = false
         } else if nodes.count > 0 {
-            if touchedNodes.goBack {
-                wtSceneDelegate!.gameFinished(start: NoMore)
-                return
-            }
             if touchedNodes.shapeIndex >= 0 && startShapeIndex == touchedNodes.shapeIndex {
                     ws[touchedNodes.shapeIndex].rotate()
                     ws[touchedNodes.shapeIndex].position = origPosition[touchedNodes.shapeIndex]
@@ -913,12 +970,19 @@ class WTScene: SKScene, WTGameboardDelegate {
         }
     }
     
-    private func showGameFinished() {
-        let size = CGSize(width: self.frame.width * 0.8, height: self.frame.height * 0.5)
-        let position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-        let gameFinishedSprite = WTGameFinished(size: size, position: position)
-        self.addChild(gameFinishedSprite)
-        gameFinishedSprite.showFinish()
+    private func checkIfGameFinished()->Bool {
+        if GV.allMandatoryWordsFounded() {
+            realm.beginWrite()
+            GV.playingRecord.gameStatus = GV.GameStatusFinished
+            try! realm.commitWrite()
+            wtGameFinishedSprite.showFinish(status: .OK)
+            return true
+        }
+        return false
+    }
+    
+    private func showGameFinished(status: GameFinisheStatus) {
+        wtGameFinishedSprite.showFinish(status: status)
         realm.beginWrite()
         GV.playingRecord.gameStatus = GV.GameStatusFinished
         try! realm.commitWrite()
@@ -1057,6 +1121,7 @@ class WTScene: SKScene, WTGameboardDelegate {
                 }
                 wtGameboard!.checkWholeWords()
                 activityItems.removeLast()
+                showLastOwnWords()
                 modifyHeader()
             }
         }
@@ -1093,11 +1158,13 @@ class WTScene: SKScene, WTGameboardDelegate {
                 roundIndexes.append(round.index)
             }
         }
-        if GV.playingRecord.rounds.last!.gameArray.count > 0 {
-            wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
-//        wtGameboard!.clearGameArray() // delete all contents from GameArray
-//        fillGameArrayFromActivityItems()
-//        var wsIndex = 0
+        if GV.playingRecord.rounds.count > 0 {
+            if GV.playingRecord.rounds.last!.gameArray.count > 0 {
+                wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
+    //        wtGameboard!.clearGameArray() // delete all contents from GameArray
+    //        fillGameArrayFromActivityItems()
+    //        var wsIndex = 0
+            }
         }
         for index in 0..<tilesForGame.count {
             let tileForGame = tilesForGame[index]
@@ -1207,8 +1274,8 @@ class WTScene: SKScene, WTGameboardDelegate {
             default: break
             }
         }
-        let lengths = [1,1,1,2,2,2,2,2,3,3,4]
-//        let lengths = [1,1,1,2,2,2]
+//        let lengths = [1,1,1,2,2,2,2,2,3,3,4]
+        let lengths = [1,1,1,2,2,2]
         var generateLength = 0
         repeat {
             let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
