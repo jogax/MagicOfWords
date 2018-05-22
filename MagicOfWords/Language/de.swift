@@ -17,6 +17,7 @@ let deDictionary: [TextConstants: String] = [
     .tcNewGame:          "Neues Spiel",
     .tcRestart:          "Neustart",
     .tcContinue:         "Fortsetzen",
+    .tcFinished:         "Beendere Spiele",
     .tcSettings:         "Einstellungen",
     .tcWordTris:         "Wortris",
     .tcSearchWords:      "Wörter suchen",

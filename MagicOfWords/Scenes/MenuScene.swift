@@ -28,20 +28,20 @@ class MenuScene: SKScene {
     var menuSceneDelegate: MenuSceneDelegate?
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
-        if realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusNew).count > 0 {
-            createMenuItem(menuInt: .tcNewGame, firstLine: true)
-        }
-        if realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusPlaying).count > 0 {
-            createMenuItem(menuInt: .tcContinue)
-        }
-        createMenuItem(menuInt: .tcChooseGameType)
-        createMenuItem(menuInt: .tcSettings)
+        var enabled = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusNew).count > 0
+        createMenuItem(menuInt: .tcNewGame, firstLine: true, enabled: enabled)
+        enabled = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusPlaying).count > 0
+        createMenuItem(menuInt: .tcContinue, enabled: enabled)
+        enabled = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusFinished).count > 0
+        createMenuItem(menuInt: .tcFinished, enabled: enabled)
+        createMenuItem(menuInt: .tcChooseGameType, enabled: true)
+        createMenuItem(menuInt: .tcSettings, enabled: true)
     }
     public func setDelegate(delegate: MenuSceneDelegate) {
         menuSceneDelegate = delegate
     }
     var line = 0
-    func createMenuItem(menuInt: TextConstants, firstLine: Bool = false) {
+    func createMenuItem(menuInt: TextConstants, firstLine: Bool = false, enabled: Bool) {
         line = firstLine ? 1 : line + 1
         let menuItem = SKLabelNode(fontNamed: "Noteworthy")// Snell Roundhand")
         let startYPosition = self.frame.size.height * 0.80
@@ -51,6 +51,8 @@ class MenuScene: SKScene {
         menuItem.position = CGPoint(x: self.frame.size.width / 2, y: startYPosition - (CGFloat(line) * 50) )
         menuItem.fontColor = SKColor.blue
         menuItem.color = UIColor.brown
+        menuItem.isUserInteractionEnabled = enabled
+        menuItem.alpha = enabled ? 1.0 : 0.3
         self.addChild(menuItem)
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -68,6 +70,9 @@ class MenuScene: SKScene {
                     case String(TextConstants.tcContinue.rawValue):
                         menuSceneDelegate!.continueGame()
                     
+                    case String(TextConstants.tcFinished.rawValue):
+                        showFinishedGames()
+                    
                     case String(TextConstants.tcSettings.rawValue):
                         menuSceneDelegate!.startSettings()
                     
@@ -78,6 +83,10 @@ class MenuScene: SKScene {
                 }
             }
         }
+    }
+    
+    private func showFinishedGames() {
+        
     }
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")

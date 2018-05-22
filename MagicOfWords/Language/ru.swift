@@ -17,6 +17,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcNewGame:          "Новая игра",
     .tcRestart:          "Перезапуск",
     .tcContinue:         "Продолжение",
+    .tcFinished:         "Законченные игры",
     .tcSettings:         "Настройки",
     .tcWordTris:         "Словотрис",
     .tcSearchWords:       "Найти слова",
