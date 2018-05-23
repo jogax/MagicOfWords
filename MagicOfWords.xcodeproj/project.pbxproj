@@ -23,10 +23,6 @@
 		201FB1DE20288CEA00EC9F36 /* en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D220288CEA00EC9F36 /* en.swift */; };
 		201FB1DF20288CEA00EC9F36 /* de.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D320288CEA00EC9F36 /* de.swift */; };
 		201FB1E020288CEA00EC9F36 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D420288CEA00EC9F36 /* Language.swift */; };
-		201FB1E2202891C300EC9F36 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E1202891C300EC9F36 /* Realm.framework */; };
-		201FB1E3202891C300EC9F36 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E1202891C300EC9F36 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		201FB1E6202891C900EC9F36 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E5202891C900EC9F36 /* RealmSwift.framework */; };
-		201FB1E7202891C900EC9F36 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 201FB1E5202891C900EC9F36 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
 		204A8ADA2029EE6000E9C11F /* WTScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WTScene.swift */; };
 		204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204AEB38205D1F47004D2ECD /* WTGameFinished.swift */; };
@@ -49,6 +45,10 @@
 		2087AC0E202C86FF008DEF26 /* LoadingScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087AC0D202C86FF008DEF26 /* LoadingScene.swift */; };
 		20943C8E2092129000B34A07 /* MyQuestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20943C8D2092129000B34A07 /* MyQuestions.swift */; };
 		2098BB8E20601B0B00C3641B /* magier.png in Resources */ = {isa = PBXBuildFile; fileRef = 2098BB8D20601B0B00C3641B /* magier.png */; };
+		209D91D720B5877700EC141E /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209D91D620B5877700EC141E /* Realm.framework */; };
+		209D91D820B5877700EC141E /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 209D91D620B5877700EC141E /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		209D91DB20B5879400EC141E /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209D91DA20B5879400EC141E /* RealmSwift.framework */; };
+		209D91DC20B5879400EC141E /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 209D91DA20B5879400EC141E /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A604B22035D93A00DC48F0 /* MyRandom.swift */; };
 		20A6913D203088FF00AB47C0 /* enWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20A6913C203088FF00AB47C0 /* enWords.txt */; };
 		20A6914020309B9F00AB47C0 /* WTPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6913F20309B9F00AB47C0 /* WTPiece.swift */; };
@@ -62,14 +62,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		201FB1E4202891C300EC9F36 /* Embed Frameworks */ = {
+		209D91D920B5877700EC141E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				201FB1E7202891C900EC9F36 /* RealmSwift.framework in Embed Frameworks */,
-				201FB1E3202891C300EC9F36 /* Realm.framework in Embed Frameworks */,
+				209D91DC20B5879400EC141E /* RealmSwift.framework in Embed Frameworks */,
+				209D91D820B5877700EC141E /* Realm.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -119,6 +119,8 @@
 		2087AC0D202C86FF008DEF26 /* LoadingScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScene.swift; sourceTree = "<group>"; };
 		20943C8D2092129000B34A07 /* MyQuestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyQuestions.swift; sourceTree = "<group>"; };
 		2098BB8D20601B0B00C3641B /* magier.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = magier.png; path = MagicOfWords/Pictures/magier.png; sourceTree = SOURCE_ROOT; };
+		209D91D620B5877700EC141E /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
+		209D91DA20B5879400EC141E /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		20A604B22035D93A00DC48F0 /* MyRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRandom.swift; sourceTree = "<group>"; };
 		20A6913C203088FF00AB47C0 /* enWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enWords.txt; sourceTree = "<group>"; };
 		20A6913F20309B9F00AB47C0 /* WTPiece.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTPiece.swift; sourceTree = "<group>"; };
@@ -136,9 +138,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				209D91D720B5877700EC141E /* Realm.framework in Frameworks */,
 				2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */,
-				201FB1E6202891C900EC9F36 /* RealmSwift.framework in Frameworks */,
-				201FB1E2202891C300EC9F36 /* Realm.framework in Frameworks */,
+				209D91DB20B5879400EC141E /* RealmSwift.framework in Frameworks */,
 				2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -149,6 +151,8 @@
 		201FB1A520288C2B00EC9F36 = {
 			isa = PBXGroup;
 			children = (
+				209D91DA20B5879400EC141E /* RealmSwift.framework */,
+				209D91D620B5877700EC141E /* Realm.framework */,
 				201FB1E5202891C900EC9F36 /* RealmSwift.framework */,
 				201FB1E1202891C300EC9F36 /* Realm.framework */,
 				201FB1B020288C2B00EC9F36 /* MagicOfWords */,
@@ -278,7 +282,8 @@
 				201FB1AA20288C2B00EC9F36 /* Sources */,
 				201FB1AB20288C2B00EC9F36 /* Frameworks */,
 				201FB1AC20288C2B00EC9F36 /* Resources */,
-				201FB1E4202891C300EC9F36 /* Embed Frameworks */,
+				209D91D920B5877700EC141E /* Embed Frameworks */,
+				209D91DD20B588D400EC141E /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -356,6 +361,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		209D91DD20B588D400EC141E /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		201FB1AA20288C2B00EC9F36 /* Sources */ = {

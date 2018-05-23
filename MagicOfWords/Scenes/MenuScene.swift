@@ -26,6 +26,8 @@ public protocol MenuSceneDelegate: class {
 
 class MenuScene: SKScene {
     var menuSceneDelegate: MenuSceneDelegate?
+    let enabledAlpha: CGFloat = 1.0
+    let disabledAlpha: CGFloat = 0.4
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
         var enabled = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusNew).count > 0
@@ -51,8 +53,7 @@ class MenuScene: SKScene {
         menuItem.position = CGPoint(x: self.frame.size.width / 2, y: startYPosition - (CGFloat(line) * 50) )
         menuItem.fontColor = SKColor.blue
         menuItem.color = UIColor.brown
-        menuItem.isUserInteractionEnabled = enabled
-        menuItem.alpha = enabled ? 1.0 : 0.3
+        menuItem.alpha = enabled ? enabledAlpha : disabledAlpha
         self.addChild(menuItem)
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -63,7 +64,8 @@ class MenuScene: SKScene {
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
         if nodes.count > 0 {
-            if let name = nodes.first!.name {
+            let name = nodes.first!.name
+            if name != nil && nodes.first!.alpha == enabledAlpha {
                 switch name {
                     case String(TextConstants.tcNewGame.rawValue):
                         menuSceneDelegate!.startNewGame()
