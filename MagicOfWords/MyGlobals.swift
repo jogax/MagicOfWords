@@ -82,6 +82,14 @@ struct GV {
     static func allMandatoryWordsFounded()->Bool {
         return GV.countMandatoryWords == countWords(mandatory: true)
     }
+    
+    static func getScore()->Int {
+        var score = 0
+        for actWord in GV.allWords {
+            score += actWord.score
+        }
+        return score
+    }
 }
 
 

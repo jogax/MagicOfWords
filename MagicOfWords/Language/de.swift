@@ -14,10 +14,10 @@ let deDictionary: [TextConstants: String] = [
     .tcGerman:           "Deutsch (Német)",
     .tcHungarian:        "Magyar (Magyar)",
     .tcRussian:          "Русский (Orosz)",
-    .tcNewGame:          "Neues Spiel",
+    .tcNewGame:          "Neues Spiel %",
     .tcRestart:          "Neustart",
-    .tcContinue:         "Fortsetzen",
-    .tcFinished:         "Beendere Spiele",
+    .tcContinue:         "Fortsetzen %",
+    .tcFinished:         "Beendete Spiele %",
     .tcSettings:         "Einstellungen",
     .tcWordTris:         "Wortris",
     .tcSearchWords:      "Wörter suchen",
@@ -31,6 +31,7 @@ let deDictionary: [TextConstants: String] = [
     .tcOwnWords:          "Eigene Wörter (% / % / %)",
     .tcNoMoreSteps:       "Herzlichen Glückwunsch, du hast das Spiel beendet!",
     .tcScore:             "Punkte:",
+    .tcBest:              "Beste Erg.:",
     .tcCollectedRequiredWords: "Pflichtwörter:",
     .tcCollectedOwnWords:      "Eigene Wörter:",
     .tcTotal:               "Insgesamt:",
@@ -42,7 +43,8 @@ let deDictionary: [TextConstants: String] = [
     .tcNoMoreStepsAnswer1: "Markieren",
     .tcNoMoreStepsAnswer2: "Nächste Runde",
     .tcAlphabet:           "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜẞ",
-
+    .tcGameNumber:          "SpielNr",
+    .tcOK:                  "OK",
 ]
 
 

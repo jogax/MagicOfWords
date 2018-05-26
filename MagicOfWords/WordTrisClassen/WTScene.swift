@@ -202,14 +202,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 //        createHeader()
         createUndo()
         wtGameFinishedSprite.setDelegate(delegate: self)
-        
+        setCountMandatoryWords()
         showWordsToCollect()
         play()
    }
     
+    func setCountMandatoryWords() {
+        let mandatoryWords = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
+        for item in mandatoryWords {
+            if item.count > 0 {
+                GV.allWords.append(WordToCheck(word: item.uppercased(), countFounded: 0, mandatory: true, creationIndex: 0, score: 0))
+            }
+        }
+        GV.countMandatoryWords = mandatoryWords.count
+    }
+    
     func startNewGame() {
         wtSceneDelegate!.gameFinished(start: .NewGame)
-
     }
     
     func restartThisGame() {
@@ -415,6 +424,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
     }
     
+    override func update(_ currentTime: TimeInterval) {
+        if checkIfGameFinished() {
+//            self.view?.isUserInteractionEnabled = false
+        }
+    }
+    
     private func modifyHeader() {
         let text = GV.language.getText(.tcHeader, values: String(GV.playingRecord.gameNumber + 1), String(GV.playingRecord.rounds.count), String(totalScore))
         headerLabel.text = text
@@ -590,8 +605,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func createLabel(word: String, first: Bool, name: String) {
+        let ownYPosition: [CGFloat] = [0.82, 0.80, 0.78]
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
-        let yPosition = self.frame.height * (first ? 0.88 : 0.82)
+        let yIndex = (GV.countMandatoryWords / countWordsInRow) - 2
+        let yPosition = self.frame.height * (first ? 0.88 : ownYPosition[yIndex])
         let xPosition = self.frame.size.width * 0.5
         label.position = CGPoint(x: xPosition, y: yPosition)
         label.fontSize = self.frame.size.height * 0.018
@@ -607,7 +624,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         } else {
             time = 0
         }
-        GV.countMandatoryWords = 0
+//        GV.countMandatoryWords = 0
         createHeader()
         myTimer = MyTimer(maxTime: 3600)
         addChild(myTimer!)
@@ -619,13 +636,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
         }
-        let mandatoryWords = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
-        for item in mandatoryWords {
-            if item.count > 0 {
-                GV.allWords.append(WordToCheck(word: item.uppercased(), countFounded: 0, mandatory: true, creationIndex: 0, score: 0))
-            }
-        }
-        GV.countMandatoryWords = mandatoryWords.count
 //        showWordsToCollect()
         if !new {
 //            wtGameboard!.setRoundInfos(infos: GV.playingRecord.roundInfos)
@@ -638,7 +648,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             }
             restoreGameArray()
 //            wtGameboard!.checkWholeWords()
-            _ = checkIfGameFinished()
+//            checkIfGameFinished()
         } else {
             if GV.playingRecord.rounds.count == 0 {
                 realm.beginWrite()
@@ -919,7 +929,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 activityItems.append(activityItem)
                 saveActualState()
             }
-            _ = checkIfGameFinished()
         } else if moved {
             let fixed = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row)
             if fixed {
@@ -945,14 +954,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 ws[lastPosition].setPieceFromPosition(index: lastPosition)
                 self.addChild(ws[lastPosition])
                 let freePlaceFound = checkFreePlace()
-                if !checkIfGameFinished() {
-                    if !freePlaceFound {
-                        let question = MyQuestion(question: .NoMoreSteps, parentSize: self.size)
-                        question.position = CGPoint(x:self.size.width * 0.5, y: self.size.height * 0.5)
-                        self.addChild(question)
-                        enabled = false
-                        gameboardEnabled = false
-                    }
+//                checkIfGameFinished()
+                if !freePlaceFound {
+                    let question = MyQuestion(question: .NoMoreSteps, parentSize: self.size)
+                    question.position = CGPoint(x:self.size.width * 0.5, y: self.size.height * 0.5)
+                    self.addChild(question)
+                    enabled = false
+                    gameboardEnabled = false
                 }
                saveActualState()
             } else {
@@ -966,14 +974,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                     ws[touchedNodes.shapeIndex].rotate()
                     ws[touchedNodes.shapeIndex].position = origPosition[touchedNodes.shapeIndex]
             }
-            
         }
+//        checkIfGameFinished()
     }
     
     private func checkIfGameFinished()->Bool {
         if GV.allMandatoryWordsFounded() {
             realm.beginWrite()
+            GV.playingRecord.score = GV.getScore()
             GV.playingRecord.gameStatus = GV.GameStatusFinished
+            GV.playingRecord.nowPlaying = false
+            GV.playingRecord.pieces = ""
+            GV.playingRecord.activityItems = ""
+            GV.playingRecord.time = "0"
+            GV.playingRecord.rounds.removeAll()
             try! realm.commitWrite()
             wtGameFinishedSprite.showFinish(status: .OK)
             return true

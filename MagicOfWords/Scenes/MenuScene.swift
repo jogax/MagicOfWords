@@ -11,16 +11,10 @@ import GameKit
 
 public protocol MenuSceneDelegate: class {
     
-    /// Method called when New Game choosed
     func startNewGame()
-    
-    /// Method called when Continue choosed
     func continueGame()
-    
-    /// Method called when Choose Game Type pressed
+    func showFinishedGames()
     func startChooseGameType()
-    
-    /// Method called when Settings choosed
     func startSettings()
 }
 
@@ -30,31 +24,41 @@ class MenuScene: SKScene {
     let disabledAlpha: CGFloat = 0.4
     override func didMove(to view: SKView) {
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
-        var enabled = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusNew).count > 0
-        createMenuItem(menuInt: .tcNewGame, firstLine: true, enabled: enabled)
-        enabled = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusPlaying).count > 0
-        createMenuItem(menuInt: .tcContinue, enabled: enabled)
-        enabled = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusFinished).count > 0
-        createMenuItem(menuInt: .tcFinished, enabled: enabled)
-        createMenuItem(menuInt: .tcChooseGameType, enabled: true)
-        createMenuItem(menuInt: .tcSettings, enabled: true)
+        var count = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusNew).count
+        createMenuItem(menuInt: .tcNewGame, firstLine: true, count: count)
+        count = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusPlaying).count
+        createMenuItem(menuInt: .tcContinue, count: count)
+        count = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusFinished).count
+        createMenuItem(menuInt: .tcFinished, count: count)
+        createMenuItem(menuInt: .tcChooseGameType, showValue: false, touchbar: false)
+        createMenuItem(menuInt: .tcSettings, showValue: false, touchbar: false)
     }
     public func setDelegate(delegate: MenuSceneDelegate) {
         menuSceneDelegate = delegate
     }
     var line = 0
-    func createMenuItem(menuInt: TextConstants, firstLine: Bool = false, enabled: Bool) {
+    
+    func createMenuItem(menuInt: TextConstants, firstLine: Bool = false, count: Int = NoValue, showValue: Bool = true, touchbar: Bool = true) {
+        let texture = SKTexture(imageNamed: "button.png")
+        let button = SKSpriteNode(texture: texture, color: .white, size: CGSize(width: self.size.width * 0.5, height: self.size.height * 0.2))
         line = firstLine ? 1 : line + 1
-        let menuItem = SKLabelNode(fontNamed: "Noteworthy")// Snell Roundhand")
         let startYPosition = self.frame.size.height * 0.80
-        menuItem.text = GV.language.getText(menuInt)
-        menuItem.name = String(menuInt.rawValue)
+        button.size = CGSize(width: self.frame.size.width * 0.8, height: self.frame.size.height * 0.1)
+        button.position = CGPoint(x: self.frame.size.width / 2, y: startYPosition - (CGFloat(line) * self.frame.size.height * 0.1) )
+        button.name = String("button\(menuInt.rawValue)")
+        let menuItem = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
         menuItem.fontSize = self.frame.size.height / 30
-        menuItem.position = CGPoint(x: self.frame.size.width / 2, y: startYPosition - (CGFloat(line) * 50) )
+        menuItem.position = CGPoint(x:0, y: button.frame.height * 0.1)
         menuItem.fontColor = SKColor.blue
-        menuItem.color = UIColor.brown
-        menuItem.alpha = enabled ? enabledAlpha : disabledAlpha
-        self.addChild(menuItem)
+        menuItem.alpha = showValue && count > 0 ? enabledAlpha : disabledAlpha
+        menuItem.colorBlendFactor = 0.9
+        menuItem.text = GV.language.getText(menuInt, values: showValue ? "(\(count))" : "")
+        menuItem.zPosition = self.zPosition + 1
+        menuItem.horizontalAlignmentMode = .center
+        menuItem.verticalAlignmentMode = .center
+        menuItem.name = String(menuInt.rawValue) + (touchbar ? "" : "noTouch")
+        button.addChild(menuItem)
+        self.addChild(button)
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if menuSceneDelegate == nil {
@@ -64,32 +68,31 @@ class MenuScene: SKScene {
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
         if nodes.count > 0 {
-            let name = nodes.first!.name
-            if name != nil && nodes.first!.alpha == enabledAlpha {
-                switch name {
+            for node in nodes {
+                let name = node.name
+                if name != nil && node.alpha == enabledAlpha {
+                    switch name {
                     case String(TextConstants.tcNewGame.rawValue):
                         menuSceneDelegate!.startNewGame()
                     case String(TextConstants.tcContinue.rawValue):
                         menuSceneDelegate!.continueGame()
                     
                     case String(TextConstants.tcFinished.rawValue):
-                        showFinishedGames()
+                        menuSceneDelegate!.showFinishedGames()
                     
                     case String(TextConstants.tcSettings.rawValue):
                         menuSceneDelegate!.startSettings()
-                    
-                case String(TextConstants.tcChooseGameType.rawValue):
-                    menuSceneDelegate!.startChooseGameType()
 
-                default: break
+                    case String(TextConstants.tcChooseGameType.rawValue):
+                        menuSceneDelegate!.startChooseGameType()
+
+                    default: break
+                    }
                 }
             }
         }
     }
     
-    private func showFinishedGames() {
-        
-    }
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
     }

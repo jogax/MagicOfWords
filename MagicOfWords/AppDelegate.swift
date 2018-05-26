@@ -18,7 +18,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(
+            schemaVersion: 1,   // new param in PlayerModel: onlineCompetitionEnabled (Bool)
+            
+            migrationBlock: { migration, oldSchemaVersion in
+                switch oldSchemaVersion {
+                case 0:
+                    // migrate PlayerModel
+                    migration.enumerateObjects(ofType: GameDataModel.className()) { oldObject, newObject in
+                        newObject!["score"] = 0 // (oldObject!["levelID"] as! Int) / MaxColorValue
+                    }
+                default:
+                    break
+                }
+        })
         return true
+
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

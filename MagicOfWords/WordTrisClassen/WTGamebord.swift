@@ -454,7 +454,8 @@ class WTGameboard: SKShapeNode {
         } else {
             var clearNeaded = false
             for index in 0..<usedItems.count {
-                if usedItems[index].item!.status == .used {
+                let actItemStatus = usedItems[index].item!.status
+                if actItemStatus == .used || actItemStatus == .wholeWord {
                     clearNeaded = true
                     break
                 }

@@ -14,10 +14,10 @@ let ruDictionary: [TextConstants: String] = [
     .tcGerman:           "Deutsch (Немецкий)",
     .tcHungarian:        "Magyar (Венгерский)",
     .tcRussian:          "Русский (Русский)",
-    .tcNewGame:          "Новая игра",
+    .tcNewGame:          "Новая игра %",
     .tcRestart:          "Перезапуск",
-    .tcContinue:         "Продолжение",
-    .tcFinished:         "Законченные игры",
+    .tcContinue:         "Продолжение %",
+    .tcFinished:         "Законченные игры %",
     .tcSettings:         "Настройки",
     .tcWordTris:         "Словотрис",
     .tcSearchWords:       "Найти слова",
@@ -31,6 +31,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcOwnWords:          "Мои слова (% / % / %)",
     .tcNoMoreSteps:       "Поздравляю, ты закончил игру!",
     .tcScore:             "Очки:",
+    .tcBest:              "Лучшие очки:",
     .tcCollectedRequiredWords: "Обязательные слова:",
     .tcCollectedOwnWords:      "Собственные слова:",
     .tcTotal:               "Всего:",
@@ -42,4 +43,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcNoMoreStepsAnswer1: "Указать",
     .tcNoMoreStepsAnswer2: "Следующий раунд",
     .tcAlphabet:           "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ", //Ъ !!!
+    .tcGameNumber:          "Nr. игры",
+    .tcOK:                  "OK",
 ]

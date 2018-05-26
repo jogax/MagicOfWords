@@ -11,7 +11,19 @@ import SpriteKit
 import GameplayKit
 import RealmSwift
 
-class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WTSceneDelegate, LoadingSceneDelegate {
+class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WTSceneDelegate, LoadingSceneDelegate, ShowFinishedGamesSceneDelegate {
+    func backToMenuScene() {
+        startMenuScene()
+    }
+    
+    func showFinishedGames() {
+        let showFinishedGamesScene = ShowFinishedGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        showFinishedGamesScene.setDelegate(delegate: self)
+        if let view = self.view as! SKView? {
+            view.presentScene(showFinishedGamesScene)
+        }
+    }
+    
     func startChooseGameType() {
         print("Choose game type choosed")
         let gameTypeScene = GameTypeScene(size: CGSize(width: view.frame.width, height: view.frame.height))

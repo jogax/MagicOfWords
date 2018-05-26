@@ -33,6 +33,7 @@ enum TextConstants: Int {
     tcOwnWords,
     tcNoMoreSteps,
     tcScore,
+    tcBest,
     tcCollectedRequiredWords,
     tcCollectedOwnWords,
     tcTotal,
@@ -42,7 +43,9 @@ enum TextConstants: Int {
     tcNoMoreStepsQuestion,
     tcNoMoreStepsAnswer1,
     tcNoMoreStepsAnswer2,
-    tcAlphabet
+    tcAlphabet,
+    tcGameNumber,
+    tcOK
 
 }
 

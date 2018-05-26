@@ -31,6 +31,7 @@
 		205184F72061525C00E7FAF4 /* huGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F62061525C00E7FAF4 /* huGameData.txt */; };
 		205184F920615B3100E7FAF4 /* deGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F820615B3100E7FAF4 /* deGameData.txt */; };
 		205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184FA20615B5C00E7FAF4 /* enGameData.txt */; };
+		20531C6820B6EA5400E060E2 /* ShowFinishedGamesScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20531C6720B6EA5400E060E2 /* ShowFinishedGamesScene.swift */; };
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
 		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */; };
@@ -105,6 +106,7 @@
 		205184F62061525C00E7FAF4 /* huGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huGameData.txt; sourceTree = "<group>"; };
 		205184F820615B3100E7FAF4 /* deGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deGameData.txt; sourceTree = "<group>"; };
 		205184FA20615B5C00E7FAF4 /* enGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enGameData.txt; sourceTree = "<group>"; };
+		20531C6720B6EA5400E060E2 /* ShowFinishedGamesScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowFinishedGamesScene.swift; sourceTree = "<group>"; };
 		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2057BA292029F591000DF337 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePackageScene.swift; sourceTree = "<group>"; };
@@ -185,6 +187,7 @@
 				201FB1C320288C2B00EC9F36 /* Info.plist */,
 				20A6913E20309B2200AB47C0 /* WordTrisClassen */,
 				201FB1E92028940D00EC9F36 /* Scenes */,
+				20531C6720B6EA5400E060E2 /* ShowFinishedGamesScene.swift */,
 				20587FAF205A6D9F008C018A /* Pictures */,
 				201FB1E8202893E500EC9F36 /* Language */,
 				201FB1EA20289CEC00EC9F36 /* RealmModels */,
@@ -401,6 +404,7 @@
 				20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */,
 				201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */,
 				201FB1D720288CEA00EC9F36 /* ru.swift in Sources */,
+				20531C6820B6EA5400E060E2 /* ShowFinishedGamesScene.swift in Sources */,
 				204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */,
 				20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */,
 				20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */,
