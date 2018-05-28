@@ -16,7 +16,7 @@ class MyTimer: SKSpriteNode {
     let screenWidth: CGFloat
     var timeBackgroundSprite: SKSpriteNode?
     var mySize: CGSize
-    let maxTime: Int
+    var maxTime: Int
     init(maxTime: Int) {
         self.maxTime = maxTime
         let bounds = UIScreen.main.bounds
@@ -59,6 +59,13 @@ class MyTimer: SKSpriteNode {
         } else {
             return false
         }
+    }
+    
+    public func increaseMaxTime(value: Int) {
+        maxTime += value
+    }
+    public func decreaseMaxTime(value: Int) {
+        maxTime -= value
     }
     private func createTimer() {
        if self.childNode(withName: myTimerName) == nil {

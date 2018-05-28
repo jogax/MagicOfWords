@@ -1,0 +1,3 @@
+Build 3, Version 1.02
+- fixes a bug, that could cause a crash on iPad while launching in landscape orientation
+- fixes a bug the caused a crash while launching with hungarian words

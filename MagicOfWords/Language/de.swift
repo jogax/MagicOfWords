@@ -45,6 +45,8 @@ let deDictionary: [TextConstants: String] = [
     .tcAlphabet:           "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜẞ",
     .tcGameNumber:          "SpielNr",
     .tcOK:                  "OK",
+    .tcChooseName:          "Wähle einen Spitznamen",
+    .tcReady:               "Fertig",
 ]
 
 

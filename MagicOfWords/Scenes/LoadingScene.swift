@@ -23,6 +23,7 @@ class LoadingScene: SKScene {
     var procentLabel: SKLabelNode?
     var labelZPosition = -1
     var upper = true
+    var stopUpdate = false
     
 
     var loadingSceneDelegate: LoadingSceneDelegate?
@@ -117,13 +118,16 @@ class LoadingScene: SKScene {
             // stop if all records done
             if GV.EndOfFileReached {
                 loadingSceneDelegate!.loadingFinished()
+                stopUpdate = true
             }
             
         }
     }
     
     override func update(_ currentTime: TimeInterval) {
-        showProgress()
+        if !stopUpdate {
+            showProgress()
+        }
     }
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")

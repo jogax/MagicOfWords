@@ -4002,7 +4002,6 @@ bibeszál
 bibeszár
 bibi
 bibircsók
-Biblia
 biblia
 bibliafordítás
 bibliai héber
@@ -8900,7 +8899,6 @@ estebéd
 esteledés
 esthajnal
 esthajnalcsillag
-Esthajnalcsillag
 estély
 estélyi
 esz
@@ -9476,7 +9474,6 @@ ezüstóra
 ésszerűsítés
 ész
 észak
-Észak
 észak-amerikai
 észak-európai
 észak-koreai
@@ -16415,7 +16412,6 @@ kelengye
 kelepce
 kelepelés
 kelet
-Kelet
 kelet-európai
 keletelés
 keleti
@@ -22667,7 +22663,6 @@ nyoszolyóasszony
 nyoszolyólány
 nyugalom
 nyugat
-Nyugat
 nyugat-európai
 nyugdíj
 nyugdíjas
@@ -23271,7 +23266,6 @@ országbíró
 országgyűlés
 országhatár
 országház
-Országház
 országismeret
 országjárás
 országnagy

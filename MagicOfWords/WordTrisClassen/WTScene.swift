@@ -115,6 +115,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         var gameFinishedOKButton = false
     }
     
+    let iHour = 3600
+    let iHalfHour = 1800
+    let iQuarterHour = 900
+    let iTenMinutes = 600
+    let iFiveMinutes = 300 
     
     var wtSceneDelegate: WTSceneDelegate?
     var wtGameboard: WTGameboard?
@@ -188,9 +193,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     let previousName = "°°°previousGame°°°"
     let nextName = "°°°nextGame°°°"
     let ownWordsBackgroundName = "°°°ownWordsBackgroundName°°°"
+    var timeIncreaseValues: [Int]?
 
     
     override func didMove(to view: SKView) {
+        timeIncreaseValues = [0, 0, 0, 0, 0, 0, iFiveMinutes, iFiveMinutes, iTenMinutes, iTenMinutes, iQuarterHour]
         self.name = "WTScene"
         self.view!.isMultipleTouchEnabled = false
         self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
@@ -504,7 +511,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 
     }
     
-    
     func addOwnWord(word: String, creationIndex: Int, check: Bool)->Bool {
         var returnBool = false
         if realm.objects(WordListModel.self).filter("word = %@", word.lowercased()).count == 1 {
@@ -512,7 +518,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 returnBool = true
                 let myIndex = (creationIndex == NoValue ? indexOfTilesForGame : creationIndex)
                 let ownWordToCheck = WordToCheck(word: word, countFounded: 1, mandatory: false, creationIndex: myIndex, score: 0)
+                var lengthOfWord = ownWordToCheck.word.count
+                lengthOfWord = lengthOfWord > 10 ? 11 : lengthOfWord
+                
                 GV.allWords.append(ownWordToCheck)
+                myTimer!.increaseMaxTime(value: timeIncreaseValues![lengthOfWord])
                 createWordLabel(wordToShow: ownWordToCheck, counter: GV.countWords(mandatory: false), own: true)
                 if check {
                     wtGameboard!.checkWholeWords()
@@ -626,7 +636,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
         }
 //        GV.countMandatoryWords = 0
         createHeader()
-        myTimer = MyTimer(maxTime: 3600)
+        myTimer = MyTimer(maxTime: iHour)
         addChild(myTimer!)
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
         createBackgroundForOwnWords()
@@ -688,8 +698,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     @objc private func countTime(timerX: Timer) {
         time += 1
-//        print("time: \(time)")
-        timeLabel.text = GV.language.getText(.tcTime, values: time.HourMinSec)
+        let remainingTime = myTimer!.maxTime - time
+        timeLabel.text = GV.language.getText(.tcTime, values: remainingTime.HourMinSec)
         realm.beginWrite()
         GV.playingRecord.time = String(time)
         try! realm.commitWrite()
@@ -892,6 +902,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 newRound.index = activityItems.count - 1
                 newRound.gameArray = wtGameboard!.gameArrayToString()
                 GV.playingRecord.rounds.append(newRound)
+                myTimer!.increaseMaxTime(value: iHalfHour)
                 try! realm.commitWrite()
                 modifyHeader()
             }
@@ -1083,6 +1094,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                     realm.beginWrite()
                     GV.playingRecord.rounds.removeLast()
                     try! realm.commitWrite()
+                    myTimer!.decreaseMaxTime(value: iHalfHour)
                     wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
                     modifyHeader()
                 } else {
@@ -1133,6 +1145,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 if let label = self.childNode(withName: actItem.choosedWord.word)! as? SKLabelNode {
                     label.removeFromParent() // This word is no more known
                 }
+                var lengthOfWord = actItem.choosedWord.word.count
+                lengthOfWord = lengthOfWord > 10 ? 11 : lengthOfWord
+                myTimer!.decreaseMaxTime(value: timeIncreaseValues![lengthOfWord])
                 wtGameboard!.checkWholeWords()
                 activityItems.removeLast()
                 showLastOwnWords()

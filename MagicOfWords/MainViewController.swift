@@ -12,6 +12,7 @@ import GameplayKit
 import RealmSwift
 
 class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WTSceneDelegate, LoadingSceneDelegate, ShowFinishedGamesSceneDelegate {
+    var basicData: BasicDataModel?
     func backToMenuScene() {
         startMenuScene()
     }
@@ -34,10 +35,83 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     }
     
     func loadingFinished() {
+        basicData = realm.objects(BasicDataModel.self)[0]
+
+        if let view = self.view as! SKView? {
+            view.presentScene(nil)
+        }
         GV.loadingScene = nil
         startMenuScene()
+//        if basicData!.myName == "" {
+//            getName()
+//        } else {
+//            loginToRealmSync(new: false, userName: basicData!.myName)
+////            startMenuScene()
+//        }
     }
     
+    private func loginToRealmSync(new: Bool, userName: String) {
+        let password = "@@@" + userName + "@@@"
+        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
+        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
+            if user == nil {  // create a new Account
+                let signUpCredentials = SyncCredentials.usernamePassword(username: userName, password: password, register: true)
+                SyncUser.logIn(with: signUpCredentials, server: GV.AUTH_URL) { user, error in
+                    if user == nil {
+                        print("Error, user couldn't be created")
+                    } else {
+                        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
+                        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
+                            if user == nil {
+                                print("error after register")
+                            } else {
+                                realm.beginWrite()
+                                self.basicData!.myName = userName
+                                //                print(textField.text)
+                                try! realm.commitWrite()
+                                self.startMenuScene()
+
+                                print("OK after register")
+                            }
+                        }
+                    }
+                }
+            } else {
+                if new {
+                    self.getName(exists: true)
+                } else {
+                    self.startMenuScene()
+                }
+            }
+        }
+        
+
+    }
+    
+    //Create Account
+    
+    //Log in
+    func getName(exists: Bool = false) {
+        if exists {
+            print("hier")
+        } else {
+            let alertController = UIAlertController(title: GV.language.getText(.tcChooseName), message: "", preferredStyle: .alert)
+
+            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcReady), style: .default, handler: { //[unowned self]
+                alert -> Void in
+                let textField = alertController.textFields![0] as UITextField
+                self.loginToRealmSync(new: true, userName: textField.text!)
+    //            self.startMenuScene()
+             }))
+            alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
+                textField.placeholder = "New Item Text"
+            })
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
+    
+
     func gameFinished(start: StartType) {
         switch start {
         case .NoMore: startMenuScene(showMenu: true)
@@ -83,8 +157,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     }
 
     func startNewGame() {
-        let basicData = realm.objects(BasicDataModel.self).first!
-        let gameType = GameType(rawValue: basicData.gameType)!
+//        let basicData = realm.objects(BasicDataModel.self).first!
+        let gameType = GameType(rawValue: basicData!.gameType)!
         switch gameType {
         case .WordTris:
             startWTScene(new: true, next: .NoMore)
@@ -96,8 +170,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     }
     
     func continueGame() {
-        let basicData = realm.objects(BasicDataModel.self).first!
-        let gameType = GameType(rawValue: basicData.gameType)!
+//        let basicData = realm.objects(BasicDataModel.self).first!
+        let gameType = GameType(rawValue: basicData!.gameType)!
         switch gameType {
         case .WordTris:
             startWTScene(new: false, next: .NoMore)
@@ -147,5 +221,9 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
             print("Font Names = [\(names)]")
         }
     }
-
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+    
 }

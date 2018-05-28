@@ -15,6 +15,7 @@ class BasicDataModel: Object {
     @objc dynamic var wordListVersion = ""
     @objc dynamic var gameDataVersion = ""
     @objc dynamic var gameType = 1
+    @objc dynamic var myName = ""
     override  class func primaryKey() -> String {
         return "ID"
     }

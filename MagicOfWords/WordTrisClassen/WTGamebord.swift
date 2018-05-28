@@ -245,7 +245,6 @@ class WTGameboard: SKShapeNode {
     private var roundInfos = [RoundInfos]()
     private var foundedWordsWithCount = [FoundedWordWithCounter]()
 //    private var foundedWordsWithCountArchiv = [FoundedWordsWithCounter]()
-    private let scoreProWord = 50
     private let scoreProLetter = 10
 
     init(size: Int, parentScene: SKScene, delegate: WTGameboardDelegate) {
@@ -479,7 +478,8 @@ class WTGameboard: SKShapeNode {
             return fixed  // when shape remaining on gameBoard, return true
         }
     }
-
+    private  let scoreProWord: [Int] = [0, 0, 10, 30, 50, 80, 120, 180, 250, 330, 430, 550]
+    
     public func checkWholeWords() {
         foundedWords.removeAll()
         for col in 0..<size {
@@ -539,7 +539,9 @@ class WTGameboard: SKShapeNode {
             for letter in foundedWords[index].usedLetters {
                 countLetterUsing += gameArray![letter.col][letter.row].getCountOccurences()
             }
-            foundedWords[index].score = scoreProWord + countLetterUsing * scoreProLetter
+            var countLetters = foundedWords[index].word.count
+            countLetters = countLetters > 10 ? 11 : countLetters
+            foundedWords[index].score = scoreProWord[countLetters] + countLetterUsing * scoreProLetter
         }
         foundedWordsWithCount.removeAll()
         for foundedWord in foundedWords {

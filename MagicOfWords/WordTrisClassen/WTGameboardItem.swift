@@ -57,7 +57,7 @@ class WTGameboardItem: SKSpriteNode {
         label = SKLabelNode()
         let texture = SKTexture()
         super.init(texture: texture, color: .white, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
-        label.fontName = "Courier"
+        label.fontName = "CourierNewPS-BoldMT"
         label.fontColor = .black
         label.verticalAlignmentMode = .center
         label.fontSize = fontSize

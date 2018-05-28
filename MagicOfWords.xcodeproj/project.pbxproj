@@ -23,6 +23,7 @@
 		201FB1DE20288CEA00EC9F36 /* en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D220288CEA00EC9F36 /* en.swift */; };
 		201FB1DF20288CEA00EC9F36 /* de.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D320288CEA00EC9F36 /* de.swift */; };
 		201FB1E020288CEA00EC9F36 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D420288CEA00EC9F36 /* Language.swift */; };
+		20439FEF20BC40DB00D44286 /* Versions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20439FEE20BC40DB00D44286 /* Versions.txt */; };
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
 		204A8ADA2029EE6000E9C11F /* WTScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WTScene.swift */; };
 		204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204AEB38205D1F47004D2ECD /* WTGameFinished.swift */; };
@@ -98,6 +99,7 @@
 		201FB1D420288CEA00EC9F36 /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		201FB1E1202891C300EC9F36 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		201FB1E5202891C900EC9F36 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
+		20439FEE20BC40DB00D44286 /* Versions.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Versions.txt; sourceTree = "<group>"; };
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
 		204A8AD92029EE6000E9C11F /* WTScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTScene.swift; sourceTree = "<group>"; };
 		204AEB38205D1F47004D2ECD /* WTGameFinished.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameFinished.swift; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 		201FB1B020288C2B00EC9F36 /* MagicOfWords */ = {
 			isa = PBXGroup;
 			children = (
+				20439FEE20BC40DB00D44286 /* Versions.txt */,
 				201FB1CF20288CEA00EC9F36 /* Extensions.swift */,
 				20943C8D2092129000B34A07 /* MyQuestions.swift */,
 				201FB1CA20288CE900EC9F36 /* MainViewController.swift */,
@@ -344,6 +347,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
 				205184F920615B3100E7FAF4 /* deGameData.txt in Resources */,
 				20842DE62031EA910078FFDA /* ruWords.txt in Resources */,
