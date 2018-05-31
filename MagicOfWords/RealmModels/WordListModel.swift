@@ -10,9 +10,7 @@ import Foundation
 import RealmSwift
 
 class WordListModel: Object {
-
         @objc dynamic var word = ""
-        @objc dynamic var length = 0
         override  class func primaryKey() -> String {
             return "word"
         }

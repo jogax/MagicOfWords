@@ -131,7 +131,7 @@ class GenerateGameData {
                     GV.lastSavedWord = word
                     realm.beginWrite()
                     let wordListModel = WordListModel()
-                    wordListModel.length = word.mySubString(startPos:word.count - 1) == exclamationMark ? word.count - 1 : word.count
+//                    wordListModel.length = word.mySubString(startPos:word.count - 1) == exclamationMark ? word.count - 1 : word.count
                     wordListModel.word = word
                     realm.add(wordListModel)
                     try! realm.commitWrite()

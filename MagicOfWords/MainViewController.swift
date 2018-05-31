@@ -189,6 +189,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     override func viewDidLoad() {
         super.viewDidLoad()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
+//        _ = WordDBGenerator()
         GV.loadingScene = LoadingScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
             GV.loadingScene!.setDelegate(delegate: self)
