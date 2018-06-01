@@ -41,7 +41,6 @@
 		2060036E20347FF400023E10 /* WTGameboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036D20347FF400023E10 /* WTGameboardItem.swift */; };
 		2060037020348A8800023E10 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036F20348A8800023E10 /* Grid.swift */; };
 		206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206664A720A45A3000C6C5E4 /* RoundDataModel.swift */; };
-		2074A64020C051190075432A /* default.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2074A63F20C051190075432A /* default.realm */; };
 		20819320202B472900406D9A /* GameDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081931F202B472900406D9A /* GameDataModel.swift */; };
 		20819322202B484D00406D9A /* gameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20819321202B484D00406D9A /* gameData.txt */; };
 		20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20819323202B4A7100406D9A /* GenerateGameData.swift */; };
@@ -63,6 +62,9 @@
 		20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE120330E73001682B2 /* BasicDataModel.swift */; };
 		20B28AE4203331B4001682B2 /* GameTypeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE3203331B4001682B2 /* GameTypeModel.swift */; };
 		20B28AE620333273001682B2 /* WTShowGameList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTShowGameList.swift */; };
+		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
+		20FA4DC320C1989500D93882 /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 20FA4DC220C1989500D93882 /* Mandatory.realm */; };
+		20FA4DC520C1993F00D93882 /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 20FA4DC420C1993E00D93882 /* WordList.realm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -119,7 +121,6 @@
 		2060036D20347FF400023E10 /* WTGameboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameboardItem.swift; sourceTree = "<group>"; };
 		2060036F20348A8800023E10 /* Grid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
 		206664A720A45A3000C6C5E4 /* RoundDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundDataModel.swift; sourceTree = "<group>"; };
-		2074A63F20C051190075432A /* default.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = default.realm; sourceTree = "<group>"; };
 		2081931F202B472900406D9A /* GameDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDataModel.swift; sourceTree = "<group>"; };
 		20819321202B484D00406D9A /* gameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = gameData.txt; sourceTree = "<group>"; };
 		20819323202B4A7100406D9A /* GenerateGameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateGameData.swift; sourceTree = "<group>"; };
@@ -139,6 +140,9 @@
 		20B28AE120330E73001682B2 /* BasicDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicDataModel.swift; sourceTree = "<group>"; };
 		20B28AE3203331B4001682B2 /* GameTypeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTypeModel.swift; sourceTree = "<group>"; };
 		20B28AE520333273001682B2 /* WTShowGameList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTShowGameList.swift; sourceTree = "<group>"; };
+		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
+		20FA4DC220C1989500D93882 /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
+		20FA4DC420C1993E00D93882 /* WordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = WordList.realm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -234,6 +238,7 @@
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
 				20B28AE3203331B4001682B2 /* GameTypeModel.swift */,
+				20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */,
 				20A6913C203088FF00AB47C0 /* enWords.txt */,
 				20B28ADF20330C64001682B2 /* deWords.txt */,
 				204A8AD72029DDFF00E9C11F /* huWords.txt */,
@@ -272,7 +277,8 @@
 		2074A64120C051780075432A /* ReadOnlyDB */ = {
 			isa = PBXGroup;
 			children = (
-				2074A63F20C051190075432A /* default.realm */,
+				20FA4DC220C1989500D93882 /* Mandatory.realm */,
+				20FA4DC420C1993E00D93882 /* WordList.realm */,
 			);
 			path = ReadOnlyDB;
 			sourceTree = "<group>";
@@ -363,6 +369,7 @@
 			files = (
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
+				20FA4DC520C1993F00D93882 /* WordList.realm in Resources */,
 				205184F920615B3100E7FAF4 /* deGameData.txt in Resources */,
 				20842DE62031EA910078FFDA /* ruWords.txt in Resources */,
 				20B28AE020330C64001682B2 /* deWords.txt in Resources */,
@@ -372,9 +379,9 @@
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
 				205E8E2820948E2E00314646 /* button.png in Resources */,
-				2074A64020C051190075432A /* default.realm in Resources */,
 				205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
+				20FA4DC320C1989500D93882 /* Mandatory.realm in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
 				204BB45D2063E9E000CDF085 /* undo.png in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
@@ -417,6 +424,7 @@
 				20B28AE4203331B4001682B2 /* GameTypeModel.swift in Sources */,
 				20A6914220309CC500AB47C0 /* WTGamebord.swift in Sources */,
 				2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */,
+				20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */,
 				201FB1DE20288CEA00EC9F36 /* en.swift in Sources */,
 				201FB1DA20288CEA00EC9F36 /* hu.swift in Sources */,
 				2060036E20347FF400023E10 /* WTGameboardItem.swift in Sources */,
