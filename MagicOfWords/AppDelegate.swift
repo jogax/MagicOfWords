@@ -10,6 +10,22 @@ import UIKit
 import RealmSwift
 
 var realm: Realm = try! Realm()
+let wordListConfig = Realm.Configuration(
+    fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
+    readOnly: true)
+
+// Open the Realm with the configuration
+let realmWordList:Realm = try! Realm(configuration: wordListConfig)
+
+let mandatoryConfig = Realm.Configuration(
+    // Get the path to the bundled file
+    fileURL: URL(string: Bundle.main.path(forResource: "Mandatory", ofType:"realm")!),
+    // Open the file in read-only mode as application bundles are not writeable
+    readOnly: true)
+
+// Open the Realm with the configuration
+let realmMandatory: Realm = try! Realm(configuration: mandatoryConfig)
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,27 +34,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        Realm.Configuration.defaultConfiguration = Realm.Configuration(
-            schemaVersion: 2,   // new param in PlayerModel: onlineCompetitionEnabled (Bool)
-            
-            migrationBlock: { migration, oldSchemaVersion in
-                switch oldSchemaVersion {
-                case 0, 1:
-                    // migrate PlayerModel
-                    migration.enumerateObjects(ofType: GameDataModel.className()) { oldObject, newObject in
-                        if oldObject == nil {
-                            newObject!["score"] = 0 // (oldObject!["levelID"] as! Int) / MaxColorValue
-                        }
-                    }
-                    migration.enumerateObjects(ofType: BasicDataModel.className()) { oldObject, newObject in
-                        if oldObject == nil {
-                            newObject!["myName"] = "" // (oldObject!["levelID"] as! Int) / MaxColorValue
-                        }
-                    }
-               default:
-                    break
-                }
-        })
+//        Realm.Configuration.defaultConfiguration = Realm.Configuration(
+//            schemaVersion: 2,   // new param in PlayerModel: onlineCompetitionEnabled (Bool)
+//            
+//            migrationBlock: { migration, oldSchemaVersion in
+//                switch oldSchemaVersion {
+//                case 0, 1:
+//                    // migrate PlayerModel
+//                    migration.enumerateObjects(ofType: GameDataModel.className()) { oldObject, newObject in
+//                        if oldObject == nil {
+//                            newObject!["score"] = 0 // (oldObject!["levelID"] as! Int) / MaxColorValue
+//                        }
+//                    }
+//                    migration.enumerateObjects(ofType: BasicDataModel.className()) { oldObject, newObject in
+//                        if oldObject == nil {
+//                            newObject!["myName"] = "" // (oldObject!["levelID"] as! Int) / MaxColorValue
+//                        }
+//                    }
+//               default:
+//                    break
+//                }
+//        })
         return true
 
     }

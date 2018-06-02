@@ -24,7 +24,7 @@ class ShowFinishedGamesScene: SKScene {
     }
     
     private func createShowingItem() {
-        let finishedGames = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusFinished)
+        let finishedGames = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusFinished, GV.language.getText(.tcAktLanguage))
         createHeader(text: GV.language.getText(.tcGameNumber), index: 0)
         createHeader(text: GV.language.getText(.tcScore), index: 1)
         createHeader(text: GV.language.getText(.tcBest), index: 2)

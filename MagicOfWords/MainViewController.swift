@@ -11,8 +11,8 @@ import SpriteKit
 import GameplayKit
 import RealmSwift
 
-class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDelegate, WTSceneDelegate, LoadingSceneDelegate, ShowFinishedGamesSceneDelegate {
-    var basicData: BasicDataModel?
+class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, ShowFinishedGamesSceneDelegate {
+    var basicDataRecord: BasicDataModel?
     func backToMenuScene() {
         startMenuScene()
     }
@@ -25,30 +25,30 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
         }
     }
     
-    func startChooseGameType() {
-        print("Choose game type choosed")
-        let gameTypeScene = GameTypeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        if let view = self.view as! SKView? {
-            gameTypeScene.setDelegate(delegate: self)
-            view.presentScene(gameTypeScene)
-        }
-    }
-    
-    func loadingFinished() {
-        basicData = realm.objects(BasicDataModel.self)[0]
-
-        if let view = self.view as! SKView? {
-            view.presentScene(nil)
-        }
-        GV.loadingScene = nil
-        startMenuScene()
-//        if basicData!.myName == "" {
-//            getName()
-//        } else {
-//            loginToRealmSync(new: false, userName: basicData!.myName)
-////            startMenuScene()
+//    func startChooseGameType() {
+//        print("Choose game type choosed")
+//        let gameTypeScene = GameTypeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+//        if let view = self.view as! SKView? {
+//            gameTypeScene.setDelegate(delegate: self)
+//            view.presentScene(gameTypeScene)
 //        }
-    }
+//    }
+    
+//    func loadingFinished() {
+//        basicData = realm.objects(BasicDataModel.self)[0]
+//
+//        if let view = self.view as! SKView? {
+//            view.presentScene(nil)
+//        }
+////        GV.loadingScene = nil
+//        startMenuScene()
+////        if basicData!.myName == "" {
+////            getName()
+////        } else {
+////            loginToRealmSync(new: false, userName: basicData!.myName)
+//////            startMenuScene()
+////        }
+//    }
     
     private func loginToRealmSync(new: Bool, userName: String) {
         let password = "@@@" + userName + "@@@"
@@ -66,7 +66,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
                                 print("error after register")
                             } else {
                                 realm.beginWrite()
-                                self.basicData!.myName = userName
+                                self.basicDataRecord!.myName = userName
                                 //                print(textField.text)
                                 try! realm.commitWrite()
                                 self.startMenuScene()
@@ -158,28 +158,28 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
 
     func startNewGame() {
 //        let basicData = realm.objects(BasicDataModel.self).first!
-        let gameType = GameType(rawValue: basicData!.gameType)!
-        switch gameType {
-        case .WordTris:
+//        let gameType = GameType(rawValue: basicData!.gameType)!
+//        switch gameType {
+//        case .WordTris:
             startWTScene(new: true, next: .NoMore)
-        case .SearchWords:
-            startFindWordsScene()
-        case .NoMoreGames:
-            break
-        }
+//        case .SearchWords:
+//            startFindWordsScene()
+//        case .NoMoreGames:
+//            break
+//        }
     }
     
     func continueGame() {
 //        let basicData = realm.objects(BasicDataModel.self).first!
-        let gameType = GameType(rawValue: basicData!.gameType)!
-        switch gameType {
-        case .WordTris:
+//        let gameType = GameType(rawValue: basicData!.gameType)!
+//        switch gameType {
+//        case .WordTris:
             startWTScene(new: false, next: .NoMore)
-        case .SearchWords:
-            startFindWordsScene()
-        case .NoMoreGames:
-            break
-        }
+//        case .SearchWords:
+//            startFindWordsScene()
+//        case .NoMoreGames:
+//            break
+//        }
     }
     
     func startSettings() {
@@ -188,16 +188,13 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        generateBasicDataRecordIfNeeded()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
-        _ = WordDBGenerator(mandatory: true)
-        GV.loadingScene = LoadingScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        if let view = self.view as! SKView? {
-            GV.loadingScene!.setDelegate(delegate: self)
-            view.presentScene(GV.loadingScene!)
-        }
-        
-            
+//        basicDataRecord = realm.objects(BasicDataModel.self)[0]
+//        _ = WordDBGenerator(mandatory: true)
             // Get the SKScene from the loaded GKScene
+        GV.aktLanguage = GV.language.getText(.tcAktLanguage)
+        startMenuScene()
     }
     
     func startMenuScene(showMenu: Bool = false) {
@@ -212,6 +209,19 @@ class MainViewController: UIViewController, MenuSceneDelegate, GameTypeSceneDele
             }
         }
     }
+    
+    private func generateBasicDataRecordIfNeeded() {
+        try! realm.write {
+            if realm.objects(BasicDataModel.self).count == 0 {
+                basicDataRecord = BasicDataModel()
+                realm.add(basicDataRecord!)
+            } else {
+                basicDataRecord = realm.objects(BasicDataModel.self).first!
+            }
+            basicDataRecord!.actLanguage = GV.language.getText(.tcAktLanguage)
+        }
+    }
+
 
     func printFonts() {
         let fontFamilyNames = UIFont.familyNames

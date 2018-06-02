@@ -256,13 +256,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     private func getPlayingRecord(new: Bool, next: StartType) {
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
         if new {
-            let games = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusNew)
+            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d", GV.GameStatusNew)
             /// reset all records with nowPlaying status
             if actGames.count > 0 {
-                for actGame in actGames {
-                    realm.beginWrite()
-                    actGame.nowPlaying = false
-                    try! realm.commitWrite()
+                try! realm.write {
+                    for actGame in actGames {
+                        actGame.nowPlaying = false
+                    }
                 }
             }
             if games.count > 0 {
@@ -270,23 +270,35 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 realm.beginWrite()
                 GV.playingRecord.nowPlaying = true
                 try! realm.commitWrite()
+            } else {
+                let newGameNumber = realm.objects(GameDataModel.self).filter("language = %@", GV.aktLanguage).count + GV.gameNumberAdder[GV.aktLanguage]!
+                let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", newGameNumber, GV.aktLanguage).first!
+                if mandatoryRecord != nil {
+                    try! realm.write {
+                        GV.playingRecord = GameDataModel()
+                        GV.playingRecord.mandatoryWords = mandatoryRecord!.mandatoryWords
+                        GV.playingRecord.gameNumber = mandatoryRecord!.gameNumber
+                        GV.playingRecord.language = GV.aktLanguage
+                        realm.add(GV.playingRecord)
+                    }
+                }
             }
         } else {
             var first = true
             if actGames.count > 0 {
                 for actGame in actGames {
                     if !first {
-                        realm.beginWrite()
-                        actGame.nowPlaying = false
-                        try! realm.commitWrite()
+                        try! realm.write {
+                            actGame.nowPlaying = false
+                        }
                     }
                     first = false
                 }
             } else {
-                actGames = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusPlaying)
-                realm.beginWrite()
-                actGames[0].nowPlaying = true
-                try! realm.commitWrite()
+                actGames = realm.objects(GameDataModel.self).filter("gameStatus = %d", GV.GameStatusPlaying)
+                try! realm.write {
+                    actGames[0].nowPlaying = true
+                }
             }
             let playedNowGame = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
             if playedNowGame.count > 0 {
@@ -295,8 +307,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 case .NoMore:
                     GV.playingRecord = playedNowGame[0]
                 case .PreviousGame:
-                    let previousRecords = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber < %d",
-                                                                                  GV.gameType, GV.GameStatusPlaying, actGameNumber)
+                    let previousRecords = realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d",
+                                                                                  GV.GameStatusPlaying, actGameNumber)
                     if previousRecords.count == 1 {
                         GV.playingRecord = previousRecords[0]
                     } else if let record = Array(previousRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).last {
@@ -305,8 +317,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                         GV.playingRecord = playedNowGame.first!
                     }
                 case .NextGame:
-                    let nextRecords = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber > %d",
-                                                                                   GV.gameType, GV.GameStatusPlaying, actGameNumber)
+                    let nextRecords = realm.objects(GameDataModel.self).filter(" gameStatus = %d and gameNumber > %d",
+                                                                                   GV.GameStatusPlaying, actGameNumber)
                     if nextRecords.count == 1 {
                         GV.playingRecord = nextRecords[0]
                     } else if let record = Array(nextRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).first {
@@ -438,7 +450,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func modifyHeader() {
-        let text = GV.language.getText(.tcHeader, values: String(GV.playingRecord.gameNumber + 1), String(GV.playingRecord.rounds.count), String(totalScore))
+        let gameNumber = GV.playingRecord.gameNumber - GV.gameNumberAdder[GV.aktLanguage]!
+        let text = GV.language.getText(.tcHeader, values: String(gameNumber + 1), String(GV.playingRecord.rounds.count), String(totalScore))
         headerLabel.text = text
     }
 
@@ -687,13 +700,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
-        return realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber < %d",
-            GV.gameType, GV.GameStatusPlaying, playingRecord.gameNumber).count > 0
+        return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d",
+            GV.GameStatusPlaying, playingRecord.gameNumber).count > 0
     }
     
     private func hasNextRecords(playingRecord: GameDataModel)->Bool {
-    return realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d and gameNumber > %d",
-    GV.gameType, GV.GameStatusPlaying, playingRecord.gameNumber).count > 0
+    return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber > %d",
+    GV.GameStatusPlaying, playingRecord.gameNumber).count > 0
     
     }
     @objc private func countTime(timerX: Timer) {
@@ -1231,11 +1244,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func generateArrayOfWordPieces()->String {
-        let gameType = GV.playingRecord.gameType
         let gameNumber =  GV.playingRecord.gameNumber
         let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
         let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
-        let random = MyRandom(gameType: gameType, gameNumber: gameNumber)
+        let random = MyRandom(gameNumber: gameNumber)
         func getLetters( from: inout [String], archiv: inout [String])->[String] {
             
             if from.count == 0 {

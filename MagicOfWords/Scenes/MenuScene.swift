@@ -14,7 +14,7 @@ public protocol MenuSceneDelegate: class {
     func startNewGame()
     func continueGame()
     func showFinishedGames()
-    func startChooseGameType()
+//    func startChooseGameType()
     func startSettings()
 }
 
@@ -22,15 +22,18 @@ class MenuScene: SKScene {
     var menuSceneDelegate: MenuSceneDelegate?
     let enabledAlpha: CGFloat = 1.0
     let disabledAlpha: CGFloat = 0.4
+    
     override func didMove(to view: SKView) {
+        let actLanguage = GV.language.getText(.tcAktLanguage)
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
-        var count = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusNew).count
-        createMenuItem(menuInt: .tcNewGame, firstLine: true, count: count)
-        count = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusPlaying).count
+        var count = realmMandatory.objects(MandatoryModel.self).filter("language = %@", actLanguage).count
+        let count1 = realm.objects(GameDataModel.self).filter("gameStatus != %d", GV.GameStatusNew).count
+        createMenuItem(menuInt: .tcNewGame, firstLine: true, count: count - count1)
+        count = realm.objects(GameDataModel.self).filter("gameStatus = %d", GV.GameStatusPlaying).count
         createMenuItem(menuInt: .tcContinue, count: count)
-        count = realm.objects(GameDataModel.self).filter("gameType = %d and gameStatus = %d", GV.gameType, GV.GameStatusFinished).count
+        count = realm.objects(GameDataModel.self).filter("gameStatus = %d", GV.GameStatusFinished).count
         createMenuItem(menuInt: .tcFinished, count: count)
-        createMenuItem(menuInt: .tcChooseGameType, showValue: false, touchbar: false)
+//        createMenuItem(menuInt: .tcChooseGameType, showValue: false, touchbar: false)
         createMenuItem(menuInt: .tcSettings, showValue: false, touchbar: false)
     }
     public func setDelegate(delegate: MenuSceneDelegate) {
@@ -83,16 +86,15 @@ class MenuScene: SKScene {
                     case String(TextConstants.tcSettings.rawValue):
                         menuSceneDelegate!.startSettings()
 
-                    case String(TextConstants.tcChooseGameType.rawValue):
-                        menuSceneDelegate!.startChooseGameType()
-
+//                    case String(TextConstants.tcChooseGameType.rawValue):
+//                        menuSceneDelegate!.startChooseGameType()
+//
                     default: break
                     }
                 }
             }
         }
     }
-    
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
     }

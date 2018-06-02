@@ -55,6 +55,8 @@ struct WordToCheck {
 
 
 struct GV {
+    static let gameNumberAdder: [String:Int] = ["en": 0, "de": 10000, "hu":20000, "ru": 30000]
+    static var aktLanguage = ""
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2
@@ -64,9 +66,9 @@ struct GV {
     static var actRecordCount = 0
     static var EndOfFileReached = false
     static var lastSavedWord = ""
-    static var loadingScene: LoadingScene?
+//    static var loadingScene: LoadingScene?
     static var gameNumber = 0
-    static var gameType = 0
+//    static var gameType = 0
     static let onIpad = UIDevice.current.model.hasSuffix("iPad")
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static var activated = false

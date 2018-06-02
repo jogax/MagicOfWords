@@ -9,13 +9,13 @@
 import Foundation
 import RealmSwift
 
-class GameTypeModel: Object {
-    
-// Specify properties to ignore (Realm won't persist these)
-    
-    @objc dynamic var gameNumber = 0
-    @objc dynamic var gameType = 0
-    override  class func primaryKey() -> String {
-        return "gameType"
-    }
-}
+//class GameTypeModel: Object {
+//    
+//// Specify properties to ignore (Realm won't persist these)
+//    
+//    @objc dynamic var gameNumber = 0
+//    @objc dynamic var gameType = 0
+//    override  class func primaryKey() -> String {
+//        return "gameType"
+//    }
+//}

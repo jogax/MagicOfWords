@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		201435D320C2C561002D1C04 /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 201435D120C2C423002D1C04 /* WordList.realm */; };
+		201435D720C2EFF2002D1C04 /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 201435D620C2EFDE002D1C04 /* Mandatory.realm */; };
 		201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1B120288C2B00EC9F36 /* AppDelegate.swift */; };
 		201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BB20288C2B00EC9F36 /* Main.storyboard */; };
 		201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BE20288C2B00EC9F36 /* Assets.xcassets */; };
@@ -63,8 +65,6 @@
 		20B28AE4203331B4001682B2 /* GameTypeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE3203331B4001682B2 /* GameTypeModel.swift */; };
 		20B28AE620333273001682B2 /* WTShowGameList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTShowGameList.swift */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
-		20FA4DC320C1989500D93882 /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 20FA4DC220C1989500D93882 /* Mandatory.realm */; };
-		20FA4DC520C1993F00D93882 /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 20FA4DC420C1993E00D93882 /* WordList.realm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -83,6 +83,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		201435D120C2C423002D1C04 /* WordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = WordList.realm; sourceTree = "<group>"; };
+		201435D620C2EFDE002D1C04 /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
 		201FB1AE20288C2B00EC9F36 /* MagicOfWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MagicOfWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		201FB1B120288C2B00EC9F36 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		201FB1BC20288C2B00EC9F36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -141,8 +143,6 @@
 		20B28AE3203331B4001682B2 /* GameTypeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTypeModel.swift; sourceTree = "<group>"; };
 		20B28AE520333273001682B2 /* WTShowGameList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTShowGameList.swift; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
-		20FA4DC220C1989500D93882 /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
-		20FA4DC420C1993E00D93882 /* WordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = WordList.realm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -199,7 +199,6 @@
 				2074A64120C051780075432A /* ReadOnlyDB */,
 				20A6913E20309B2200AB47C0 /* WordTrisClassen */,
 				201FB1E92028940D00EC9F36 /* Scenes */,
-				20531C6720B6EA5400E060E2 /* ShowFinishedGamesScene.swift */,
 				20587FAF205A6D9F008C018A /* Pictures */,
 				201FB1E8202893E500EC9F36 /* Language */,
 				201FB1EA20289CEC00EC9F36 /* RealmModels */,
@@ -222,6 +221,7 @@
 		201FB1E92028940D00EC9F36 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				20531C6720B6EA5400E060E2 /* ShowFinishedGamesScene.swift */,
 				201FB1D120288CEA00EC9F36 /* MenuScene.swift */,
 				2087AC0D202C86FF008DEF26 /* LoadingScene.swift */,
 				201FB1D020288CEA00EC9F36 /* GameTypeScene.swift */,
@@ -234,11 +234,11 @@
 			isa = PBXGroup;
 			children = (
 				201FB1CD20288CEA00EC9F36 /* WordListModel.swift */,
+				20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */,
 				2081931F202B472900406D9A /* GameDataModel.swift */,
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
 				20B28AE3203331B4001682B2 /* GameTypeModel.swift */,
-				20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */,
 				20A6913C203088FF00AB47C0 /* enWords.txt */,
 				20B28ADF20330C64001682B2 /* deWords.txt */,
 				204A8AD72029DDFF00E9C11F /* huWords.txt */,
@@ -277,8 +277,8 @@
 		2074A64120C051780075432A /* ReadOnlyDB */ = {
 			isa = PBXGroup;
 			children = (
-				20FA4DC220C1989500D93882 /* Mandatory.realm */,
-				20FA4DC420C1993E00D93882 /* WordList.realm */,
+				201435D620C2EFDE002D1C04 /* Mandatory.realm */,
+				201435D120C2C423002D1C04 /* WordList.realm */,
 			);
 			path = ReadOnlyDB;
 			sourceTree = "<group>";
@@ -367,9 +367,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				201435D720C2EFF2002D1C04 /* Mandatory.realm in Resources */,
+				201435D320C2C561002D1C04 /* WordList.realm in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
-				20FA4DC520C1993F00D93882 /* WordList.realm in Resources */,
 				205184F920615B3100E7FAF4 /* deGameData.txt in Resources */,
 				20842DE62031EA910078FFDA /* ruWords.txt in Resources */,
 				20B28AE020330C64001682B2 /* deWords.txt in Resources */,
@@ -381,7 +382,6 @@
 				205E8E2820948E2E00314646 /* button.png in Resources */,
 				205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
-				20FA4DC320C1989500D93882 /* Mandatory.realm in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
 				204BB45D2063E9E000CDF085 /* undo.png in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,

@@ -41,7 +41,6 @@ class WordDBGenerator {
             realm.beginWrite()
             realm.add(wordModel)
             try! realm.commitWrite()
-            print(wordModel.word)
         }
     }
     
@@ -57,7 +56,7 @@ class WordDBGenerator {
         for line in myLines {
             let myItems = line.components(separatedBy: "/")
             if myItems.count == 3 {
-                let gameType = myItems[0]
+//                let gameType = myItems[0]
                 let gameNumber = myItems[1]
                 let myWords = myItems[2].components(separatedBy: itemSeparator)
                 let maxIndex = 6
@@ -69,8 +68,8 @@ class WordDBGenerator {
                 } while index < maxIndex
                 lineToSave.removeLast()
                 let mandatoryModel = MandatoryModel()
-                mandatoryModel.gameType = Int(gameType)!
-                mandatoryModel.gameNumber = language + gameNumber
+                mandatoryModel.gameNumber = Int(gameNumber)! + GV.gameNumberAdder[language]!
+                mandatoryModel.language = language
                 mandatoryModel.mandatoryWords = lineToSave
                 realm.beginWrite()
                 realm.add(mandatoryModel)
