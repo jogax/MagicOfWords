@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		201435D320C2C561002D1C04 /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 201435D120C2C423002D1C04 /* WordList.realm */; };
 		201435D720C2EFF2002D1C04 /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 201435D620C2EFDE002D1C04 /* Mandatory.realm */; };
+		201435D920C2FE24002D1C04 /* SettingsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201435D820C2FE24002D1C04 /* SettingsScene.swift */; };
 		201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1B120288C2B00EC9F36 /* AppDelegate.swift */; };
 		201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BB20288C2B00EC9F36 /* Main.storyboard */; };
 		201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BE20288C2B00EC9F36 /* Assets.xcassets */; };
@@ -20,7 +21,6 @@
 		201FB1D920288CEA00EC9F36 /* WordListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1CD20288CEA00EC9F36 /* WordListModel.swift */; };
 		201FB1DA20288CEA00EC9F36 /* hu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1CE20288CEA00EC9F36 /* hu.swift */; };
 		201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1CF20288CEA00EC9F36 /* Extensions.swift */; };
-		201FB1DC20288CEA00EC9F36 /* GameTypeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D020288CEA00EC9F36 /* GameTypeScene.swift */; };
 		201FB1DD20288CEA00EC9F36 /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D120288CEA00EC9F36 /* MenuScene.swift */; };
 		201FB1DE20288CEA00EC9F36 /* en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D220288CEA00EC9F36 /* en.swift */; };
 		201FB1DF20288CEA00EC9F36 /* de.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D320288CEA00EC9F36 /* de.swift */; };
@@ -85,6 +85,7 @@
 /* Begin PBXFileReference section */
 		201435D120C2C423002D1C04 /* WordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = WordList.realm; sourceTree = "<group>"; };
 		201435D620C2EFDE002D1C04 /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
+		201435D820C2FE24002D1C04 /* SettingsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScene.swift; sourceTree = "<group>"; };
 		201FB1AE20288C2B00EC9F36 /* MagicOfWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MagicOfWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		201FB1B120288C2B00EC9F36 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		201FB1BC20288C2B00EC9F36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -98,7 +99,6 @@
 		201FB1CD20288CEA00EC9F36 /* WordListModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WordListModel.swift; sourceTree = "<group>"; };
 		201FB1CE20288CEA00EC9F36 /* hu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = hu.swift; sourceTree = "<group>"; };
 		201FB1CF20288CEA00EC9F36 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		201FB1D020288CEA00EC9F36 /* GameTypeScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameTypeScene.swift; sourceTree = "<group>"; };
 		201FB1D120288CEA00EC9F36 /* MenuScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
 		201FB1D220288CEA00EC9F36 /* en.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = en.swift; sourceTree = "<group>"; };
 		201FB1D320288CEA00EC9F36 /* de.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = de.swift; sourceTree = "<group>"; };
@@ -224,8 +224,8 @@
 				20531C6720B6EA5400E060E2 /* ShowFinishedGamesScene.swift */,
 				201FB1D120288CEA00EC9F36 /* MenuScene.swift */,
 				2087AC0D202C86FF008DEF26 /* LoadingScene.swift */,
-				201FB1D020288CEA00EC9F36 /* GameTypeScene.swift */,
 				2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */,
+				201435D820C2FE24002D1C04 /* SettingsScene.swift */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -417,7 +417,6 @@
 				206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */,
 				2087AC0E202C86FF008DEF26 /* LoadingScene.swift in Sources */,
 				201FB1DF20288CEA00EC9F36 /* de.swift in Sources */,
-				201FB1DC20288CEA00EC9F36 /* GameTypeScene.swift in Sources */,
 				20819320202B472900406D9A /* GameDataModel.swift in Sources */,
 				201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */,
 				201FB1E020288CEA00EC9F36 /* Language.swift in Sources */,
@@ -431,6 +430,7 @@
 				20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */,
 				201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */,
 				201FB1D720288CEA00EC9F36 /* ru.swift in Sources */,
+				201435D920C2FE24002D1C04 /* SettingsScene.swift in Sources */,
 				20531C6820B6EA5400E060E2 /* ShowFinishedGamesScene.swift in Sources */,
 				204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */,
 				20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */,

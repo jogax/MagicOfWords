@@ -14,6 +14,10 @@ let deDictionary: [TextConstants: String] = [
     .tcGerman:           "Deutsch (Német)",
     .tcHungarian:        "Magyar (Magyar)",
     .tcRussian:          "Русский (Orosz)",
+    .tcEnglishShort:     "en",
+    .tcGermanShort:      "de",
+    .tcHungarianShort:   "hu",
+    .tcRussianShort:     "ru",
     .tcNewGame:          "Neues Spiel %",
     .tcRestart:          "Neustart",
     .tcContinue:         "Fortsetzen %",
@@ -47,6 +51,7 @@ let deDictionary: [TextConstants: String] = [
     .tcOK:                  "OK",
     .tcChooseName:          "Wähle einen Spitznamen",
     .tcReady:               "Fertig",
+    .tcChooseLanguage:      "Sprache wählen",
 ]
 
 

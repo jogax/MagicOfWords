@@ -14,6 +14,10 @@ let huDictionary: [TextConstants: String] = [
     .tcGerman:           "Deutsch (Német)",
     .tcHungarian:        "Magyar (Magyar)",
     .tcRussian:          "Русский (Orosz)",
+    .tcEnglishShort:     "en",
+    .tcGermanShort:      "de",
+    .tcHungarianShort:   "hu",
+    .tcRussianShort:     "ru",
     .tcNewGame:          "Új játék %",
     .tcRestart:          "Újrakezdés",
     .tcContinue:         "Folytatás %",
@@ -47,4 +51,5 @@ let huDictionary: [TextConstants: String] = [
     .tcOK:                  "OK",
     .tcChooseName:          "Válassz egy becenevet",
     .tcReady:               "Kész",
+    .tcChooseLanguage:      "Válassz nyelvet",
 ]

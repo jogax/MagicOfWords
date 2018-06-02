@@ -14,6 +14,10 @@ let enDictionary: [TextConstants: String] = [
     .tcGerman:           "Deutsch (German)",
     .tcHungarian:        "Magyar (Hungarian)",
     .tcRussian:          "Русский (Russian)",
+    .tcEnglishShort:     "en",
+    .tcGermanShort:      "de",
+    .tcHungarianShort:   "hu",
+    .tcRussianShort:     "ru",
     .tcNewGame:          "New game %",
     .tcRestart:          "Restart",
     .tcContinue:         "Continue %",
@@ -47,4 +51,5 @@ let enDictionary: [TextConstants: String] = [
     .tcOK:                  "OK",
     .tcChooseName:          "Choose a Nickname",
     .tcReady:               "Done",
+    .tcChooseLanguage:      "Choose language",
 ]

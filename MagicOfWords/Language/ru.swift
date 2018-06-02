@@ -14,6 +14,10 @@ let ruDictionary: [TextConstants: String] = [
     .tcGerman:           "Deutsch (Немецкий)",
     .tcHungarian:        "Magyar (Венгерский)",
     .tcRussian:          "Русский (Русский)",
+    .tcEnglishShort:     "en",
+    .tcGermanShort:      "de",
+    .tcHungarianShort:   "hu",
+    .tcRussianShort:     "ru",
     .tcNewGame:          "Новая игра %",
     .tcRestart:          "Перезапуск",
     .tcContinue:         "Продолжение %",
@@ -47,4 +51,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcOK:                  "OK",
     .tcChooseName:          "Выбери псевдоним!",
     .tcReady:               "Готово",
+    .tcChooseLanguage:      "Выбери язык",
 ]

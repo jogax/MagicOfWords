@@ -27,14 +27,14 @@ class MenuScene: SKScene {
         let actLanguage = GV.language.getText(.tcAktLanguage)
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
         var count = realmMandatory.objects(MandatoryModel.self).filter("language = %@", actLanguage).count
-        let count1 = realm.objects(GameDataModel.self).filter("gameStatus != %d", GV.GameStatusNew).count
+        let count1 = realm.objects(GameDataModel.self).filter("gameStatus != %d and language = %@", GV.GameStatusNew, GV.aktLanguage).count
         createMenuItem(menuInt: .tcNewGame, firstLine: true, count: count - count1)
-        count = realm.objects(GameDataModel.self).filter("gameStatus = %d", GV.GameStatusPlaying).count
+        count = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusPlaying, GV.aktLanguage).count
         createMenuItem(menuInt: .tcContinue, count: count)
-        count = realm.objects(GameDataModel.self).filter("gameStatus = %d", GV.GameStatusFinished).count
+        count = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusFinished, GV.aktLanguage).count
         createMenuItem(menuInt: .tcFinished, count: count)
-//        createMenuItem(menuInt: .tcChooseGameType, showValue: false, touchbar: false)
-        createMenuItem(menuInt: .tcSettings, showValue: false, touchbar: false)
+//        createMenuItem(menuInt: .tcSettings, showValue: true, touchbar: false)
+        createMenuItem(menuInt: .tcChooseLanguage, showValue: false, touchbar: true)
     }
     public func setDelegate(delegate: MenuSceneDelegate) {
         menuSceneDelegate = delegate
@@ -53,7 +53,7 @@ class MenuScene: SKScene {
         menuItem.fontSize = self.frame.size.height / 30
         menuItem.position = CGPoint(x:0, y: button.frame.height * 0.1)
         menuItem.fontColor = SKColor.blue
-        menuItem.alpha = showValue && count > 0 ? enabledAlpha : disabledAlpha
+        menuItem.alpha = ((showValue && count > 0) || (!showValue && touchbar)) ? enabledAlpha : disabledAlpha
         menuItem.colorBlendFactor = 0.9
         menuItem.text = GV.language.getText(menuInt, values: showValue ? "(\(count))" : "")
         menuItem.zPosition = self.zPosition + 1
@@ -83,7 +83,7 @@ class MenuScene: SKScene {
                     case String(TextConstants.tcFinished.rawValue):
                         menuSceneDelegate!.showFinishedGames()
                     
-                    case String(TextConstants.tcSettings.rawValue):
+                    case String(TextConstants.tcChooseLanguage.rawValue):
                         menuSceneDelegate!.startSettings()
 
 //                    case String(TextConstants.tcChooseGameType.rawValue):

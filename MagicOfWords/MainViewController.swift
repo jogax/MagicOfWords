@@ -11,7 +11,11 @@ import SpriteKit
 import GameplayKit
 import RealmSwift
 
-class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, ShowFinishedGamesSceneDelegate {
+class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, ShowFinishedGamesSceneDelegate, SettingsSceneDelegate {
+    func backFromSettingsScene() {
+       startMenuScene()
+    }
+    
     var basicDataRecord: BasicDataModel?
     func backToMenuScene() {
         startMenuScene()
@@ -183,7 +187,13 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     }
     
     func startSettings() {
-        print("Settings started")
+        let settingsScene = SettingsScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        if let view = self.view as! SKView? {
+                settingsScene.setDelegate(delegate: self)
+            view.presentScene(settingsScene)
+        } else {
+            continueGame()
+        }
     }
     
     override func viewDidLoad() {

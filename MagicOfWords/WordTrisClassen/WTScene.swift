@@ -254,8 +254,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 //    }
 //
     private func getPlayingRecord(new: Bool, next: StartType) {
-        var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
-        if new {
+        var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
+        if new || actGames.count == 0 {
             let games = realm.objects(GameDataModel.self).filter("gameStatus = %d", GV.GameStatusNew)
             /// reset all records with nowPlaying status
             if actGames.count > 0 {
@@ -295,12 +295,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                     first = false
                 }
             } else {
-                actGames = realm.objects(GameDataModel.self).filter("gameStatus = %d", GV.GameStatusPlaying)
-                try! realm.write {
-                    actGames[0].nowPlaying = true
+                actGames = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusPlaying, GV.aktLanguage)
+                if actGames.count > 0 {
+                    try! realm.write {
+                        actGames[0].nowPlaying = true
+                    }
                 }
             }
-            let playedNowGame = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
+            let playedNowGame = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
             if playedNowGame.count > 0 {
                 let actGameNumber = playedNowGame.first!.gameNumber
                 switch nextGame {
