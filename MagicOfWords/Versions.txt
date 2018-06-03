@@ -6,3 +6,4 @@ Buil 4, Version 1.04
 - WordList and Mandatory Words in own DB, launching without loading time!
 - Nicer Font in Gameboard
 - changing of language is now possible
+- merged into master
