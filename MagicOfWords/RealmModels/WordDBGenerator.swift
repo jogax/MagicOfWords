@@ -38,9 +38,9 @@ class WordDBGenerator {
         for word in wordList {
             let wordModel = WordListModel()
             wordModel.word = language + word
-            realm.beginWrite()
-            realm.add(wordModel)
-            try! realm.commitWrite()
+            try! realm.write {
+                realm.add(wordModel)
+            }
         }
     }
     
@@ -71,9 +71,9 @@ class WordDBGenerator {
                 mandatoryModel.gameNumber = Int(gameNumber)! + GV.gameNumberAdder[language]!
                 mandatoryModel.language = language
                 mandatoryModel.mandatoryWords = lineToSave
-                realm.beginWrite()
-                realm.add(mandatoryModel)
-                try! realm.commitWrite()
+                try! realm.write {
+                    realm.add(mandatoryModel)
+                }
             }
         }
     }

@@ -316,7 +316,7 @@ class WTGameboard: SKShapeNode {
             gameArray.append( [WTGameboardItem]() )
             
             for j in 0..<size {
-                gameArray[i].append( WTGameboardItem(blockSize: blockSize!, fontSize: parentScene.frame.width / 20) )
+                gameArray[i].append( WTGameboardItem(blockSize: blockSize!, fontSize: parentScene.frame.width * 0.045) )
                 gameArray[i][j].letter = emptyLetter
             }
         }
@@ -793,7 +793,7 @@ class WTGameboard: SKShapeNode {
                 }
             }
             else {
-                print("and hier? ActLetter: \(actLetter), status: \(status), noMoreMove: \(noMoreMove) ")
+//                print("and hier? ActLetter: \(actLetter), status: \(status), noMoreMove: \(noMoreMove) ")
             }
         }
 

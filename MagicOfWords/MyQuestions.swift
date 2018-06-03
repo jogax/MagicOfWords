@@ -51,7 +51,7 @@ class MyQuestion: SKSpriteNode {
         let label = SKLabelNode()
         label.fontName = "TimesNewRoman"
         label.fontColor = .black
-        label.numberOfLines = 0
+//        label.numberOfLines = 0
         label.verticalAlignmentMode = .center
         label.horizontalAlignmentMode = .center
         label.fontSize = self.size.width * 0.04

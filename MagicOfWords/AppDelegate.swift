@@ -9,10 +9,24 @@
 import UIKit
 import RealmSwift
 
-var realm: Realm = try! Realm()
+// for Standard Using
+let defaultConfig = Realm.Configuration(
+    objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self])
+
+// for Generating WordList DB
+//let defaultConfig = Realm.Configuration(
+//    objectTypes: [WordListModel.self])
+
+// for generating Mandatory Words
+//let defaultConfig = Realm.Configuration(
+//    objectTypes: [MandatoryModel.self])
+
+var realm: Realm = try! Realm(configuration: defaultConfig)
+
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
-    readOnly: true)
+    readOnly: true,
+    objectTypes: [WordListModel.self])
 
 // Open the Realm with the configuration
 let realmWordList:Realm = try! Realm(configuration: wordListConfig)
@@ -21,7 +35,8 @@ let mandatoryConfig = Realm.Configuration(
     // Get the path to the bundled file
     fileURL: URL(string: Bundle.main.path(forResource: "Mandatory", ofType:"realm")!),
     // Open the file in read-only mode as application bundles are not writeable
-    readOnly: true)
+    readOnly: true,
+    objectTypes: [MandatoryModel.self])
 
 // Open the Realm with the configuration
 let realmMandatory: Realm = try! Realm(configuration: mandatoryConfig)

@@ -1,3 +1,8 @@
 Build 3, Version 1.02
 - fixes a bug, that could cause a crash on iPad while launching in landscape orientation
 - fixes a bug the caused a crash while launching with hungarian words
+
+Buil 4, Version 1.04
+- WordList and Mandatory Words in own DB, launching without loading time!
+- Nicer Font in Gameboard
+- changing of language is now possible

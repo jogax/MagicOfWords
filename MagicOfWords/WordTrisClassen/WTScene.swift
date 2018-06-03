@@ -255,8 +255,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 //
     private func getPlayingRecord(new: Bool, next: StartType) {
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
-        if new || actGames.count == 0 {
-            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d", GV.GameStatusNew)
+        if new {
+            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusNew, GV.aktLanguage)
             /// reset all records with nowPlaying status
             if actGames.count > 0 {
                 try! realm.write {
@@ -528,7 +528,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     
     func addOwnWord(word: String, creationIndex: Int, check: Bool)->Bool {
         var returnBool = false
-        if realm.objects(WordListModel.self).filter("word = %@", word.lowercased()).count == 1 {
+        if realmWordList.objects(WordListModel.self).filter("word = %@", GV.aktLanguage + word.lowercased()).count == 1 {
             if !GV.allWords.contains(where: {$0.word == word}) {
                 returnBool = true
                 let myIndex = (creationIndex == NoValue ? indexOfTilesForGame : creationIndex)
@@ -676,10 +676,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
 //            checkIfGameFinished()
         } else {
             if GV.playingRecord.rounds.count == 0 {
-                realm.beginWrite()
-                let rounds = RoundDataModel()
-                GV.playingRecord.rounds.append(rounds)
-                try! realm.commitWrite()
+                try! realm.write {
+                    let rounds = RoundDataModel()
+                    GV.playingRecord.rounds.append(rounds)
+                }
             }
 
             ws = Array(repeating: WTPiece(), count: 3)
@@ -702,14 +702,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
-        return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d",
-            GV.GameStatusPlaying, playingRecord.gameNumber).count > 0
+        return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d and language = %@",
+            GV.GameStatusPlaying, playingRecord.gameNumber, GV.aktLanguage).count > 0
     }
     
     private func hasNextRecords(playingRecord: GameDataModel)->Bool {
-    return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber > %d",
-    GV.GameStatusPlaying, playingRecord.gameNumber).count > 0
-    
+        return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber > %d and language = %@",
+            GV.GameStatusPlaying, playingRecord.gameNumber, GV.aktLanguage).count > 0
     }
     @objc private func countTime(timerX: Timer) {
         time += 1
@@ -726,10 +725,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
     }
     
     private func generateArrayOfWordPieces(new: Bool) {
-        if new {
-            realm.beginWrite()
-            GV.playingRecord.pieces = generateArrayOfWordPieces()
-            try! realm.commitWrite()
+        if new || GV.playingRecord.pieces.count == 0 {
+            try! realm.write {
+                GV.playingRecord.pieces = generateArrayOfWordPieces()
+            }
         }
         tilesForGame.removeAll()
         let piecesToPlay = GV.playingRecord.pieces.components(separatedBy: "°")
@@ -1039,37 +1038,41 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
                 tempOwnWords += item.toString() + "°"
             }
         }
-        realm.beginWrite()
-        GV.playingRecord.ownWords = tempOwnWords
-        GV.playingRecord.pieces = pieces
-        GV.playingRecord.gameStatus = GV.GameStatusPlaying
-        var rounds: RoundDataModel
-        rounds = GV.playingRecord.rounds.last!
-        rounds.index = roundIndexes.last!
-        rounds.infos = wtGameboard!.roundInfosToString(all:false)
-        rounds.gameArray  = wtGameboard!.gameArrayToString()
-//        GV.playingRecord.roundGameArrays = wtGameboard!.gameArrayToString()
-        
-        
-        var activityItemsString = ""
-        if activityItems.count > 0 {
-            for index in 0..<activityItems.count {
-                let actItem = activityItems[index]
-                activityItemsString += actItem.type.description + itemInnerSeparator
-                switch activityItems[index].type  {
-                case .FromBottom:
-                    activityItemsString += String(actItem.fromBottomIndex)
-                case .Moving:
-                    activityItemsString += actItem.movingItem.toString()
-                case .Choosing:
-                    activityItemsString += String(actItem.choosedWord.toString())
-                }
-                activityItemsString += itemSeparator
+        try! realm.write {
+            GV.playingRecord.ownWords = tempOwnWords
+            GV.playingRecord.pieces = pieces
+            GV.playingRecord.gameStatus = GV.GameStatusPlaying
+            var rounds: RoundDataModel
+            if GV.playingRecord.rounds.count == 0 {
+                let rounds = RoundDataModel()
+                GV.playingRecord.rounds.append(rounds)
             }
-            activityItemsString.removeLast()
-            GV.playingRecord.activityItems = activityItemsString
+            rounds = GV.playingRecord.rounds.last!
+            rounds.index = roundIndexes.last!
+            rounds.infos = wtGameboard!.roundInfosToString(all:false)
+            rounds.gameArray  = wtGameboard!.gameArrayToString()
+    //        GV.playingRecord.roundGameArrays = wtGameboard!.gameArrayToString()
+            
+            
+            var activityItemsString = ""
+            if activityItems.count > 0 {
+                for index in 0..<activityItems.count {
+                    let actItem = activityItems[index]
+                    activityItemsString += actItem.type.description + itemInnerSeparator
+                    switch activityItems[index].type  {
+                    case .FromBottom:
+                        activityItemsString += String(actItem.fromBottomIndex)
+                    case .Moving:
+                        activityItemsString += actItem.movingItem.toString()
+                    case .Choosing:
+                        activityItemsString += String(actItem.choosedWord.toString())
+                    }
+                    activityItemsString += itemSeparator
+                }
+                activityItemsString.removeLast()
+                GV.playingRecord.activityItems = activityItemsString
+            }
         }
-        try! realm.commitWrite()
     }
     
     private func checkFreePlace()->Bool {
@@ -1375,7 +1378,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             let label = SKLabelNode()
             label.fontName = "TimesNewRoman"
             label.fontColor = .black
-            label.numberOfLines = 0
+//            label.numberOfLines = 0
             label.verticalAlignmentMode = .center
             label.horizontalAlignmentMode = .center
             label.fontSize = self.size.width * 0.03

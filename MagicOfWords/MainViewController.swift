@@ -13,10 +13,13 @@ import RealmSwift
 
 class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, ShowFinishedGamesSceneDelegate, SettingsSceneDelegate {
     func backFromSettingsScene() {
+    try! realm.write {
+        GV.basicDataRecord.actLanguage = GV.aktLanguage
+    }
+
        startMenuScene()
     }
     
-    var basicDataRecord: BasicDataModel?
     func backToMenuScene() {
         startMenuScene()
     }
@@ -70,7 +73,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
                                 print("error after register")
                             } else {
                                 realm.beginWrite()
-                                self.basicDataRecord!.myName = userName
+                                GV.basicDataRecord.myName = userName
                                 //                print(textField.text)
                                 try! realm.commitWrite()
                                 self.startMenuScene()
@@ -161,29 +164,11 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     }
 
     func startNewGame() {
-//        let basicData = realm.objects(BasicDataModel.self).first!
-//        let gameType = GameType(rawValue: basicData!.gameType)!
-//        switch gameType {
-//        case .WordTris:
-            startWTScene(new: true, next: .NoMore)
-//        case .SearchWords:
-//            startFindWordsScene()
-//        case .NoMoreGames:
-//            break
-//        }
+        startWTScene(new: true, next: .NoMore)
     }
     
     func continueGame() {
-//        let basicData = realm.objects(BasicDataModel.self).first!
-//        let gameType = GameType(rawValue: basicData!.gameType)!
-//        switch gameType {
-//        case .WordTris:
-            startWTScene(new: false, next: .NoMore)
-//        case .SearchWords:
-//            startFindWordsScene()
-//        case .NoMoreGames:
-//            break
-//        }
+        startWTScene(new: false, next: .NoMore)
     }
     
     func startSettings() {
@@ -198,19 +183,18 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        generateBasicDataRecordIfNeeded()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
-//        basicDataRecord = realm.objects(BasicDataModel.self)[0]
+//        _ = WordDBGenerator(mandatory: false)
 //        _ = WordDBGenerator(mandatory: true)
             // Get the SKScene from the loaded GKScene
-        GV.aktLanguage = GV.language.getText(.tcAktLanguage)
+        generateBasicDataRecordIfNeeded()
         startMenuScene()
     }
     
     func startMenuScene(showMenu: Bool = false) {
         let menuScene = MenuScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
-            let actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE")
+            let actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
             if showMenu || actGames.count == 0 {
                 menuScene.setDelegate(delegate: self)
                 view.presentScene(menuScene)
@@ -223,12 +207,13 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     private func generateBasicDataRecordIfNeeded() {
         try! realm.write {
             if realm.objects(BasicDataModel.self).count == 0 {
-                basicDataRecord = BasicDataModel()
-                realm.add(basicDataRecord!)
+                GV.basicDataRecord = BasicDataModel()
+                GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
+                realm.add(GV.basicDataRecord)
             } else {
-                basicDataRecord = realm.objects(BasicDataModel.self).first!
+                GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
+                GV.language.setLanguage(GV.basicDataRecord.actLanguage)
             }
-            basicDataRecord!.actLanguage = GV.language.getText(.tcAktLanguage)
         }
     }
 

@@ -56,11 +56,17 @@ struct WordToCheck {
 
 struct GV {
     static let gameNumberAdder: [String:Int] = ["en": 0, "de": 10000, "hu":20000, "ru": 30000]
-    static var aktLanguage = ""
+    static var aktLanguage: String {
+        get {
+            return GV.language.getText(.tcAktLanguage)
+        }
+    }
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2
     static var playingRecord = GameDataModel()
+    static var basicDataRecord = BasicDataModel()
+
     static let language = Language()
     static var maxRecordCount = 0
     static var actRecordCount = 0
