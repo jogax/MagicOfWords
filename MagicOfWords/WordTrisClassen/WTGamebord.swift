@@ -852,14 +852,16 @@ class WTGameboard: SKShapeNode {
             var index = -1
             repeat {
                 index += 1
-            } while choosedWord.usedLetters[index].letter == emptyLetter
+            } while index < choosedWord.usedLetters.count && choosedWord.usedLetters[index].letter == emptyLetter 
             let length = choosedWord.usedLetters.count - index
-            let colFrom = choosedWord.usedLetters[0].col
-            let rowFrom = choosedWord.usedLetters[0].row
-            let colTo = choosedWord.usedLetters[index].col
-            let rowTo = choosedWord.usedLetters[index].row
-            delegate.setLettersMoved(colFrom: colFrom, rowFrom: rowFrom, colTo: colTo, rowTo: rowTo, length: length)
-            checkWholeWords()
+            if length > 0 {
+                let colFrom = choosedWord.usedLetters[0].col
+                let rowFrom = choosedWord.usedLetters[0].row
+                let colTo = choosedWord.usedLetters[index].col
+                let rowTo = choosedWord.usedLetters[index].row
+                delegate.setLettersMoved(colFrom: colFrom, rowFrom: rowFrom, colTo: colTo, rowTo: rowTo, length: length)
+                checkWholeWords()
+            }
             return nil
         } else {
             if col < 0 || col >= size || row < 0 || row >= size {

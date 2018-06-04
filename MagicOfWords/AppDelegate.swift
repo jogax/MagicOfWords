@@ -10,6 +10,7 @@ import UIKit
 import RealmSwift
 
 // for Standard Using
+#if !GENERATEWORDLIST && !GENERATEMANDATORY
 let defaultConfig = Realm.Configuration(
     objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self])
 
@@ -22,6 +23,7 @@ let defaultConfig = Realm.Configuration(
 //    objectTypes: [MandatoryModel.self])
 
 var realm: Realm = try! Realm(configuration: defaultConfig)
+#endif
 
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),

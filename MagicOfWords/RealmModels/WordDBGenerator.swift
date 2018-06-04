@@ -5,9 +5,22 @@
 //  Created by Jozsef Romhanyi on 31/05/2018.
 //  Copyright © 2018 Jozsef Romhanyi. All rights reserved.
 //
-
+#if GENERATEWORDLIST || GENERATEMANDATORY
 import Foundation
 import RealmSwift
+
+#if GENERATEWORDLIST
+// for Generating WordList DB
+    let defaultConfig = Realm.Configuration(
+        objectTypes: [WordListModel.self])
+#endif
+#if GENERATEMANDATORY
+// for generating Mandatory Words
+let defaultConfig = Realm.Configuration(
+    objectTypes: [MandatoryModel.self])
+#endif
+
+var realm: Realm = try! Realm(configuration: defaultConfig)
 
 class WordDBGenerator {
     
@@ -37,7 +50,7 @@ class WordDBGenerator {
         let wordList = wordsFile.components(separatedBy: .newlines)
         for word in wordList {
             let wordModel = WordListModel()
-            wordModel.word = language + word
+            wordModel.word = (language + word).lowercased()
             try! realm.write {
                 realm.add(wordModel)
             }
@@ -79,3 +92,4 @@ class WordDBGenerator {
     }
 
 }
+#endif

@@ -184,8 +184,14 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     override func viewDidLoad() {
         super.viewDidLoad()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
-//        _ = WordDBGenerator(mandatory: false)
-//        _ = WordDBGenerator(mandatory: true)
+        #if GENERATEWORDLIST
+        _ = WordDBGenerator(mandatory: false)
+        print("WordList Generated")
+        #endif
+        #if GENERATEMANDATORY
+        _ = WordDBGenerator(mandatory: true)
+        print("Mandatory Generated")
+        #endif
             // Get the SKScene from the loaded GKScene
         generateBasicDataRecordIfNeeded()
         startMenuScene()
