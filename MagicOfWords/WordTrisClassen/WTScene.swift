@@ -711,7 +711,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate {
             GV.GameStatusPlaying, playingRecord.gameNumber, GV.aktLanguage).count > 0
     }
     @objc private func countTime(timerX: Timer) {
-        time += 1
+        let state = UIApplication.shared.applicationState
+        if state == .background {
+            print("App in Background")
+        } else if state == .active {
+            time += 1
+        }
         let remainingTime = myTimer!.maxTime - time
         timeLabel.text = GV.language.getText(.tcTime, values: remainingTime.HourMinSec)
         realm.beginWrite()
