@@ -78,26 +78,28 @@ struct GV {
     static let onIpad = UIDevice.current.model.hasSuffix("iPad")
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static var activated = false
-    static var countMandatoryWords = 0
-    static var allWords = [WordToCheck]()
-    static func countWords(mandatory: Bool, countAll: Bool = false)->Int {
-        var count = 0
-        for actWord in GV.allWords {
-            count += actWord.mandatory == mandatory && actWord.countFounded > 0 ? (countAll ? actWord.countFounded : 1) : 0
-        }
-        return count
-    }
-    static func allMandatoryWordsFounded()->Bool {
-        return GV.countMandatoryWords == countWords(mandatory: true)
-    }
+    static var gameArray: [[WTGameboardItem]] = [[WTGameboardItem]]()
+
+//    static var countMandatoryWords = 0
+//    static var allWordsX = [WordToCheck]()
+//    static func countWords(mandatory: Bool, countAll: Bool = false)->Int {
+//        var count = 0
+//        for actWord in GV.allWordsX {
+//            count += actWord.mandatory == mandatory && actWord.countFounded > 0 ? (countAll ? actWord.countFounded : 1) : 0
+//        }
+//        return count
+//    }
+//    static func allMandatoryWordsFounded()->Bool {
+//        return GV.countMandatoryWords == countWords(mandatory: true)
+//    }
     
-    static func getScore()->Int {
-        var score = 0
-        for actWord in GV.allWords {
-            score += actWord.score
-        }
-        return score
-    }
+//    static func getScore()->Int {
+//        var score = 0
+//        for actWord in GV.allWordsX {
+//            score += actWord.score
+//        }
+//        return score
+//    }
     
 //    RealmSync Constants
     static let MY_INSTANCE_ADDRESS = "magic-of-words.us1.cloud.realm.io" // <- update this

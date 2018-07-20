@@ -41,6 +41,7 @@
 		205E8E2820948E2E00314646 /* button.png in Resources */ = {isa = PBXBuildFile; fileRef = 205E8E2720948E2D00314646 /* button.png */; };
 		2060036E20347FF400023E10 /* WTGameboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036D20347FF400023E10 /* WTGameboardItem.swift */; };
 		2060037020348A8800023E10 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036F20348A8800023E10 /* Grid.swift */; };
+		2065252620FD212C00F0BC46 /* WTGameWordList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2065252520FD212C00F0BC46 /* WTGameWordList.swift */; };
 		206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206664A720A45A3000C6C5E4 /* RoundDataModel.swift */; };
 		20819320202B472900406D9A /* GameDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081931F202B472900406D9A /* GameDataModel.swift */; };
 		20819322202B484D00406D9A /* gameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20819321202B484D00406D9A /* gameData.txt */; };
@@ -64,6 +65,7 @@
 		20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE120330E73001682B2 /* BasicDataModel.swift */; };
 		20B28AE4203331B4001682B2 /* GameTypeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE3203331B4001682B2 /* GameTypeModel.swift */; };
 		20B28AE620333273001682B2 /* WTShowGameList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTShowGameList.swift */; };
+		20DA3BF220FE1DFC00EA2D55 /* StateOfWordChanging.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -121,6 +123,7 @@
 		205E8E2720948E2D00314646 /* button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button.png; sourceTree = "<group>"; };
 		2060036D20347FF400023E10 /* WTGameboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameboardItem.swift; sourceTree = "<group>"; };
 		2060036F20348A8800023E10 /* Grid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
+		2065252520FD212C00F0BC46 /* WTGameWordList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameWordList.swift; sourceTree = "<group>"; };
 		206664A720A45A3000C6C5E4 /* RoundDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundDataModel.swift; sourceTree = "<group>"; };
 		2081931F202B472900406D9A /* GameDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDataModel.swift; sourceTree = "<group>"; };
 		20819321202B484D00406D9A /* gameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = gameData.txt; sourceTree = "<group>"; };
@@ -142,6 +145,7 @@
 		20B28AE120330E73001682B2 /* BasicDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicDataModel.swift; sourceTree = "<group>"; };
 		20B28AE3203331B4001682B2 /* GameTypeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTypeModel.swift; sourceTree = "<group>"; };
 		20B28AE520333273001682B2 /* WTShowGameList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTShowGameList.swift; sourceTree = "<group>"; };
+		20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateOfWordChanging.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -249,6 +253,7 @@
 				205184FA20615B5C00E7FAF4 /* enGameData.txt */,
 				205184F62061525C00E7FAF4 /* huGameData.txt */,
 				205184F4206150AC00E7FAF4 /* ruGameData.txt */,
+				20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
 			);
 			path = RealmModels;
@@ -294,6 +299,7 @@
 				20A6914120309CC500AB47C0 /* WTGamebord.swift */,
 				2060036D20347FF400023E10 /* WTGameboardItem.swift */,
 				20A6E83420AEDB4B000F5950 /* MyTimer.swift */,
+				2065252520FD212C00F0BC46 /* WTGameWordList.swift */,
 			);
 			path = WordTrisClassen;
 			sourceTree = "<group>";
@@ -369,6 +375,7 @@
 			files = (
 				2055CB6B20C59AFB005F57E3 /* WordList.realm in Resources */,
 				208D085620C42F4000954E63 /* Mandatory.realm in Resources */,
+				20DA3BF220FE1DFC00EA2D55 /* StateOfWordChanging.txt in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
 				205184F920615B3100E7FAF4 /* deGameData.txt in Resources */,
@@ -426,6 +433,7 @@
 				20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */,
 				201FB1DE20288CEA00EC9F36 /* en.swift in Sources */,
 				201FB1DA20288CEA00EC9F36 /* hu.swift in Sources */,
+				2065252620FD212C00F0BC46 /* WTGameWordList.swift in Sources */,
 				2060036E20347FF400023E10 /* WTGameboardItem.swift in Sources */,
 				20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */,
 				201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */,

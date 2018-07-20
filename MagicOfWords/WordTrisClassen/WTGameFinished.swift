@@ -98,17 +98,17 @@ class WTGameFinished: SKSpriteNode {
   }
     
     private func getResults()->Bool {
-        for word in GV.allWords {
-            if word.mandatory {
-                results.countMandatoryWords += word.countFounded
-                results.scoreMandatoryWords += word.score
+        for actWord in WTGameWordList.shared.allWords {
+            if actWord.mandatory {
+                results.countMandatoryWords += actWord.counter
+                results.scoreMandatoryWords += actWord.score
             } else {
-                results.countOwnWords += word.countFounded
-                results.scoreOwnWords += word.score
+                results.countOwnWords += actWord.counter
+                results.scoreOwnWords += actWord.score
             }
-            results.countUsedLetters += word.word.count
+            results.countUsedLetters += actWord.word.count
         }
-        return GV.allMandatoryWordsFounded()
+        return WTGameWordList.shared.gameFinished()
     }
     
     private func createHeaderLabel(line: Int, text: String) {
