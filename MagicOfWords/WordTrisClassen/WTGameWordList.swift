@@ -22,11 +22,11 @@ struct SelectedWord {
     var mandatory = false
     var score: Int {
         get {
-            var countUsing = 0
-            for letter in usedLetters {
-                countUsing += GV.gameArray[letter.col][letter.row].getCountOccurences()
-            }
-            let score = (word.length > 25 ? maxScore : pointsForWord[word.length]!) + countUsing * pointsForLetter
+            //var countUsing = 0
+            //for letter in usedLetters {
+            //    countUsing += GV.gameArray[letter.col][letter.row].getCountOccurences()
+            //}
+            let score = (word.length > 25 ? maxScore : pointsForWord[word.length]!) + word.length * pointsForLetter
             return score
         }
     }
