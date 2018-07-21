@@ -11,8 +11,9 @@ import Foundation
 import GameplayKit
 let maxScore = 2000
 let pointsForLetter = 10
-let pointsForWord: [Int:Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 20, 5:40, 6: 60, 7: 80, 8: 100, 9: 120, 10: 150, 11: 180, 12: 200, 13: 250, 14: 300,
-                                15: 350, 16: 400, 17: 450, 18:500, 19: 550, 20:600, 21: 650, 22: 700, 23: 800, 24: 900, 25: 1000]
+let maxUsedLength = 25
+let pointsForWord: [Int:Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 50, 5:90, 6: 120, 7: 150, 8: 180, 9: 210, 10: 250, 11: 290, 12: 320, 13: 380, 14: 440,
+                                15: 500, 16: 560, 17: 620, 18:680, 19: 740, 20:800, 21: 860, 22: 920, 23: 1030, 24: 1140, 25: 1250]
 let minutesForWord: [Int: Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 5, 7: 5, 8: 10, 9:10, 10: 15, 11: 15, 12: 20, 13: 20, 14: 20,
                                   15: 20, 16: 25, 17: 25, 18:25, 19: 25, 20:30, 21: 30, 22: 30, 23: 30, 24: 30, 25: 60]
 
@@ -26,7 +27,7 @@ struct SelectedWord {
             //for letter in usedLetters {
             //    countUsing += GV.gameArray[letter.col][letter.row].getCountOccurences()
             //}
-            let score = (word.length > 25 ? maxScore : pointsForWord[word.length]!) + word.length * pointsForLetter
+            let score = (word.length > 25 ? maxScore : pointsForWord[word.length]!)
             return score
         }
     }
@@ -89,7 +90,7 @@ extension SelectedWord: Equatable {
 public protocol WTGameWordListDelegate: class {
     
     /// Method called when a new Word is saved
-    func showScore(newScore: Int, totalScore: Int)
+    func showScore(newWord: String, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int)
 }
 
 
@@ -125,6 +126,19 @@ class WTGameWordList {
         for word in myMandatoryWords {
             allWords.append(WordWithCounter(word: word, counter: 0, mandatory: true))
         }
+    }
+    
+    public func getMandatoryWords()->[WordWithCounter] {
+        var returnArray = [WordWithCounter]()
+        for mandatoryWord in allWords {
+            if mandatoryWord.mandatory {
+                returnArray.append(mandatoryWord)
+            } else {
+                break
+            }
+        }
+        return returnArray
+        
     }
     
     public func gameFinished()->Bool {
@@ -174,7 +188,7 @@ class WTGameWordList {
             for selectedWordString in selectedWords {
                 let selectedWord = SelectedWord(from: selectedWordString)
                 if selectedWord.word.length > 0 {
-                    _ = addWord(selectedWord: selectedWord)
+                    _ = addWord(selectedWord: selectedWord, doAnimate: false)
                 }
             }
         }
@@ -188,11 +202,10 @@ class WTGameWordList {
         return returnBool
     }
     
-    public func addWord(selectedWord: SelectedWord)->(Bool, Int) {
+    public func addWord(selectedWord: SelectedWord, doAnimate: Bool = true)->Bool {
         
         var noCommonLetter = true
         var noDiagonal = true
-        var increaseMin = 0
         for index1 in 0..<selectedWord.usedLetters.count - 1 {
             // check if a letter is 2x used in the word
             for index2 in index1 + 1..<selectedWord.usedLetters.count {
@@ -228,13 +241,10 @@ class WTGameWordList {
             }
             addWordToAllWords(word: selectedWord.word)
             let newScore = getActualScore()
-            delegate!.showScore(newScore: newScore - oldScore, totalScore: newScore)
-            let min: Int? = minutesForWord[selectedWord.word.length]!
-            if min != nil {
-                increaseMin = min!
-            }
+            let changeTime = minutesForWord[selectedWord.word.length]
+            delegate!.showScore(newWord: selectedWord.word, newScore: newScore - oldScore, totalScore: newScore, doAnimate: doAnimate, changeTime: changeTime!)
         }
-        return (noCommonLetter, increaseMin)
+        return noCommonLetter
     }
     
     private func addWordToAllWords(word: String) {
@@ -257,7 +267,8 @@ class WTGameWordList {
                 GV.gameArray[letter.col][letter.row].decrementCountOccurences()
             }
             let newScore = getActualScore()
-            delegate!.showScore(newScore: newScore - oldScore, totalScore: newScore)
+            let changeTime = -selectedWord.word.length > maxUsedLength ? minutesForWord[maxUsedLength] : minutesForWord[selectedWord.word.length]
+            delegate!.showScore(newWord: selectedWord.word, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: changeTime!)
         }
     }
     

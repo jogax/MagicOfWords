@@ -97,11 +97,52 @@ let trueString = "1"
 let falseString = "0"
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordListDelegate {
-    func showScore(newScore: Int, totalScore: Int) {
-        self.totalScore = totalScore
-        modifyHeader()
+    func showScore(newWord: String, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int) {
+        if doAnimate {
+            showWordAndScore(word: newWord, score: newScore)
+        }
+        if changeTime > 0 {
+            myTimer!.increaseMaxTime(value: changeTime * 60)
+        }
+        if changeTime < 0 {
+            myTimer!.decreaseMaxTime(value: -changeTime * 60)
+        }
+       self.totalScore = totalScore
         showFoundedWords()
         return
+    }
+    
+    private func showWordAndScore(word: String, score: Int) {
+        let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.04
+        let textOnBalloon = word + " (" + String(score) + ")"
+        let balloon = SKSpriteNode(imageNamed: "balloon.png")
+        let widthMultiplier: CGFloat = 0.1 + CGFloat(textOnBalloon.length) * (GV.onIpad ? 0.015 : 0.030)
+        balloon.size = CGSize(width: self.frame.size.width * widthMultiplier, height: self.frame.size.width * 0.10)
+        balloon.zPosition = 100
+        let startPosY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
+        let endPosY = score > 0 ? self.frame.size.height * 0.98 : self.frame.size.height * -0.04
+        balloon.position = CGPoint(x: self.frame.size.width * 0.5, y: startPosY )
+        self.addChild(balloon)
+        let scoreLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+        scoreLabel.text = String(score)
+//        scoreLabel.verticalAlignmentMode = .center
+        scoreLabel.position = CGPoint(x: balloon.size.width * 0, y: -balloon.size.width * 0.40)
+        scoreLabel.horizontalAlignmentMode = .center
+        scoreLabel.fontSize = fontSize
+        scoreLabel.fontColor = SKColor.blue
+        let wordLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+        wordLabel.text = textOnBalloon
+        wordLabel.verticalAlignmentMode = .center
+        scoreLabel.position = CGPoint(x: balloon.size.width * 0, y: balloon.size.width * 0.20)
+        wordLabel.fontSize = fontSize
+        wordLabel.fontColor = SKColor.blue
+//        balloon.addChild(scoreLabel)
+        balloon.addChild(wordLabel)
+        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: endPosY), duration: 4.0)
+        let fadeAway = SKAction.fadeOut(withDuration: 0.25)
+        let removeNode = SKAction.removeFromParent()
+        let sequence = SKAction.sequence([movingAction, fadeAway, removeNode])
+        balloon.run(sequence)
     }
     
     
@@ -495,6 +536,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         showFoundedWords()
     }
     func showFoundedWords() {
+        let myMandatoryWords = WTGameWordList.shared.getMandatoryWords()
+        for actWord in myMandatoryWords {
+            let label = self.childNode(withName: actWord.word) as? SKLabelNode
+            if label != nil {
+                label!.text = actWord.word + " (\(actWord.counter)) "
+            }
+        }
+
         if let label = self.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
             label.text = GV.language.getText(.tcWordsToCollect, values: String(WTGameWordList.shared.getCountWords(mandatory: true)), String(WTGameWordList.shared.getCountFoundedWords(mandatory: true, countFoundedMandatory: true)),
                 String(WTGameWordList.shared.getCountFoundedWords(mandatory: true, countAll: true)),
@@ -533,10 +582,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         var returnBool = false
         if realmWordList.objects(WordListModel.self).filter("word = %@", GV.aktLanguage + word.lowercased()).count == 1 {
             let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
-            let (boolValue, increaseTime) = WTGameWordList.shared.addWord(selectedWord: selectedWord)
-            if boolValue {
-                myTimer!.increaseMaxTime(value: increaseTime)
-            }
+            let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord)
+//            if boolValue {
+//                myTimer!.increaseMaxTime(value: increaseTime)
+//            }
             returnBool = boolValue
         }
         return returnBool
@@ -670,7 +719,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //            }
             restoreGameArray()
             WTGameWordList.shared.setDelegate(delegate: self)
-//            wtGameWordList = WTGameWordList(delegate: self, from: GV.playingRecord.rounds.last!.infos)
+            WTGameWordList.shared.initFromString(from: GV.playingRecord.rounds.last!.infos)
 //            wtGameboard!.checkWholeWords()
 //            checkIfGameFinished()
         } else {
@@ -1175,7 +1224,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //                }
                 var lengthOfWord = actItem.choosedWord.word.count
                 lengthOfWord = lengthOfWord > 10 ? 11 : lengthOfWord
-                myTimer!.decreaseMaxTime(value: timeIncreaseValues![lengthOfWord])
+//                myTimer!.decreaseMaxTime(value: timeIncreaseValues![lengthOfWord])
 //                wtGameboard!.checkWholeWords()
                 activityItems.removeLast()
 //                showLastOwnWords()
