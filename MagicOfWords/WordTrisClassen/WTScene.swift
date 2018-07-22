@@ -259,6 +259,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        createHeader()
         createUndo()
         wtGameFinishedSprite.setDelegate(delegate: self)
+        WTGameWordList.shared.clear()
         WTGameWordList.shared.setMandatoryWords()
         showWordsToCollect()
         play()
@@ -610,20 +611,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     private func showWordsToCollect() {
         var counter = 1
-        let wordList = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: "°")
+//        let wordList = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: "°")
+        let wordList = WTGameWordList.shared.getMandatoryWords()
         for word in wordList {
 //            GV.allWords.append(WordToCheck(word: word, mandatory: true, creationIndex: NoValue, countFounded: 0))
 //            var wordToShow = AllWordsToShow(word: word)
 //            allWordsToShow.append(wordToShow)
-            let wordToShow = WordToCheck(word: word, countFounded: 0, mandatory: true, creationIndex: 0, score: 0)
-            createWordLabel(wordToShow: wordToShow, counter: counter)
+//            let wordToShow = WordToCheck(word: word.word, countFounded: 0, mandatory: true, creationIndex: 0, score: 0)
+            createWordLabel(wordToShow: word, counter: counter)
             counter += 1
         }
         createLabel(word: GV.language.getText(.tcWordsToCollect, values: String(WTGameWordList.shared.getCountWords(mandatory: true)), "0","0", "0"), first: true, name: mandatoryWordsHeaderName)
         createLabel(word: GV.language.getText(.tcOwnWords, values: "0", "0", "0"), first: false, name: ownWordsHeaderName)
     }
     
-    private func createWordLabel(wordToShow: WordToCheck, counter: Int) {
+    private func createWordLabel(wordToShow: WordWithCounter, counter: Int) {
         let xPositionMultiplier = [0.2, 0.5, 0.8]
         let mandatoryYPositionMultiplier:CGFloat = 0.86
 //        let ownYPositionMultiplier:CGFloat = 0.80 // orig
@@ -655,7 +657,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         label.position = CGPoint(x: xPosition, y: yPosition)
         label.fontSize = self.frame.size.height * 0.0175
         label.fontColor = .black
-        label.text = wordToShow.word + " (\(wordToShow.countFounded))"
+        label.text = wordToShow.word + " (\(wordToShow.counter))"
         label.name = wordToShow.word
         label.zPosition = self.zPosition + 10
         self.addChild(label)
@@ -707,21 +709,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
         }
-//        showWordsToCollect()
         if !new {
-//            wtGameboard!.setRoundInfos(infos: GV.playingRecord.roundInfos)
             wtGameboard!.setRoundInfos()
-//            let ownWords = GV.playingRecord.ownWords.components(separatedBy: "°")
-//            for item in ownWords {
-//                if item.count > 0 {
-//                    addOwnWord(ownWord: WordToCheck(from: item))
-//                }
-//            }
-            restoreGameArray()
             WTGameWordList.shared.setDelegate(delegate: self)
-            WTGameWordList.shared.initFromString(from: GV.playingRecord.rounds.last!.infos)
-//            wtGameboard!.checkWholeWords()
-//            checkIfGameFinished()
+            WTGameWordList.shared.restoreFromPlayingRecord()
+            restoreGameArray()
         } else {
             if GV.playingRecord.rounds.count == 0 {
                 try! realm.write {
@@ -972,6 +964,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 newRound.gameArray = wtGameboard!.gameArrayToString()
                 GV.playingRecord.rounds.append(newRound)
                 myTimer!.increaseMaxTime(value: iHalfHour)
+                WTGameWordList.shared.clearWordsInGame()
                 try! realm.commitWrite()
                 modifyHeader()
             }

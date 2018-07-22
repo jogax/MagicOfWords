@@ -12,10 +12,10 @@ import GameplayKit
 let maxScore = 2000
 let pointsForLetter = 10
 let maxUsedLength = 25
-let pointsForWord: [Int:Int] = [0: 0, 1: 0, 2: 0, 3: 10, 4: 50, 5:90, 6: 120, 7: 150, 8: 180, 9: 210, 10: 250, 11: 290, 12: 320, 13: 380, 14: 440,
-                                15: 500, 16: 560, 17: 620, 18:680, 19: 740, 20:800, 21: 860, 22: 920, 23: 1030, 24: 1140, 25: 1250]
-let minutesForWord: [Int: Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 5, 7: 5, 8: 10, 9:10, 10: 15, 11: 15, 12: 20, 13: 20, 14: 20,
-                                  15: 20, 16: 25, 17: 25, 18:25, 19: 25, 20:30, 21: 30, 22: 30, 23: 30, 24: 30, 25: 60]
+let pointsForWord: [Int:Int] = [0: 0, 1: 0, 2: 0, 3: 10, 4: 50, 5:100, 6: 150, 7: 200, 8: 250, 9: 300, 10: 350, 11: 410, 12: 470, 13: 530, 14: 600,
+                                15: 670, 16: 740, 17: 820, 18:900, 19: 1000, 20:1100, 21: 1200, 22: 1300, 23: 1400, 24: 1500, 25: 2000]
+let minutesForWord: [Int: Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 5, 8: 5, 9:10, 10: 10, 11: 15, 12: 15, 13: 15, 14: 15,
+                                  15: 20, 16: 20, 17: 20, 18:20, 19: 25, 20:25, 21: 25, 22: 30, 23: 30, 24: 30, 25: 60]
 
 struct SelectedWord {
     var word: String = ""
@@ -86,6 +86,22 @@ extension SelectedWord: Equatable {
     }
 }
 
+struct WordWithCounter {
+    var word: String
+    var mandatory: Bool
+    var counter: Int
+    var score: Int {
+        get {
+            return WTGameWordList.shared.getScore(forWord: word)
+        }
+    }
+    init(word: String, counter: Int, mandatory: Bool) {
+        self.word = word
+        self.counter = counter
+        self.mandatory = mandatory
+    }
+}
+
 
 public protocol WTGameWordListDelegate: class {
     
@@ -95,21 +111,6 @@ public protocol WTGameWordListDelegate: class {
 
 
 class WTGameWordList {
-    struct WordWithCounter {
-        var word: String
-        var mandatory: Bool
-        var counter: Int
-        var score: Int {
-            get {
-                return WTGameWordList.shared.getScore(forWord: word)
-            }
-        }
-        init(word: String, counter: Int, mandatory: Bool) {
-            self.word = word
-            self.counter = counter
-            self.mandatory = mandatory
-        }
-    }
     var wordsInGame: [SelectedWord]
     var delegate: WTGameWordListDelegate?
     var allWords = [WordWithCounter]()
@@ -181,6 +182,13 @@ class WTGameWordList {
         return countFoundedMandatory ? countFoundedMandatoryWords : countAll ? countAllWords : counter
     }
     
+    public func restoreFromPlayingRecord() {
+        for round in GV.playingRecord.rounds {
+            clearWordsInGame()
+            initFromString(from: round.infos)
+        }
+    }
+    
     public func initFromString(from: String) {
         wordsInGame = [SelectedWord]()
         if from.length > 0 {
@@ -193,7 +201,7 @@ class WTGameWordList {
             }
         }
     }
-    
+
     public func isMandatory(word: String)->Bool {
         var returnBool = false
         if let index = allWords.index(where: {$0.word == word}) {
@@ -286,7 +294,7 @@ class WTGameWordList {
         }
     }
     
-    private func getScore(forWord: String)->Int {
+    public func getScore(forWord: String)->Int {
         var score = 0
         for selectedWord in wordsInGame {
             if selectedWord.word == forWord {
@@ -324,4 +332,19 @@ class WTGameWordList {
         }
         return returnString
     }
+    
+    public func clear() {
+        wordsInGame = [SelectedWord]()
+        allWords = [WordWithCounter]()
+    }
+    
+    public func clearWordsInGame() {
+        for selectedWord in wordsInGame {
+            for letter in selectedWord.usedLetters {
+                GV.gameArray[letter.col][letter.row].decrementCountOccurences()
+            }
+        }
+        wordsInGame = [SelectedWord]()        
+    }
+    
 }

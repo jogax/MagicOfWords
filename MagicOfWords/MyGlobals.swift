@@ -20,38 +20,38 @@ enum GameType: Int {
 }
 let NoValue = -1
 
-struct WordToCheck {
-    var word: String = ""
-    var countFounded = 0
-    var score = 0
-    var mandatory = false
-    var creationIndex = 0
-    var founded: Bool {
-        get {
-            return (countFounded > 0)
-        }
-    }
-    init(word: String, countFounded: Int, mandatory: Bool, creationIndex: Int, score: Int) {
-        self.word = word
-        self.countFounded = countFounded
-        self.mandatory = mandatory
-        self.creationIndex = creationIndex
-        self.score = score
-    }
-    init(from: String) {
-        let valueTab = from.components(separatedBy: "-")
-        if valueTab.count == 2 {
-            self.word = valueTab[0]
-            self.creationIndex = 0
-            if let createIndex = Int(valueTab[1]) {
-                self.creationIndex = createIndex
-            }
-        }
-    }
-    func toString()->String {
-        return word + "-" + String(creationIndex)
-    }
-}
+//struct WordToCheck {
+//    var word: String = ""
+//    var countFounded = 0
+//    var score = 0
+//    var mandatory = false
+//    var creationIndex = 0
+//    var founded: Bool {
+//        get {
+//            return (countFounded > 0)
+//        }
+//    }
+//    init(word: String, countFounded: Int, mandatory: Bool, creationIndex: Int, score: Int) {
+//        self.word = word
+//        self.countFounded = countFounded
+//        self.mandatory = mandatory
+//        self.creationIndex = creationIndex
+//        self.score = score
+//    }
+//    init(from: String) {
+//        let valueTab = from.components(separatedBy: "-")
+//        if valueTab.count == 2 {
+//            self.word = valueTab[0]
+//            self.creationIndex = 0
+//            if let createIndex = Int(valueTab[1]) {
+//                self.creationIndex = createIndex
+//            }
+//        }
+//    }
+//    func toString()->String {
+//        return word + "-" + String(creationIndex)
+//    }
+//}
 
 
 struct GV {

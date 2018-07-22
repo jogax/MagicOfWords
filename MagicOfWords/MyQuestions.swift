@@ -32,7 +32,7 @@ class MyQuestion: SKSpriteNode {
         super.init(texture: texture, color: .red, size: CGSize(width: parentSize.width * 0.9, height: parentSize.height * 0.25))
         self.name = MyQuestionName
         self.zPosition = 100
-        addChild(createLabel(withText: GV.language.getText(.tcNoMoreStepsQuestion), position: CGPoint(x:self.size.width * 0.0, y:self.size.height * 0.2), fontSize: self.size.width * 0.04, name: questionName))
+        createLabels(withText: GV.language.getText(.tcNoMoreStepsQuestion), position: CGPoint(x:self.size.width * 0.0, y:self.size.height * 0.2), name: questionName)
         addChild(createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer1), position: CGPoint(x:-self.size.width * 0.24, y:-self.size.height * 0.1), name: answer1Name))
         addChild(createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer2), position: CGPoint(x:self.size.width * 0.21, y:-self.size.height * 0.1), name: answer2Name))
     }
@@ -42,16 +42,24 @@ class MyQuestion: SKSpriteNode {
         let button = SKSpriteNode(texture: texture, color: .white, size: CGSize(width: self.size.width * 0.4, height: self.size.height * 0.3))
         button.position = position
         button.name = name
-        button.addChild(createLabel(withText: withText, position: CGPoint(x:0, y:10), fontSize: self.size.width * 0.03, name: name + "Label"))
+        button.addChild(createLabel(withText: withText, position: CGPoint(x:0, y:10), name: name + "Label"))
         return button
         
     }
     
-    private func createLabel(withText: String, position: CGPoint, fontSize: CGFloat, name: String)->SKLabelNode {
-        let label = SKLabelNode()
-        label.fontName = "TimesNewRoman"
+    private func createLabels(withText: String, position: CGPoint, name: String) {
+        let textTable = withText.components(separatedBy: itemSeparator)
+        if textTable.count == 2 {
+            let label1 = createLabel(withText: textTable[0], position: CGPoint(x: position.x, y: position.y + self.size.width * 0.035), name: name)
+            let label2 = createLabel(withText: textTable[1], position: CGPoint(x: position.x, y: position.y - self.size.width * 0.015), name: name)
+            addChild(label1)
+            addChild(label2)
+       }
+    }
+    
+    private func createLabel(withText: String, position: CGPoint, name: String)->SKLabelNode {
+        let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
         label.fontColor = .black
-//        label.numberOfLines = 0
         label.verticalAlignmentMode = .center
         label.horizontalAlignmentMode = .center
         label.fontSize = self.size.width * 0.04

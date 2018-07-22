@@ -42,8 +42,7 @@ let enDictionary: [TextConstants: String] = [
     .tcTaskNotCompletedWithNoMoreSteps: "No more steps, task not completed!",
     .tcTaskNotCompletedWithTimeOut: "Timeout, task not completed!",
     .tcWillBeRestarted:     "Game will be restarted!",
-    .tcNoMoreStepsQuestion: "No more steps!\r\n" +
-                            "Would yue like to choose own words?",
+    .tcNoMoreStepsQuestion: "No more steps!°Would yue like to choose own words?",
     .tcNoMoreStepsAnswer1: "Choose",
     .tcNoMoreStepsAnswer2: "Next round",
     .tcAlphabet:           "ABCDEFGHIJKLMNOPQRSTUVWXYZ",

@@ -42,8 +42,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcTaskNotCompletedWithNoMoreSteps: "Больше нет шагов, задача не выполнена!",
     .tcTaskNotCompletedWithTimeOut: "Время истекло, задача не выполнена!",
     .tcWillBeRestarted:     "Игра будет перезапущена!",
-    .tcNoMoreStepsQuestion: "Больше никаких шагов!\r\n" +
-                            "Хочешь указать собственные слова?",
+    .tcNoMoreStepsQuestion: "Больше никаких шагов!°Хочешь указать собственные слова?",
     .tcNoMoreStepsAnswer1: "Указать",
     .tcNoMoreStepsAnswer2: "Следующий раунд",
     .tcAlphabet:           "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ", //Ъ !!!

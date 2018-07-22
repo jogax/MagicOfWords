@@ -42,8 +42,7 @@ let huDictionary: [TextConstants: String] = [
     .tcTaskNotCompletedWithNoMoreSteps: "Nincs több lépés, feladat nem teljesült!",
     .tcTaskNotCompletedWithTimeOut: "Az idő lejárt, feladat nem teljesült!",
     .tcWillBeRestarted:     "A játék újra indul!",
-    .tcNoMoreStepsQuestion: "Nincs több lépés!\r\n" +
-                            "Szeretne saját szavakat kijelölni?",
+    .tcNoMoreStepsQuestion: "Nincs több lépés!°Szeretnél saját szavakat kijelölni?",
     .tcNoMoreStepsAnswer1: "Kijelölés",
     .tcNoMoreStepsAnswer2: "Következő kör",
     .tcAlphabet:           "AÁBCDEÉFGHIÍJKLMNOÓÖŐPRSTUÚÜŰVZXY",

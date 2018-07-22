@@ -42,8 +42,7 @@ let deDictionary: [TextConstants: String] = [
     .tcTaskNotCompletedWithNoMoreSteps: "Keine weiteren Schritte, Aufgabe nicht erledigt!",
     .tcTaskNotCompletedWithTimeOut: "Timeout, Aufgabe nicht erledigt!",
     .tcWillBeRestarted:     "Das Spiel wird neu gestartet!",
-    .tcNoMoreStepsQuestion: "Keine weiteren Schritte!\r\n" +
-                            "Möchtest du eigenen Wörter markieren?",
+    .tcNoMoreStepsQuestion: "Keine weiteren Schritte!°Möchtest du eigenen Wörter markieren?",
     .tcNoMoreStepsAnswer1: "Markieren",
     .tcNoMoreStepsAnswer2: "Nächste Runde",
     .tcAlphabet:           "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜẞ",

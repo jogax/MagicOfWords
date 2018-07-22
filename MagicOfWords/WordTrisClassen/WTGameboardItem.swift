@@ -156,9 +156,11 @@ class WTGameboardItem: SKSpriteNode {
     }
     
     public func decrementCountOccurences() {
-        self.countOccurencesInWords -= 1
-        if self.countOccurencesInWords == 0 {
-            setGreenToUsedColor()
+        if countOccurencesInWords > 0 {
+            self.countOccurencesInWords -= 1
+            if self.countOccurencesInWords == 0 {
+                setGreenToUsedColor()
+            }
         }
     }
     
