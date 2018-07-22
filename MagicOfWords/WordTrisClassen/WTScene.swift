@@ -97,6 +97,36 @@ let trueString = "1"
 let falseString = "0"
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordListDelegate {
+    let nameForSpriteWidthWords = "°°°nameForSpriteWidthWords°°°"
+    var spriteToShowWords: SKSpriteNode?
+    func startShowingWordsOverPosition(wordList: [String]) {
+        let texture = SKTexture(imageNamed: "menuBackground.png")
+        spriteToShowWords = SKSpriteNode(texture: texture)
+        spriteToShowWords!.name = nameForSpriteWidthWords
+        spriteToShowWords!.alpha = 1.0
+        spriteToShowWords!.position = CGPoint(x: self.frame.size.width * 0.25, y: self.frame.size.height * 0.9)
+        spriteToShowWords!.size = CGSize(width: self.frame.size.width * 0.5, height: (self.frame.size.height * 0.05 * CGFloat(wordList.count)))
+        self.addChild(spriteToShowWords!)
+        for (index, word) in wordList.enumerated(){
+            let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+            label.fontColor = .black
+            label.position = CGPoint(x: 0, y: CGFloat(index) * self.frame.size.height * 0.02 )
+            label.verticalAlignmentMode = .center
+            label.horizontalAlignmentMode = .center
+            label.fontSize = self.size.width * 0.02
+            label.zPosition = self.zPosition + 500
+            label.text = word
+            label.name = nameForSpriteWidthWords
+            spriteToShowWords!.addChild(label)
+        }
+    }
+    
+    func stopShowingWordsOverPosition() {
+        spriteToShowWords!.removeAllChildren()
+        removeNodesWith(name: nameForSpriteWidthWords)
+        spriteToShowWords?.position = CGPoint(x: 0, y: 0)
+    }
+
     func showScore(newWord: String, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int) {
         if doAnimate {
             showWordAndScore(word: newWord, score: newScore)
@@ -1260,9 +1290,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         if GV.playingRecord.rounds.count > 0 {
             if GV.playingRecord.rounds.last!.gameArray.count > 0 {
                 wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
-    //        wtGameboard!.clearGameArray() // delete all contents from GameArray
-    //        fillGameArrayFromActivityItems()
-    //        var wsIndex = 0
             }
         }
         for index in 0..<tilesForGame.count {

@@ -226,11 +226,13 @@ func == (left: FoundedWord, right: FoundedWord) -> Bool {
 class WTGameboard: SKShapeNode {
     var delegate: WTGameboardDelegate
     var parentScene: SKScene
+    
     var size: Int
     var grid: Grid?
     let blockSize: CGFloat?
 //    var gameArray: [[WTGameboardItem]]?
     var shape: WTPiece = WTPiece()
+    private var showingWords = false
     private var lastCol: Int = 0
     private var lastRow: Int = 0
     private var startCol: Int = 0
@@ -481,281 +483,16 @@ class WTGameboard: SKShapeNode {
     }
     private  let scoreProWord: [Int] = [0, 0, 10, 30, 50, 80, 120, 180, 250, 330, 430, 550]
     
-//    public func checkWholeWords() {
-//        return
-//        foundedWords.removeAll()
-//        for col in 0..<size {
-//            for row in 0..<size {
-//                GV.gameArray[col][row].resetCountOccurences()
-//                GV.gameArray[col][row].setGreenToUsedColor()
-//            }
-//        }
-//        for col in 0..<GV.gameArray.count {
-//            for row in 0..<GV.gameArray.count {
-//                let letter = getLetter(col: col, row: row)
-//                if letter != "" {
-//                    for actWord in GV.allWords {
-//                        if actWord.word.count > 0 {
-//                            if letter == actWord.word.subString(startPos: 0, length: 1) {
-//                                OKPositions.removeAll()
-//                                if flyOverWord(compare: letter, col: col, row: row, fromCol: col, fromRow: row, withWord: actWord.word) {
-//                                } else {
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        // analyze the repeated words: in 2 identical words my be only 1 letter with the same position
-//       foundedWords.removeAll()
-//       analyzeFoundedWords()
-//        if roundInfos.count == GV.actRound {
-//            roundInfos.append(RoundInfos())
-//        }
-//        if GV.actRound > roundInfos.count - 1 {
-//            GV.actRound = roundInfos.count - 1
-//        }
-//        if roundInfos.count > 0 {
-//            if roundInfos.last!.words.count > 0 {
-//                roundInfos[roundInfos.count - 1].words.removeAll()
-//            }
-//        } else {
-//            roundInfos.append(RoundInfos())
-//        }
-//        for foundedWord in foundedWords {
-//            var color:MyColor = GV.allMandatoryWordsFounded() ? .myWholeWordColor : .myGoldColor
-//            if GV.allWords.contains(where: {$0.word == foundedWord.word}) {
-//                color = .myWholeWordColor
-//            }
-//            for letter in foundedWord.usedLetters {
-//                var letterColor: MyColor = .myWholeWordColor
-//                if GV.gameArray[letter.col][letter.row].myColor != .myWholeWordColor {
-//                    letterColor = color
-//                }
-//                GV.gameArray[letter.col][letter.row].setFoundedWord(toColor: letterColor)
-//                GV.gameArray[letter.col][letter.row].incrementCountOccurences()
-//            }
-//        }
-//        for index in 0..<foundedWords.count {
-//            var countLetterUsing = 0
-//            for letter in foundedWords[index].usedLetters {
-//                countLetterUsing += GV.gameArray[letter.col][letter.row].getCountOccurences()
-//            }
-//            var countLetters = foundedWords[index].word.count
-//            countLetters = countLetters > 10 ? 11 : countLetters
-//            foundedWords[index].score = scoreProWord[countLetters] + countLetterUsing * scoreProLetter
-//        }
-//        foundedWordsWithCount.removeAll()
-//        for foundedWord in foundedWords {
-//            var founded = false
-//            if roundInfos.count > 0 {
-//                for index in 0..<roundInfos.last!.words.count {
-//                    if foundedWord.word == roundInfos.last!.words[index].word {
-//                        roundInfos[roundInfos.count - 1].words[index].counter += 1
-//                        roundInfos[roundInfos.count - 1].words[index].score += foundedWord.score
-//                        founded = true
-//                    }
-//                }
-//            }
-//            for index in 0..<foundedWordsWithCount.count {
-//                if foundedWord.word == foundedWordsWithCount[index].word {
-//                    foundedWordsWithCount[index].counter += 1
-//                    foundedWordsWithCount[index].score += foundedWord.score
-//                    founded = true
-//                }
-//            }
-//
-//            if !founded {
-//                foundedWordsWithCount.append(FoundedWordWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
-//                roundInfos[roundInfos.count - 1].words.append(FoundedWordWithCounter(word: foundedWord.word, counter: 1, score: foundedWord.score))
-//            }
-//        }
-//
-//        for index in 0..<GV.allWords.count {
-//            GV.allWords[index].countFounded = 0
-//            GV.allWords[index].score = 0
-//        }
-//
-//        for roundInfo in roundInfos {
-//            for index in 0..<roundInfo.words.count {
-//                for index1 in 0..<GV.allWords.count {
-//                    if roundInfo.words[index].word == GV.allWords[index1].word {
-//                        GV.allWords[index1].countFounded += roundInfo.words[index].counter
-//                        GV.allWords[index1].score += roundInfo.words[index].score
-//                    }
-//                }
-//            }
-//        }
-
-//        var wordDictionary = calculateCountersAndScores()
-//        var foundedWordsToShow = [FoundedWordWithCounter]()
-//        for (key, _) in wordDictionary {
-//            foundedWordsToShow.append(wordDictionary[key]!)
-//        }
-//        delegate.showFoundedWords()
-//    }
     
-//    private func calculateCountersAndScores()->[String : FoundedWordWithCounter] {
-//        var wordDictionary = [String: FoundedWordWithCounter]()
-//        for index in 0..<roundInfos.count {
-//            for wordInfos in roundInfos[index].words {
-//                if wordDictionary[wordInfos.word] == nil {
-//                    wordDictionary[wordInfos.word] = wordInfos
-//                } else {
-//                    wordDictionary[wordInfos.word] = FoundedWordWithCounter(
-//                        word: wordInfos.word,
-//                        counter: wordInfos.counter + wordDictionary[wordInfos.word]!.counter,
-//                        score: wordInfos.score + wordDictionary[wordInfos.word]!.score
-//                    )
-//                }
-//            }
-//        }
-//        return wordDictionary
-//    }
-    
-//    var OKPositions = [UsedLetter]()
-    
-//    private func flyOverWord(compare: String, col: Int, row: Int, fromCol: Int, fromRow: Int, withWord: String)->Bool {
-//        let myWord = compare
-//        var searchString = ""
-//        if withWord == "МОЛОКО" {
-//            var allPositions = ""
-//            for okPosition in OKPositions {
-//                allPositions += "\(okPosition.col)\(okPosition.row)-"
-//            }
-//            if allPositions.count > 0 {
-//                allPositions.removeLast()
-//            }
-//            searchString = "searching: \(compare): at \(allPositions)-\(col)\(row)"
-//        }
-        
-//        var returnBool = false
-//        if myWord.count == withWord.count {
-//            if myWord != withWord {
-//                return false
-//            } else {
-//
-//                OKPositions.append(UsedLetter(col:col, row: row, letter: GV.gameArray[col][row].letter))
-//                if withWord == "МОЛОКО" {
-//                    print("Stopped at \(withWord)")
-//                    print("\(OKPositions)")
-//                }
-//                var positionOnce = true
-//                for index0 in 0..<OKPositions.count - 1 {
-//                    for index1 in index0 + 1..<OKPositions.count {
-//                        if OKPositions[index0].col == OKPositions[index1].col && OKPositions[index0].row == OKPositions[index1].row {
-//                            positionOnce = false
-//                        }
-//                    }
-//                }
-//                var word = ""
-//                for okPosition in OKPositions {
-//                    word += okPosition.letter
-//                }
-//                if positionOnce && word == withWord {
-//                    foundedWords.append(FoundedWord(word: myWord, usedLetters: OKPositions))
-//                }
-//                if withWord == "МОЛОКО" {
-//                    print ("\(searchString): \(positionOnce)")
-//                }
-//                return positionOnce
-//            }
-//        }
-//        if myWord == withWord.subString(startPos: 0, length: myWord.count) {
-//            OKPositions.append(UsedLetter(col:col, row: row, letter: GV.gameArray[col][row].letter))
-//            if col > 0 && col - 1 != fromCol && !OKPositions.contains(where: {$0.col == col - 1 && $0.row == row}) {
-//                let new = getLetter(col: col - 1, row: row)
-//                if new != "" {
-//                    if flyOverWord(compare: myWord + new, col: col - 1, row: row, fromCol: col, fromRow: row, withWord: withWord) {
-//                        OKPositions.removeLast()
-//                        returnBool = true
-//                    }
-//                }
-//            }
-//            if col < size - 1 && col + 1 != fromCol && !OKPositions.contains(where: {$0.col == col + 1 && $0.row == row}) {
-//                let new = getLetter(col: col + 1, row: row)
-//                if new != "" {
-//                    if flyOverWord(compare: myWord + new, col: col + 1, row: row, fromCol: col, fromRow: row, withWord: withWord) {
-//                        OKPositions.removeLast()
-//                        returnBool = true
-//                    }
-//                }
-//            }
-//            if row > 0 && row - 1 != fromRow && !OKPositions.contains(where: {$0.col == col && $0.row == row - 1}) {
-//                let new = getLetter(col: col, row: row - 1)
-//                if new != "" {
-//                    if flyOverWord(compare: myWord + new, col: col, row: row - 1, fromCol: col, fromRow: row, withWord: withWord) {
-//                        OKPositions.removeLast()
-//                        returnBool = true
-//                    }
-//                }
-//            }
-//            if row < size - 1 && row + 1 != fromRow && !OKPositions.contains(where: {$0.col == col && $0.row == row + 1}) {
-//                let new = getLetter(col: col, row: row + 1)
-//                if new != "" {
-//                    if flyOverWord(compare: myWord + new, col: col, row: row + 1, fromCol: col, fromRow: row, withWord: withWord) {
-//                        OKPositions.removeLast()
-//                        returnBool = true
-//                    }
-//                }
-//            }
-//            if !returnBool && OKPositions.count > 0 {
-//                OKPositions.removeLast()
-//            }
-//        }
-//        return returnBool
-//    }
-    
-//    private func analyzeFoundedWords() {
-//        if foundedWords.count > 0 {
-//            var indexesToRemove = [Int]()
-//            foundedWords = foundedWords.sorted(by:{$0.word < $1.word})
-//            var wordTable = [String: [UsedLetter]]()
-//            for (index, foundedWord) in foundedWords.enumerated() {
-//                if wordTable[foundedWord.word] == nil {
-//                    wordTable[foundedWord.word] = foundedWord.usedLetters
-//                } else {
-//                    var appended = false
-//                    for usedLetter in foundedWord.usedLetters {
-//                        if !wordTable[foundedWord.word]!.contains(where: {$0 == usedLetter}) {
-//                            wordTable[foundedWord.word]!.append(usedLetter)
-//                            appended = true
-//                        }
-//                    }
-//                    if !appended {
-//                        indexesToRemove.append(index)
-//                    }
-//                }
-//            }
-//            if indexesToRemove.count > 0 {
-//                let indexes = indexesToRemove.sorted(by: {$0 > $1})
-//                for index in indexes {
-//                    foundedWords.remove(at: index)
-//                }
-//            }
-//        }
-//    }
-    
-//    private func getLetter(col: Int, row: Int)->String {
-//        if GV.gameArray[col][row].status == .used || GV.gameArray[col][row].status == .wholeWord {
-//            return GV.gameArray[col][row].letter //children[0] as! SKLabelNode).text!
-//        } else {
-//            return ""
-//        }
-//    }
-//    
     var moveModusStarted = false
     var noMoreMove = false
-//    var lengthOfMovedItem = 0
-//    var colFrom = 0
-//    var rowFrom = 0
-//    var colTo = 0
-//    var rowTo = 0
-    
     public func startChooseOwnWord(col: Int, row: Int) {
         moveModusStarted = false
         noMoreMove = false
+        if showingWords {
+            WTGameWordList.shared.stopShowingWords()
+            showingWords = false
+        }
         choosedWord = FoundedWord()
         choosedWord.addLetter(letter: UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter))
         GV.gameArray[col][row].changeColor(toColor: .myBlueColor)
@@ -776,7 +513,7 @@ class WTGameboard: SKShapeNode {
                 let last = choosedWord.usedLetters.last!
                 if choosedWord.usedLetters.first!.letter == emptyLetter {
                     choosedWord.removeFirstLetter()
-                    GV.gameArray[last.col][last.row].remove()
+                     GV.gameArray[last.col][last.row].remove()
                     for letter in choosedWord.usedLetters {
                         if letter.letter != emptyLetter {
                             _ = GV.gameArray[letter.col][letter.row].setLetter(letter: letter.letter, status: .used, toColor: .myBlueColor, forcedChange: true)
@@ -796,7 +533,7 @@ class WTGameboard: SKShapeNode {
                 }
             }
             else {
-//                print("and hier? ActLetter: \(actLetter), status: \(status), noMoreMove: \(noMoreMove) ")
+                print("and hier? ActLetter: \(actLetter), status: \(status), noMoreMove: \(noMoreMove) ")
             }
         }
 
@@ -880,6 +617,11 @@ class WTGameboard: SKShapeNode {
 //                wordAdded = delegate.addOwnWordOld(word: word, creationIndex: NoValue, check: true)
                 wordAdded = delegate.addOwnWordNew(word: word, usedLetters: choosedWord.usedLetters)
                 clear()
+            } else {
+                showingWords = true
+                if choosedWord.usedLetters[0].letter != emptyLetter {
+                    WTGameWordList.shared.showWordsContainingThisLetter(choosedWord: choosedWord)
+                }
             }
             if wordAdded {
                 return choosedWord
@@ -985,16 +727,6 @@ class WTGameboard: SKShapeNode {
         return infoString
     }
 
-//    public func addOwnWordToCheck(word: String) {
-//        wordsToCheck.append(word)
-//    }
-//
-//    public func removeOwnWordToCheck(word: String) {
-//        if let index = wordsToCheck.index(where: {$0 == word}) {
-//            wordsToCheck.remove(at: index)
-//        }
-//    }
-//
     public func checkFreePlaceForPiece(piece: WTPiece, rotateIndex: Int)->Bool {
         let form = myForms[piece.myType]![rotateIndex]
         for col in 0..<size {

@@ -181,7 +181,7 @@ class WTGameboardItem: SKSpriteNode {
         }
     }
     
-    private func setColors(toColor: MyColor) {
+    public func setColors(toColor: MyColor) {
         self.myColor = toColor
         self.color = convertMyColorToSKColor(color: toColor)
     }
@@ -215,6 +215,9 @@ class WTGameboardItem: SKSpriteNode {
             }
         }
         letter = from.subString(startPos: 1, length: 1)
+        if letter == emptyLetter {
+            color = .myWhiteColor
+        }
         _ = setLetter(letter: letter, status: status, toColor: color)
         origLetter = emptyLetter
         origColor = .myWhiteColor

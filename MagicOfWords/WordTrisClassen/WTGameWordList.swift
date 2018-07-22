@@ -107,6 +107,8 @@ public protocol WTGameWordListDelegate: class {
     
     /// Method called when a new Word is saved
     func showScore(newWord: String, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int)
+    func startShowingWordsOverPosition(wordList: [String])
+    func stopShowingWordsOverPosition()
 }
 
 
@@ -345,6 +347,33 @@ class WTGameWordList {
             }
         }
         wordsInGame = [SelectedWord]()        
+    }
+    var showedWords = [SelectedWord]()
+    var wordsToShow = [String]()
+    
+    public func showWordsContainingThisLetter(choosedWord: FoundedWord) {
+        showedWords = [SelectedWord]()
+        wordsToShow = [String]()
+        for selectedWord in wordsInGame {
+            if selectedWord.usedLetters.contains(where: {$0.col == choosedWord.usedLetters[0].col && $0.row == choosedWord.usedLetters[0].row}) {
+                for letter in selectedWord.usedLetters {
+                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myGoldColor)
+                }
+                showedWords.append(selectedWord)
+                wordsToShow.append(selectedWord.word)
+            }
+        }
+        delegate!.startShowingWordsOverPosition(wordList: wordsToShow)
+
+    }
+    public func stopShowingWords() {
+        for selectedWord in showedWords {
+            for letter in selectedWord.usedLetters {
+                GV.gameArray[letter.col][letter.row].setColors(toColor: .myWholeWordColor)
+            }
+        }
+        showedWords = [SelectedWord]()
+        delegate!.stopShowingWordsOverPosition()
     }
     
 }
