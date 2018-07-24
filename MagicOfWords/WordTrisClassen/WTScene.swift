@@ -34,6 +34,7 @@ struct ActivityItem {
             }
         }
     }
+    
     var type: ActivityType = .FromBottom
     var fromBottomIndex: Int
     var movingItem: MovingItem
@@ -77,7 +78,6 @@ struct ActivityItem {
                 choosedWord = FoundedWord(word: word, usedLetters: usedLetters)
             }
             self.init(type: .Choosing, choosedWord: choosedWord)
-            
         }
     }
     
@@ -99,32 +99,44 @@ let falseString = "0"
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordListDelegate {
     let nameForSpriteWidthWords = "°°°nameForSpriteWidthWords°°°"
     var spriteToShowWords: SKSpriteNode?
-    func startShowingWordsOverPosition(wordList: [String]) {
+    func startShowingWordsOverPosition(wordList: [SelectedWord]) {
+        let sizeOfLine = myHeight * 0.027
+        let sizeOfLines = CGFloat(wordList.count) * sizeOfLine
+        var maxLength = 0
+        let widthMultiplier:CGFloat = GV.onIpad ? 0.02 : 0.035
+        for selectedWord in wordList {
+            let word = selectedWord.word + " (" + String(selectedWord.score) + ")"
+            maxLength = word.length > maxLength ? word.length : maxLength
+        }
         let texture = SKTexture(imageNamed: "menuBackground.png")
         spriteToShowWords = SKSpriteNode(texture: texture)
         spriteToShowWords!.name = nameForSpriteWidthWords
         spriteToShowWords!.alpha = 1.0
-        spriteToShowWords!.position = CGPoint(x: self.frame.size.width * 0.25, y: self.frame.size.height * 0.9)
-        spriteToShowWords!.size = CGSize(width: self.frame.size.width * 0.5, height: (self.frame.size.height * 0.05 * CGFloat(wordList.count)))
+        spriteToShowWords!.color = .yellow
+        spriteToShowWords!.colorBlendFactor = 0.25
+        spriteToShowWords!.size = CGSize(width: CGFloat(maxLength) * myWidth * widthMultiplier, height: myHeight * 0.01 + sizeOfLines)
+        spriteToShowWords!.position = CGPoint(x: myWidth * 0.5, y: myHeight * 0.95 - spriteToShowWords!.size.height / 2)
+        spriteToShowWords!.zPosition = self.zPosition + 100
         self.addChild(spriteToShowWords!)
-        for (index, word) in wordList.enumerated(){
+        for (index, selectedWord) in wordList.enumerated(){
             let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
             label.fontColor = .black
-            label.position = CGPoint(x: 0, y: CGFloat(index) * self.frame.size.height * 0.02 )
+            label.position = CGPoint(x: 0, y: spriteToShowWords!.size.height - sizeOfLines * 0.63 - CGFloat(index + 1) * sizeOfLine * 0.7)
             label.verticalAlignmentMode = .center
             label.horizontalAlignmentMode = .center
-            label.fontSize = self.size.width * 0.02
-            label.zPosition = self.zPosition + 500
-            label.text = word
+            label.fontSize = self.size.width * widthMultiplier
+            label.text = selectedWord.word + " (" + String(selectedWord.score) + ")"
             label.name = nameForSpriteWidthWords
             spriteToShowWords!.addChild(label)
         }
     }
     
     func stopShowingWordsOverPosition() {
-        spriteToShowWords!.removeAllChildren()
-        removeNodesWith(name: nameForSpriteWidthWords)
-        spriteToShowWords?.position = CGPoint(x: 0, y: 0)
+        if spriteToShowWords != nil {
+            spriteToShowWords!.removeAllChildren()
+            removeNodesWith(name: nameForSpriteWidthWords)
+            spriteToShowWords?.position = CGPoint(x: 0, y: 0)
+        }
     }
 
     func showScore(newWord: String, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int) {
@@ -842,6 +854,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         moved = false
         inChoosingOwnWord = false
         ownWordsScrolling = false
+        WTGameWordList.shared.stopShowingWords()
         let firstTouch = touches.first
         firstTouchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: firstTouchLocation)
@@ -1194,6 +1207,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     try! realm.commitWrite()
                     myTimer!.decreaseMaxTime(value: iHalfHour)
                     wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
+                    WTGameWordList.shared.initFromString(from: GV.playingRecord.rounds.last!.infos)
                     modifyHeader()
                 } else {
                     let indexOfLastPiece = activityItems.last!.fromBottomIndex

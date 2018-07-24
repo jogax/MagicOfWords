@@ -17,7 +17,7 @@ enum ItemStatus: Int {
 }
 
 enum MyColor: Int {
-    case myWhiteColor = 0, myWholeWordColor, myUsedColor, myGoldColor, myBlueColor, myTemporaryColor, myRedColor, myNoColor
+    case myWhiteColor = 0, myWholeWordColor, myUsedColor, myGoldColor, myBlueColor, myTemporaryColor, myRedColor, myNoColor, myDarkGoldColor
     var description: String {
     return String(self.rawValue)
 //    switch self {
@@ -36,6 +36,7 @@ let usedColor = SKColor(red:255/255, green: 153/255, blue: 153/255, alpha: 1.0)
 let goldColor  = SKColor(red:255/255, green: 215/255, blue: 0/255, alpha: 1.0)
 let temporaryColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha: 1.0)
 let turquoiseColor = SKColor(red: 64/255, green: 224/255, blue: 208/255, alpha: 1.0)
+let darkGoldColor = SKColor(red: 255/255, green: 180/255, blue: 0/255, alpha: 1.0)
 
 let emptyLetter = " "
 
@@ -152,12 +153,14 @@ class WTGameboardItem: SKSpriteNode {
     
     public func incrementCountOccurences() {
         self.countOccurencesInWords += 1
+        print("increment myLetter: \(letter), count: \(countOccurencesInWords)")
         setFoundedWord(toColor: .myWholeWordColor)
     }
     
     public func decrementCountOccurences() {
         if countOccurencesInWords > 0 {
             self.countOccurencesInWords -= 1
+            print("decrement myLetter: \(letter), count: \(countOccurencesInWords)")
             if self.countOccurencesInWords == 0 {
                 setGreenToUsedColor()
             }
@@ -177,6 +180,7 @@ class WTGameboardItem: SKSpriteNode {
         case .myGoldColor: return goldColor
         case .myBlueColor: return turquoiseColor
         case .myTemporaryColor: return temporaryColor
+        case .myDarkGoldColor: return darkGoldColor
         case .myNoColor: return .white
         }
     }

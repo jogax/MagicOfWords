@@ -19,6 +19,8 @@ enum GameType: Int {
     case WordTris = 1, SearchWords, NoMoreGames
 }
 let NoValue = -1
+var myWidth: CGFloat = 0
+var myHeight: CGFloat = 0 
 
 //struct WordToCheck {
 //    var word: String = ""

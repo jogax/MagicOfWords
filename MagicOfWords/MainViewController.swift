@@ -183,6 +183,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        myHeight = self.view.frame.size.height
+        myWidth = self.view.frame.size.width
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         #if GENERATEWORDLIST
         _ = WordDBGenerator(mandatory: false)

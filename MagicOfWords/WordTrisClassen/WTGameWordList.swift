@@ -17,7 +17,7 @@ let pointsForWord: [Int:Int] = [0: 0, 1: 0, 2: 0, 3: 10, 4: 50, 5:100, 6: 150, 7
 let minutesForWord: [Int: Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 5, 8: 5, 9:10, 10: 10, 11: 15, 12: 15, 13: 15, 14: 15,
                                   15: 20, 16: 20, 17: 20, 18:20, 19: 25, 20:25, 21: 25, 22: 30, 23: 30, 24: 30, 25: 60]
 
-struct SelectedWord {
+public struct SelectedWord {
     var word: String = ""
     var usedLetters = [UsedLetter]()
     var mandatory = false
@@ -71,7 +71,7 @@ struct SelectedWord {
 }
 
 extension SelectedWord: Equatable {
-    static func == (lhs: SelectedWord, rhs: SelectedWord) -> Bool {
+    public static func == (lhs: SelectedWord, rhs: SelectedWord) -> Bool {
         func checkPositions()->Bool {
             var positionsOK = true
             for index in 0..<lhs.usedLetters.count {
@@ -86,7 +86,7 @@ extension SelectedWord: Equatable {
     }
 }
 
-struct WordWithCounter {
+public struct WordWithCounter {
     var word: String
     var mandatory: Bool
     var counter: Int
@@ -107,12 +107,12 @@ public protocol WTGameWordListDelegate: class {
     
     /// Method called when a new Word is saved
     func showScore(newWord: String, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int)
-    func startShowingWordsOverPosition(wordList: [String])
+    func startShowingWordsOverPosition(wordList: [SelectedWord])
     func stopShowingWordsOverPosition()
 }
 
 
-class WTGameWordList {
+public class WTGameWordList {
     var wordsInGame: [SelectedWord]
     var delegate: WTGameWordListDelegate?
     var allWords = [WordWithCounter]()
@@ -246,6 +246,7 @@ class WTGameWordList {
 //            var isSaved = false
             let oldScore = getActualScore()
             wordsInGame.append(selectedWord)
+            print("======== increment ========")
             for letter in selectedWord.usedLetters {
                 GV.gameArray[letter.col][letter.row].incrementCountOccurences()
             }
@@ -273,6 +274,7 @@ class WTGameWordList {
             if selectedWord == wordsInGame.last! {
                 wordsInGame.removeLast()
             }
+            print("======== decrement ========")
             for letter in selectedWord.usedLetters {
                 GV.gameArray[letter.col][letter.row].decrementCountOccurences()
             }
@@ -353,17 +355,18 @@ class WTGameWordList {
     
     public func showWordsContainingThisLetter(choosedWord: FoundedWord) {
         showedWords = [SelectedWord]()
-        wordsToShow = [String]()
+//        wordsToShow = [String]()
         for selectedWord in wordsInGame {
             if selectedWord.usedLetters.contains(where: {$0.col == choosedWord.usedLetters[0].col && $0.row == choosedWord.usedLetters[0].row}) {
                 for letter in selectedWord.usedLetters {
                     GV.gameArray[letter.col][letter.row].setColors(toColor: .myGoldColor)
                 }
+                GV.gameArray[choosedWord.usedLetters[0].col][choosedWord.usedLetters[0].row].setColors(toColor: .myDarkGoldColor)
                 showedWords.append(selectedWord)
-                wordsToShow.append(selectedWord.word)
+//                wordsToShow.append(selectedWord.word)
             }
         }
-        delegate!.startShowingWordsOverPosition(wordList: wordsToShow)
+        delegate!.startShowingWordsOverPosition(wordList: showedWords)
 
     }
     public func stopShowingWords() {

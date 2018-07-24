@@ -490,7 +490,7 @@ class WTGameboard: SKShapeNode {
         moveModusStarted = false
         noMoreMove = false
         if showingWords {
-            WTGameWordList.shared.stopShowingWords()
+//            WTGameWordList.shared.stopShowingWords()
             showingWords = false
         }
         choosedWord = FoundedWord()
