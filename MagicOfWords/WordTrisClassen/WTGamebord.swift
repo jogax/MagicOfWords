@@ -770,7 +770,7 @@ class WTGameboard: SKShapeNode {
 //
 //
     public func clearGreenFieldsForNextRound() {
-        foundedWordsWithCount.removeAll()
+//        foundedWordsWithCount.removeAll()
         for col in 0..<size {
             for row in 0..<size {
 //                print("col: \(col), row: \(row), letter: \(gameArray![col][row].letter) ")

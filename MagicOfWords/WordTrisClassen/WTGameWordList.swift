@@ -246,9 +246,8 @@ public class WTGameWordList {
 //            var isSaved = false
             let oldScore = getActualScore()
             wordsInGame.append(selectedWord)
-            print("======== increment ========")
             for letter in selectedWord.usedLetters {
-                GV.gameArray[letter.col][letter.row].incrementCountOccurences()
+                GV.gameArray[letter.col][letter.row].setColors(toColor: .myWholeWordColor, toStatus: .wholeWord)
             }
             addWordToAllWords(word: selectedWord.word)
             let newScore = getActualScore()
@@ -271,17 +270,30 @@ public class WTGameWordList {
         if wordsInGame.count > 0 {
             let oldScore = getActualScore()
             removeWordFromAllWords(word: selectedWord.word)
-            if selectedWord == wordsInGame.last! {
-                wordsInGame.removeLast()
+            for index in 0..<wordsInGame.count {
+                if selectedWord == wordsInGame[index] {
+                    wordsInGame.remove(at: index)
+                    break
+                }
             }
-            print("======== decrement ========")
             for letter in selectedWord.usedLetters {
-                GV.gameArray[letter.col][letter.row].decrementCountOccurences()
+                if isThisPositionFree(letter: letter) {
+                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myUsedColor, toStatus: .used)
+                }
             }
             let newScore = getActualScore()
             let changeTime = -selectedWord.word.length > maxUsedLength ? minutesForWord[maxUsedLength] : minutesForWord[selectedWord.word.length]
             delegate!.showScore(newWord: selectedWord.word, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: changeTime!)
         }
+    }
+    
+    private func isThisPositionFree(letter: UsedLetter)->Bool {
+        for selectedWord in wordsInGame {
+            if selectedWord.usedLetters.contains(where: {$0.col == letter.col && $0.row == letter.row}) {
+                return false
+            }
+        }
+        return true
     }
     
     private func removeWordFromAllWords(word: String) {
@@ -342,10 +354,12 @@ public class WTGameWordList {
         allWords = [WordWithCounter]()
     }
     
-    public func clearWordsInGame() {
-        for selectedWord in wordsInGame {
-            for letter in selectedWord.usedLetters {
-                GV.gameArray[letter.col][letter.row].decrementCountOccurences()
+    public func clearWordsInGame(changeGameArray: Bool = true) {
+        if changeGameArray {
+            for selectedWord in wordsInGame {
+                for letter in selectedWord.usedLetters {
+                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myUsedColor, toStatus: .used)
+                }
             }
         }
         wordsInGame = [SelectedWord]()        
@@ -359,9 +373,9 @@ public class WTGameWordList {
         for selectedWord in wordsInGame {
             if selectedWord.usedLetters.contains(where: {$0.col == choosedWord.usedLetters[0].col && $0.row == choosedWord.usedLetters[0].row}) {
                 for letter in selectedWord.usedLetters {
-                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myGoldColor)
+                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myGoldColor, toStatus: .noChange)
                 }
-                GV.gameArray[choosedWord.usedLetters[0].col][choosedWord.usedLetters[0].row].setColors(toColor: .myDarkGoldColor)
+                GV.gameArray[choosedWord.usedLetters[0].col][choosedWord.usedLetters[0].row].setColors(toColor: .myDarkGoldColor, toStatus: .noChange)
                 showedWords.append(selectedWord)
 //                wordsToShow.append(selectedWord.word)
             }
@@ -372,7 +386,7 @@ public class WTGameWordList {
     public func stopShowingWords() {
         for selectedWord in showedWords {
             for letter in selectedWord.usedLetters {
-                GV.gameArray[letter.col][letter.row].setColors(toColor: .myWholeWordColor)
+                GV.gameArray[letter.col][letter.row].setColors(toColor: .myWholeWordColor, toStatus: .wholeWord)
             }
         }
         showedWords = [SelectedWord]()

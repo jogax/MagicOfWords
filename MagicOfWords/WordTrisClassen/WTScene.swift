@@ -1007,7 +1007,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 newRound.gameArray = wtGameboard!.gameArrayToString()
                 GV.playingRecord.rounds.append(newRound)
                 myTimer!.increaseMaxTime(value: iHalfHour)
-                WTGameWordList.shared.clearWordsInGame()
+                WTGameWordList.shared.clearWordsInGame(changeGameArray: false)
                 try! realm.commitWrite()
                 modifyHeader()
             }
