@@ -1142,7 +1142,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             rounds = GV.playingRecord.rounds.last!
             rounds.index = roundIndexes.last!
 //            rounds.infos = wtGameboard!.roundInfosToString(all:false)
-            rounds.infos = WTGameWordList.shared.toString()
+            rounds.infos = WTGameWordList.shared.toStringLastRound()
             rounds.gameArray  = wtGameboard!.gameArrayToString()
     //        GV.playingRecord.roundGameArrays = wtGameboard!.gameArrayToString()
             
@@ -1207,7 +1207,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     try! realm.commitWrite()
                     myTimer!.decreaseMaxTime(value: iHalfHour)
                     wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
-                    WTGameWordList.shared.initFromString(from: GV.playingRecord.rounds.last!.infos)
+                    WTGameWordList.shared.getPreviousRound()
                     modifyHeader()
                 } else {
                     let indexOfLastPiece = activityItems.last!.fromBottomIndex
