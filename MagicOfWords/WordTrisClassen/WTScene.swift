@@ -240,8 +240,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //    var scoreOwnWords = 0
 //    var countMandatoryWords = 0
 //    var countOwnWords = 0
-    var activityItems = [ActivityItem]()
-    var roundIndexes = [Int]()
+    struct ActivityRound {
+        var activityItems = [ActivityItem]()
+        init () {
+            
+        }
+    }
+    var activityRoundItem = [ActivityRound]()
+//    var activityItems = [ActivityItem]()
+//    var roundIndexes = [Int]()
     var new: Bool = true
     var nextGame: StartType = .NoMore
     var startTouchedNodes = TouchedNodes()
@@ -325,7 +332,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         realm.beginWrite()
 //        GV.playingRecord.ownWords = ""
         GV.playingRecord.pieces = ""
-        GV.playingRecord.activityItems = ""
+//        GV.playingRecord.activityItems = ""
         GV.playingRecord.time = "0"
         GV.playingRecord.rounds.removeAll()
         GV.playingRecord.gameStatus = GV.GameStatusNew
@@ -556,7 +563,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     func setLettersMoved(colFrom: Int, rowFrom: Int, colTo: Int, rowTo: Int, length: Int) {
         let movingItem = MovingItem(colFrom: colFrom, rowFrom: rowFrom, colTo: colTo, rowTo: rowTo, length: length)
         let activityItem = ActivityItem(type: .Moving, movingItem: movingItem)
-        activityItems.append(activityItem)
+        activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
+//        activityItems.append(activityItem)
         saveActualState()
 
     }
@@ -765,7 +773,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             }
 
             ws = Array(repeating: WTPiece(), count: 3)
-            roundIndexes.append(0)
+//            roundIndexes.append(0)
             for index in 0..<3 {
                 ws[index] = getNextPiece(horizontalPosition: index)
                 origSize[index] = ws[index].size
@@ -1000,14 +1008,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             if !checkFreePlace() {
                 showGameFinished(status: .NoMoreSteps)
             } else {
-                roundIndexes.append(activityItems.count - 1)
+//                roundIndexes.append(activityItems.count - 1)
                 realm.beginWrite()
                 let newRound = RoundDataModel()
-                newRound.index = activityItems.count - 1
+//                newRound.index = activityItems.count - 1
                 newRound.gameArray = wtGameboard!.gameArrayToString()
                 GV.playingRecord.rounds.append(newRound)
                 myTimer!.increaseMaxTime(value: iHalfHour)
-                WTGameWordList.shared.clearWordsInGame(changeGameArray: false)
+//                WTGameWordList.shared.clearWordsInGame(changeGameArray: false)
+                activityRoundItem.append(ActivityRound())
+                activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
                 try! realm.commitWrite()
                 modifyHeader()
             }
@@ -1042,7 +1052,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             let word = wtGameboard!.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
             if word != nil {
                 let activityItem = ActivityItem(type: .Choosing, choosedWord: word!)
-                activityItems.append(activityItem)
+                activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
+//                activityItems.append(activityItem)
                 saveActualState()
             }
         } else if moved {
@@ -1051,7 +1062,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 ws[movedIndex].zPosition = 1
                 ws[movedIndex].setPieceFromPosition(index: movedIndex)
                 let activityItem = ActivityItem(type: .FromBottom, fromBottomIndex: ws[movedIndex].getArrayIndex())
-                activityItems.append(activityItem)
+                if activityRoundItem.last!.activityItems.count == 0 {
+                    activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
+                }
+                activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
+//                activityItems.append(activityItem)
                 undoSprite.alpha = 1.0
                 let fixedName = "Pos\(movedIndex)"
                 removeNodesWith(name: fixedName)
@@ -1102,7 +1117,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             GV.playingRecord.gameStatus = GV.GameStatusFinished
             GV.playingRecord.nowPlaying = false
             GV.playingRecord.pieces = ""
-            GV.playingRecord.activityItems = ""
+//            GV.playingRecord.activityItems = ""
             GV.playingRecord.time = "0"
             GV.playingRecord.rounds.removeAll()
             try! realm.commitWrite()
@@ -1140,7 +1155,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 GV.playingRecord.rounds.append(rounds)
             }
             rounds = GV.playingRecord.rounds.last!
-            rounds.index = roundIndexes.last!
+//            rounds.index = roundIndexes.last!
 //            rounds.infos = wtGameboard!.roundInfosToString(all:false)
             rounds.infos = WTGameWordList.shared.toStringLastRound()
             rounds.gameArray  = wtGameboard!.gameArrayToString()
@@ -1148,11 +1163,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             
             
             var activityItemsString = ""
-            if activityItems.count > 0 {
-                for index in 0..<activityItems.count {
-                    let actItem = activityItems[index]
+            let actCount = activityRoundItem[activityRoundItem.count - 1].activityItems.count
+            if actCount > 0 {
+                for index in 0..<actCount {
+                    let actItem = activityRoundItem[activityRoundItem.count - 1].activityItems[index]
                     activityItemsString += actItem.type.description + itemInnerSeparator
-                    switch activityItems[index].type  {
+                    switch actItem.type  {
                     case .FromBottom:
                         activityItemsString += String(actItem.fromBottomIndex)
                     case .Moving:
@@ -1163,7 +1179,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     activityItemsString += itemSeparator
                 }
                 activityItemsString.removeLast()
-                GV.playingRecord.activityItems = activityItemsString
+                rounds.activityItems = activityItemsString
             }
         }
     }
@@ -1198,59 +1214,60 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             ws[to].setPieceFromPosition(index: to)
             origSize[to] = ws[to].size
         }
-        if activityItems.count > 0 {
-            switch activityItems.last!.type {
-            case .FromBottom:
-                if GV.playingRecord.rounds.count > 1 && GV.playingRecord.rounds.last!.index == activityItems.count - 1 {
-                    realm.beginWrite()
+        if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
+            try! realm.write() {
+                if activityRoundItem.count > 0 {
                     GV.playingRecord.rounds.removeLast()
-                    try! realm.commitWrite()
                     myTimer!.decreaseMaxTime(value: iHalfHour)
                     wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
-                    WTGameWordList.shared.getPreviousRound()
+//                    WTGameWordList.shared.getPreviousRound()
+                    activityRoundItem.removeLast()
                     modifyHeader()
                 } else {
-                    let indexOfLastPiece = activityItems.last!.fromBottomIndex
-                    let tileForGame = tilesForGame[indexOfLastPiece]
-                    if tileForGame.isOnGameboard {
-                        wtGameboard!.removeFromGameboard(sprite: tileForGame)
-                        tileForGame.resetGameArrayPositions()
-                        indexOfTilesForGame -= 1
-                        switch tileForGame.pieceFromPosition {
-                        case 0:
-                            movePieceToPosition(from: ws[1], to: 2, remove: true)
-                            movePieceToPosition(from: ws[0], to: 1)
-                            movePieceToPosition(from: tileForGame, to: 0)
-                            tileForGame.alpha = 1.0
-                            self.addChild(ws[0])
-                        case 1:
-                            movePieceToPosition(from: ws[1], to: 2, remove: true)
-                            movePieceToPosition(from: tileForGame, to: 1)
-                            tileForGame.alpha = 1.0
-                            self.addChild(ws[1])
-                        case 2:
-                            movePieceToPosition(from: tileForGame, to: 2, remove: true)
-                            tileForGame.alpha = 1.0
-                            self.addChild(ws[2])
-                        default: break
-                        }
-                    }
-//                    wtGameboard!.checkWholeWords()
-                    activityItems.removeLast()
-                    if activityItems.count == 0 {
-                        undoSprite.alpha = 0.1
+                    undoSprite.alpha = 0.1
+                }
+            }
+
+        } else if activityRoundItem[activityRoundItem.count - 1].activityItems.count > 0 {
+            switch activityRoundItem[activityRoundItem.count - 1].activityItems.last!.type {
+            case .FromBottom:
+                let indexOfLastPiece = activityRoundItem[activityRoundItem.count - 1].activityItems.last!.fromBottomIndex
+                let tileForGame = tilesForGame[indexOfLastPiece]
+                if tileForGame.isOnGameboard {
+                    wtGameboard!.removeFromGameboard(sprite: tileForGame)
+                    tileForGame.resetGameArrayPositions()
+                    indexOfTilesForGame -= 1
+                    switch tileForGame.pieceFromPosition {
+                    case 0:
+                        movePieceToPosition(from: ws[1], to: 2, remove: true)
+                        movePieceToPosition(from: ws[0], to: 1)
+                        movePieceToPosition(from: tileForGame, to: 0)
+                        tileForGame.alpha = 1.0
+                        self.addChild(ws[0])
+                    case 1:
+                        movePieceToPosition(from: ws[1], to: 2, remove: true)
+                        movePieceToPosition(from: tileForGame, to: 1)
+                        tileForGame.alpha = 1.0
+                        self.addChild(ws[1])
+                    case 2:
+                        movePieceToPosition(from: tileForGame, to: 2, remove: true)
+                        tileForGame.alpha = 1.0
+                        self.addChild(ws[2])
+                    default: break
                     }
                 }
+//                    wtGameboard!.checkWholeWords()
+                activityRoundItem[activityRoundItem.count - 1].activityItems.removeLast()
             case .Moving:
 //                var multiplier = 1
-                let item = activityItems.last!
+                let item = activityRoundItem[activityRoundItem.count - 1].activityItems.last!
 //                print(item.toString())
                 wtGameboard!.moveItemToOrigPlace(movedItem: item.movingItem)
-                activityItems.removeLast()
+                activityRoundItem[activityRoundItem.count - 1].activityItems.removeLast()
 //                wtGameboard!.checkWholeWords()
                 modifyHeader()
             case .Choosing:
-                let actItem = activityItems.last!
+                let actItem = activityRoundItem[activityRoundItem.count - 1].activityItems.last!
                 let selectedWord = SelectedWord(word: actItem.choosedWord.word, usedLetters: actItem.choosedWord.usedLetters)
                 WTGameWordList.shared.removeLastWord(selectedWord: selectedWord)
 //                if let index = GV.allWords.index(where: {$0.word == actItem.choosedWord.word}) {
@@ -1263,7 +1280,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 lengthOfWord = lengthOfWord > 10 ? 11 : lengthOfWord
 //                myTimer!.decreaseMaxTime(value: timeIncreaseValues![lengthOfWord])
 //                wtGameboard!.checkWholeWords()
-                activityItems.removeLast()
+                activityRoundItem[activityRoundItem.count - 1].activityItems.removeLast()
 //                showLastOwnWords()
                 modifyHeader()
             }
@@ -1277,28 +1294,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             origSize[pieceIndex] = piece.size
             ws[pieceIndex].name = "Pos\(pieceIndex )"
             self.addChild(ws[pieceIndex])
-
         }
-        let activityItemsArray = GV.playingRecord.activityItems.components(separatedBy: itemSeparator)
-//        if activityItemsArray.count > 1 {
-//            if activityItemsArray[0] == "" {
-//                activityItemsArray.removeFirst()
-//            }
-//        }
-        if activityItemsArray.count < 1 {
-            roundIndexes = [0]
-        } else {
-            activityItems.removeAll()
+        activityRoundItem = [ActivityRound]()
+        for round in GV.playingRecord.rounds {
+            activityRoundItem.append(ActivityRound())
+            activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
+            let activityItemsArray = round.activityItems.components(separatedBy: itemSeparator)
             for activityItem in activityItemsArray {
                 if activityItem != "" {
                     let itemValue = ActivityItem(fromString: activityItem)
-                    activityItems.append(itemValue)
+                    activityRoundItem[activityRoundItem.count - 1].activityItems.append(itemValue)
                 }
-            }
-            roundIndexes.removeAll()
-            let rounds = GV.playingRecord.rounds
-            for round in rounds {
-                roundIndexes.append(round.index)
             }
         }
         if GV.playingRecord.rounds.count > 0 {
@@ -1330,7 +1336,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 
             }
         }
-        if activityItems.count > 0 {
+        if activityRoundItem[0].activityItems.count > 0 {
             undoSprite.alpha = 1.0
         }
         if let iTime = Int(GV.playingRecord.time) {
@@ -1447,25 +1453,25 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         return generatedArrayInStringForm
     }
     
-    func fillGameArrayFromActivityItems() {
-        for (index, item) in activityItems.enumerated() {
-            switch item.type {
-            case .FromBottom:
-                if roundIndexes.contains(index) {
-//                    wtGameboard!.checkWholeWords()
-                    wtGameboard!.clearGreenFieldsForNextRound()
-                }
-                let tileForGame = tilesForGame[item.fromBottomIndex]
-                wtGameboard!.showPieceOnGameArray(piece: tileForGame)
-            case .Moving:
-                break
-            case .Choosing:
-                break
-            }
-        }
-
-    }
-    
+//    func fillGameArrayFromActivityItems() {
+//        for (index, item) in activityItems.enumerated() {
+//            switch item.type {
+//            case .FromBottom:
+//                if roundIndexes.contains(index) {
+////                    wtGameboard!.checkWholeWords()
+//                    wtGameboard!.clearGreenFieldsForNextRound()
+//                }
+//                let tileForGame = tilesForGame[item.fromBottomIndex]
+//                wtGameboard!.showPieceOnGameArray(piece: tileForGame)
+//            case .Moving:
+//                break
+//            case .Choosing:
+//                break
+//            }
+//        }
+//
+//    }
+//
     private func createButton(withText: String, position: CGPoint, name: String)->SKSpriteNode {
         func createLabel(withText: String, position: CGPoint, fontSize: CGFloat, name: String)->SKLabelNode {
             let label = SKLabelNode()

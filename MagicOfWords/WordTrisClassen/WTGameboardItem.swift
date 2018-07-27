@@ -138,6 +138,12 @@ class WTGameboardItem: SKSpriteNode {
 //            status = .used
         }
     }
+    
+    public func correctStatusIfNeeded() {
+        if status == .wholeWord && letter == emptyLetter {
+            status = .empty
+        }
+    }
     public func remove() {
 //        self.status = .empty
         label.text = emptyLetter

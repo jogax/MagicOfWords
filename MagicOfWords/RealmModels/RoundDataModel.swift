@@ -11,7 +11,8 @@ import RealmSwift
 
 class RoundDataModel: Object {
     
-    @objc dynamic var index = 0
+//    @objc dynamic var index = 0
     @objc dynamic var infos = ""
+    @objc dynamic var activityItems = ""
     @objc dynamic var gameArray = ""
 }

@@ -501,6 +501,7 @@ class WTGameboard: SKShapeNode {
     
     public func moveChooseOwnWord(col: Int, row: Int) {
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
+        GV.gameArray[col][row].correctStatusIfNeeded()
         let status = GV.gameArray[col][row].status
         // when in the same recteck
         if choosedWord.usedLetters.last! == actLetter {
