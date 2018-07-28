@@ -279,6 +279,10 @@ public class WTGameWordList {
         }
     }
     
+    public func addNewRound() {
+        wordsInRound.append(WordInRound())
+    }
+    
     public func removeLastWord(selectedWord: SelectedWord) {
         let wordsInGame = wordsInRound.last!.wordsInGame
         if wordsInGame.count > 0 {

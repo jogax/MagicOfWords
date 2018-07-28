@@ -1015,7 +1015,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 newRound.gameArray = wtGameboard!.gameArrayToString()
                 GV.playingRecord.rounds.append(newRound)
                 myTimer!.increaseMaxTime(value: iHalfHour)
-//                WTGameWordList.shared.clearWordsInGame(changeGameArray: false)
+                WTGameWordList.shared.addNewRound()
                 activityRoundItem.append(ActivityRound())
                 activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
                 try! realm.commitWrite()
