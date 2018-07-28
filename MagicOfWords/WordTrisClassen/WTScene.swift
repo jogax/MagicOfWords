@@ -96,7 +96,41 @@ struct ActivityItem {
 let trueString = "1"
 let falseString = "0"
 
-class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordListDelegate {
+class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordListDelegate, WTTableViewDelegate {
+    func geTitleForHeaderInSection(section: Int) -> String? {
+        switch section {
+        case 0:
+            return "Mandatory Words"
+        case 1:
+            return "Own Words"
+        default:
+            return ""
+        }
+    }
+    
+    func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
+        let cell:UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
+        switch indexPath.section {
+        case 0:
+            cell.textLabel?.text = mandatoryWordsForShow![indexPath.row]
+        case 1:
+            cell.textLabel?.text = ownWordsForShow![indexPath.row]
+        default: break
+        }
+        return cell
+    }
+    
+    func getNumberOfSections() -> Int {
+        return 2
+    }
+    func getNumberOfRowsInSections(section: Int)->Int {
+        switch section {
+        case 0: return WTGameWordList.shared.getCountWords(mandatory: true)
+        case 1: return WTGameWordList.shared.getCountWords(mandatory: false)
+        default: return 0
+        }
+    }
+    
     let nameForSpriteWidthWords = "°°°nameForSpriteWidthWords°°°"
     var spriteToShowWords: SKSpriteNode?
     func startShowingWordsOverPosition(wordList: [SelectedWord]) {
@@ -201,8 +235,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         var shapeIndex = NoValue
         var answer1 = false
         var answer2 = false
-        var ownWordsBackground = false
+//        var ownWordsBackground = false
         var gameFinishedOKButton = false
+        var showOwnWordsButton = false
     }
     
     let iHour = 3600
@@ -289,7 +324,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     let gameNumberName = "°°°gameNumber°°°"
     let previousName = "°°°previousGame°°°"
     let nextName = "°°°nextGame°°°"
-    let ownWordsBackgroundName = "°°°ownWordsBackgroundName°°°"
+//    let ownWordsBackgroundName = "°°°ownWordsBackgroundName°°°"
+    let ownWordsButtonName = "°°°ownWordsButtonName°°°"
+
     var timeIncreaseValues: [Int]?
 //    var wtGameWordList: WTGameWordList?
 
@@ -521,32 +558,32 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         
    }
     
-    private func createBackgroundForOwnWords() {
-        let ownYPositionMultiplier:CGFloat = 0.80
-        firstLineYPosition = self.frame.height * (ownYPositionMultiplier)
-        heightOfLine = self.size.height * 0.02
-        let minY: CGFloat? = wtGameboard!.children[0].frame.maxY
-        let maxY: CGFloat? = self.childNode(withName: ownWordsHeaderName)!.frame.maxY
-        var yPos: CGFloat = 0
-        var height: CGFloat = 0
-        if minY != nil && maxY != nil {
-            height = (maxY! - minY!) * 1.1
-            yPos = minY! + (maxY! - minY!) * 0.38
-            countShowingOwnWords = countWordsInRow * (Int(height / (self.size.height * 0.02)) - 1)
-            countShowingRows = countShowingOwnWords / countWordsInRow
-        }
-
-        if self.childNode(withName: ownWordsBackgroundName) == nil {
-            let texture = SKTexture(imageNamed: "menuBackground.png")
-            let ownWordsBackgroundSprite = SKSpriteNode(texture: texture, color: .red, size: CGSize(width: self.size.width, height: height))
-            ownWordsBackgroundSprite.position = CGPoint(x: self.size.width * 0.52, y: yPos)
-            ownWordsBackgroundSprite.alpha = 0.3
-            ownWordsBackgroundSprite.name = ownWordsBackgroundName
-            ownWordsBackgroundSprite.alpha = 0.01
-            ownWordsBackgroundSprite.isHidden = false
-            self.addChild(ownWordsBackgroundSprite)
-        }
-    }
+//    private func createBackgroundForOwnWords() {
+//        let ownYPositionMultiplier:CGFloat = 0.80
+//        firstLineYPosition = self.frame.height * (ownYPositionMultiplier)
+//        heightOfLine = self.size.height * 0.02
+//        let minY: CGFloat? = wtGameboard!.children[0].frame.maxY
+//        let maxY: CGFloat? = self.childNode(withName: ownWordsButtonName)!.frame.maxY
+//        var yPos: CGFloat = 0
+//        var height: CGFloat = 0
+//        if minY != nil && maxY != nil {
+//            height = (maxY! - minY!) * 1.1
+//            yPos = minY! + (maxY! - minY!) * 0.38
+//            countShowingOwnWords = countWordsInRow * (Int(height / (self.size.height * 0.02)) - 1)
+//            countShowingRows = countShowingOwnWords / countWordsInRow
+//        }
+//
+//        if self.childNode(withName: ownWordsBackgroundName) == nil {
+//            let texture = SKTexture(imageNamed: "menuBackground.png")
+//            let ownWordsBackgroundSprite = SKSpriteNode(texture: texture, color: .red, size: CGSize(width: self.size.width, height: height))
+//            ownWordsBackgroundSprite.position = CGPoint(x: self.size.width * 0.52, y: yPos)
+//            ownWordsBackgroundSprite.alpha = 0.3
+//            ownWordsBackgroundSprite.name = ownWordsBackgroundName
+//            ownWordsBackgroundSprite.alpha = 0.01
+//            ownWordsBackgroundSprite.isHidden = false
+//            self.addChild(ownWordsBackgroundSprite)
+//        }
+//    }
     
     override func update(_ currentTime: TimeInterval) {
         if checkIfGameFinished() {
@@ -600,9 +637,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 String(WTGameWordList.shared.getCountFoundedWords(mandatory: true, countAll: true)),
                 String(WTGameWordList.shared.getScore(mandatory: true)))
         }
-        if let label = self.childNode(withName: ownWordsHeaderName)! as? SKLabelNode {
-            label.text = GV.language.getText(.tcOwnWords, values: String(WTGameWordList.shared.getCountWords(mandatory: false)), String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
-                String(WTGameWordList.shared.getScore(mandatory: false)))
+        if let button = self.childNode(withName: ownWordsButtonName)! as? SKSpriteNode {
+            if let label = button.childNode(withName: ownWordsButtonName + "Label")! as? SKLabelNode {
+                let myText = GV.language.getText(.tcOwnWords, values:
+                    String(WTGameWordList.shared.getCountWords(mandatory: false)),
+                     String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
+                     String(WTGameWordList.shared.getScore(mandatory: false)))
+                button.size = CGSize(width: self.frame.width * 0.023 * CGFloat(myText.length), height: self.frame.height * 0.05)
+                label.text = GV.language.getText(.tcOwnWords, values: String(WTGameWordList.shared.getCountWords(mandatory: false)), String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
+                    String(WTGameWordList.shared.getScore(mandatory: false)))
+            }
         }
         modifyHeader()
 
@@ -672,7 +716,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             counter += 1
         }
         createLabel(word: GV.language.getText(.tcWordsToCollect, values: String(WTGameWordList.shared.getCountWords(mandatory: true)), "0","0", "0"), first: true, name: mandatoryWordsHeaderName)
-        createLabel(word: GV.language.getText(.tcOwnWords, values: "0", "0", "0"), first: false, name: ownWordsHeaderName)
+        let buttonPosition = CGPoint(x: self.frame.width * 0.5, y: self.frame.height * 0.8)
+        let ownWordsButton = createButton(withText: GV.language.getText(.tcOwnWords, values: "0", "0", "0"), position: buttonPosition, name: ownWordsButtonName)
+        addChild(ownWordsButton)
+//        createLabel(word: GV.language.getText(.tcOwnWords, values: "0", "0", "0"), first: false, name: ownWordsHeaderName)
     }
     
     private func createWordLabel(wordToShow: WordWithCounter, counter: Int) {
@@ -752,7 +799,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         myTimer = MyTimer(maxTime: iHour)
         addChild(myTimer!)
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
-        createBackgroundForOwnWords()
+//        createBackgroundForOwnWords()
         generateArrayOfWordPieces(new: new)
         indexOfTilesForGame = 0
         ws = Array(repeating: WTPiece(), count: 3)
@@ -873,6 +920,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         if touchedNodes.gameFinishedOKButton {
             wtGameFinishedSprite.OKButtonPressed()
         }
+        if touchedNodes.showOwnWordsButton {
+            showOwnWordsInTableView()
+        }
         if touchedNodes.shapeIndex > NoValue {
             startShapeIndex = touchedNodes.shapeIndex
             ws[touchedNodes.shapeIndex].zPosition = 10
@@ -880,9 +930,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         } else if touchedNodes.GCol.between(min: 0, max: sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: sizeOfGrid - 1){
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
-        } else if touchedNodes.ownWordsBackground {
-            ownWordsScrolling = true
-            ownWordsScrollingStartPos = firstTouchLocation
+//        } else if touchedNodes.ownWordsBackground {
+//            ownWordsScrolling = true
+//            ownWordsScrollingStartPos = firstTouchLocation
         }
 
     }
@@ -961,6 +1011,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     touchedNodes.undo = enabled
                 } else if name == GameFinishedOKName {
                     touchedNodes.gameFinishedOKButton = true
+                } else if name == ownWordsButtonName {
+                    touchedNodes.showOwnWordsButton = true
                 } else if name.begins(with: "GBD") {
                     touchedNodes.GCol = Int(name.subString(startPos: 4, length:1))!
                     touchedNodes.GRow = Int(name.subString(startPos: 6, length:1))!
@@ -982,8 +1034,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                touchedNodes.answer1 = true
             } else if name == answer2Name {
                 touchedNodes.answer2 = true
-            } else if name == ownWordsBackgroundName {
-                touchedNodes.ownWordsBackground = true
+//            } else if name == ownWordsBackgroundName {
+//                touchedNodes.ownWordsBackground = true
             }
         }
         return touchedNodes
@@ -1472,7 +1524,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //
 //    }
 //
-    private func createButton(withText: String, position: CGPoint, name: String)->SKSpriteNode {
+    private func createButton(withText: String, position: CGPoint, name: String, buttonSize: CGSize? = nil)->SKSpriteNode {
         func createLabel(withText: String, position: CGPoint, fontSize: CGFloat, name: String)->SKLabelNode {
             let label = SKLabelNode()
             label.fontName = "TimesNewRoman"
@@ -1480,16 +1532,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //            label.numberOfLines = 0
             label.verticalAlignmentMode = .center
             label.horizontalAlignmentMode = .center
-            label.fontSize = self.size.width * 0.03
+            label.fontSize = self.size.width * 0.04
             label.zPosition = self.zPosition + 1
             label.text = withText
             label.name = name
             label.position = position
             return label
         }
-
+        let mySize = CGSize(width: buttonSize == nil ? self.size.width * 0.4 : buttonSize!.width,
+                            height: buttonSize == nil ? self.size.height * 0.1 : buttonSize!.height)
         let texture = SKTexture(imageNamed: "button.png")
-        let button = SKSpriteNode(texture: texture, color: .white, size: CGSize(width: self.size.width * 0.4, height: self.size.height * 0.1))
+        let button = SKSpriteNode(texture: texture, color: .white, size: mySize)
         button.position = position
         button.name = name
         button.addChild(createLabel(withText: withText, position: CGPoint(x:0, y:10), fontSize: self.size.width * 0.03, name: name + "Label"))
@@ -1505,6 +1558,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             }
         }
     }
+    
+    var showOwnWordsView = WTTableView()
+    var mandatoryWordsForShow: [String]?
+    var ownWordsForShow: [String]?
+    private func showOwnWordsInTableView() {
+        mandatoryWordsForShow = WTGameWordList.shared.getWordsForShow(mandatory: true)
+        ownWordsForShow = WTGameWordList.shared.getWordsForShow(mandatory: false)
+        showOwnWordsView.setDelegate(delegate: self)
+        showOwnWordsView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        showOwnWordsView.frame=CGRect(x:self.frame.width * 0.5 - 140,y:50,width:280,height:600)
+        self.scene?.view?.addSubview(showOwnWordsView)
+        showOwnWordsView.reloadData()
+    }
+    
+
     
 
     

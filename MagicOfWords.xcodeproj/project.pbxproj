@@ -65,7 +65,7 @@
 		20B28AE020330C64001682B2 /* deWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20B28ADF20330C64001682B2 /* deWords.txt */; };
 		20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE120330E73001682B2 /* BasicDataModel.swift */; };
 		20B28AE4203331B4001682B2 /* GameTypeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE3203331B4001682B2 /* GameTypeModel.swift */; };
-		20B28AE620333273001682B2 /* WTShowGameList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTShowGameList.swift */; };
+		20B28AE620333273001682B2 /* WTTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTTableView.swift */; };
 		20DA3BF220FE1DFC00EA2D55 /* StateOfWordChanging.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
@@ -146,7 +146,7 @@
 		20B28ADF20330C64001682B2 /* deWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deWords.txt; sourceTree = "<group>"; };
 		20B28AE120330E73001682B2 /* BasicDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicDataModel.swift; sourceTree = "<group>"; };
 		20B28AE3203331B4001682B2 /* GameTypeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTypeModel.swift; sourceTree = "<group>"; };
-		20B28AE520333273001682B2 /* WTShowGameList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTShowGameList.swift; sourceTree = "<group>"; };
+		20B28AE520333273001682B2 /* WTTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTTableView.swift; sourceTree = "<group>"; };
 		20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateOfWordChanging.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -295,7 +295,7 @@
 			isa = PBXGroup;
 			children = (
 				2060036F20348A8800023E10 /* Grid.swift */,
-				20B28AE520333273001682B2 /* WTShowGameList.swift */,
+				20B28AE520333273001682B2 /* WTTableView.swift */,
 				204A8AD92029EE6000E9C11F /* WTScene.swift */,
 				204AEB38205D1F47004D2ECD /* WTGameFinished.swift */,
 				20A6913F20309B9F00AB47C0 /* WTPiece.swift */,
@@ -447,7 +447,7 @@
 				204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */,
 				20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */,
 				20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */,
-				20B28AE620333273001682B2 /* WTShowGameList.swift in Sources */,
+				20B28AE620333273001682B2 /* WTTableView.swift in Sources */,
 				2060037020348A8800023E10 /* Grid.swift in Sources */,
 				20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */,
 				205E601A20C02BB800A5AB39 /* WordDBGenerator.swift in Sources */,

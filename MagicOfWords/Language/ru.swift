@@ -32,7 +32,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcHeader:             "Игра: %, Круг: %, Очки: %",
     .tcTime:               "Время: %",
     .tcWordsToCollect:    "Слова для сбора: (% / % / % / %)",
-    .tcOwnWords:          "Мои слова (% / % / %)",
+    .tcOwnWords:          "Покажи мои слова (% / % / %)",
     .tcNoMoreSteps:       "Поздравляю, ты закончил игру!",
     .tcScore:             "Очки:",
     .tcBest:              "Лучшие очки:",

@@ -32,7 +32,7 @@ let huDictionary: [TextConstants: String] = [
     .tcHeader:             "Játék: %, Kör: %, Pontszám: %",
     .tcTime:               "Idő: %",
     .tcWordsToCollect:    "Kirakandó szavak: (% / % / % / %)",
-    .tcOwnWords:          "Saját szavak (% / % / %)",
+    .tcOwnWords:          "Mutasd a saját szavaimat (% / % / %)",
     .tcNoMoreSteps:       "Gratulálok, befejezted a játékot!",
     .tcScore:             "Pontszám:",
     .tcBest:              "Legjobb:",

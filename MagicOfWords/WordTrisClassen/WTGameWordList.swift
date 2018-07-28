@@ -283,6 +283,10 @@ public class WTGameWordList {
         wordsInRound.append(WordInRound())
     }
     
+    public func getAllWords()->[WordWithCounter] {
+        return allWords
+    }
+    
     public func removeLastWord(selectedWord: SelectedWord) {
         let wordsInGame = wordsInRound.last!.wordsInGame
         if wordsInGame.count > 0 {
@@ -420,6 +424,17 @@ public class WTGameWordList {
         }
         showedWords = [SelectedWord]()
         delegate!.stopShowingWordsOverPosition()
+    }
+    public func getWordsForShow(mandatory: Bool)->[String] {
+        var returnWords = [String]()
+        for foundedWord in allWords {
+            if foundedWord.mandatory == mandatory {
+                let score = foundedWord.score
+                let myString = foundedWord.word + "/" + String(foundedWord.counter) + "/" + String(score)
+                returnWords.append(myString)
+            }
+        }
+        return returnWords
     }
     
 }
