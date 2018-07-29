@@ -533,9 +533,9 @@ class WTGameboard: SKShapeNode {
 //                    gameArray![col][row].changeColor(toColor: .myBlueColor)
                 }
             }
-            else {
-                print("and hier? ActLetter: \(actLetter), status: \(status), noMoreMove: \(noMoreMove) ")
-            }
+//            else {
+//                print("and hier? ActLetter: \(actLetter), status: \(status), noMoreMove: \(noMoreMove) ")
+//            }
         }
 
         var onlyUsedLetters = true

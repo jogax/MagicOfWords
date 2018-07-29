@@ -95,14 +95,19 @@ struct ActivityItem {
 
 let trueString = "1"
 let falseString = "0"
+let iHour = 3600
+let iHalfHour = 1800
+let iQuarterHour = 900
+let iTenMinutes = 600
+let iFiveMinutes = 300
+
+
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordListDelegate, WTTableViewDelegate {
     func geTitleForHeaderInSection(section: Int) -> String? {
         switch section {
         case 0:
-            return "Mandatory Words"
-        case 1:
-            return "Own Words"
+            return GV.language.getText(.tcCollectedOwnWords)
         default:
             return ""
         }
@@ -110,23 +115,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let cell:UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
+        cell.textLabel!.font = UIFont(name: "CourierNewPS-BoldMT", size: self.frame.width * 0.015)
         switch indexPath.section {
         case 0:
-            cell.textLabel?.text = mandatoryWordsForShow![indexPath.row]
-        case 1:
-            cell.textLabel?.text = ownWordsForShow![indexPath.row]
+            cell.textLabel!.text = ownWordsForShow![indexPath.row]
         default: break
         }
         return cell
     }
     
     func getNumberOfSections() -> Int {
-        return 2
+        return 1
     }
     func getNumberOfRowsInSections(section: Int)->Int {
         switch section {
-        case 0: return WTGameWordList.shared.getCountWords(mandatory: true)
-        case 1: return WTGameWordList.shared.getCountWords(mandatory: false)
+         case 0: return WTGameWordList.shared.getCountWords(mandatory: false)
         default: return 0
         }
     }
@@ -153,7 +156,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         spriteToShowWords!.zPosition = self.zPosition + 100
         self.addChild(spriteToShowWords!)
         for (index, selectedWord) in wordList.enumerated(){
-            let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+            let label = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")
             label.fontColor = .black
             label.position = CGPoint(x: 0, y: spriteToShowWords!.size.height - sizeOfLines * 0.63 - CGFloat(index + 1) * sizeOfLine * 0.7)
             label.verticalAlignmentMode = .center
@@ -178,10 +181,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             showWordAndScore(word: newWord, score: newScore)
         }
         if changeTime > 0 {
-            myTimer!.increaseMaxTime(value: changeTime * 60)
+            timeForGame.incrementMaxTime(value: changeTime * 60)
         }
         if changeTime < 0 {
-            myTimer!.decreaseMaxTime(value: -changeTime * 60)
+            timeForGame.decrementMaxTime(value: -changeTime * 60)
         }
        self.totalScore = totalScore
         showFoundedWords()
@@ -240,12 +243,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         var showOwnWordsButton = false
     }
     
-    let iHour = 3600
-    let iHalfHour = 1800
-    let iQuarterHour = 900
-    let iTenMinutes = 600
-    let iFiveMinutes = 300 
-    
     var wtSceneDelegate: WTSceneDelegate?
     var wtGameboard: WTGameboard?
 //    var wordsToPlay = Array<GameDataModel>()
@@ -259,7 +256,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //    var mandatoryWords = [String]()
     var grid: Grid?
     var myTimer: MyTimer?
-    var time: Int = 0
+    var timeForGame = TimeForGame()
+    var timerIsCounting = false
     let heightMultiplicator = CGFloat((GV.onIpad ? 0.10 : 0.15))
     var blockSize: CGFloat = 0
     var random: MyRandom?
@@ -333,7 +331,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     override func didMove(to view: SKView) {
 //        wtGameWordList = WTGameWordList(delegate: self)
-        timeIncreaseValues = [0, 0, 0, 0, 0, 0, iFiveMinutes, iFiveMinutes, iTenMinutes, iTenMinutes, iQuarterHour]
+//        timeIncreaseValues = [0, 0, 0, 0, 0, 0, iFiveMinutes, iFiveMinutes, iTenMinutes, iTenMinutes, iQuarterHour]
         self.name = "WTScene"
         self.view!.isMultipleTouchEnabled = false
         self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
@@ -370,7 +368,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        GV.playingRecord.ownWords = ""
         GV.playingRecord.pieces = ""
 //        GV.playingRecord.activityItems = ""
-        GV.playingRecord.time = "0"
+        GV.playingRecord.time = "0°origMaxTime"
         GV.playingRecord.rounds.removeAll()
         GV.playingRecord.gameStatus = GV.GameStatusNew
         try! realm.commitWrite()
@@ -511,7 +509,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             timeLabel.position = CGPoint(x: xPosition, y: YPosition)
             timeLabel.fontSize = self.frame.size.height * 0.0175
             timeLabel.fontColor = .black
-            timeLabel.text = GV.language.getText(.tcTime, values: time.HourMinSec)
+            timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.time.HourMinSec)
             timeLabel.horizontalAlignmentMode = .right
             timeLabel.name = timeName
             self.addChild(timeLabel)
@@ -788,15 +786,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     }
     
     private func play() {
+        timerIsCounting = true
         WTGameWordList.shared.setDelegate(delegate: self)
-        if let iTime = Int(GV.playingRecord.time) {
-            time = iTime
-        } else {
-            time = 0
-        }
+        timeForGame = TimeForGame(from: GV.playingRecord.time)
+//        if let iTime = Int(GV.playingRecord.time) {
+//            time = iTime
+//        } else {
+//            time = 0
+//        }
 //        GV.countMandatoryWords = 0
         createHeader()
-        myTimer = MyTimer(maxTime: iHour)
+        myTimer = MyTimer(time: timeForGame)
         addChild(myTimer!)
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
 //        createBackgroundForOwnWords()
@@ -853,15 +853,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let state = UIApplication.shared.applicationState
         if state == .background {
             print("App in Background")
-        } else if state == .active {
-            time += 1
+        } else if state == .active && timerIsCounting {
+            timeForGame.incrementTime()
         }
-        let remainingTime = myTimer!.maxTime - time
-        timeLabel.text = GV.language.getText(.tcTime, values: remainingTime.HourMinSec)
+        timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.remainingTime.HourMinSec)
         realm.beginWrite()
-        GV.playingRecord.time = String(time)
+        GV.playingRecord.time = timeForGame.toString()
         try! realm.commitWrite()
-        if myTimer!.update(time: time) {
+        if myTimer!.update(time: timeForGame) {
             timer!.invalidate()
             timer = nil
             showGameFinished(status: .TimeOut)
@@ -914,14 +913,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         firstTouchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: firstTouchLocation)
         let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .start)
+        if showingWordsInTable && !touchedNodes.showOwnWordsButton {
+            showingWordsInTable = false
+            showOwnWordsView.removeFromSuperview()
+            timerIsCounting = true
+        }
         if touchedNodes.undo {
             undoTouched = true
         }
         if touchedNodes.gameFinishedOKButton {
             wtGameFinishedSprite.OKButtonPressed()
-        }
-        if touchedNodes.showOwnWordsButton {
-            showOwnWordsInTableView()
         }
         if touchedNodes.shapeIndex > NoValue {
             startShapeIndex = touchedNodes.shapeIndex
@@ -1050,6 +1051,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let nodes = self.nodes(at: touchLocation)
         let lastPosition = ws.count - 1
         let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .stop)
+        if touchedNodes.showOwnWordsButton {
+            showOwnWordsInTableView()
+            showingWordsInTable = true
+        }
         if touchedNodes.answer1 {
             gameboardEnabled = true
             removeNodesWith(name: MyQuestionName)
@@ -1066,7 +1071,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //                newRound.index = activityItems.count - 1
                 newRound.gameArray = wtGameboard!.gameArrayToString()
                 GV.playingRecord.rounds.append(newRound)
-                myTimer!.increaseMaxTime(value: iHalfHour)
+                timeForGame.incrementMaxTime(value: iHalfHour)
                 WTGameWordList.shared.addNewRound()
                 activityRoundItem.append(ActivityRound())
                 activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
@@ -1270,7 +1275,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             try! realm.write() {
                 if activityRoundItem.count > 0 {
                     GV.playingRecord.rounds.removeLast()
-                    myTimer!.decreaseMaxTime(value: iHalfHour)
+                    timeForGame.decrementMaxTime(value: iHalfHour)
                     wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
 //                    WTGameWordList.shared.getPreviousRound()
                     activityRoundItem.removeLast()
@@ -1391,11 +1396,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         if activityRoundItem[0].activityItems.count > 0 {
             undoSprite.alpha = 1.0
         }
-        if let iTime = Int(GV.playingRecord.time) {
-            time = iTime
-        } else {
-            time = 0
-        }
+        timeForGame = TimeForGame(from: GV.playingRecord.time)
 //        wtGameboard!.checkWholeWords()
     }
     
@@ -1560,10 +1561,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     }
     
     var showOwnWordsView = WTTableView()
-    var mandatoryWordsForShow: [String]?
     var ownWordsForShow: [String]?
+    var showingWordsInTable = false
     private func showOwnWordsInTableView() {
-        mandatoryWordsForShow = WTGameWordList.shared.getWordsForShow(mandatory: true)
+        timerIsCounting = false
         ownWordsForShow = WTGameWordList.shared.getWordsForShow(mandatory: false)
         showOwnWordsView.setDelegate(delegate: self)
         showOwnWordsView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")

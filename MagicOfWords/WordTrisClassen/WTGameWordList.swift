@@ -427,10 +427,19 @@ public class WTGameWordList {
     }
     public func getWordsForShow(mandatory: Bool)->[String] {
         var returnWords = [String]()
+        var maxLength = 0
         for foundedWord in allWords {
             if foundedWord.mandatory == mandatory {
+                if foundedWord.word.length > maxLength {
+                    maxLength = foundedWord.word.length
+                }
+            }
+        }
+        for foundedWord in allWords {
+            if foundedWord.mandatory == mandatory {
+                var myString = foundedWord.word.fixLength(length: maxLength, leadingBlanks: false)
                 let score = foundedWord.score
-                let myString = foundedWord.word + "/" + String(foundedWord.counter) + "/" + String(score)
+                myString += " | " + String(foundedWord.counter).fixLength(length: 4) + " | " + String(score).fixLength(length: 4)
                 returnWords.append(myString)
             }
         }

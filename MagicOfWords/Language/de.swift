@@ -37,7 +37,7 @@ let deDictionary: [TextConstants: String] = [
     .tcScore:             "Punkte:",
     .tcBest:              "Beste Erg.:",
     .tcCollectedRequiredWords: "Pflichtwörter:",
-    .tcCollectedOwnWords:      "Eigene Wörter:",
+    .tcCollectedOwnWords:      "Eigene Wörter",
     .tcTotal:               "Insgesamt:",
     .tcTaskNotCompletedWithNoMoreSteps: "Keine weiteren Schritte, Aufgabe nicht erledigt!",
     .tcTaskNotCompletedWithTimeOut: "Timeout, Aufgabe nicht erledigt!",

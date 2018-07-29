@@ -18,8 +18,8 @@ public protocol WTTableViewDelegate: class {
     func geTitleForHeaderInSection(section: Int)->String?
 }
 class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
-    var items: [String] = ["Player1", "Player2", "Player3"]
-    var words: [String] = ["Word1", "Word2", "Word3", "Word4", "Word5"]
+//    var items: [String] = ["Player1", "Player2", "Player3"]
+//    var words: [String] = ["Word1", "Word2", "Word3", "Word4", "Word5"]
     var myDelegate: WTTableViewDelegate?
     override init(frame: CGRect, style: UITableViewStyle) {
         super.init(frame: frame, style: style)

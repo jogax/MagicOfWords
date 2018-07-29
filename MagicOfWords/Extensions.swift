@@ -389,11 +389,11 @@ extension String {
         }
     }
 
-    func fixLength(length: Int)->String {
+    func fixLength(length: Int, leadingBlanks: Bool = true)->String {
         var returnValue: String = self
         if returnValue.count < length {
             repeat {
-                returnValue = " " + returnValue
+                returnValue = leadingBlanks ? " " + returnValue : returnValue + " "
             } while returnValue.count < length
         }
         return returnValue

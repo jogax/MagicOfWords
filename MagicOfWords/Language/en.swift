@@ -37,7 +37,7 @@ let enDictionary: [TextConstants: String] = [
     .tcScore:             "Score:",
     .tcBest:              "Bestscore:",
     .tcCollectedRequiredWords: "Mandatory words:",
-    .tcCollectedOwnWords:   "Own words:",
+    .tcCollectedOwnWords:   "Own words",
     .tcTotal:               "Total:",
     .tcTaskNotCompletedWithNoMoreSteps: "No more steps, task not completed!",
     .tcTaskNotCompletedWithTimeOut: "Timeout, task not completed!",

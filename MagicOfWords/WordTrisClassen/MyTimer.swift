@@ -11,14 +11,59 @@ import GameplayKit
 
 
 let myTimerName = "°°°MyTimerName°°°"
+
+class TimeForGame {
+    var time: Int
+    var maxTime: Int
+    var hourMinSec: String {
+        get {
+            return time.HourMinSec
+        }
+    }
+    var remainingTime: Int {
+        get {
+            return maxTime - time > 0 ? maxTime - time : 0
+        }
+    }
+    init() {
+        time = 0
+        maxTime = iHour
+    }
+    init(from: String) {
+        time = 0
+        maxTime = iHour
+        let components = from.components(separatedBy: itemSeparator)
+        if components.count == 2 {
+            if let myTime = Int(components[0]) {
+                time = myTime
+            }
+            if let myMaxTime = Int(components[1]) {
+                maxTime = myMaxTime
+            }
+        }
+    }
+    func toString()->String {
+        return String(time) + itemSeparator + String(maxTime)
+    }
+    func incrementTime() {
+        time += 1
+    }
+    func incrementMaxTime(value: Int) {
+        maxTime += value
+    }
+    func decrementMaxTime(value: Int) {
+        maxTime -= value
+    }
+}
+
 class MyTimer: SKSpriteNode {
     let screenHeight: CGFloat
     let screenWidth: CGFloat
     var timeBackgroundSprite: SKSpriteNode?
     var mySize: CGSize
-    var maxTime: Int
-    init(maxTime: Int) {
-        self.maxTime = maxTime
+    var myTime: TimeForGame
+    init(time: TimeForGame) {
+        self.myTime = time
         let bounds = UIScreen.main.bounds
         screenHeight = bounds.size.height
         screenWidth = bounds.size.width
@@ -39,9 +84,9 @@ class MyTimer: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func update(time: Int)->Bool {
+    public func update(time: TimeForGame)->Bool {
         var color: SKColor = .green
-        var heightMultiplier = CGFloat(maxTime - time) / CGFloat(maxTime)
+        var heightMultiplier = CGFloat(time.maxTime - time.time) / CGFloat(time.maxTime)
         heightMultiplier = heightMultiplier < 0 ? 0 : heightMultiplier
         switch Int(heightMultiplier * 100) {
         case 5...10: color = .yellow
@@ -54,19 +99,13 @@ class MyTimer: SKSpriteNode {
         
         timeBackgroundSprite!.color = color
             
-        if time >= maxTime {
+        if time.time >= time.maxTime {
             return true
         } else {
             return false
         }
     }
     
-    public func increaseMaxTime(value: Int) {
-        maxTime += value
-    }
-    public func decreaseMaxTime(value: Int) {
-        maxTime -= value
-    }
     private func createTimer() {
        if self.childNode(withName: myTimerName) == nil {
             let texture = SKTexture()

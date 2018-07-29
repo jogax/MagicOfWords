@@ -37,7 +37,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcScore:             "Очки:",
     .tcBest:              "Лучшие очки:",
     .tcCollectedRequiredWords: "Обязательные слова:",
-    .tcCollectedOwnWords:      "Собственные слова:",
+    .tcCollectedOwnWords:      "Собственные слова",
     .tcTotal:               "Всего:",
     .tcTaskNotCompletedWithNoMoreSteps: "Больше нет шагов, задача не выполнена!",
     .tcTaskNotCompletedWithTimeOut: "Время истекло, задача не выполнена!",
