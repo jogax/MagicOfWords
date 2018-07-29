@@ -106,7 +106,7 @@ public struct WordWithCounter {
 public protocol WTGameWordListDelegate: class {
     
     /// Method called when a new Word is saved
-    func showScore(newWord: String, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int)
+    func showScore(newWord: SelectedWord, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int)
     func startShowingWordsOverPosition(wordList: [SelectedWord])
     func stopShowingWordsOverPosition()
 }
@@ -265,7 +265,7 @@ public class WTGameWordList {
             addWordToAllWords(word: selectedWord.word)
             let newScore = getActualScore()
             let changeTime = minutesForWord[selectedWord.word.length]
-            delegate!.showScore(newWord: selectedWord.word, newScore: newScore - oldScore, totalScore: newScore, doAnimate: doAnimate, changeTime: changeTime!)
+            delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: doAnimate, changeTime: changeTime!)
         }
         return noCommonLetter
     }
@@ -305,7 +305,7 @@ public class WTGameWordList {
             }
             let newScore = getActualScore()
             let changeTime = -selectedWord.word.length > maxUsedLength ? minutesForWord[maxUsedLength] : minutesForWord[selectedWord.word.length]
-            delegate!.showScore(newWord: selectedWord.word, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: changeTime!)
+            delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: changeTime!)
         }
     }
     

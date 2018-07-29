@@ -176,7 +176,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         }
     }
 
-    func showScore(newWord: String, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int) {
+    func showScore(newWord: SelectedWord, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int) {
         if doAnimate {
             showWordAndScore(word: newWord, score: newScore)
         }
@@ -191,16 +191,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         return
     }
     
-    private func showWordAndScore(word: String, score: Int) {
+    private func showWordAndScore(word: SelectedWord, score: Int) {
         let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.04
-        let textOnBalloon = word + " (" + String(score) + ")"
+        let textOnBalloon = word.word + " (" + String(score) + ")"
+        
         let balloon = SKSpriteNode(imageNamed: "balloon.png")
         let widthMultiplier: CGFloat = 0.1 + CGFloat(textOnBalloon.length) * (GV.onIpad ? 0.015 : 0.030)
         balloon.size = CGSize(width: self.frame.size.width * widthMultiplier, height: self.frame.size.width * 0.10)
         balloon.zPosition = 100
-        let startPosY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
-        let endPosY = score > 0 ? self.frame.size.height * 0.98 : self.frame.size.height * -0.04
-        balloon.position = CGPoint(x: self.frame.size.width * 0.5, y: startPosY )
+//        let startPosY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
+        let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
+//        let startPosY = startPos.y
+        let endPosY = score > 0 ? self.frame.size.height * 0.80 : self.frame.size.height * -0.04
+        balloon.position = CGPoint(x: startPos.x, y: startPos.y )
         self.addChild(balloon)
         let scoreLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
         scoreLabel.text = String(score)
@@ -217,11 +220,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         wordLabel.fontColor = SKColor.blue
 //        balloon.addChild(scoreLabel)
         balloon.addChild(wordLabel)
-        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: endPosY), duration: 4.0)
-        let fadeAway = SKAction.fadeOut(withDuration: 0.25)
+        var actions = Array<SKAction>()
+        let waitAction = SKAction.wait(forDuration: 1.0)
+        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: endPosY), duration: 3.0)
+        let fadeAway = SKAction.fadeOut(withDuration: 2.5)
         let removeNode = SKAction.removeFromParent()
-        let sequence = SKAction.sequence([movingAction, fadeAway, removeNode])
-        balloon.run(sequence)
+        actions.append(SKAction.sequence([waitAction, movingAction]))
+        actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))
+        let group = SKAction.group(actions);
+        balloon.run(group)
     }
     
     
@@ -1119,7 +1126,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 ws[movedIndex].zPosition = 1
                 ws[movedIndex].setPieceFromPosition(index: movedIndex)
                 let activityItem = ActivityItem(type: .FromBottom, fromBottomIndex: ws[movedIndex].getArrayIndex())
-                if activityRoundItem.last!.activityItems.count == 0 {
+                if activityRoundItem.count > 0 {
+                    if activityRoundItem.last!.activityItems.count == 0 {
+                        activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
+                    }
+                } else {
+                    activityRoundItem.append(ActivityRound())
                     activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
                 }
                 activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)

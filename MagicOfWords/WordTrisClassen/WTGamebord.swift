@@ -800,6 +800,11 @@ class WTGameboard: SKShapeNode {
         }
     }
     
+    public func getCellPosition(col: Int, row: Int)->CGPoint {
+        let addPosition = grid!.position
+        return grid!.gridPosition(col: col, row: row) + addPosition
+    }
+    
     public func printGameArray() {
         let line = "____________________________________________"
         for row in 0..<10 {

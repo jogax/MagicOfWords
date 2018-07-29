@@ -60,11 +60,13 @@ class WTGameboardItem: SKSpriteNode {
         super.init(texture: texture, color: .white, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
         label.fontName = "KohinoorTelugu-Regular"
         label.fontName = "Baskerville"
+        label.fontName = "ChalkboardSE-Light"
+        label.fontName = "PingFangTC-Semibold"
+        label.fontName = "KohinoorBangla-Regular"
         label.fontColor = .black
         label.verticalAlignmentMode = .center
         label.fontSize = fontSize
         label.zPosition = self.zPosition + 1
-        letter = emptyLetter
         addChild(label)
     }
     
