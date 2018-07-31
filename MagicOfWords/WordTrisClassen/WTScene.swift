@@ -104,6 +104,23 @@ let iFiveMinutes = 300
 
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordListDelegate, WTTableViewDelegate {
+    func setLettersMoved(fromLetters: [UsedLetter], toLetters: [UsedLetter]) {
+        let movingItem = MovingItem(fromLetters: fromLetters, toLetters: toLetters)
+        let activityItem = ActivityItem(type: .Moving, movingItem: movingItem)
+        activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
+        //        activityItems.append(activityItem)
+        saveActualState()
+    }
+    
+//    func setLettersMoved(colFrom: Int, rowFrom: Int, colTo: Int, rowTo: Int, length: Int) {
+//        let movingItem = MovingItem(colFrom: colFrom, rowFrom: rowFrom, colTo: colTo, rowTo: rowTo, length: length)
+//        let activityItem = ActivityItem(type: .Moving, movingItem: movingItem)
+//        activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
+//        //        activityItems.append(activityItem)
+//        saveActualState()
+//        
+//    }
+    
     func geTitleForHeaderInSection(section: Int) -> String? {
         switch section {
         case 0:
@@ -180,12 +197,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         if doAnimate {
             showWordAndScore(word: newWord, score: newScore)
         }
-        if changeTime > 0 {
+        if changeTime != 0 {
             timeForGame.incrementMaxTime(value: changeTime * 60)
         }
-        if changeTime < 0 {
-            timeForGame.decrementMaxTime(value: -changeTime * 60)
-        }
+//        if changeTime < 0 {
+//            timeForGame.decrementMaxTime(value: changeTime * 60)
+//        }
        self.totalScore = totalScore
         showFoundedWords()
         return
@@ -299,7 +316,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     var origSize: [CGSize] = Array(repeating: CGSize(width:0, height: 0), count: 3)
     var totalScore: Int = 0
     var moved = false
-    var ownWordsScrolling = false
+//    var ownWordsScrolling = false
     var inChoosingOwnWord = false
     var movedIndex = 0
     var countShowingOwnWords = 0
@@ -333,6 +350,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     let ownWordsButtonName = "°°°ownWordsButtonName°°°"
 
     var timeIncreaseValues: [Int]?
+    var movingSprite: Bool = false
 //    var wtGameWordList: WTGameWordList?
 
     
@@ -602,15 +620,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         headerLabel.text = text
     }
 
-    func setLettersMoved(colFrom: Int, rowFrom: Int, colTo: Int, rowTo: Int, length: Int) {
-        let movingItem = MovingItem(colFrom: colFrom, rowFrom: rowFrom, colTo: colTo, rowTo: rowTo, length: length)
-        let activityItem = ActivityItem(type: .Moving, movingItem: movingItem)
-        activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
-//        activityItems.append(activityItem)
-        saveActualState()
-
-    }
-    
     func scrollOwnWords(up: Bool) {
         if up {
             showingOwnWordsIndex += countWordsInRow
@@ -914,7 +923,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         }
         moved = false
         inChoosingOwnWord = false
-        ownWordsScrolling = false
+//        ownWordsScrolling = false
         WTGameWordList.shared.stopShowingWords()
         let firstTouch = touches.first
         firstTouchLocation = firstTouch!.location(in: self)
@@ -964,10 +973,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             }
 
         } else if inChoosingOwnWord {
-            if touchedNodes.GCol >= 0 && touchedNodes.GCol < sizeOfGrid && touchedNodes.GRow >= 0 && touchedNodes.GRow < sizeOfGrid {
-                wtGameboard?.moveChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
+            if movingSprite {
+//                print("GCol: \(touchedNodes.GCol), GRow: \(touchedNodes.GRow)")
+                _ = wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 2)   // true says moving finished
+            } else if touchedNodes.GCol >= 0 && touchedNodes.GCol < sizeOfGrid && touchedNodes.GRow >= 0 && touchedNodes.GRow < sizeOfGrid {
+                movingSprite = (wtGameboard?.moveChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow))!
             }
-        } else if ownWordsScrolling {
+//        } else if ownWordsScrolling {
 //            let movedBy = touchLocation.y - ownWordsScrollingStartPos.y
 //            let multiplier = 0.02 * movedBy / abs(movedBy)
 //            if abs(movedBy) > self.frame.height * abs(multiplier) {
@@ -985,7 +997,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //                origSize[shapeindex] = ws[index].size
 //                moved = true
                 if touchedNodes.shapeIndex >= 0 {
-                    moved = wtGameboard!.startShowingSpriteOnGameboard(shape: ws[touchedNodes.shapeIndex], col: touchedNodes.col, row: touchedNodes.row, shapePos: touchedNodes.shapeIndex)
+                    moved = wtGameboard!.startShowingSpriteOnGameboard(shape: ws[touchedNodes.shapeIndex], col: touchedNodes.col, row: touchedNodes.row) //, shapePos: touchedNodes.shapeIndex)
                     movedIndex = touchedNodes.shapeIndex
                 }
             } 
@@ -1113,15 +1125,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             return
         }
         if inChoosingOwnWord {
-            let word = wtGameboard!.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
-            if word != nil {
-                let activityItem = ActivityItem(type: .Choosing, choosedWord: word!)
-                activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
-//                activityItems.append(activityItem)
-                saveActualState()
+            if movingSprite {
+                movingSprite = false
+                _ = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 2, fromBottom: false)
+            } else {
+                let word = wtGameboard!.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
+                if word != nil {
+                    let activityItem = ActivityItem(type: .Choosing, choosedWord: word!)
+                    activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
+    //                activityItems.append(activityItem)
+                    saveActualState()
+                }
             }
         } else if moved {
-            let fixed = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row)
+            let fixed = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row, fromBottom: true)
             if fixed {
                 ws[movedIndex].zPosition = 1
                 ws[movedIndex].setPieceFromPosition(index: movedIndex)
@@ -1354,6 +1371,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 modifyHeader()
             }
         }
+        if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
+            undoSprite.alpha = 0.1
+        }
+            
     }
     
     func restoreGameArray() {
@@ -1484,8 +1505,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             default: break
             }
         }
-//        let lengths = [1,1,1,2,2,2,2,2,3,3,4]
-        let lengths = [1,1,1,2,2,2]
+//        let lengths = [1,1,1,1,1,2,2,2,2,2,2,3,3,4]
+        let lengths = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3]
         var generateLength = 0
         repeat {
             let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]

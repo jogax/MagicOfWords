@@ -15,20 +15,21 @@ enum MyShapes: Int {
         L_Shape_1, // 2
         L_Shape_2, // 3
         L_Shape_3, // 4
-        T_Shape_1, // 5
-        O_Shape_1, // 6
-        I_Shape_1, // 7
-        I_Shape_2, // 8
-        I_Shape_3, // 9
-        I_Shape_4, // 10
+        L_Shape_4, // 5
+        T_Shape_1, // 6
+        O_Shape_1, // 7
+        I_Shape_1, // 8
+        I_Shape_2, // 9
+        I_Shape_3, // 10
+        I_Shape_4, // 11
         NotUsed
     static var count: Int { return MyShapes.NotUsed.hashValue + 1}
     func toString()->String {
-        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "T1", "O1", "I1", "I2", "I3", "I4", "NotUsed"]
+        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "L4", "T1", "O1", "I1", "I2", "I3", "I4", "NotUsed"]
         return stringType[self.rawValue]
     }
     static func toValue(name: String)->MyShapes {
-        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "T1", "O1", "I1", "I2", "I3", "I4", "NotUsed"]
+        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "L4", "T1", "O1", "I1", "I2", "I3", "I4", "NotUsed"]
         return MyShapes(rawValue: stringType.index{$0 == name}!)!
     }
 
@@ -41,9 +42,10 @@ struct LetterCoordinates {
 let myForms: [MyShapes : [[Int]]] = [
     .Z_Shape_1 : [[00, 01, 11, 12], [20, 10, 11, 01], [12, 11, 01, 00], [01, 11, 10, 20]], //OK
     .Z_Shape_2 : [[10, 11, 01, 02], [21, 11, 10, 00], [02, 01, 11, 10], [00, 10, 11, 21]], //OK
-    .L_Shape_1 : [[00, 01, 11], [10, 00, 01], [11, 10, 00], [01, 11, 10]], // OK
-    .L_Shape_2 : [[21, 20, 10, 00], [02, 12, 11, 10], [00, 01, 11, 21], [10, 00, 01, 02]], // OK
-    .L_Shape_3 : [[20, 21, 11, 01], [12, 02, 01, 00], [01, 00, 10, 20], [00, 10, 11, 12]], // OK
+    .L_Shape_1 : [[00, 10, 11], [10, 11, 01], [11, 01, 00], [01, 00, 10]], // OK
+    .L_Shape_2 : [[00, 01, 11], [10, 00, 01], [11, 10, 00], [01, 11, 10]], // OK
+    .L_Shape_3 : [[21, 20, 10, 00], [02, 12, 11, 10], [00, 01, 11, 21], [10, 00, 01, 02]], // OK
+    .L_Shape_4 : [[20, 21, 11, 01], [12, 02, 01, 00], [01, 00, 10, 20], [00, 10, 11, 12]], // OK
     .T_Shape_1 : [[12, 11, 10, 01], [01, 11, 21, 10], [00, 01, 02, 11], [20, 10, 00, 11]],  // OK
     .O_Shape_1  : [[00, 01, 11, 10], [10, 00, 01, 11], [11, 10, 00, 01], [01, 11, 10, 00]], // OK
     .I_Shape_1 : [[00], [00], [00], [00]], // OK
@@ -61,6 +63,7 @@ class WTPiece: SKSpriteNode {
     let blockSize: CGFloat
     let letters: [String]
     var gameArrayPositions = [String]()
+    var usedLetters = [UsedLetter]()
     var arrayIndex: Int
     var pieceFromPosition = NoValue
     var isOnGameboard = false
@@ -101,6 +104,31 @@ class WTPiece: SKSpriteNode {
             self.size = calculateSize()
             addLettersToPositions()
             self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
+            for letter in letters {
+                let usedLetter = UsedLetter(col: 0, row: 0, letter: letter)
+                usedLetters.append(usedLetter)
+            }
+        }
+    }
+    
+    init(fromChoosedWord: FoundedWord, parent: SKScene, blockSize: CGFloat) {
+        self.myParent = parent
+        self.blockSize = blockSize
+        self.arrayIndex = 0
+        self.myType = .I_Shape_1
+        var letters = [String]()
+        for usedLetter in fromChoosedWord.usedLetters {
+            letters.append(usedLetter.letter)
+        }
+        usedLetters = fromChoosedWord.usedLetters
+        self.letters = letters
+        let texture = SKTexture()
+        super.init(texture: texture, color: .clear, size: CGSize(width: 10, height: 10))
+        (self.myType, self.rotateIndex) = getTypeFromLetters(usedLetters: fromChoosedWord.usedLetters)
+        if myType != .NotUsed {
+            self.size = calculateSize()
+            addLettersToPositions()
+            self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
         }
     }
     
@@ -126,6 +154,52 @@ class WTPiece: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func getTypeFromLetters(usedLetters: [UsedLetter])->(MyShapes, Int) {
+        let searchTypes: [MyShapes] = [ .Z_Shape_1, // : [[00, 01, 11, 12], [20, 10, 11, 01], [12, 11, 01, 00], [01, 11, 10, 20]], //OK
+            .Z_Shape_2, // : [[10, 11, 01, 02], [21, 11, 10, 00], [02, 01, 11, 10], [00, 10, 11, 21]], //OK
+            .L_Shape_2, // : [[21, 20, 10, 00], [02, 12, 11, 10], [00, 01, 11, 21], [10, 00, 01, 02]], // OK
+            .L_Shape_3, // : [[20, 21, 11, 01], [12, 02, 01, 00], [01, 00, 10, 20], [00, 10, 11, 12]], // OK
+            .T_Shape_1, // : [[12, 11, 10, 01], [01, 11, 21, 10], [00, 01, 02, 11], [20, 10, 00, 11]],  // OK
+            .O_Shape_1, // : [[00, 01, 11, 10], [10, 00, 01, 11], [11, 10, 00, 01], [01, 11, 10, 00]], // OK
+            .I_Shape_4, // : [[00, 10, 20, 30], [00, 01, 02, 03], [30, 20, 10, 00], [03, 02, 01, 00]] // OK
+            .I_Shape_3, // : [[00, 10, 20], [00, 01, 02], [20, 10, 00], [02, 01, 00]], // OK
+            .L_Shape_1, // : [[00, 10, 11], [10, 11, 01], [11, 01, 00], [01, 00, 10]], // OK
+            .L_Shape_2, // : [[00, 01, 11], [10, 00, 01], [11, 10, 00], [01, 11, 10]], // OK
+            .I_Shape_2, // : [[00, 10], [00, 01], [10, 00], [01, 00]], // OK
+            .I_Shape_1, // : [[00], [00], [00], [00]], // OK
+        ]
+        var minCol = usedLetters[0].col
+        var maxCol = usedLetters[0].col
+        var minRow = usedLetters[0].row
+        var maxRow = usedLetters[0].row
+        for usedLetter in usedLetters {
+            minCol = minCol > usedLetter.col ? usedLetter.col : minCol
+            maxCol = maxCol < usedLetter.col ? usedLetter.col : maxCol
+            minRow = minRow > usedLetter.row ? usedLetter.row : minRow
+            maxRow = maxRow < usedLetter.row ? usedLetter.row : maxRow
+        }
+        var myPositions = [Int]()
+        for usedLetter in usedLetters {
+            let position = 10 * (usedLetter.col - minCol) + usedLetter.row - minRow
+            myPositions.append(position)
+        }
+//        maxCol = maxCol - minCol
+//        minCol = 0
+//        maxRow = maxRow - minRow
+//        minRow = 0
+        for type in searchTypes {
+            let forms = myForms[type]
+            if forms![0].count == usedLetters.count {
+                for rotateIndex in 0...3 {
+                    let form = forms![rotateIndex]
+                    if form == myPositions {
+                        return (type, (rotateIndex + 1) % 4)
+                    }
+                }
+            }
+        }
+        return (.NotUsed, 0)
+    }
     private func calculateSize()->CGSize {
         let form = myForms[myType]![rotateIndex]
         var maxCol = 0
@@ -176,9 +250,14 @@ class WTPiece: SKSpriteNode {
     }
 
     public func setGameArrayPositions(gameArrayPositions: [GameArrayPositions]) {
+        self.usedLetters = [UsedLetter]()
         if gameArrayPositions.count == myForms[myType]![0].count {
             for index in 0..<gameArrayPositions.count {
-                self.gameArrayPositions[index] = String(gameArrayPositions[index].col) + String(gameArrayPositions[index].row)
+                let col = gameArrayPositions[index].col
+                let row = gameArrayPositions[index].row
+                let letter = letters[index]
+                self.gameArrayPositions[index] = String(col) + String(row)
+                self.usedLetters.append(UsedLetter(col: col,row: row, letter: letter))
             }
             isOnGameboard = true
         }

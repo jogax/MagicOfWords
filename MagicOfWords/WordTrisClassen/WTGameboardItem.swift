@@ -105,7 +105,9 @@ class WTGameboardItem: SKSpriteNode {
             setColors(toColor: self.origColor, toStatus: .noChange)
 //            self.color = convertMyColorToSKColor(color: self.origColor)
             self.doubleUsed = false
-        }
+        } else if letter != emptyLetter && (myColor == .myBlueColor || myColor == .myGoldColor || myColor == .myDarkGoldColor) {
+            setColors(toColor: .myUsedColor, toStatus: .used)
+        } 
     }
     
     public func fixIfTemporary()->Bool {

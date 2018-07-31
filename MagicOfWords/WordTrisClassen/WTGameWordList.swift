@@ -367,12 +367,14 @@ public class WTGameWordList {
     
     public func toStringLastRound()->String {
         var returnString = ""
-        let lastItem = wordsInRound.last!
-        for selectedWord in lastItem.wordsInGame {
-            returnString += selectedWord.toString() + itemSeparator
-        }
-        if returnString.length > 1 {
-            returnString.removeLast()
+        if wordsInRound.count > 0 {
+            let lastItem = wordsInRound.last!
+            for selectedWord in lastItem.wordsInGame {
+                returnString += selectedWord.toString() + itemSeparator
+            }
+            if returnString.length > 1 {
+                returnString.removeLast()
+            }
         }
         return returnString
     }

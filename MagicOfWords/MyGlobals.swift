@@ -11,6 +11,7 @@ import AVFoundation
 import UIKit
 
 let exclamationMark = "!"
+public let roundSeparator = "/"
 let itemSeparator = "°"
 let itemInnerSeparator = "^"
 
