@@ -213,6 +213,8 @@ public protocol WTGameboardDelegate: class {
     func addOwnWordNew(word: String, usedLetters: [UsedLetter])->Bool
     /// method is called when letters are moved on gameboard
     func setLettersMoved(fromLetters: [UsedLetter], toLetters: [UsedLetter])
+    /// method is called when waitingTimer has fired
+    func setMovingSprite()
 }
 
 
@@ -379,13 +381,20 @@ class WTGameboard: SKShapeNode {
             let calculatedCol = myCol + itemCol //- colAdder
             let calculatedRow = myRow - itemRow //- rowAdder
             if calculatedRow < 0 {return false}
-        _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
+            _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
             usedItems.append(usedItem)
         }
         return true
     }
+
+    @objc private func waitingTimerFired(timerX: Timer) {
+        if setMoveModusIfPossible() {
+            delegate.setMovingSprite()
+        }
+    }
     
+
     public func moveSpriteOnGameboard(col: Int, row: Int) -> Bool {
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
         let (myCol, myRow) = analyseColAndRow(col: col, row: row, formOfShape: formOfShape)
@@ -394,7 +403,6 @@ class WTGameboard: SKShapeNode {
             clear()
             return true
         }
-        
         for index in 0..<shape.children.count {
             let letter = shape.letters[index]
             let itemCol = formOfShape[index] % 10
@@ -452,22 +460,25 @@ class WTGameboard: SKShapeNode {
         var fixed = true
 //        self.wordsToCheck = wordsToCheck
         if row == 10 {
-            for index in 0..<usedItems.count {
-                usedItems[index].item!.clearIfTemporary()
-            }
-            return false  // when shape not remaining on gameBoard, return false
-        } else {
-            var clearNeaded = false
-            for usedItem in usedItems {
-                let actItemStatus = usedItem.item!.status
-                if actItemStatus == .used || actItemStatus == .wholeWord {
-                    clearNeaded = true
-                    break
+            if fromBottom {
+                for index in 0..<usedItems.count {
+                    usedItems[index].item!.clearIfTemporary()
                 }
+                return false  // when shape not remaining on gameBoard, return false
             }
-            if clearNeaded {
-                if !fromBottom {
-                    for index in 0..<usedItems.count {
+         }
+        var clearNeaded = false
+        for usedItem in usedItems {
+            let actItemStatus = usedItem.item!.status
+            if actItemStatus == .used || actItemStatus == .wholeWord {
+                clearNeaded = true
+                break
+            }
+        }
+        if clearNeaded {
+            if !fromBottom {
+                for index in 0..<usedItems.count {
+                    if index < origChoosedWord.usedLetters.count {
                         let origCol = origChoosedWord.usedLetters[index].col
                         let origRow = origChoosedWord.usedLetters[index].row
                         let letter = origChoosedWord.usedLetters[index].letter
@@ -476,28 +487,28 @@ class WTGameboard: SKShapeNode {
                         _ = GV.gameArray[origCol][origRow].setLetter(letter: letter, status: .used, toColor: .myUsedColor)
                         _ = GV.gameArray[actCol][actRow].clearIfTemporary()
                     }
-                } else {
-                    clear()
                 }
-                return false
             } else {
-                for usedItem in usedItems {
-                    fixed = fixed && usedItem.item!.fixIfTemporary()
-                }
+                clear()
             }
-            if fixed {
-//                checkWholeWords()
-                var gameArrayPositions = [GameArrayPositions]()
-                for index in 0..<usedItems.count {
-                    gameArrayPositions.append(GameArrayPositions(col:usedItems[index].col,row: usedItems[index].row))
-                }
-                shape.setGameArrayPositions(gameArrayPositions: gameArrayPositions)
-                if !fromBottom {
-                        delegate.setLettersMoved(fromLetters: origChoosedWord.usedLetters, toLetters: shape.usedLetters)
-                }
+            return false
+        } else {
+            for usedItem in usedItems {
+                fixed = fixed && usedItem.item!.fixIfTemporary()
             }
-            return fixed  // when shape remaining on gameBoard, return true
         }
+        if fixed {
+//                checkWholeWords()
+            var gameArrayPositions = [GameArrayPositions]()
+            for index in 0..<usedItems.count {
+                gameArrayPositions.append(GameArrayPositions(col:usedItems[index].col,row: usedItems[index].row))
+            }
+            shape.setGameArrayPositions(gameArrayPositions: gameArrayPositions)
+            if !fromBottom {
+                    delegate.setLettersMoved(fromLetters: origChoosedWord.usedLetters, toLetters: shape.usedLetters)
+            }
+        }
+        return fixed  // when shape remaining on gameBoard, return true
     }
     private  let scoreProWord: [Int] = [0, 0, 10, 30, 50, 80, 120, 180, 250, 330, 430, 550]
     
@@ -517,8 +528,17 @@ class WTGameboard: SKShapeNode {
     }
     
     var origChoosedWord = FoundedWord()
-    
+    var waitingTimer: Timer?
+//    var waitingCol = 0
+//    var waitingRow = 0
+
     public func moveChooseOwnWord(col: Int, row: Int)->Bool {
+        if waitingTimer != nil {
+            waitingTimer!.invalidate()
+        }
+//        waitingCol = col
+//        waitingRow = row + 1
+        waitingTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitingTimerFired(timerX: )), userInfo: nil, repeats: false)
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
         GV.gameArray[col][row].correctStatusIfNeeded()
         let status = GV.gameArray[col][row].status
@@ -557,41 +577,43 @@ class WTGameboard: SKShapeNode {
 //            }
         }
 
-        var onlyUsedLetters = true
 //        print("col: \(col), row: \(row), actLetter: \(actLetter.letter), NoMoreMove: \(noMoreMove)")
         if (status == .empty) { // empty block
-            if !noMoreMove {
-                if !moveModusStarted {
-                    for letter in choosedWord.usedLetters {
-                        if GV.gameArray[letter.col][letter.row].status == .wholeWord {
-                            onlyUsedLetters = false
-                        }
-                    }
-                }
-                if onlyUsedLetters {
-                    moveModusStarted = true
-                    myPiece = WTPiece(fromChoosedWord: choosedWord, parent: parentScene, blockSize: blockSize!)
-                    if myPiece.myType != .NotUsed {
-                        origChoosedWord = choosedWord
-                        if startShowingSpriteOnGameboard(shape: myPiece, col: choosedWord.usedLetters[0].col, row: choosedWord.usedLetters[0].row) {
-                            for usedLetter in choosedWord.usedLetters {
-                                GV.gameArray[usedLetter.col][usedLetter.row].remove()
-                            }
-                            return true
-                        }
-                    }
-// //                   lengthOfMovedItem = choosedWord.word.count
-//                    choosedWord.addFirstLetter(letter: actLetter)
+            if setMoveModusIfPossible() {
+                return true
+            }
+//            if !noMoreMove {
+//                if !moveModusStarted {
 //                    for letter in choosedWord.usedLetters {
-//                        if letter.letter == emptyLetter {
-//                            _ = GV.gameArray[letter.col][letter.row].setLetter(letter: letter.letter, status: .empty, toColor: .myWhiteColor, forcedChange: true)
-//                        } else {
-//                            _ = GV.gameArray[letter.col][letter.row].setLetter(letter: letter.letter, status: .used, toColor: .myUsedColor, forcedChange: true)
-//                            GV.gameArray[letter.col][letter.row].changeColor(toColor: .myBlueColor)
+//                        if GV.gameArray[letter.col][letter.row].status == .wholeWord {
+//                            onlyUsedLetters = false
 //                        }
 //                    }
-                 }
-            }
+//                }
+//                if onlyUsedLetters {
+//                    moveModusStarted = true
+//                    myPiece = WTPiece(fromChoosedWord: choosedWord, parent: parentScene, blockSize: blockSize!)
+//                    if myPiece.myType != .NotUsed {
+//                        origChoosedWord = choosedWord
+//                        if startShowingSpriteOnGameboard(shape: myPiece, col: choosedWord.usedLetters[0].col, row: choosedWord.usedLetters[0].row) {
+//                            for usedLetter in choosedWord.usedLetters {
+//                                GV.gameArray[usedLetter.col][usedLetter.row].remove()
+//                            }
+//                            return true
+//                        }
+//                    }
+//// //                   lengthOfMovedItem = choosedWord.word.count
+////                    choosedWord.addFirstLetter(letter: actLetter)
+////                    for letter in choosedWord.usedLetters {
+////                        if letter.letter == emptyLetter {
+////                            _ = GV.gameArray[letter.col][letter.row].setLetter(letter: letter.letter, status: .empty, toColor: .myWhiteColor, forcedChange: true)
+////                        } else {
+////                            _ = GV.gameArray[letter.col][letter.row].setLetter(letter: letter.letter, status: .used, toColor: .myUsedColor, forcedChange: true)
+////                            GV.gameArray[letter.col][letter.row].changeColor(toColor: .myBlueColor)
+////                        }
+////                    }
+//                 }
+//            }
         } else { // Not empty field
             if !moveModusStarted {
                if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters[choosedWord.usedLetters.count - 2] == actLetter {
@@ -611,8 +633,37 @@ class WTGameboard: SKShapeNode {
         return false
     }
     
+    private func setMoveModusIfPossible()->Bool {
+        var onlyUsedLetters = true
+        if !moveModusStarted {
+            for letter in choosedWord.usedLetters {
+                if GV.gameArray[letter.col][letter.row].status == .wholeWord {
+                    onlyUsedLetters = false
+                }
+            }
+        }
+        if onlyUsedLetters {
+            moveModusStarted = true
+            myPiece = WTPiece(fromChoosedWord: choosedWord, parent: parentScene, blockSize: blockSize!)
+            if myPiece.myType != .NotUsed {
+                origChoosedWord = choosedWord
+                if startShowingSpriteOnGameboard(shape: myPiece, col: choosedWord.usedLetters[0].col, row: choosedWord.usedLetters[0].row) {
+                    for usedLetter in choosedWord.usedLetters {
+                        GV.gameArray[usedLetter.col][usedLetter.row].remove()
+                    }
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
     
     public func endChooseOwnWord(col: Int, row: Int)->FoundedWord? {
+        if waitingTimer != nil {
+            waitingTimer!.invalidate()
+            waitingTimer = nil
+        }
         for col in 0..<size {
             for row in 0..<size {
                 if GV.gameArray[col][row].myColor == .myBlueColor {
@@ -855,6 +906,9 @@ class WTGameboard: SKShapeNode {
                 var greenMark = emptyLetter
                 if GV.gameArray[col][row].status == .wholeWord {
                     greenMark = "*"
+                }
+                if GV.gameArray[col][row].doubleUsed {
+                    greenMark = "!"
                 }
                 infoLine += greenMark + (char == "" ? "!" : char) + greenMark + "|"
             }

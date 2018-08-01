@@ -49,7 +49,7 @@ class WTGameboardItem: SKSpriteNode {
     ]
     private var origLetter: String = emptyLetter
     private var origColor: MyColor = .myWhiteColor
-    private var doubleUsed = false
+    public var doubleUsed = false
     private var blockSize:CGFloat = 0
     private var label: SKLabelNode
 //    private var countOccurencesInWords = 0
@@ -104,10 +104,10 @@ class WTGameboardItem: SKSpriteNode {
             self.letter = self.origLetter
             setColors(toColor: self.origColor, toStatus: .noChange)
 //            self.color = convertMyColorToSKColor(color: self.origColor)
-            self.doubleUsed = false
         } else if letter != emptyLetter && (myColor == .myBlueColor || myColor == .myGoldColor || myColor == .myDarkGoldColor) {
             setColors(toColor: .myUsedColor, toStatus: .used)
         } 
+        self.doubleUsed = false
     }
     
     public func fixIfTemporary()->Bool {

@@ -228,6 +228,9 @@ public class WTGameWordList {
         
         var noCommonLetter = true
         var noDiagonal = true
+        if wordsInRound.count == 0 {
+            wordsInRound.append(WordInRound())
+        }
         let wordsInGame = wordsInRound.last!.wordsInGame
         for index1 in 0..<selectedWord.usedLetters.count - 1 {
             // check if a letter is 2x used in the word

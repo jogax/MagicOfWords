@@ -954,6 +954,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 
     }
     
+    func setMovingSprite() {
+        movingSprite = true
+    }
+    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if wtSceneDelegate == nil {
             return
@@ -974,8 +978,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 
         } else if inChoosingOwnWord {
             if movingSprite {
-//                print("GCol: \(touchedNodes.GCol), GRow: \(touchedNodes.GRow)")
-                _ = wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 2)   // true says moving finished
+                _ = wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 1)   // true says moving finished
             } else if touchedNodes.GCol >= 0 && touchedNodes.GCol < sizeOfGrid && touchedNodes.GRow >= 0 && touchedNodes.GRow < sizeOfGrid {
                 movingSprite = (wtGameboard?.moveChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow))!
             }
@@ -1127,7 +1130,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         if inChoosingOwnWord {
             if movingSprite {
                 movingSprite = false
-                _ = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 2, fromBottom: false)
+                let row = touchedNodes.row + 2 == 10 ? 9 : touchedNodes.row + 2
+                _ = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: row, fromBottom: false)
             } else {
                 let word = wtGameboard!.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
                 if word != nil {
