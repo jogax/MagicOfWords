@@ -23,6 +23,12 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     var myDelegate: WTTableViewDelegate?
     override init(frame: CGRect, style: UITableViewStyle) {
         super.init(frame: frame, style: style)
+//        self.backgroundColor = UIColor.lightGray
+//        let backgroundImage = UIImageView(frame: frame)
+//        backgroundImage.clipsToBounds = true
+//        backgroundImage.image = UIImage(named: "menuBackground.png")
+//        backgroundImage.contentMode = .scaleToFill
+//        self.backgroundView = backgroundImage
         self.delegate = self
         self.dataSource = self
     }

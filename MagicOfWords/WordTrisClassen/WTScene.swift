@@ -132,10 +132,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let cell:UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
-        cell.textLabel!.font = UIFont(name: "CourierNewPS-BoldMT", size: self.frame.width * 0.015)
+        let fontSize = GV.onIpad ? self.frame.width * 0.015 : self.frame.width * 0.040
+//        let backgroundImage = UIImageView(frame: cell.frame)
+//        backgroundImage.clipsToBounds = true
+//        backgroundImage.image = UIImage(named: "menuBackground.png")
+//        backgroundImage.contentMode = .scaleToFill
+//        cell.backgroundView = backgroundImage
+        cell.backgroundColor = UIColor(red:255/255, green: 128/255, blue: 0/255, alpha: 1.0)
+        cell.textLabel!.font = UIFont(name: "CourierNewPS-BoldMT", size: fontSize)
         switch indexPath.section {
         case 0:
-            cell.textLabel!.text = ownWordsForShow![indexPath.row]
+            cell.textLabel!.text = ownWordsForShow[indexPath.row]
         default: break
         }
         return cell
@@ -1366,8 +1373,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //                if let label = self.childNode(withName: actItem.choosedWord.word)! as? SKLabelNode {
 //                    label.removeFromParent() // This word is no more known
 //                }
-                var lengthOfWord = actItem.choosedWord.word.count
-                lengthOfWord = lengthOfWord > 10 ? 11 : lengthOfWord
+//                var lengthOfWord = actItem.choosedWord.word.count
+//                lengthOfWord = lengthOfWord > 10 ? 11 : lengthOfWord
 //                myTimer!.decreaseMaxTime(value: timeIncreaseValues![lengthOfWord])
 //                wtGameboard!.checkWholeWords()
                 activityRoundItem[activityRoundItem.count - 1].activityItems.removeLast()
@@ -1598,14 +1605,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     }
     
     var showOwnWordsView = WTTableView()
-    var ownWordsForShow: [String]?
+    var ownWordsForShow = [String]()
+    var maxLength = 0
     var showingWordsInTable = false
     private func showOwnWordsInTableView() {
         timerIsCounting = false
-        ownWordsForShow = WTGameWordList.shared.getWordsForShow(mandatory: false)
+        (ownWordsForShow, maxLength) = WTGameWordList.shared.getWordsForShow(mandatory: false)
         showOwnWordsView.setDelegate(delegate: self)
         showOwnWordsView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        showOwnWordsView.frame=CGRect(x:self.frame.width * 0.5 - 140,y:50,width:280,height:600)
+        let indexPath = IndexPath(row: 0, section: 0)
+        let frame = showOwnWordsView.rectForRow(at: indexPath)
+        let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(maxLength)), y: 50)
+        let headerframe = showOwnWordsView.rectForHeader(inSection: 0)
+        let size = CGSize(width: CGFloat(maxLength), height: CGFloat(ownWordsForShow.count) * frame.height + headerframe.height)
+        showOwnWordsView.frame=CGRect(origin: origin, size: size)
         self.scene?.view?.addSubview(showOwnWordsView)
         showOwnWordsView.reloadData()
     }

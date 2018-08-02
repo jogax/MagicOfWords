@@ -538,7 +538,7 @@ class WTGameboard: SKShapeNode {
         }
 //        waitingCol = col
 //        waitingRow = row + 1
-        waitingTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitingTimerFired(timerX: )), userInfo: nil, repeats: false)
+        waitingTimer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(waitingTimerFired(timerX: )), userInfo: nil, repeats: false)
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
         GV.gameArray[col][row].correctStatusIfNeeded()
         let status = GV.gameArray[col][row].status
@@ -643,7 +643,6 @@ class WTGameboard: SKShapeNode {
             }
         }
         if onlyUsedLetters {
-            moveModusStarted = true
             myPiece = WTPiece(fromChoosedWord: choosedWord, parent: parentScene, blockSize: blockSize!)
             if myPiece.myType != .NotUsed {
                 origChoosedWord = choosedWord
@@ -651,6 +650,7 @@ class WTGameboard: SKShapeNode {
                     for usedLetter in choosedWord.usedLetters {
                         GV.gameArray[usedLetter.col][usedLetter.row].remove()
                     }
+                    moveModusStarted = true
                     return true
                 }
             }

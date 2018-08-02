@@ -307,8 +307,8 @@ public class WTGameWordList {
                 }
             }
             let newScore = getActualScore()
-            let changeTime = -selectedWord.word.length > maxUsedLength ? minutesForWord[maxUsedLength] : minutesForWord[selectedWord.word.length]
-            delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: changeTime!)
+            let changeTime = selectedWord.word.length > maxUsedLength ? minutesForWord[maxUsedLength] : minutesForWord[selectedWord.word.length]
+            delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: -changeTime!)
         }
     }
     
@@ -430,7 +430,7 @@ public class WTGameWordList {
         showedWords = [SelectedWord]()
         delegate!.stopShowingWordsOverPosition()
     }
-    public func getWordsForShow(mandatory: Bool)->[String] {
+    public func getWordsForShow(mandatory: Bool)->([String], Int) {
         var returnWords = [String]()
         var maxLength = 0
         for foundedWord in allWords {
@@ -448,7 +448,7 @@ public class WTGameWordList {
                 returnWords.append(myString)
             }
         }
-        return returnWords
+        return (returnWords, 11 * (maxLength + 15))
     }
     
 }
