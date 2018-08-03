@@ -368,7 +368,7 @@ class WTGameboard: SKShapeNode {
         
         self.shape = shape
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
-        let (myCol, myRow) = analyseColAndRow(col: col, row: row, formOfShape: formOfShape)
+        let (myCol, myRow) = analyseColAndRow(col: col, row: row, GRow: row - 2, formOfShape: formOfShape)
         if myRow == size {
             clear()
             return true
@@ -395,20 +395,20 @@ class WTGameboard: SKShapeNode {
     }
     
 
-    public func moveSpriteOnGameboard(col: Int, row: Int) -> Bool {
+    public func moveSpriteOnGameboard(col: Int, row: Int, GRow: Int) -> Bool {
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
-        let (myCol, myRow) = analyseColAndRow(col: col, row: row, formOfShape: formOfShape)
-        clear()
+        let (myCol, myRow) = analyseColAndRow(col: col, row: row, GRow: GRow, formOfShape: formOfShape)
         if myRow == size {
             clear()
             return true
         }
+        clear()
         for index in 0..<shape.children.count {
             let letter = shape.letters[index]
             let itemCol = formOfShape[index] % 10
             let itemRow = formOfShape[index] / 10
             let calculatedCol = myCol + itemCol // - adder
-            let calculatedRow = myRow - itemRow
+            let calculatedRow = myRow - itemRow < 0 ? 0 : myRow - itemRow > size - 1 ? size - 1 : myRow - itemRow
             _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
             usedItems.append(usedItem)
@@ -416,7 +416,7 @@ class WTGameboard: SKShapeNode {
         return false
     }
     
-    private func analyseColAndRow(col: Int, row: Int, formOfShape: [Int])->(Int, Int) {
+    private func analyseColAndRow(col: Int, row: Int, GRow: Int, formOfShape: [Int])->(Int, Int) {
         var maxCol = 0
         var maxRow = 0
         var myCol = col
@@ -429,6 +429,10 @@ class WTGameboard: SKShapeNode {
         }
         if myRow < maxRow {
             myRow = maxRow
+        }
+        
+        if myRow == 1 && GRow == 0 {
+            myRow = 0
         }
         
         if myCol + maxCol > size - 1 {
