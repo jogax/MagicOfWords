@@ -79,6 +79,7 @@ class WTPiece: SKSpriteNode {
     var arrayIndex: Int
     var pieceFromPosition = NoValue
     var isOnGameboard = false
+    var createdFromLetters = false
     public var rotateIndex: Int = 0
 //    var origPosition: [CGPoint] = [CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0), CGPoint(x:0, y:0)]
     var myType: MyShapes
@@ -142,6 +143,7 @@ class WTPiece: SKSpriteNode {
             addLettersToPositions()
             self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
         }
+        createdFromLetters = true
     }
     
     convenience init(from: String, parent: SKScene = SKScene(), blockSize: CGFloat = 0, arrayIndex: Int) {

@@ -405,21 +405,22 @@ public class WTGameWordList {
     var wordsToShow = [String]()
     
     public func showWordsContainingThisLetter(choosedWord: FoundedWord) {
-        showedWords = [SelectedWord]()
 //        wordsToShow = [String]()
-        let lastItem = wordsInRound.last!
-        for selectedWord in lastItem.wordsInGame {
-            if selectedWord.usedLetters.contains(where: {$0.col == choosedWord.usedLetters[0].col && $0.row == choosedWord.usedLetters[0].row}) {
-                for letter in selectedWord.usedLetters {
-                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myGoldColor, toStatus: .noChange)
+        if wordsInRound.count > 0 {
+            showedWords = [SelectedWord]()
+            let lastItem = wordsInRound.last!
+            for selectedWord in lastItem.wordsInGame {
+                if selectedWord.usedLetters.contains(where: {$0.col == choosedWord.usedLetters[0].col && $0.row == choosedWord.usedLetters[0].row}) {
+                    for letter in selectedWord.usedLetters {
+                        GV.gameArray[letter.col][letter.row].setColors(toColor: .myGoldColor, toStatus: .noChange)
+                    }
+                    GV.gameArray[choosedWord.usedLetters[0].col][choosedWord.usedLetters[0].row].setColors(toColor: .myDarkGoldColor, toStatus: .noChange)
+                    showedWords.append(selectedWord)
+    //                wordsToShow.append(selectedWord.word)
                 }
-                GV.gameArray[choosedWord.usedLetters[0].col][choosedWord.usedLetters[0].row].setColors(toColor: .myDarkGoldColor, toStatus: .noChange)
-                showedWords.append(selectedWord)
-//                wordsToShow.append(selectedWord.word)
             }
+            delegate!.startShowingWordsOverPosition(wordList: showedWords)
         }
-        delegate!.startShowingWordsOverPosition(wordList: showedWords)
-
     }
     public func stopShowingWords() {
         for selectedWord in showedWords {
