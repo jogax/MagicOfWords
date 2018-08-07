@@ -398,22 +398,62 @@ class WTGameboard: SKShapeNode {
     
 
     public func moveSpriteOnGameboard(col: Int, row: Int, GRow: Int) -> Bool {
+        let upDir = 0 // rotateIndex 0
+        let rightDir = 1 // rotateIndex 1
+        let downDir = 2 // rotateIndex 2
+        let leftDir = 3 // rotateIndex 3
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
         let (myCol, myRow) = analyseColAndRow(col: col, row: row, GRow: GRow, formOfShape: formOfShape)
         if myRow == size {
             clear()
             return true
         }
-        clear()
-        for index in 0..<shape.children.count {
-            let letter = shape.letters[index]
-            let itemCol = formOfShape[index] % 10
-            let itemRow = formOfShape[index] / 10
-            let calculatedCol = myCol + itemCol // - adder
-            let calculatedRow = myRow - itemRow < 0 ? 0 : myRow - itemRow > size - 1 ? size - 1 : myRow - itemRow
-            _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
-            let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
-            usedItems.append(usedItem)
+        if moveModusStarted {
+            if (shape.rotateIndex == leftDir && col + shape.letters.count - 1 < size && col >= 0) || // OK
+               (shape.rotateIndex == rightDir && col < size && col - shape.letters.count + 1 >= 0) || // OK
+               (shape.rotateIndex == upDir && row + shape.letters.count - 1 < size && row >= 0) ||
+               (shape.rotateIndex == downDir && row < size && row - shape.letters.count + 1 >= 0) {
+                clear()
+                for index in 0..<shape.children.count {
+                    let letter = shape.letters[index]
+                    let itemCol = formOfShape[index] % 10
+                    let itemRow = formOfShape[index] / 10
+                    var calculatedCol = 0
+                    var calculatedRow = 0
+                    switch shape.rotateIndex {
+                    case leftDir: // OK
+                        calculatedCol = myCol + itemCol
+                        calculatedRow = myRow
+                    case rightDir:  // OK
+                        calculatedCol = col + itemCol - shape.letters.count + 1
+                        calculatedRow = myRow
+                    case upDir:
+                        calculatedCol = myCol
+                        let rowX = (row == 1 && GRow >= 0) ? GRow : row
+                        calculatedRow = rowX - itemRow + shape.letters.count - 1
+                    case downDir:
+                        calculatedCol = myCol
+                        calculatedRow = row - itemRow < 0 ? 0 : row - itemRow > size - 1 ? size - 1 : row - itemRow
+                    default: break
+                    }
+                    _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
+                    let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
+                    usedItems.append(usedItem)
+                }
+            }
+
+        } else {
+            clear()
+            for index in 0..<shape.children.count {
+                let letter = shape.letters[index]
+                let itemCol = formOfShape[index] % 10
+                let itemRow = formOfShape[index] / 10
+                let calculatedCol = myCol + itemCol // - adder
+                let calculatedRow = myRow - itemRow < 0 ? 0 : myRow - itemRow > size - 1 ? size - 1 : myRow - itemRow
+                _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
+                let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
+                usedItems.append(usedItem)
+            }
         }
         return false
     }
