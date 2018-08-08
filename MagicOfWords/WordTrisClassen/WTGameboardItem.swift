@@ -17,7 +17,7 @@ enum ItemStatus: Int {
 }
 
 enum MyColor: Int {
-    case myWhiteColor = 0, myWholeWordColor, myUsedColor, myGoldColor, myBlueColor, myTemporaryColor, myRedColor, myNoColor, myDarkGoldColor
+    case myWhiteColor = 0, myWholeWordColor, myUsedColor, myGoldColor, myBlueColor, myTemporaryColor, myRedColor, myNoColor, myDarkGoldColor, myDarkGreenColor
     var description: String {
     return String(self.rawValue)
 //    switch self {
@@ -37,6 +37,7 @@ let goldColor  = SKColor(red:255/255, green: 215/255, blue: 0/255, alpha: 1.0)
 let temporaryColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha: 1.0)
 let turquoiseColor = SKColor(red: 64/255, green: 224/255, blue: 208/255, alpha: 1.0)
 let darkGoldColor = SKColor(red: 255/255, green: 180/255, blue: 0/255, alpha: 1.0)
+let darkGreenColor = SKColor(red: 0/255, green: 186/255, blue: 0/255, alpha: 1.0)
 
 let emptyLetter = " "
 
@@ -89,9 +90,24 @@ class WTGameboardItem: SKSpriteNode {
             return true
         }
     }
+    
+    public func getColor()->MyColor {
+        return myColor
+    }
     public func setFoundedWord(toColor: MyColor, toStatus: ItemStatus) {
         setColors(toColor: toColor, toStatus: toStatus)
         self.status = .wholeWord
+    }
+    
+    public func setColorByState() {
+        switch status {
+        case .used:
+            setColors(toColor: .myUsedColor, toStatus: .noChange)
+        case .wholeWord:
+            setColors(toColor: .myWholeWordColor, toStatus: .noChange)
+        default:
+            break
+        }
     }
     
     public func clearIfTemporary() {
@@ -190,6 +206,7 @@ class WTGameboardItem: SKSpriteNode {
         case .myBlueColor: return turquoiseColor
         case .myTemporaryColor: return temporaryColor
         case .myDarkGoldColor: return darkGoldColor
+        case .myDarkGreenColor: return darkGreenColor
         case .myNoColor: return .white
         }
     }

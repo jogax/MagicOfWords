@@ -104,6 +104,58 @@ let iFiveMinutes = 300
 
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordListDelegate, WTTableViewDelegate {
+    func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord, commonLetters: [UsedLetter]) {
+        for letter in newWord.usedLetters {
+            var color: MyColor = .myRedColor
+            if commonLetters.contains(where: {$0.col == letter.col && $0.row == letter.row}) {
+                color = .myDarkGreenColor
+            }
+            let myNode = GV.gameArray[letter.col][letter.row]
+            let showRedAction = SKAction.run({
+                myNode.setColors(toColor: color, toStatus: .noChange)
+            })
+            let waitAction = SKAction.wait(forDuration: 0.5)
+            let showOrigAction = SKAction.run({
+                myNode.setColorByState()
+            })
+            var sequence = [SKAction]()
+            for _ in 0...5 {
+                sequence.append(showRedAction)
+                sequence.append(waitAction)
+                sequence.append(showOrigAction)
+                sequence.append(waitAction)
+            }
+            myNode.run(SKAction.sequence(sequence))
+ 
+
+        }
+        for letter in foundedWord.usedLetters {
+            var color: MyColor = .myGoldColor
+            if commonLetters.contains(where: {$0.col == letter.col && $0.row == letter.row}) {
+                color = .myDarkGreenColor
+            }
+            let myNode = GV.gameArray[letter.col][letter.row]
+            let showGoldAction = SKAction.run({
+                myNode.setColors(toColor: color, toStatus: .noChange)
+            })
+            let waitAction = SKAction.wait(forDuration: 0.5)
+            let showOrigAction = SKAction.run({
+                myNode.setColorByState()
+            })
+            var sequence = [SKAction]()
+            for _ in 0...5 {
+                sequence.append(showGoldAction)
+                sequence.append(waitAction)
+                sequence.append(showOrigAction)
+                sequence.append(waitAction)
+            }
+            myNode.run(SKAction.sequence(sequence))
+            
+            
+        }
+
+    }
+    
     func setLettersMoved(fromLetters: [UsedLetter], toLetters: [UsedLetter]) {
         let movingItem = MovingItem(fromLetters: fromLetters, toLetters: toLetters)
         let activityItem = ActivityItem(type: .Moving, movingItem: movingItem)
@@ -702,9 +754,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         if realmWordList.objects(WordListModel.self).filter("word = %@", GV.aktLanguage + word.lowercased()).count == 1 {
             let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
             let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord)
-//            if boolValue {
-//                myTimer!.increaseMaxTime(value: increaseTime)
-//            }
             returnBool = boolValue
         }
         return returnBool
@@ -944,7 +993,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let firstTouch = touches.first
         firstTouchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: firstTouchLocation)
-        let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .start)
+        let nodes1 = self.nodes(at: CGPoint(x: firstTouchLocation.x, y: firstTouchLocation.y + blockSize * 0.11))
+        let touchedNodes = analyzeNodes(nodes: nodes, nodes1: nodes1, calledFrom: .start)
         if showingWordsInTable && !touchedNodes.showOwnWordsButton {
             showingWordsInTable = false
             showOwnWordsView.removeFromSuperview()
@@ -981,7 +1031,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
-        let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .move)
+        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
+        let touchedNodes = analyzeNodes(nodes: nodes, nodes1: nodes1, calledFrom: .move)
         if moved {
             let sprite = ws[movedIndex]
             sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * WSGameboardSizeMultiplier)
@@ -1038,7 +1089,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     var enabled = true
     var gameboardEnabled = true
 
-    private func analyzeNodes(nodes: [SKNode], calledFrom: CalledFrom)->TouchedNodes {
+    private func analyzeNodes(nodes: [SKNode], nodes1: [SKNode], calledFrom: CalledFrom)->TouchedNodes {
         var touchedNodes = TouchedNodes()
         for node in nodes {
             guard let name = node.name else {
@@ -1084,6 +1135,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //                touchedNodes.ownWordsBackground = true
             }
         }
+        if touchedNodes.GRow == -1 {
+            for node in nodes1 {
+                guard let name = node.name else {
+                    continue
+                }
+                if name.begins(with: "GBD") {
+                    touchedNodes.GRow = Int(name.subString(startPos: 6, length:1))!
+                }
+            }
+        }
         return touchedNodes
     }
 
@@ -1095,7 +1156,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let touchLocation = firstTouch!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
         let lastPosition = ws.count - 1
-        let touchedNodes = analyzeNodes(nodes: nodes, calledFrom: .stop)
+        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
+        let touchedNodes = analyzeNodes(nodes: nodes, nodes1: nodes1, calledFrom: .stop)
         if touchedNodes.showOwnWordsButton {
             showOwnWordsInTableView()
             showingWordsInTable = true

@@ -33,7 +33,7 @@ public struct SelectedWord {
     }
 //    var creationIndex = 0
 //    var round = 0
-    init(word: String, usedLetters: [UsedLetter]) {
+    init(word: String = "", usedLetters: [UsedLetter] = [UsedLetter]()) {
         self.word = word
         self.usedLetters = usedLetters
 //        self.mandatory = WTGameWordList.shared.isMandatory(word: word)
@@ -109,6 +109,7 @@ public protocol WTGameWordListDelegate: class {
     func showScore(newWord: SelectedWord, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int)
     func startShowingWordsOverPosition(wordList: [SelectedWord])
     func stopShowingWordsOverPosition()
+    func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord, commonLetters: [UsedLetter])
 }
 
 
@@ -228,6 +229,7 @@ public class WTGameWordList {
         
         var noCommonLetter = true
         var noDiagonal = true
+        var commonLetters = [UsedLetter]()
         if wordsInRound.count == 0 {
             wordsInRound.append(WordInRound())
         }
@@ -253,8 +255,12 @@ public class WTGameWordList {
                 for letterIndex in 0..<savedSelectedWord.word.length {
                     if savedSelectedWord.usedLetters[letterIndex].col == selectedWord.usedLetters[letterIndex].col &&
                         savedSelectedWord.usedLetters[letterIndex].row == selectedWord.usedLetters[letterIndex].row {
+                        commonLetters.append(savedSelectedWord.usedLetters[letterIndex])
                         noCommonLetter = false
                     }
+                }
+                if !noCommonLetter {
+                    delegate!.blinkWords(newWord: selectedWord, foundedWord: savedSelectedWord, commonLetters: commonLetters)
                 }
             }
         }
