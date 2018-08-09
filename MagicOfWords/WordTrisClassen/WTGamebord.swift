@@ -303,6 +303,7 @@ class WTGameboard: SKShapeNode {
     
     public func startShowingSpriteOnGameboard(shape: WTPiece, col: Int, row: Int)->Bool {
         showingSprite = true
+        moveModusStarted = false
         self.shape = shape
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
         let (myCol, myRow) = analyseColAndRow(col: col, row: row, GRow: row - 2, formOfShape: formOfShape)
@@ -348,11 +349,10 @@ class WTGameboard: SKShapeNode {
                     switch shape.rotateIndex {
                     case leftDir: // OK
                         calculatedCol = myCol + itemCol
-                        calculatedRow = myRow
-                    case rightDir:  // OK
+                        calculatedRow = rowX - itemRow //+ shape.letters.count - 1
+                   case rightDir:  // OK
                         calculatedCol = col + itemCol - shape.letters.count + 1
-                        calculatedRow = shape.letters.count == 1 ? rowX - itemRow + shape.letters.count - 1 : myRow
-                        print("calculatedRow: \(calculatedRow), GRow: \(GRow), row: \(row), rowX: \(rowX)")
+                        calculatedRow = rowX - itemRow //+ shape.letters.count - 1
                     case upDir:
                         calculatedCol = myCol
                          calculatedRow = rowX - itemRow + shape.letters.count - 1
@@ -474,8 +474,6 @@ class WTGameboard: SKShapeNode {
         }
         return fixed  // when shape remaining on gameBoard, return true
     }
-    private  let scoreProWord: [Int] = [0, 0, 10, 30, 50, 80, 120, 180, 250, 330, 430, 550]
-    
     
     var moveModusStarted = false
     var noMoreMove = false
@@ -512,6 +510,13 @@ class WTGameboard: SKShapeNode {
                     GV.gameArray[last.col][last.row].changeColor(toColor: .myNoColor)
                     choosedWord.removeLast()
                 } else {
+                    if choosedWord.usedLetters.count > 0 {
+                        if abs(choosedWord.usedLetters.last!.col - col) == 1 && abs(choosedWord.usedLetters.last!.row - row) == 1 {
+                            if setMoveModusIfPossible() {
+                                return true
+                            }
+                        }
+                    }
                     GV.gameArray[col][row].changeColor(toColor: .myBlueColor)
                     choosedWord.addLetter(letter: actLetter)
                 }

@@ -130,7 +130,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 
         }
         for letter in foundedWord.usedLetters {
-            var color: MyColor = .myGoldColor
+            var color: MyColor = .myLightGreenColor
             if commonLetters.contains(where: {$0.col == letter.col && $0.row == letter.row}) {
                 color = .myDarkGreenColor
             }
@@ -182,23 +182,38 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         }
     }
     let showWordsBackgroundColor = UIColor(red:255/255, green: 204/255, blue: 153/255, alpha: 1.0)
+    let maxLengthMultiplier: CGFloat = 50
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
-        let cell:UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
         let fontSize = GV.onIpad ? self.frame.width * 0.015 : self.frame.width * 0.040
-//        let backgroundImage = UIImageView(frame: cell.frame)
-//        backgroundImage.clipsToBounds = true
-//        backgroundImage.image = UIImage(named: "menuBackground.png")
-//        backgroundImage.contentMode = .scaleToFill
-//        cell.backgroundView = backgroundImage
-        cell.backgroundColor = showWordsBackgroundColor
-        cell.textLabel!.font = UIFont(name: "CourierNewPS-BoldMT", size: fontSize)
-        switch indexPath.section {
-        case 0:
-            cell.textLabel!.text = ownWordsForShow[indexPath.row]
-        default: break
-        }
+        let font = UIFont(name: "CourierNewPS-BoldMT", size: fontSize)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
+        cell.setFont(font: font!)
+        cell.setCellSize(size: CGSize(width: tableView.frame.width, height: self.frame.width * 0.040))
+        cell.setBGColor(color: showWordsBackgroundColor)
+        cell.addColumn(width: CGFloat(maxLength) * maxLengthMultiplier, text: ownWordsForShow[indexPath.row].word) // WordColumn
+        cell.addColumn(width: 4 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].counter).fixLength(length: 4)) // Counter column
+        cell.addColumn(width: 4 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].score).fixLength(length: 4)) // Score column
+
+//        cell.setLabelText(index: 0, text: ownWordsForShow[indexPath.row].word)
+//        cell.setLabelText(index: 1, text: String(ownWordsForShow[indexPath.row].counter).fixLength(length: 4))
+//        cell.setLabelText(index: 2, text: String(ownWordsForShow[indexPath.row].score).fixLength(length: 4))
         return cell
+//        let cell:UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
+//        let fontSize = GV.onIpad ? self.frame.width * 0.015 : self.frame.width * 0.040
+////        let backgroundImage = UIImageView(frame: cell.frame)
+////        backgroundImage.clipsToBounds = true
+////        backgroundImage.image = UIImage(named: "menuBackground.png")
+////        backgroundImage.contentMode = .scaleToFill
+////        cell.backgroundView = backgroundImage
+//        cell.backgroundColor = showWordsBackgroundColor
+//        cell.textLabel!.font = UIFont(name: "CourierNewPS-BoldMT", size: fontSize)
+//        switch indexPath.section {
+//        case 0:
+//            cell.textLabel!.text = ownWordsForShow[indexPath.row]
+//        default: break
+//        }
+//        return cell
     }
     
     func getNumberOfSections() -> Int {
@@ -210,6 +225,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         default: return 0
         }
     }
+    
     
     let nameForSpriteWidthWords = "°°°nameForSpriteWidthWords°°°"
     var spriteToShowWords: SKSpriteNode?
@@ -643,33 +659,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         
    }
     
-//    private func createBackgroundForOwnWords() {
-//        let ownYPositionMultiplier:CGFloat = 0.80
-//        firstLineYPosition = self.frame.height * (ownYPositionMultiplier)
-//        heightOfLine = self.size.height * 0.02
-//        let minY: CGFloat? = wtGameboard!.children[0].frame.maxY
-//        let maxY: CGFloat? = self.childNode(withName: ownWordsButtonName)!.frame.maxY
-//        var yPos: CGFloat = 0
-//        var height: CGFloat = 0
-//        if minY != nil && maxY != nil {
-//            height = (maxY! - minY!) * 1.1
-//            yPos = minY! + (maxY! - minY!) * 0.38
-//            countShowingOwnWords = countWordsInRow * (Int(height / (self.size.height * 0.02)) - 1)
-//            countShowingRows = countShowingOwnWords / countWordsInRow
-//        }
-//
-//        if self.childNode(withName: ownWordsBackgroundName) == nil {
-//            let texture = SKTexture(imageNamed: "menuBackground.png")
-//            let ownWordsBackgroundSprite = SKSpriteNode(texture: texture, color: .red, size: CGSize(width: self.size.width, height: height))
-//            ownWordsBackgroundSprite.position = CGPoint(x: self.size.width * 0.52, y: yPos)
-//            ownWordsBackgroundSprite.alpha = 0.3
-//            ownWordsBackgroundSprite.name = ownWordsBackgroundName
-//            ownWordsBackgroundSprite.alpha = 0.01
-//            ownWordsBackgroundSprite.isHidden = false
-//            self.addChild(ownWordsBackgroundSprite)
-//        }
-//    }
-    
     override func update(_ currentTime: TimeInterval) {
         if checkIfGameFinished() {
 //            self.view?.isUserInteractionEnabled = false
@@ -992,9 +981,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         WTGameWordList.shared.stopShowingWords()
         let firstTouch = touches.first
         firstTouchLocation = firstTouch!.location(in: self)
-        let nodes = self.nodes(at: firstTouchLocation)
-        let nodes1 = self.nodes(at: CGPoint(x: firstTouchLocation.x, y: firstTouchLocation.y + blockSize * 0.11))
-        let touchedNodes = analyzeNodes(nodes: nodes, nodes1: nodes1, calledFrom: .start)
+//        let nodes = self.nodes(at: firstTouchLocation)
+//        let nodes1 = self.nodes(at: CGPoint(x: firstTouchLocation.x, y: firstTouchLocation.y + blockSize * 0.11))
+//        let touchedNodes = analyzeNodes(nodes: nodes, nodes1: nodes1, calledFrom: .start)
+        let touchedNodes = analyzeNodes(touchLocation: firstTouchLocation, calledFrom: .start)
         if showingWordsInTable && !touchedNodes.showOwnWordsButton {
             showingWordsInTable = false
             showOwnWordsView.removeFromSuperview()
@@ -1030,9 +1020,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         }
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
-        let nodes = self.nodes(at: touchLocation)
-        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
-        let touchedNodes = analyzeNodes(nodes: nodes, nodes1: nodes1, calledFrom: .move)
+//        let nodes = self.nodes(at: touchLocation)
+//        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
+        let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .move)
         if moved {
             let sprite = ws[movedIndex]
             sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * WSGameboardSizeMultiplier)
@@ -1089,7 +1079,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     var enabled = true
     var gameboardEnabled = true
 
-    private func analyzeNodes(nodes: [SKNode], nodes1: [SKNode], calledFrom: CalledFrom)->TouchedNodes {
+//    private func analyzeNodes(nodes: [SKNode], nodes1: [SKNode], calledFrom: CalledFrom)->TouchedNodes {
+    private func analyzeNodes(touchLocation: CGPoint, calledFrom: CalledFrom)->TouchedNodes {
+        let nodes = self.nodes(at: touchLocation)
         var touchedNodes = TouchedNodes()
         for node in nodes {
             guard let name = node.name else {
@@ -1135,16 +1127,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //                touchedNodes.ownWordsBackground = true
             }
         }
-        if touchedNodes.GRow == -1 {
-            for node in nodes1 {
-                guard let name = node.name else {
-                    continue
-                }
-                if name.begins(with: "GBD") {
-                    touchedNodes.GRow = Int(name.subString(startPos: 6, length:1))!
-                }
-            }
-        }
+//        if touchedNodes.GRow == -1 {
+//            for node in nodes1 {
+//                guard let name = node.name else {
+//                    continue
+//                }
+//                if name.begins(with: "GBD") {
+//                    touchedNodes.GRow = Int(name.subString(startPos: 6, length:1))!
+//                }
+//            }
+//        }
         return touchedNodes
     }
 
@@ -1154,10 +1146,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         }
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
-        let nodes = self.nodes(at: touchLocation)
+//        let nodes = self.nodes(at: touchLocation)
         let lastPosition = ws.count - 1
-        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
-        let touchedNodes = analyzeNodes(nodes: nodes, nodes1: nodes1, calledFrom: .stop)
+//        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
+        let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .stop)
         if touchedNodes.showOwnWordsButton {
             showOwnWordsInTableView()
             showingWordsInTable = true
@@ -1275,7 +1267,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 ws[movedIndex].alpha = 1
             }
             moved = false
-        } else if nodes.count > 0 {
+        } else if self.nodes(at: touchLocation).count > 0 {
             if touchedNodes.shapeIndex >= 0 && startShapeIndex == touchedNodes.shapeIndex {
                     ws[touchedNodes.shapeIndex].rotate()
                     ws[touchedNodes.shapeIndex].position = origPosition[touchedNodes.shapeIndex]
@@ -1596,6 +1588,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         }
 //        let lengths = [1,1,1,1,1,2,2,2,2,2,2,3,3,4]
         let lengths = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3]
+//        let lengths = [1,1,2,2,3,3,3,3]
         var generateLength = 0
         repeat {
             let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
@@ -1683,17 +1676,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     }
     
     var showOwnWordsView = WTTableView()
-    var ownWordsForShow = [String]()
+    var ownWordsForShow = [FoundedWordWithCounter]()
     var maxLength = 0
     var showingWordsInTable = false
     private func showOwnWordsInTableView() {
         timerIsCounting = false
         (ownWordsForShow, maxLength) = WTGameWordList.shared.getWordsForShow(mandatory: false)
         showOwnWordsView.setDelegate(delegate: self)
-        showOwnWordsView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        showOwnWordsView.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
         let indexPath = IndexPath(row: 0, section: 0)
         let frame = showOwnWordsView.rectForRow(at: indexPath)
-        let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(maxLength)), y: 50)
+        let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(maxLength) * maxLengthMultiplier), y: 50)
         let headerframeHeight = showOwnWordsView.rectForHeader(inSection: 0).height
         var showingWordsHeight = CGFloat(ownWordsForShow.count) * frame.height
         if showingWordsHeight  > self.frame.height * 0.8 {
@@ -1703,7 +1696,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 showingWordsHeight = frame.height * counter
             } while showingWordsHeight + headerframeHeight > self.frame.height * 0.8
         }
-        let size = CGSize(width: CGFloat(maxLength), height: showingWordsHeight + headerframeHeight)
+        let size = CGSize(width: CGFloat(maxLength) * maxLengthMultiplier, height: showingWordsHeight + headerframeHeight)
         showOwnWordsView.frame=CGRect(origin: origin, size: size)
         self.scene?.view?.addSubview(showOwnWordsView)
         showOwnWordsView.reloadData()

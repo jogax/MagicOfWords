@@ -17,7 +17,8 @@ enum ItemStatus: Int {
 }
 
 enum MyColor: Int {
-    case myWhiteColor = 0, myWholeWordColor, myUsedColor, myGoldColor, myBlueColor, myTemporaryColor, myRedColor, myNoColor, myDarkGoldColor, myDarkGreenColor
+    case myWhiteColor = 0, myGreenColor, myUsedColor, myGoldColor, myBlueColor, myTemporaryColor, myRedColor, myNoColor, myDarkGoldColor, myDarkGreenColor,
+    myLightGreenColor
     var description: String {
     return String(self.rawValue)
 //    switch self {
@@ -38,6 +39,7 @@ let temporaryColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha:
 let turquoiseColor = SKColor(red: 64/255, green: 224/255, blue: 208/255, alpha: 1.0)
 let darkGoldColor = SKColor(red: 255/255, green: 180/255, blue: 0/255, alpha: 1.0)
 let darkGreenColor = SKColor(red: 0/255, green: 186/255, blue: 0/255, alpha: 1.0)
+let lightGreenColor = SKColor(red: 0/255, green: 255/255, blue: 127/255, alpha: 1.0)
 
 let emptyLetter = " "
 
@@ -46,7 +48,7 @@ class WTGameboardItem: SKSpriteNode {
     public var status: ItemStatus = .empty
     public var myColor: MyColor = .myWhiteColor
     private var colorToStatus: [ItemStatus:MyColor] = [
-        .empty : .myWhiteColor, .temporary : .myTemporaryColor, .used : .myUsedColor, .wholeWord : .myWholeWordColor
+        .empty : .myWhiteColor, .temporary : .myTemporaryColor, .used : .myUsedColor, .wholeWord : .myGreenColor
     ]
     private var origLetter: String = emptyLetter
     private var origColor: MyColor = .myWhiteColor
@@ -57,8 +59,8 @@ class WTGameboardItem: SKSpriteNode {
     public var letter = emptyLetter
     init(blockSize: CGFloat, fontSize: CGFloat) {
         label = SKLabelNode()
-        let texture = SKTexture()
-        super.init(texture: texture, color: .white, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
+        let texture = SKTexture(imageNamed: "whiteSprite.png")
+        super.init(texture: texture, color: .white, size: CGSize(width: blockSize, height: blockSize))
         label.fontName = "KohinoorTelugu-Regular"
         label.fontName = "Baskerville"
         label.fontName = "ChalkboardSE-Light"
@@ -104,7 +106,7 @@ class WTGameboardItem: SKSpriteNode {
         case .used:
             setColors(toColor: .myUsedColor, toStatus: .noChange)
         case .wholeWord:
-            setColors(toColor: .myWholeWordColor, toStatus: .noChange)
+            setColors(toColor: .myGreenColor, toStatus: .noChange)
         default:
             break
         }
@@ -200,13 +202,14 @@ class WTGameboardItem: SKSpriteNode {
         switch color {
         case .myRedColor: return .red
         case .myWhiteColor: return .white
-        case .myWholeWordColor: return .green
+        case .myGreenColor: return .green
         case .myUsedColor: return usedColor
         case .myGoldColor: return goldColor
         case .myBlueColor: return turquoiseColor
         case .myTemporaryColor: return temporaryColor
         case .myDarkGoldColor: return darkGoldColor
         case .myDarkGreenColor: return darkGreenColor
+        case .myLightGreenColor: return lightGreenColor
         case .myNoColor: return .white
         }
     }

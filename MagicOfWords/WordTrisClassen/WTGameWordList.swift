@@ -269,7 +269,7 @@ public class WTGameWordList {
             let oldScore = getActualScore()
             wordsInRound[wordsInRound.count - 1].wordsInGame.append(selectedWord)
             for letter in selectedWord.usedLetters {
-                GV.gameArray[letter.col][letter.row].setColors(toColor: .myWholeWordColor, toStatus: .wholeWord)
+                GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord)
             }
             addWordToAllWords(word: selectedWord.word)
             let newScore = getActualScore()
@@ -431,31 +431,28 @@ public class WTGameWordList {
     public func stopShowingWords() {
         for selectedWord in showedWords {
             for letter in selectedWord.usedLetters {
-                GV.gameArray[letter.col][letter.row].setColors(toColor: .myWholeWordColor, toStatus: .wholeWord)
+                GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord)
             }
         }
         showedWords = [SelectedWord]()
         delegate!.stopShowingWordsOverPosition()
     }
-    public func getWordsForShow(mandatory: Bool)->([String], Int) {
-        var returnWords = [String]()
-        var maxLength = 0
+    public func getWordsForShow(mandatory: Bool)->([FoundedWordWithCounter], Int) {
+        var returnWords = [FoundedWordWithCounter]()
+        var maxLengthOfWords = 0
         for foundedWord in allWords {
             if foundedWord.mandatory == mandatory {
-                if foundedWord.word.length > maxLength {
-                    maxLength = foundedWord.word.length
+                if foundedWord.word.length > maxLengthOfWords {
+                    maxLengthOfWords = foundedWord.word.length
                 }
             }
         }
         for foundedWord in allWords {
             if foundedWord.mandatory == mandatory {
-                var myString = foundedWord.word.fixLength(length: maxLength, leadingBlanks: false)
-                let score = foundedWord.score
-                myString += " | " + String(foundedWord.counter).fixLength(length: 4) + " | " + String(score).fixLength(length: 4)
-                returnWords.append(myString)
+                returnWords.append(FoundedWordWithCounter(word: foundedWord.word, counter: foundedWord.counter, score: foundedWord.score))
             }
         }
-        return (returnWords, 11 * (maxLength + 15))
+        return (returnWords, maxLengthOfWords)
     }
     
 }
