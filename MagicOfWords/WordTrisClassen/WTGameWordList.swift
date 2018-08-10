@@ -40,7 +40,7 @@ public struct SelectedWord {
     }
     init(from: String) {
         let valueTab = from.components(separatedBy: itemInnerSeparator)
-        if valueTab.count > 4 {
+        if valueTab.count > 3 {
             self.word = valueTab[0]
             for index in 1..<valueTab.count {
                 if let iColRow = Int(valueTab[index]) {
@@ -202,6 +202,7 @@ public class WTGameWordList {
     }
     
     private func initFromString(from: String) {
+        
         if from.length > 0 {
             let selectedWords = from.components(separatedBy: itemSeparator)
             for selectedWordString in selectedWords {
@@ -452,7 +453,8 @@ public class WTGameWordList {
                 returnWords.append(FoundedWordWithCounter(word: foundedWord.word, counter: foundedWord.counter, score: foundedWord.score))
             }
         }
-        return (returnWords, maxLengthOfWords)
+        
+        return (returnWords.sorted(by: {$0.score > $1.score || $0.score == $1.score && $0.word < $1.word}), maxLengthOfWords)
     }
     
 }

@@ -181,16 +181,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             return ""
         }
     }
+    
+    func setHeaderView(tableView: UITableView, headerView: UIView, section: Int) {
+        let header = headerView as? UITableViewHeaderFooterView
+//        let fontSize = GV.onIpad ? self.frame.width * 0.018 : self.frame.width * 0.060
+        header?.textLabel?.font = UIFont(name: "CourierNewPS-BoldMT", size: 25) // change it according to ur requirement
+        header?.textLabel?.textAlignment = .center
+        header?.textLabel?.textColor = UIColor.black // change it according to ur requirement
+        header?.backgroundColor = UIColor.red //showWordsBackgroundColor
+    }
+    
+
     let showWordsBackgroundColor = UIColor(red:255/255, green: 204/255, blue: 153/255, alpha: 1.0)
     let maxLengthMultiplier: CGFloat = 50
     
+    
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
-        let fontSize = GV.onIpad ? self.frame.width * 0.015 : self.frame.width * 0.040
+        let fontSize = GV.onIpad ? self.frame.width * 0.018 : self.frame.width * 0.060
         let font = UIFont(name: "CourierNewPS-BoldMT", size: fontSize)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: font!)
         cell.setCellSize(size: CGSize(width: tableView.frame.width, height: self.frame.width * 0.040))
-        cell.setBGColor(color: showWordsBackgroundColor)
+        cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
         cell.addColumn(width: CGFloat(maxLength) * maxLengthMultiplier, text: ownWordsForShow[indexPath.row].word) // WordColumn
         cell.addColumn(width: 4 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].counter).fixLength(length: 4)) // Counter column
         cell.addColumn(width: 4 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].score).fixLength(length: 4)) // Score column
@@ -1679,24 +1691,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     var ownWordsForShow = [FoundedWordWithCounter]()
     var maxLength = 0
     var showingWordsInTable = false
+    
     private func showOwnWordsInTableView() {
         timerIsCounting = false
         (ownWordsForShow, maxLength) = WTGameWordList.shared.getWordsForShow(mandatory: false)
         showOwnWordsView.setDelegate(delegate: self)
         showOwnWordsView.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
+//        showOwnWordsView.rowHeight = 20
         let indexPath = IndexPath(row: 0, section: 0)
         let frame = showOwnWordsView.rectForRow(at: indexPath)
-        let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(maxLength) * maxLengthMultiplier), y: 50)
+        let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(maxLength + 8) * maxLengthMultiplier), y: 100)
         let headerframeHeight = showOwnWordsView.rectForHeader(inSection: 0).height
         var showingWordsHeight = CGFloat(ownWordsForShow.count) * frame.height
-        if showingWordsHeight  > self.frame.height * 0.8 {
+        if showingWordsHeight  > self.frame.height * 0.9 {
             var counter = CGFloat(ownWordsForShow.count)
             repeat {
                 counter -= 1
                 showingWordsHeight = frame.height * counter
-            } while showingWordsHeight + headerframeHeight > self.frame.height * 0.8
+            } while showingWordsHeight + headerframeHeight > self.frame.height * 0.9
         }
-        let size = CGSize(width: CGFloat(maxLength) * maxLengthMultiplier, height: showingWordsHeight + headerframeHeight)
+        let size = CGSize(width: CGFloat(maxLength + 8) * maxLengthMultiplier, height: showingWordsHeight + headerframeHeight)
         showOwnWordsView.frame=CGRect(origin: origin, size: size)
         self.scene?.view?.addSubview(showOwnWordsView)
         showOwnWordsView.reloadData()

@@ -16,19 +16,12 @@ public protocol WTTableViewDelegate: class {
     func getNumberOfRowsInSections(section: Int)->Int
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath)->UITableViewCell
     func geTitleForHeaderInSection(section: Int)->String?
+    func setHeaderView(tableView: UITableView, headerView: UIView, section: Int)
 }
 class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
-//    var items: [String] = ["Player1", "Player2", "Player3"]
-//    var words: [String] = ["Word1", "Word2", "Word3", "Word4", "Word5"]
     var myDelegate: WTTableViewDelegate?
     override init(frame: CGRect, style: UITableViewStyle) {
         super.init(frame: frame, style: style)
-//        self.backgroundColor = UIColor.lightGray
-//        let backgroundImage = UIImageView(frame: frame)
-//        backgroundImage.clipsToBounds = true
-//        backgroundImage.image = UIImage(named: "menuBackground.png")
-//        backgroundImage.contentMode = .scaleToFill
-//        self.backgroundView = backgroundImage
         self.delegate = self
         self.dataSource = self
     }
@@ -54,6 +47,9 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("You selected cell #\(indexPath.row)!")
     }
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        self.myDelegate!.setHeaderView(tableView: tableView, headerView: view, section: section)
     }
+}
 
 
