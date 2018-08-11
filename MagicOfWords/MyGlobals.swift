@@ -71,6 +71,7 @@ struct GV {
     static var basicDataRecord = BasicDataModel()
 
     static let language = Language()
+    static let size = 10
     static var maxRecordCount = 0
     static var actRecordCount = 0
     static var EndOfFileReached = false

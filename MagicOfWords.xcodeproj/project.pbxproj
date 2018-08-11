@@ -33,7 +33,22 @@
 		205184F920615B3100E7FAF4 /* deGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F820615B3100E7FAF4 /* deGameData.txt */; };
 		205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184FA20615B5C00E7FAF4 /* enGameData.txt */; };
 		20531C6820B6EA5400E060E2 /* ShowFinishedGamesScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20531C6720B6EA5400E060E2 /* ShowFinishedGamesScene.swift */; };
-		2055B487211C56FF000FD7A9 /* whiteSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 2055B486211C56FE000FD7A9 /* whiteSprite.png */; };
+		20552DBD211F1EFA00C54538 /* whiteSprite1001.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DAD211F1EF800C54538 /* whiteSprite1001.png */; };
+		20552DBE211F1EFA00C54538 /* whiteSprite0110.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DAE211F1EF800C54538 /* whiteSprite0110.png */; };
+		20552DBF211F1EFA00C54538 /* whiteSprite1010.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DAF211F1EF800C54538 /* whiteSprite1010.png */; };
+		20552DC0211F1EFA00C54538 /* whiteSprite0101.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB0211F1EF900C54538 /* whiteSprite0101.png */; };
+		20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB1211F1EF900C54538 /* whiteSprite1000.png */; };
+		20552DC2211F1EFA00C54538 /* whiteSprite1111.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB2211F1EF900C54538 /* whiteSprite1111.png */; };
+		20552DC3211F1EFA00C54538 /* whiteSprite0011.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB3211F1EF900C54538 /* whiteSprite0011.png */; };
+		20552DC4211F1EFA00C54538 /* whiteSprite1011.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB4211F1EF900C54538 /* whiteSprite1011.png */; };
+		20552DC5211F1EFA00C54538 /* whiteSprite0010.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB5211F1EF900C54538 /* whiteSprite0010.png */; };
+		20552DC6211F1EFA00C54538 /* whiteSprite1101.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB6211F1EF900C54538 /* whiteSprite1101.png */; };
+		20552DC7211F1EFA00C54538 /* whiteSprite1110.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB7211F1EF900C54538 /* whiteSprite1110.png */; };
+		20552DC8211F1EFA00C54538 /* whiteSprite1100.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB8211F1EFA00C54538 /* whiteSprite1100.png */; };
+		20552DC9211F1EFA00C54538 /* whiteSprite0001.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DB9211F1EFA00C54538 /* whiteSprite0001.png */; };
+		20552DCA211F1EFA00C54538 /* whiteSprite0000.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBA211F1EFA00C54538 /* whiteSprite0000.png */; };
+		20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBB211F1EFA00C54538 /* whiteSprite0111.png */; };
+		20552DCC211F1EFA00C54538 /* whiteSprite0100.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBC211F1EFA00C54538 /* whiteSprite0100.png */; };
 		2055B489211C74A9000FD7A9 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */; };
 		2055CB6B20C59AFB005F57E3 /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2055CB6A20C59AD7005F57E3 /* WordList.realm */; };
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
@@ -118,7 +133,22 @@
 		205184F820615B3100E7FAF4 /* deGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deGameData.txt; sourceTree = "<group>"; };
 		205184FA20615B5C00E7FAF4 /* enGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enGameData.txt; sourceTree = "<group>"; };
 		20531C6720B6EA5400E060E2 /* ShowFinishedGamesScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowFinishedGamesScene.swift; sourceTree = "<group>"; };
-		2055B486211C56FE000FD7A9 /* whiteSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite.png; sourceTree = "<group>"; };
+		20552DAD211F1EF800C54538 /* whiteSprite1001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite1001.png; sourceTree = "<group>"; };
+		20552DAE211F1EF800C54538 /* whiteSprite0110.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0110.png; sourceTree = "<group>"; };
+		20552DAF211F1EF800C54538 /* whiteSprite1010.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite1010.png; sourceTree = "<group>"; };
+		20552DB0211F1EF900C54538 /* whiteSprite0101.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0101.png; sourceTree = "<group>"; };
+		20552DB1211F1EF900C54538 /* whiteSprite1000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite1000.png; sourceTree = "<group>"; };
+		20552DB2211F1EF900C54538 /* whiteSprite1111.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite1111.png; sourceTree = "<group>"; };
+		20552DB3211F1EF900C54538 /* whiteSprite0011.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0011.png; sourceTree = "<group>"; };
+		20552DB4211F1EF900C54538 /* whiteSprite1011.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite1011.png; sourceTree = "<group>"; };
+		20552DB5211F1EF900C54538 /* whiteSprite0010.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0010.png; sourceTree = "<group>"; };
+		20552DB6211F1EF900C54538 /* whiteSprite1101.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite1101.png; sourceTree = "<group>"; };
+		20552DB7211F1EF900C54538 /* whiteSprite1110.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite1110.png; sourceTree = "<group>"; };
+		20552DB8211F1EFA00C54538 /* whiteSprite1100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite1100.png; sourceTree = "<group>"; };
+		20552DB9211F1EFA00C54538 /* whiteSprite0001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0001.png; sourceTree = "<group>"; };
+		20552DBA211F1EFA00C54538 /* whiteSprite0000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0000.png; sourceTree = "<group>"; };
+		20552DBB211F1EFA00C54538 /* whiteSprite0111.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0111.png; sourceTree = "<group>"; };
+		20552DBC211F1EFA00C54538 /* whiteSprite0100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0100.png; sourceTree = "<group>"; };
 		2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		2055CB6A20C59AD7005F57E3 /* WordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = WordList.realm; sourceTree = "<group>"; };
 		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -277,9 +307,24 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
-				2055B486211C56FE000FD7A9 /* whiteSprite.png */,
 				208173E02103577800960800 /* balloon.png */,
 				20B04BB120935CC2008F99A2 /* menuBackground.png */,
+				20552DBA211F1EFA00C54538 /* whiteSprite0000.png */,
+				20552DB9211F1EFA00C54538 /* whiteSprite0001.png */,
+				20552DB5211F1EF900C54538 /* whiteSprite0010.png */,
+				20552DB3211F1EF900C54538 /* whiteSprite0011.png */,
+				20552DBC211F1EFA00C54538 /* whiteSprite0100.png */,
+				20552DB0211F1EF900C54538 /* whiteSprite0101.png */,
+				20552DAE211F1EF800C54538 /* whiteSprite0110.png */,
+				20552DBB211F1EFA00C54538 /* whiteSprite0111.png */,
+				20552DB1211F1EF900C54538 /* whiteSprite1000.png */,
+				20552DAD211F1EF800C54538 /* whiteSprite1001.png */,
+				20552DAF211F1EF800C54538 /* whiteSprite1010.png */,
+				20552DB4211F1EF900C54538 /* whiteSprite1011.png */,
+				20552DB8211F1EFA00C54538 /* whiteSprite1100.png */,
+				20552DB6211F1EF900C54538 /* whiteSprite1101.png */,
+				20552DB7211F1EF900C54538 /* whiteSprite1110.png */,
+				20552DB2211F1EF900C54538 /* whiteSprite1111.png */,
 				2098BB8D20601B0B00C3641B /* magier.png */,
 				205E8E2720948E2D00314646 /* button.png */,
 				204BB45C2063E9E000CDF085 /* undo.png */,
@@ -383,26 +428,41 @@
 			buildActionMask = 2147483647;
 			files = (
 				2055CB6B20C59AFB005F57E3 /* WordList.realm in Resources */,
+				20552DC6211F1EFA00C54538 /* whiteSprite1101.png in Resources */,
 				208D085620C42F4000954E63 /* Mandatory.realm in Resources */,
 				20DA3BF220FE1DFC00EA2D55 /* StateOfWordChanging.txt in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
+				20552DBF211F1EFA00C54538 /* whiteSprite1010.png in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
+				20552DC3211F1EFA00C54538 /* whiteSprite0011.png in Resources */,
+				20552DC2211F1EFA00C54538 /* whiteSprite1111.png in Resources */,
+				20552DCC211F1EFA00C54538 /* whiteSprite0100.png in Resources */,
+				20552DC0211F1EFA00C54538 /* whiteSprite0101.png in Resources */,
 				205184F920615B3100E7FAF4 /* deGameData.txt in Resources */,
+				20552DBD211F1EFA00C54538 /* whiteSprite1001.png in Resources */,
 				20842DE62031EA910078FFDA /* ruWords.txt in Resources */,
 				20B28AE020330C64001682B2 /* deWords.txt in Resources */,
+				20552DC4211F1EFA00C54538 /* whiteSprite1011.png in Resources */,
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
 				205184F72061525C00E7FAF4 /* huGameData.txt in Resources */,
+				20552DC8211F1EFA00C54538 /* whiteSprite1100.png in Resources */,
 				208173E12103577900960800 /* balloon.png in Resources */,
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
+				20552DC7211F1EFA00C54538 /* whiteSprite1110.png in Resources */,
+				20552DCA211F1EFA00C54538 /* whiteSprite0000.png in Resources */,
+				20552DC5211F1EFA00C54538 /* whiteSprite0010.png in Resources */,
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
+				20552DBE211F1EFA00C54538 /* whiteSprite0110.png in Resources */,
 				205E8E2820948E2E00314646 /* button.png in Resources */,
 				205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */,
+				20552DC9211F1EFA00C54538 /* whiteSprite0001.png in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
-				2055B487211C56FF000FD7A9 /* whiteSprite.png in Resources */,
 				204BB45D2063E9E000CDF085 /* undo.png in Resources */,
+				20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
+				20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -275,7 +275,7 @@ class WTGameboard: SKShapeNode {
             gameArray.append( [WTGameboardItem]() )
             
             for j in 0..<size {
-                gameArray[i].append( WTGameboardItem(blockSize: blockSize!, fontSize: parentScene.frame.width * 0.045) )
+                gameArray[i].append( WTGameboardItem(blockSize: blockSize!, fontSize: parentScene.frame.width * 0.040) )
                 gameArray[i][j].letter = emptyLetter
             }
         }

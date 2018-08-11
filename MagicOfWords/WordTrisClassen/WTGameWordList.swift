@@ -17,9 +17,16 @@ let pointsForWord: [Int:Int] = [0: 0, 1: 0, 2: 0, 3: 10, 4: 50, 5:100, 6: 150, 7
 let minutesForWord: [Int: Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 5, 8: 5, 9:10, 10: 10, 11: 15, 12: 15, 13: 15, 14: 15,
                                   15: 20, 16: 20, 17: 20, 18:20, 19: 25, 20:25, 21: 25, 22: 30, 23: 30, 24: 30, 25: 60]
 
+public struct ConnectionType {
+    var left = false
+    var top = false
+    var right = false
+    var bottom = false
+}
 public struct SelectedWord {
     var word: String = ""
     var usedLetters = [UsedLetter]()
+    var connectionTypes = [ConnectionType]()
 //    var mandatory = false
     var score: Int {
         get {
@@ -36,11 +43,12 @@ public struct SelectedWord {
     init(word: String = "", usedLetters: [UsedLetter] = [UsedLetter]()) {
         self.word = word
         self.usedLetters = usedLetters
+        self.connectionTypes = setConnectionTypes()
 //        self.mandatory = WTGameWordList.shared.isMandatory(word: word)
     }
     init(from: String) {
         let valueTab = from.components(separatedBy: itemInnerSeparator)
-        if valueTab.count > 3 {
+        if valueTab.count > 1 {
             self.word = valueTab[0]
             for index in 1..<valueTab.count {
                 if let iColRow = Int(valueTab[index]) {
@@ -50,6 +58,30 @@ public struct SelectedWord {
                 }
             }
         }
+        self.connectionTypes = setConnectionTypes()
+    }
+    
+    private func setConnectionTypes()->[ConnectionType] {
+        var connectionTypes = Array(repeating: ConnectionType(), count: usedLetters.count)
+        for index in 0..<usedLetters.count - 1 {
+            if usedLetters[index].row < usedLetters[index + 1].row {
+                connectionTypes[index].bottom = true
+                connectionTypes[index + 1].top = true
+            }
+            if usedLetters[index].row > usedLetters[index + 1].row {
+                connectionTypes[index].top = true
+                connectionTypes[index + 1].bottom = true
+            }
+            if usedLetters[index].col < usedLetters[index + 1].col {
+                connectionTypes[index].right = true
+                connectionTypes[index + 1].left = true
+            }
+            if usedLetters[index].col > usedLetters[index + 1].col {
+                connectionTypes[index].left = true
+                connectionTypes[index + 1].right = true
+            }
+        }
+        return connectionTypes
     }
     func toString()->String {
         var colRowString = ""
@@ -269,8 +301,11 @@ public class WTGameWordList {
 //            var isSaved = false
             let oldScore = getActualScore()
             wordsInRound[wordsInRound.count - 1].wordsInGame.append(selectedWord)
-            for letter in selectedWord.usedLetters {
-                GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord)
+            for index in 0..<selectedWord.usedLetters.count {
+//            for letter in selectedWord.usedLetters {
+                let letter = selectedWord.usedLetters[index]
+                let connectionType = selectedWord.connectionTypes[index]
+                GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType)
             }
             addWordToAllWords(word: selectedWord.word)
             let newScore = getActualScore()
@@ -304,7 +339,7 @@ public class WTGameWordList {
             removeWordFromAllWords(word: selectedWord.word)
             for index in 0..<wordsInGame.count {
                 if selectedWord == wordsInGame[index] {
-                    wordsInRound[wordsInRound.count - 1].wordsInGame.remove(at: index)
+                    wordsInRound[wordsInRound.count - 1].wordsInGame.removeLast()
                     break
                 }
             }
@@ -316,6 +351,20 @@ public class WTGameWordList {
             let newScore = getActualScore()
             let changeTime = selectedWord.word.length > maxUsedLength ? minutesForWord[maxUsedLength] : minutesForWord[selectedWord.word.length]
             delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: -changeTime!)
+        }
+        for col in 0..<GV.size {
+            for row in 0..<GV.size {
+                GV.gameArray[col][row].clearConnectionType()
+            }
+        }
+        for word in wordsInRound.last!.wordsInGame
+ {
+            for index in 0..<word.usedLetters.count {
+                let col = word.usedLetters[index].col
+                let row = word.usedLetters[index].row
+                let connectionType = word.connectionTypes[index]
+                GV.gameArray[col][row].setConnectionType(connectionType: connectionType)
+            }
         }
     }
     

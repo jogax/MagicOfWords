@@ -55,11 +55,12 @@ class WTGameboardItem: SKSpriteNode {
     public var doubleUsed = false
     private var blockSize:CGFloat = 0
     private var label: SKLabelNode
+    private var connectionType = ConnectionType()
 //    private var countOccurencesInWords = 0
     public var letter = emptyLetter
     init(blockSize: CGFloat, fontSize: CGFloat) {
         label = SKLabelNode()
-        let texture = SKTexture(imageNamed: "whiteSprite.png")
+        let texture = SKTexture(imageNamed: "whiteSprite0000.png")
         super.init(texture: texture, color: .white, size: CGSize(width: blockSize, height: blockSize))
         label.fontName = "KohinoorTelugu-Regular"
         label.fontName = "Baskerville"
@@ -214,13 +215,44 @@ class WTGameboardItem: SKSpriteNode {
         }
     }
     
-    public func setColors(toColor: MyColor, toStatus: ItemStatus) {
+    public func clearConnectionType() {
+        self.connectionType = ConnectionType()
+        setTexture()
+    }
+    
+    public func setConnectionType(connectionType: ConnectionType) {
+        if connectionType.left {
+            self.connectionType.left = true
+        }
+        if connectionType.top {
+            self.connectionType.top = true
+        }
+        if connectionType.right {
+            self.connectionType.right = true
+        }
+        if connectionType.bottom {
+            self.connectionType.bottom = true
+        }
+        setTexture()
+    }
+    
+    public func setColors(toColor: MyColor, toStatus: ItemStatus, connectionType: ConnectionType = ConnectionType()) {
         let color = letter == emptyLetter ? .myWhiteColor : toColor
         self.myColor = color
         self.color = convertMyColorToSKColor(color: color)
         self.status = toStatus == .noChange ? self.status : toStatus
+        setConnectionType(connectionType: connectionType)
     }
     
+    private func setTexture() {
+        var name = "whiteSprite"
+        name += self.connectionType.left ? "1" : "0"
+        name += self.connectionType.top ? "1" : "0"
+        name += self.connectionType.right ? "1" : "0"
+        name += self.connectionType.bottom ? "1" : "0"
+        let texture = SKTexture(imageNamed: name)
+        self.texture = texture
+    }
     public func changeColor(toColor: MyColor = .myNoColor) {
         if toColor == .myNoColor {
             setColors(toColor: self.origColor, toStatus: .noChange)
