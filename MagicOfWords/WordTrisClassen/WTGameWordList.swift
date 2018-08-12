@@ -63,22 +63,24 @@ public struct SelectedWord {
     
     private func setConnectionTypes()->[ConnectionType] {
         var connectionTypes = Array(repeating: ConnectionType(), count: usedLetters.count)
-        for index in 0..<usedLetters.count - 1 {
-            if usedLetters[index].row < usedLetters[index + 1].row {
-                connectionTypes[index].bottom = true
-                connectionTypes[index + 1].top = true
-            }
-            if usedLetters[index].row > usedLetters[index + 1].row {
-                connectionTypes[index].top = true
-                connectionTypes[index + 1].bottom = true
-            }
-            if usedLetters[index].col < usedLetters[index + 1].col {
-                connectionTypes[index].right = true
-                connectionTypes[index + 1].left = true
-            }
-            if usedLetters[index].col > usedLetters[index + 1].col {
-                connectionTypes[index].left = true
-                connectionTypes[index + 1].right = true
+        if usedLetters.count > 0 {
+            for index in 0..<usedLetters.count - 1 {
+                if usedLetters[index].row < usedLetters[index + 1].row {
+                    connectionTypes[index].bottom = true
+                    connectionTypes[index + 1].top = true
+                }
+                if usedLetters[index].row > usedLetters[index + 1].row {
+                    connectionTypes[index].top = true
+                    connectionTypes[index + 1].bottom = true
+                }
+                if usedLetters[index].col < usedLetters[index + 1].col {
+                    connectionTypes[index].right = true
+                    connectionTypes[index + 1].left = true
+                }
+                if usedLetters[index].col > usedLetters[index + 1].col {
+                    connectionTypes[index].left = true
+                    connectionTypes[index + 1].right = true
+                }
             }
         }
         return connectionTypes
@@ -141,7 +143,7 @@ public protocol WTGameWordListDelegate: class {
     func showScore(newWord: SelectedWord, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int)
     func startShowingWordsOverPosition(wordList: [SelectedWord])
     func stopShowingWordsOverPosition()
-    func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord, commonLetters: [UsedLetter])
+    func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord)
 }
 
 
@@ -293,7 +295,7 @@ public class WTGameWordList {
                     }
                 }
                 if !noCommonLetter {
-                    delegate!.blinkWords(newWord: selectedWord, foundedWord: savedSelectedWord, commonLetters: commonLetters)
+                    delegate!.blinkWords(newWord: selectedWord, foundedWord: savedSelectedWord)
                 }
             }
         }

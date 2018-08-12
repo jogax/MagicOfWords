@@ -50,8 +50,8 @@ class CustomTableViewCell: UITableViewCell {
         for subview in boxView.subviews {
             labelPos += subview.frame.width
         }
-        let font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight(rawValue: 1.0))
-        let label = UILabel(frame: CGRect(x: labelPos, y: 0, width: width, height: font.lineHeight))
+//        let font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight(rawValue: 1.0))
+        let label = UILabel(frame: CGRect(x: labelPos, y: 0, width: width, height: myFont.lineHeight))
         label.font = myFont
         label.textColor = UIColor.black
         label.text = text

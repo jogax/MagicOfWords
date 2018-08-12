@@ -50,6 +50,9 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         self.myDelegate!.setHeaderView(tableView: tableView, headerView: view, section: section)
     }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {        
+        return GV.onIpad ? 30 : 20
+    }
 }
 
 

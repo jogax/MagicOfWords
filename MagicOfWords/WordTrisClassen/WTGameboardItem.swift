@@ -39,7 +39,7 @@ let temporaryColor = SKColor(red: 212/255, green: 249/255, blue: 236/255, alpha:
 let turquoiseColor = SKColor(red: 64/255, green: 224/255, blue: 208/255, alpha: 1.0)
 let darkGoldColor = SKColor(red: 255/255, green: 180/255, blue: 0/255, alpha: 1.0)
 let darkGreenColor = SKColor(red: 0/255, green: 186/255, blue: 0/255, alpha: 1.0)
-let lightGreenColor = SKColor(red: 0/255, green: 255/255, blue: 127/255, alpha: 1.0)
+let lightGreenColor = SKColor(red: 127/255, green: 255/255, blue: 0/255, alpha: 1.0)
 
 let emptyLetter = " "
 
