@@ -51,4 +51,9 @@ let enDictionary: [TextConstants: String] = [
     .tcChooseName:          "Choose a Nickname",
     .tcReady:               "Done",
     .tcChooseLanguage:      "Choose language",
+    .tcWord:                "Word:",
+    .tcCount:               "Cnt:",
+    .tcLength:              "Len:",
+    .tcMinutes:             "Min:",
+
 ]

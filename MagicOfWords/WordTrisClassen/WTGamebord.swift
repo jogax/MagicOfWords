@@ -146,10 +146,12 @@ public struct FoundedWordWithCounter {
     var word: String = ""
     var score: Int = 0
     var counter: Int = 0
-    init(word: String, counter: Int, score: Int) {
+    var minutes: Int = 0
+    init(word: String, counter: Int, score: Int, minutes: Int) {
         self.word = word
         self.counter = counter
         self.score = score
+        self.minutes = minutes
     }
 }
 
@@ -600,7 +602,7 @@ class WTGameboard: SKShapeNode {
                 if itemData.count == 3 {
                     if let score = Int(itemData[1]) {
                         if let counter = Int(itemData[2]) {
-                            let foundedWordWithCounter = FoundedWordWithCounter(word: itemData[0], counter: counter, score: score)
+                            let foundedWordWithCounter = FoundedWordWithCounter(word: itemData[0], counter: counter, score: score, minutes: 0)
                             roundInfos[index].words.append(foundedWordWithCounter)
                         }
                     }

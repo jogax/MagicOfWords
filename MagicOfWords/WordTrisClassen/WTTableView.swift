@@ -24,6 +24,7 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
         super.init(frame: frame, style: style)
         self.delegate = self
         self.dataSource = self
+//        self.addBorder(toSide: .Left, withColor: UIColor.black, andThickness: 5)
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -53,6 +54,7 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {        
         return GV.onIpad ? 30 : 20
     }
+    
 }
 
 

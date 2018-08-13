@@ -51,4 +51,8 @@ let huDictionary: [TextConstants: String] = [
     .tcChooseName:          "Válassz egy becenevet",
     .tcReady:               "Kész",
     .tcChooseLanguage:      "Válassz nyelvet",
+    .tcWord:                "Szó:",
+    .tcCount:               "Db.:",
+    .tcLength:              "Hossz:",
+    .tcMinutes:             "Perc:",
 ]

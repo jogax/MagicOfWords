@@ -501,11 +501,14 @@ public class WTGameWordList {
         }
         for foundedWord in allWords {
             if foundedWord.mandatory == mandatory {
-                returnWords.append(FoundedWordWithCounter(word: foundedWord.word, counter: foundedWord.counter, score: foundedWord.score))
+                returnWords.append(FoundedWordWithCounter(word: foundedWord.word, counter: foundedWord.counter, score: foundedWord.score, minutes: minutesForWord[foundedWord.word.length]!))
             }
         }
         
-        return (returnWords.sorted(by: {$0.score > $1.score || $0.score == $1.score && $0.word < $1.word}), maxLengthOfWords)
+        return (returnWords.sorted(by: {
+            $0.word.length > $1.word.length ||
+            $0.word.length == $1.word.length && $0.score > $1.score ||
+            $0.score == $1.score && $0.counter <= $1.counter && $0.word < $1.word}), maxLengthOfWords)
     }
     
 }

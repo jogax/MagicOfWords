@@ -389,12 +389,22 @@ extension String {
         }
     }
 
-    func fixLength(length: Int, leadingBlanks: Bool = true)->String {
+    func fixLength(length: Int, center: Bool = false, leadingBlanks: Bool = true)->String {
         var returnValue: String = self
         if returnValue.count < length {
-            repeat {
-                returnValue = leadingBlanks ? " " + returnValue : returnValue + " "
-            } while returnValue.count < length
+            if center {
+                repeat {
+                    returnValue = " " + returnValue
+                    if returnValue.count < length {
+                        returnValue = returnValue + " "
+                    }
+                } while returnValue.count < length
+
+            } else {
+                repeat {
+                    returnValue = leadingBlanks ? " " + returnValue : returnValue + " "
+                } while returnValue.count < length
+            }
         }
         return returnValue
     }
@@ -580,6 +590,40 @@ extension CGPoint {
     
     func normalized() -> CGPoint {
         return self / length()
+    }
+}
+
+extension UIView {
+    
+    // Example use: myView.addBorder(toSide: .Left, withColor: UIColor.redColor().CGColor, andThickness: 1.0)
+    
+    enum ViewSide {
+        case Left, Right, Top, Bottom, All
+    }
+    
+    func addBorder(toSide side: ViewSide, withColor color: UIColor, andThickness thickness: CGFloat) {
+        let border = CALayer()
+        border.backgroundColor = color.cgColor
+        func addOneSideBorder(side: ViewSide) {
+            switch side {
+            case .Left: border.frame = CGRect(x: frame.minX, y: frame.minY, width: thickness, height: frame.height)
+            case .Right: border.frame = CGRect(x: frame.maxX, y: frame.minY, width: thickness, height: frame.height)
+            case .Top: border.frame = CGRect(x: frame.minX, y: frame.minY, width: frame.width, height: thickness)
+            case .Bottom: border.frame = CGRect(x: frame.minX, y: frame.maxY, width: frame.width, height: thickness)
+            case .All: break
+            }
+        }
+        
+        if side == .All {
+            addOneSideBorder(side: .Left)
+            addOneSideBorder(side: .Right)
+            addOneSideBorder(side: .Top)
+            addOneSideBorder(side: .Bottom)
+        } else {
+            addOneSideBorder(side: side)
+        }
+        
+        layer.addSublayer(border)
     }
 }
 

@@ -171,7 +171,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     func geTitleForHeaderInSection(section: Int) -> String? {
         switch section {
         case 0:
-            return GV.language.getText(.tcCollectedOwnWords)
+            var title = ""
+            title += "\(GV.language.getText(.tcWord).fixLength(length: maxLength, center: true))"
+            title += " \(GV.language.getText(.tcCount))"
+            title += " \(GV.language.getText(.tcLength))"
+            title += " \(GV.language.getText(.tcScore))"
+            title += " \(GV.language.getText(.tcMinutes))"
+            return title
+//            return GV.language.getText(.tcCollectedOwnWords)
+
         default:
             return ""
         }
@@ -188,7 +196,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
 
     let showWordsBackgroundColor = UIColor(red:255/255, green: 204/255, blue: 153/255, alpha: 1.0)
-    let maxLengthMultiplier: CGFloat = GV.onIpad ? 15 : 25
+    let maxLengthMultiplier: CGFloat = GV.onIpad ? 15 : 15
     
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
@@ -197,9 +205,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.frame.width * (GV.onIpad ? 0.040 : 0.010)))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
         cell.addColumn(width: CGFloat(maxLength) * maxLengthMultiplier, text: " " + ownWordsForShow[indexPath.row].word) // WordColumn
-        cell.addColumn(width: 3 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].counter).fixLength(length: 4)) // Counter column
+        cell.addColumn(width: 3 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].counter).fixLength(length: 3)) // Counter column
         cell.addColumn(width: 2 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].word.length).fixLength(length: 2))
-        cell.addColumn(width: 3 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].score).fixLength(length: 4)) // Score column
+        cell.addColumn(width: 3 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].score).fixLength(length: 3)) // Score column
+        cell.addColumn(width: 2 * maxLengthMultiplier, text: String(ownWordsForShow[indexPath.row].minutes).fixLength(length: 2))
         return cell
     }
     
@@ -1676,7 +1685,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        let frame = CGRect(x: 0, y: 0, width: self.frame.width * 0.8, height: self.frame.height * 0.4)//showOwnWordsTableView?.rectForRow(at: indexPath)
         
         let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(maxLength + 8) * maxLengthMultiplier), y: 100)
-        let lineHeight = (myFont?.lineHeight)! * 1.5
+        let lineHeight = (myFont?.lineHeight)! * (GV.onIpad ? 1.5 : 2.0)
         let headerframeHeight = lineHeight
         var showingWordsHeight = CGFloat(ownWordsForShow.count) * lineHeight
         if showingWordsHeight  > self.frame.height * 0.9 {
@@ -1686,7 +1695,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 showingWordsHeight = lineHeight * counter
             } while showingWordsHeight + headerframeHeight > self.frame.height * 0.9
         }
-        let size = CGSize(width: CGFloat(maxLength + 10) * maxLengthMultiplier, height: showingWordsHeight + headerframeHeight)
+        if maxLength < GV.language.getText(.tcWord).count {
+            maxLength = GV.language.getText(.tcWord).count
+        }
+        let lengthAdder = GV.language.getText(.tcCount).count + 1 +
+                          GV.language.getText(.tcLength).count + 1 +
+                          GV.language.getText(.tcScore).count + 1 +
+                          GV.language.getText(.tcMinutes).count
+        let width = CGFloat(maxLength + lengthAdder) * maxLengthMultiplier
+        let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
         showOwnWordsTableView?.frame=CGRect(origin: origin, size: size)
         showOwnWordsTableView?.reloadData()
         self.scene?.view?.addSubview(showOwnWordsTableView!)

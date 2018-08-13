@@ -51,6 +51,10 @@ let deDictionary: [TextConstants: String] = [
     .tcChooseName:          "Wähle einen Spitznamen",
     .tcReady:               "Fertig",
     .tcChooseLanguage:      "Sprache wählen",
+    .tcWord:                "Wort:",
+    .tcCount:               "Cnt:",
+    .tcLength:              "Len:",
+    .tcMinutes:             "Min:",
 ]
 
 

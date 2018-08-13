@@ -45,16 +45,22 @@ class CustomTableViewCell: UITableViewCell {
 //        boxView = UIView.init(frame: CGRect(x : 0 , y : 0 , width :UIScreen.main.bounds.size.width - 12*2, height : self.frame.size.height))
         self.contentView.addSubview(boxView)
     }
-    public func addColumn(width: CGFloat, text: String) {
+    public func addColumn(width: CGFloat, attributedText: NSAttributedString? = nil, text: String? = nil) {
         var labelPos: CGFloat = 5
         for subview in boxView.subviews {
-            labelPos += subview.frame.width
+            labelPos += subview.frame.width + 1
         }
 //        let font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight(rawValue: 1.0))
         let label = UILabel(frame: CGRect(x: labelPos, y: 0, width: width, height: myFont.lineHeight))
         label.font = myFont
         label.textColor = UIColor.black
-        label.text = text
+        if attributedText != nil {
+            label.attributedText = attributedText
+        }
+        else if text != nil {
+            label.text = text
+        }
+//        label.addBorder(toSide: .Left, withColor: UIColor.black, andThickness: 0.5)
         boxView.addSubview(label)
     }
     
@@ -67,6 +73,13 @@ class CustomTableViewCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        boxView.subviews.forEach({ $0.removeFromSuperview() })
+        
+    }
+
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)

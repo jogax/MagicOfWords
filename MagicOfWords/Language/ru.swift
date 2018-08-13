@@ -51,4 +51,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcChooseName:          "Выбери псевдоним!",
     .tcReady:               "Готово",
     .tcChooseLanguage:      "Выбери язык",
+    .tcWord:                "Слово",
+    .tcCount:               "Штк.",
+    .tcLength:              "Дл.",
+    .tcMinutes:             "Мин.",
 ]
