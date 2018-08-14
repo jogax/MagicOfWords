@@ -710,14 +710,14 @@ class WTGameboard: SKShapeNode {
         }
     }
     
-    public func clearGameArray() {
-        for row in 0..<size {
-            for col in 0..<size {
-                GV.gameArray[col][row].remove()
-            }
-        }
-    }
-    
+//    public func clearGameArray() {
+//        for row in 0..<size {
+//            for col in 0..<size {
+//                GV.gameArray[col][row].remove()
+//            }
+//        }
+//    }
+//    
     public func getCellPosition(col: Int, row: Int)->CGPoint {
         let addPosition = grid!.position
         return grid!.gridPosition(col: col, row: row) + addPosition

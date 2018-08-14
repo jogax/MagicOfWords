@@ -34,7 +34,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcWordsToCollect:    "Слова для сбора: (% / % / % / %)",
     .tcOwnWords:          "Покажи мои слова (% / % / %)",
     .tcNoMoreSteps:       "Поздравляю, ты закончил игру!",
-    .tcScore:             "Очки:",
+    .tcScore:             "Очки",
     .tcBest:              "Лучшие очки:",
     .tcCollectedRequiredWords: "Обязательные слова:",
     .tcCollectedOwnWords:      "Собственные слова",

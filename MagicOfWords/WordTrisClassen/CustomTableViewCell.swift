@@ -45,21 +45,18 @@ class CustomTableViewCell: UITableViewCell {
 //        boxView = UIView.init(frame: CGRect(x : 0 , y : 0 , width :UIScreen.main.bounds.size.width - 12*2, height : self.frame.size.height))
         self.contentView.addSubview(boxView)
     }
-    public func addColumn(width: CGFloat, attributedText: NSAttributedString? = nil, text: String? = nil) {
-        var labelPos: CGFloat = 5
+    public func addColumn(text: String) {
+        print("text: \(text)")
+        var posForColumn: CGFloat = 2
         for subview in boxView.subviews {
-            labelPos += subview.frame.width + 1
+            posForColumn += subview.frame.width
         }
 //        let font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight(rawValue: 1.0))
-        let label = UILabel(frame: CGRect(x: labelPos, y: 0, width: width, height: myFont.lineHeight))
+        let multiplier = GV.onIpad ? 12 : 7
+        let label = UILabel(frame: CGRect(x: posForColumn, y: 0, width: CGFloat(text.length * multiplier), height: myFont.lineHeight))
         label.font = myFont
         label.textColor = UIColor.black
-        if attributedText != nil {
-            label.attributedText = attributedText
-        }
-        else if text != nil {
-            label.text = text
-        }
+        label.text = text
 //        label.addBorder(toSide: .Left, withColor: UIColor.black, andThickness: 0.5)
         boxView.addSubview(label)
     }

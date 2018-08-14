@@ -17,6 +17,7 @@ public protocol WTTableViewDelegate: class {
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath)->UITableViewCell
     func geTitleForHeaderInSection(section: Int)->String?
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int)
+    func fillHeaderView(tableView: UITableView, section: Int)->UIView
 }
 class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     var myDelegate: WTTableViewDelegate?
@@ -45,11 +46,17 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return self.myDelegate!.geTitleForHeaderInSection(section: section)
     }
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return GV.onIpad ? 48 : 28
+    }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("You selected cell #\(indexPath.row)!")
     }
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         self.myDelegate!.setHeaderView(tableView: tableView, headerView: view, section: section)
+    }
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return self.myDelegate!.fillHeaderView(tableView: tableView, section: section)
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {        
         return GV.onIpad ? 30 : 20
