@@ -202,15 +202,20 @@ class WTGameboardItem: SKSpriteNode {
         self.myColor = color
         self.color = convertMyColorToSKColor(color: color)
         self.status = toStatus == .noChange ? self.status : toStatus
+        self.status = letter == emptyLetter ? .empty : self.status
         setConnectionType(connectionType: connectionType)
     }
     
     private func setTexture() {
         var name = "whiteSprite"
-        name += self.connectionType.left ? "1" : "0"
-        name += self.connectionType.top ? "1" : "0"
-        name += self.connectionType.right ? "1" : "0"
-        name += self.connectionType.bottom ? "1" : "0"
+        if !(self.letter == emptyLetter || self.status == .used || self.myColor == .myBlueColor) {
+            name += self.connectionType.left ? "1" : "0"
+            name += self.connectionType.top ? "1" : "0"
+            name += self.connectionType.right ? "1" : "0"
+            name += self.connectionType.bottom ? "1" : "0"
+        } else {
+            name += "0000"
+        }
         let texture = SKTexture(imageNamed: name)
         self.texture = texture
     }

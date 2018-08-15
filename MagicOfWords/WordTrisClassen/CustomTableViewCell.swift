@@ -46,13 +46,12 @@ class CustomTableViewCell: UITableViewCell {
         self.contentView.addSubview(boxView)
     }
     public func addColumn(text: String) {
-        print("text: \(text)")
         var posForColumn: CGFloat = 2
         for subview in boxView.subviews {
             posForColumn += subview.frame.width
         }
 //        let font = UIFont.systemFont(ofSize: 18.0, weight: UIFont.Weight(rawValue: 1.0))
-        let multiplier = GV.onIpad ? 12 : 7
+        let multiplier = GV.onIpad ? 12 : 8
         let label = UILabel(frame: CGRect(x: posForColumn, y: 0, width: CGFloat(text.length * multiplier), height: myFont.lineHeight))
         label.font = myFont
         label.textColor = UIColor.black

@@ -46,9 +46,6 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return self.myDelegate!.geTitleForHeaderInSection(section: section)
     }
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return GV.onIpad ? 48 : 28
-    }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("You selected cell #\(indexPath.row)!")
     }
@@ -61,7 +58,10 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {        
         return GV.onIpad ? 30 : 20
     }
-    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return GV.onIpad ? 48 : 28
+    }
+
 }
 
 

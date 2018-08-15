@@ -244,7 +244,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
 
     let showWordsBackgroundColor = UIColor(red:255/255, green: 204/255, blue: 153/255, alpha: 1.0)
-    let maxLengthMultiplier: CGFloat = GV.onIpad ? 12 : 9
+    let maxLengthMultiplier: CGFloat = GV.onIpad ? 12 : 8
     
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
@@ -1700,13 +1700,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     var ownWordsForShow = [FoundedWordWithCounter]()
     var maxLength = 0
     var showingWordsInTable = false
-    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 11)
+    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
 
     
     private func showOwnWordsInTableView() {
         showOwnWordsTableView = WTTableView()
         timerIsCounting = false
         (ownWordsForShow, maxLength) = WTGameWordList.shared.getWordsForShow(mandatory: false)
+        calculateColumnWidths()
         showOwnWordsTableView?.setDelegate(delegate: self)
         showOwnWordsTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
 //        showOwnWordsView.rowHeight = 20
@@ -1714,7 +1715,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        let frame = CGRect(x: 0, y: 0, width: self.frame.width * 0.8, height: self.frame.height * 0.4)//showOwnWordsTableView?.rectForRow(at: indexPath)
         
         let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(title.length) * maxLengthMultiplier), y: 100)
-        let lineHeight = (myFont?.lineHeight)! * (GV.onIpad ? 1.5 : 2.0)
+        let lineHeight = (myFont?.lineHeight)! * (GV.onIpad ? 1.5 : 1.6)
         let headerframeHeight = lineHeight * 2
         var showingWordsHeight = CGFloat(ownWordsForShow.count) * lineHeight
         if showingWordsHeight  > self.frame.height * 0.9 {
@@ -1727,11 +1728,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         if maxLength < GV.language.getText(.tcWord).count {
             maxLength = GV.language.getText(.tcWord).count
         }
-       let width = CGFloat(title.length) * maxLengthMultiplier
+        let width = CGFloat(title.length) * maxLengthMultiplier
         let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
         showOwnWordsTableView?.frame=CGRect(origin: origin, size: size)
-        calculateColumnWidths()
-        showOwnWordsTableView?.reloadData()
+        self.showOwnWordsTableView?.reloadData()
+
+//        showOwnWordsTableView?.reloadData()
         self.scene?.view?.addSubview(showOwnWordsTableView!)
     }
     

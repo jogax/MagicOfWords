@@ -22,6 +22,12 @@ public struct ConnectionType {
     var top = false
     var right = false
     var bottom = false
+    init(left: Bool=false, top: Bool=false, right: Bool=false, bottom: Bool=false) {
+        self.left = left
+        self.top = top
+        self.right = right
+        self.bottom = bottom
+    }
 }
 public struct SelectedWord {
     var word: String = ""
@@ -230,8 +236,17 @@ public class WTGameWordList {
     public func restoreFromPlayingRecord() {
         clearWordsInGame()
         for round in GV.playingRecord.rounds {
+            cleanGameArrayConnections()
             wordsInRound.append(WordInRound())
             initFromString(from: round.infos)
+        }
+    }
+    
+    private func cleanGameArrayConnections() {        
+        for col in 0..<GV.size {
+            for row in 0..<GV.size {
+                GV.gameArray[col][row].clearConnectionType()
+            }
         }
     }
     
@@ -307,6 +322,9 @@ public class WTGameWordList {
 //            for letter in selectedWord.usedLetters {
                 let letter = selectedWord.usedLetters[index]
                 let connectionType = selectedWord.connectionTypes[index]
+                if letter.col == 4 && letter.row == 7 {
+                    print("Letter: \(letter.letter), ConnectionType: \(connectionType)")
+                }
                 GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType)
             }
             addWordToAllWords(word: selectedWord.word)
@@ -354,11 +372,8 @@ public class WTGameWordList {
             let changeTime = selectedWord.word.length > maxUsedLength ? minutesForWord[maxUsedLength] : minutesForWord[selectedWord.word.length]
             delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: -changeTime!)
         }
-        for col in 0..<GV.size {
-            for row in 0..<GV.size {
-                GV.gameArray[col][row].clearConnectionType()
-            }
-        }
+        
+        cleanGameArrayConnections()
         for word in wordsInRound.last!.wordsInGame
  {
             for index in 0..<word.usedLetters.count {
