@@ -15,7 +15,7 @@ public protocol WTTableViewDelegate: class {
     func getNumberOfSections()->Int
     func getNumberOfRowsInSections(section: Int)->Int
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath)->UITableViewCell
-    func geTitleForHeaderInSection(section: Int)->String?
+//    func geTitleForHeaderInSection(section: Int)->String?
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int)
     func fillHeaderView(tableView: UITableView, section: Int)->UIView
 }
@@ -43,9 +43,9 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         return self.myDelegate!.getTableViewCell(tableView: tableView, indexPath: indexPath)
     }
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return self.myDelegate!.geTitleForHeaderInSection(section: section)
-    }
+//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+//        return self.myDelegate!.geTitleForHeaderInSection(section: section)
+//    }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("You selected cell #\(indexPath.row)!")
     }

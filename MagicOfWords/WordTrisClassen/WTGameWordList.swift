@@ -242,7 +242,7 @@ public class WTGameWordList {
         }
     }
     
-    private func cleanGameArrayConnections() {        
+    private func cleanGameArrayConnections() {
         for col in 0..<GV.size {
             for row in 0..<GV.size {
                 GV.gameArray[col][row].clearConnectionType()
@@ -322,9 +322,6 @@ public class WTGameWordList {
 //            for letter in selectedWord.usedLetters {
                 let letter = selectedWord.usedLetters[index]
                 let connectionType = selectedWord.connectionTypes[index]
-                if letter.col == 4 && letter.row == 7 {
-                    print("Letter: \(letter.letter), ConnectionType: \(connectionType)")
-                }
                 GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType)
             }
             addWordToAllWords(word: selectedWord.word)

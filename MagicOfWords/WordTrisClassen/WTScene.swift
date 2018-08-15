@@ -168,7 +168,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        
 //    }
     
-    func geTitleForHeaderInSection(section: Int) -> String? {
+//    func geTitleForHeaderInSection(section: Int) -> String? {
 //        switch section {
 //        case 0:
 //            var title = ""
@@ -183,8 +183,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        default:
 //            return ""
 //        }
-        return""
-    }
+//        return""
+//    }
     var lengthOfWord: Int = 0
     var lengthOfCnt: Int = 0
     var lengthOfLength: Int = 0

@@ -12,6 +12,7 @@ import GameplayKit
 import RealmSwift
 
 class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, ShowFinishedGamesSceneDelegate, SettingsSceneDelegate {
+    var showFinishedGamesScene: ShowFinishedGamesScene?
     func backFromSettingsScene() {
     try! realm.write {
         GV.basicDataRecord.actLanguage = GV.aktLanguage
@@ -21,14 +22,18 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     }
     
     func backToMenuScene() {
+        if showFinishedGamesScene != nil {
+            showFinishedGamesScene!.removeFromParent()
+            showFinishedGamesScene = nil
+        }
         startMenuScene()
     }
     
     func showFinishedGames() {
-        let showFinishedGamesScene = ShowFinishedGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        showFinishedGamesScene.setDelegate(delegate: self)
+        showFinishedGamesScene = ShowFinishedGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        showFinishedGamesScene!.setDelegate(delegate: self)
         if let view = self.view as! SKView? {
-            view.presentScene(showFinishedGamesScene)
+            view.presentScene(showFinishedGamesScene!)
         }
     }
     
