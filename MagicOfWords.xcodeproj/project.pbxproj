@@ -315,6 +315,7 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				205CF7EC2129BC9300C1B89D /* back.png */,
 				205CF7EF2129BF4B00C1B89D /* nextGame.png */,
 				205CF7EE2129BF4B00C1B89D /* previousGame.png */,
 				205CF7EA2129A21000C1B89D /* finger.png */,
@@ -358,7 +359,6 @@
 				2060036F20348A8800023E10 /* Grid.swift */,
 				20B28AE520333273001682B2 /* WTTableView.swift */,
 				204A8AD92029EE6000E9C11F /* WTScene.swift */,
-				205CF7EC2129BC9300C1B89D /* back.png */,
 				2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */,
 				204AEB38205D1F47004D2ECD /* WTGameFinished.swift */,
 				20A6913F20309B9F00AB47C0 /* WTPiece.swift */,
