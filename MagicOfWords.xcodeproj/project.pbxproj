@@ -54,6 +54,10 @@
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
 		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */; };
+		205CF7EB2129A21000C1B89D /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EA2129A21000C1B89D /* finger.png */; };
+		205CF7ED2129BC9300C1B89D /* back.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EC2129BC9300C1B89D /* back.png */; };
+		205CF7F02129BF4B00C1B89D /* previousGame.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EE2129BF4B00C1B89D /* previousGame.png */; };
+		205CF7F12129BF4B00C1B89D /* nextGame.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EF2129BF4B00C1B89D /* nextGame.png */; };
 		205E601A20C02BB800A5AB39 /* WordDBGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205E601920C02BB800A5AB39 /* WordDBGenerator.swift */; };
 		205E8E2820948E2E00314646 /* button.png in Resources */ = {isa = PBXBuildFile; fileRef = 205E8E2720948E2D00314646 /* button.png */; };
 		2060036E20347FF400023E10 /* WTGameboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036D20347FF400023E10 /* WTGameboardItem.swift */; };
@@ -154,6 +158,10 @@
 		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2057BA292029F591000DF337 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePackageScene.swift; sourceTree = "<group>"; };
+		205CF7EA2129A21000C1B89D /* finger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = finger.png; path = MagicOfWords/Pictures/finger.png; sourceTree = SOURCE_ROOT; };
+		205CF7EC2129BC9300C1B89D /* back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = back.png; path = MagicOfWords/Pictures/back.png; sourceTree = SOURCE_ROOT; };
+		205CF7EE2129BF4B00C1B89D /* previousGame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = previousGame.png; sourceTree = "<group>"; };
+		205CF7EF2129BF4B00C1B89D /* nextGame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = nextGame.png; sourceTree = "<group>"; };
 		205E601920C02BB800A5AB39 /* WordDBGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDBGenerator.swift; sourceTree = "<group>"; };
 		205E8E2720948E2D00314646 /* button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button.png; sourceTree = "<group>"; };
 		2060036D20347FF400023E10 /* WTGameboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameboardItem.swift; sourceTree = "<group>"; };
@@ -307,6 +315,9 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				205CF7EF2129BF4B00C1B89D /* nextGame.png */,
+				205CF7EE2129BF4B00C1B89D /* previousGame.png */,
+				205CF7EA2129A21000C1B89D /* finger.png */,
 				208173E02103577800960800 /* balloon.png */,
 				20B04BB120935CC2008F99A2 /* menuBackground.png */,
 				20552DBA211F1EFA00C54538 /* whiteSprite0000.png */,
@@ -347,6 +358,7 @@
 				2060036F20348A8800023E10 /* Grid.swift */,
 				20B28AE520333273001682B2 /* WTTableView.swift */,
 				204A8AD92029EE6000E9C11F /* WTScene.swift */,
+				205CF7EC2129BC9300C1B89D /* back.png */,
 				2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */,
 				204AEB38205D1F47004D2ECD /* WTGameFinished.swift */,
 				20A6913F20309B9F00AB47C0 /* WTPiece.swift */,
@@ -433,6 +445,7 @@
 				20DA3BF220FE1DFC00EA2D55 /* StateOfWordChanging.txt in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				20552DBF211F1EFA00C54538 /* whiteSprite1010.png in Resources */,
+				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
 				20552DC3211F1EFA00C54538 /* whiteSprite0011.png in Resources */,
 				20552DC2211F1EFA00C54538 /* whiteSprite1111.png in Resources */,
@@ -446,18 +459,21 @@
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
 				205184F72061525C00E7FAF4 /* huGameData.txt in Resources */,
 				20552DC8211F1EFA00C54538 /* whiteSprite1100.png in Resources */,
+				205CF7F12129BF4B00C1B89D /* nextGame.png in Resources */,
 				208173E12103577900960800 /* balloon.png in Resources */,
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
 				20552DC7211F1EFA00C54538 /* whiteSprite1110.png in Resources */,
 				20552DCA211F1EFA00C54538 /* whiteSprite0000.png in Resources */,
 				20552DC5211F1EFA00C54538 /* whiteSprite0010.png in Resources */,
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
+				205CF7F02129BF4B00C1B89D /* previousGame.png in Resources */,
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
 				20552DBE211F1EFA00C54538 /* whiteSprite0110.png in Resources */,
 				205E8E2820948E2E00314646 /* button.png in Resources */,
 				205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */,
 				20552DC9211F1EFA00C54538 /* whiteSprite0001.png in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
+				205CF7ED2129BC9300C1B89D /* back.png in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
 				204BB45D2063E9E000CDF085 /* undo.png in Resources */,
 				20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */,
@@ -675,13 +691,14 @@
 					"$(inherited)",
 					"GENERATEWORDLIST=1",
 					"GENERATEMANDATORY=1",
+					"SHOWFINGER=1",
 				);
 				INFOPLIST_FILE = MagicOfWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG GENERATEWORDLISTX GENERATEMANDATORYX";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG GENERATEWORDLISTX GENERATEMANDATORYX SHOWFINGER";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

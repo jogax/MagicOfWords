@@ -45,6 +45,7 @@ struct ActivityItem {
         self.movingItem = movingItem
         self.choosedWord = choosedWord
     }
+    
     init(fromString: String) {
         let itemValues = fromString.components(separatedBy: itemInnerSeparator)
         let type: ActivityType = itemValues[0] == "0" ? .FromBottom : itemValues[0] == "1" ? .Moving : .Choosing
@@ -489,6 +490,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         getPlayingRecord(new: new, next: .NextGame)
 //        createHeader()
         createUndo()
+        createGoBack()
+        createGoPreviousGame()
+        createGoNextGame()
         wtGameFinishedSprite.setDelegate(delegate: self)
         WTGameWordList.shared.clear()
         WTGameWordList.shared.setMandatoryWords()
@@ -636,18 +640,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     }
     
     private func createHeader() {
-        if self.childNode(withName: goBackName) == nil {
-            let YPosition: CGFloat = self.frame.height * 0.92
-            let fontSize = self.frame.size.height * 0.0175
-            goBackLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
-            goBackLabel.text = GV.language.getText(.tcBack)
-            goBackLabel.name = String(goBackName)
-            goBackLabel.fontSize = fontSize
-            goBackLabel.position = CGPoint(x: self.frame.size.width * 0.1, y: YPosition )
-            goBackLabel.horizontalAlignmentMode = .left
-            goBackLabel.fontColor = SKColor.blue
-            self.addChild(goBackLabel)
-        }
+//        if self.childNode(withName: goBackName) == nil {
+//            let YPosition: CGFloat = self.frame.height * 0.92
+//            let fontSize = self.frame.size.height * 0.0175
+//            goBackLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
+//            goBackLabel.text = GV.language.getText(.tcBack)
+//            goBackLabel.name = String(goBackName)
+//            goBackLabel.fontSize = fontSize
+//            goBackLabel.position = CGPoint(x: self.frame.size.width * 0.1, y: YPosition )
+//            goBackLabel.horizontalAlignmentMode = .left
+//            goBackLabel.fontColor = SKColor.blue
+//            self.addChild(goBackLabel)
+//        }
 
         if self.childNode(withName: timeName) == nil {
             timeLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
@@ -676,30 +680,30 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             self.addChild(headerLabel)
         }
         
-        if self.childNode(withName: previousName) == nil {
-            goToPreviousGameLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
-            let yPosition = self.frame.height * 0.03
-            let xPosition = self.frame.size.width * 0.1
-            goToPreviousGameLabel.position = CGPoint(x: xPosition, y: yPosition)
-            goToPreviousGameLabel.fontSize = self.frame.size.height * 0.04
-            goToPreviousGameLabel.fontColor = .blue
-            goToPreviousGameLabel.text = "<"
-            goToPreviousGameLabel.horizontalAlignmentMode = .left
-            goToPreviousGameLabel.name = previousName
-            self.addChild(goToPreviousGameLabel)
-        }
-        if self.childNode(withName: nextName) == nil {
-            goToNextGameLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
-            let yPosition = self.frame.height * 0.03
-            let xPosition = self.frame.size.width * 0.85
-            goToNextGameLabel.position = CGPoint(x: xPosition, y: yPosition)
-            goToNextGameLabel.fontSize = self.frame.size.height * 0.04
-            goToNextGameLabel.fontColor = .blue
-            goToNextGameLabel.text = ">"
-            goToNextGameLabel.horizontalAlignmentMode = .left
-            goToNextGameLabel.name = nextName
-            self.addChild(goToNextGameLabel)
-        }
+//        if self.childNode(withName: previousName) == nil {
+//            goToPreviousGameLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
+//            let yPosition = self.frame.height * 0.03
+//            let xPosition = self.frame.size.width * 0.1
+//            goToPreviousGameLabel.position = CGPoint(x: xPosition, y: yPosition)
+//            goToPreviousGameLabel.fontSize = self.frame.size.height * 0.04
+//            goToPreviousGameLabel.fontColor = .blue
+//            goToPreviousGameLabel.text = "<"
+//            goToPreviousGameLabel.horizontalAlignmentMode = .left
+//            goToPreviousGameLabel.name = previousName
+//            self.addChild(goToPreviousGameLabel)
+//        }
+//        if self.childNode(withName: nextName) == nil {
+//            goToNextGameLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
+//            let yPosition = self.frame.height * 0.03
+//            let xPosition = self.frame.size.width * 0.85
+//            goToNextGameLabel.position = CGPoint(x: xPosition, y: yPosition)
+//            goToNextGameLabel.fontSize = self.frame.size.height * 0.04
+//            goToNextGameLabel.fontColor = .blue
+//            goToNextGameLabel.text = ">"
+//            goToNextGameLabel.horizontalAlignmentMode = .left
+//            goToNextGameLabel.name = nextName
+//            self.addChild(goToNextGameLabel)
+//        }
         
    }
     
@@ -799,16 +803,93 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //    }
     
     var line = 0
+    @objc func undoTapped() {
+        startUndo()
+    }
+    @objc func goBackTapped() {
+        timer!.invalidate()
+        timer = nil
+        wtSceneDelegate!.gameFinished(start: .NoMore)
+    }
+    @objc func goPreviousGame() {
+        timer!.invalidate()
+        timer = nil
+        wtSceneDelegate!.gameFinished(start: .PreviousGame)
+    }
+    
+    @objc func goNextGame() {
+        timer!.invalidate()
+        timer = nil
+        wtSceneDelegate!.gameFinished(start: .NextGame)
+    }
+    var goToPreviousGameButton = UIButton()
+    var goToNextGameButton = UIButton()
 
- private func createUndo() {
-        undoSprite = SKSpriteNode(imageNamed: "undo.png")
-        let yPosition = self.frame.height * 0.92
-        let xPosition = self.frame.width * 0.95
-        undoSprite.position = CGPoint(x:xPosition, y:yPosition)
-        undoSprite.alpha = 0.2
-        undoSprite.size = CGSize(width: self.frame.width * 0.08, height: self.frame.width * 0.08)
-        undoSprite.name = undoName
-        self.addChild(undoSprite)
+    func createGoPreviousGame() {
+        goToPreviousGameButton = UIButton()
+        let image = UIImage(named: "previousGame")
+        goToPreviousGameButton.setImage(image, for: UIControlState.normal)
+        goToPreviousGameButton.backgroundColor = UIColor(red: 240/255, green:240/255, blue: 240/255, alpha: 1.0)
+        goToPreviousGameButton.layer.cornerRadius = self.frame.width * 0.09 / 2
+        goToPreviousGameButton.layer.borderWidth = 5
+        goToPreviousGameButton.layer.borderColor = UIColor.lightGray.cgColor
+        goToPreviousGameButton.addTarget(self, action: #selector(self.goPreviousGame), for: .touchUpInside)
+        goToPreviousGameButton.frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.09, height: self.frame.width * 0.09)
+        goToPreviousGameButton.center = CGPoint(x:self.frame.width * 0.08, y:self.frame.height * 0.92)
+        self.view?.addSubview(goToPreviousGameButton)
+    }
+    func createGoNextGame() {
+        goToNextGameButton = UIButton()
+        let image = UIImage(named: "nextGame")
+        goToNextGameButton.setImage(image, for: UIControlState.normal)
+        goToNextGameButton.backgroundColor = UIColor(red: 240/255, green:240/255, blue: 240/255, alpha: 1.0)
+        goToNextGameButton.layer.cornerRadius = self.frame.width * 0.09 / 2
+        goToNextGameButton.layer.borderWidth = 5
+        goToNextGameButton.layer.borderColor = UIColor.lightGray.cgColor
+        goToNextGameButton.addTarget(self, action: #selector(self.goNextGame), for: .touchUpInside)
+        goToNextGameButton.frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.09, height: self.frame.width * 0.09)
+        goToNextGameButton.center = CGPoint(x:self.frame.width * 0.92, y:self.frame.height * 0.92)
+        self.view?.addSubview(goToNextGameButton)
+    }
+
+    private func createGoBack() {
+        let button = UIButton()
+        let image = UIImage(named: "back")
+        button.setImage(image, for: UIControlState.normal)
+        button.backgroundColor = UIColor(red: 240/255, green:240/255, blue: 240/255, alpha: 1.0)
+        button.layer.cornerRadius = self.frame.width * 0.08 / 2
+        button.layer.borderWidth = 5
+        button.layer.borderColor = UIColor.lightGray.cgColor
+        button.setTitle("<--", for: .normal)
+        button.setTitleColor(UIColor.blue, for: .normal)
+        button.addTarget(self, action: #selector(self.goBackTapped), for: .touchUpInside)
+        button.frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.08, height: self.frame.width * 0.08)
+        button.center = CGPoint(x:self.frame.width * 0.05, y:self.frame.height * 0.08)
+        self.view?.addSubview(button)
+    }
+    
+     private func createUndo() {
+        let button = UIButton()
+        let image = UIImage(named: "undo")
+        button.setImage(image, for: UIControlState.normal)
+        button.backgroundColor = UIColor(red: 240/255, green:240/255, blue: 240/255, alpha: 1.0)
+        button.layer.cornerRadius = self.frame.width * 0.08 / 2
+        button.layer.borderWidth = 5
+        button.layer.borderColor = UIColor.lightGray.cgColor
+        button.setTitle("Back", for: .normal)
+        button.setTitleColor(UIColor.black, for: .normal)
+        button.addTarget(self, action: #selector(self.undoTapped), for: .touchUpInside)
+        button.frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.08, height: self.frame.width * 0.08)
+        button.center = CGPoint(x:self.frame.width * 0.95, y:self.frame.height * 0.08)
+        self.view?.addSubview(button)
+    //    let yPosition = self.frame.height * 0.92
+    //    let xPosition = self.frame.width * 0.95
+    //    undoSprite = SKSpriteNode(imageNamed: "undo.png")
+    //    undoSprite.position = CGPoint(x:xPosition, y:yPosition)
+    //    undoSprite.alpha = 0.2
+    //    undoSprite.size = CGSize(width: self.frame.width * 0.08, height: self.frame.width * 0.08)
+    //    undoSprite.name = undoName
+    //    self.addChild(undoSprite)
     }
     
     private func showWordsToCollect() {
@@ -831,7 +912,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                                          String(WTGameWordList.shared.getScore(mandatory: false)))
         let ownWordsButton = createButton(withText: myText, position: buttonPosition, name: ownWordsButtonName)
         ownWordsButton.size = CGSize(width: self.frame.width * 0.023 * CGFloat(myText.length), height: self.frame.height * 0.05)
-
         addChild(ownWordsButton)
 //        createLabel(word: GV.language.getText(.tcOwnWords, values: "0", "0", "0"), first: false, name: ownWordsHeaderName)
     }
@@ -946,8 +1026,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             }
         }
         modifyHeader()
-        goToPreviousGameLabel.alpha = hasPreviousRecords(playingRecord: GV.playingRecord) ? 1.0 : 0.1
-        goToNextGameLabel.alpha = hasNextRecords(playingRecord: GV.playingRecord) ? 1.0 : 0.1
+        if  hasPreviousRecords(playingRecord: GV.playingRecord) {
+            goToPreviousGameButton.alpha = 1.0
+            goToPreviousGameButton.isEnabled = true
+        } else {
+            goToPreviousGameButton.alpha = 0.2
+            goToPreviousGameButton.isEnabled = false
+        }
+        goToNextGameButton.alpha = hasNextRecords(playingRecord: GV.playingRecord) ? 1.0 : 0.1
+        
         if timer != nil {
             timer!.invalidate()
         }
@@ -1016,6 +1103,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         return tileForGame
 
     }
+    #if SHOWFINGER
+    var finger: SKSpriteNode?
+    var fingerAdder: CGFloat = -20
+    #endif
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         startShapeIndex = -1
@@ -1031,15 +1122,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        let nodes = self.nodes(at: firstTouchLocation)
 //        let nodes1 = self.nodes(at: CGPoint(x: firstTouchLocation.x, y: firstTouchLocation.y + blockSize * 0.11))
 //        let touchedNodes = analyzeNodes(nodes: nodes, nodes1: nodes1, calledFrom: .start)
+        #if SHOWFINGER
+        let texture = SKTexture(imageNamed: "finger")
+        finger = SKSpriteNode(texture: texture)
+        let sizeDivider = GV.onIpad ? CGFloat(6) : CGFloat(12)
+        finger?.size = CGSize(width: (finger?.size.width)! / sizeDivider, height: (finger?.size.height)! / sizeDivider)
+        finger?.position = firstTouchLocation + CGPoint(x: 0, y: fingerAdder)
+        self.addChild(finger!)
+        #endif
         let touchedNodes = analyzeNodes(touchLocation: firstTouchLocation, calledFrom: .start)
         if showingWordsInTable && !touchedNodes.showOwnWordsButton {
             showingWordsInTable = false
             showOwnWordsTableView?.removeFromSuperview()
             timerIsCounting = true
         }
-        if touchedNodes.undo {
-            undoTouched = true
-        }
+//        if touchedNodes.undo {
+//            undoTouched = true
+//        }
         if touchedNodes.gameFinishedOKButton {
             wtGameFinishedSprite.OKButtonPressed()
         }
@@ -1067,6 +1166,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         }
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
+        #if SHOWFINGER
+        finger?.position = touchLocation + CGPoint(x: 0, y: fingerAdder)
+        #endif
 //        let nodes = self.nodes(at: touchLocation)
 //        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
         let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .move)
@@ -1124,17 +1226,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 continue
             }
             if enabled || gameboardEnabled {
-                if name == goBackName {
-                    touchedNodes.goBack = enabled
-                }
-                if name == previousName {
-                    touchedNodes.goPreviousGame = enabled
-                }
-                if name == nextName {
-                    touchedNodes.goNextGame = enabled
-                } else if name == undoName {
-                    touchedNodes.undo = enabled
-                } else if name == GameFinishedOKName {
+//                if name == goBackName {
+//                    touchedNodes.goBack = enabled
+//                }
+//                if name == previousName {
+//                    touchedNodes.goPreviousGame = enabled
+//                }
+//                if name == nextName {
+//                    touchedNodes.goNextGame = enabled
+//                } else if name == undoName {
+//                    touchedNodes.undo = enabled
+//                } else
+                if name == GameFinishedOKName {
                     touchedNodes.gameFinishedOKButton = true
                 } else if name == ownWordsButtonName {
                     touchedNodes.showOwnWordsButton = true
@@ -1184,6 +1287,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         }
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
+        #if SHOWFINGER
+        finger?.removeFromParent()
+        #endif
 //        let nodes = self.nodes(at: touchLocation)
         let lastPosition = ws.count - 1
 //        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
