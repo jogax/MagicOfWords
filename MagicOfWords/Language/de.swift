@@ -32,7 +32,7 @@ let deDictionary: [TextConstants: String] = [
     .tcHeader:             "Spiel: %, Runde: %, Ergebnis: %",
     .tcTime:               "Zeit: %",
     .tcWordsToCollect:    "Zu sammelnde Wörter: (% / % / % / %)",
-    .tcOwnWords:          "Zeige eigene Wörter (% / % / %)",
+    .tcOwnWords:          "Eigene Wörter (% / % / %)",
     .tcNoMoreSteps:       "Herzlichen Glückwunsch, du hast das Spiel beendet!",
     .tcScore:             "Punkte:",
     .tcBestScore:          "Beste Ergebnis",
@@ -56,6 +56,7 @@ let deDictionary: [TextConstants: String] = [
     .tcCount:               "Cnt:",
     .tcLength:              "Len:",
     .tcMinutes:             "Min:",
+    .tcShowAllWords:        "Zeige alle Wörter",
 ]
 
 

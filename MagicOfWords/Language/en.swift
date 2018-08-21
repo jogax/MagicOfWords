@@ -32,7 +32,7 @@ let enDictionary: [TextConstants: String] = [
     .tcHeader:             "Game: %, Round: %, Score: %",
     .tcTime:               "Time: %",
     .tcWordsToCollect:    "Words to collect: (% / % / % / %)",
-    .tcOwnWords:          "Show own words (% / % / %)",
+    .tcOwnWords:          "My own words (% / % / %)",
     .tcNoMoreSteps:       "Congratulations, you've finished the game!",
     .tcScore:             "Score:",
     .tcBestScore:          "Best score",
@@ -56,5 +56,5 @@ let enDictionary: [TextConstants: String] = [
     .tcCount:               "Cnt:",
     .tcLength:              "Len:",
     .tcMinutes:             "Min:",
-
+    .tcShowAllWords:        "Show all words",
 ]
