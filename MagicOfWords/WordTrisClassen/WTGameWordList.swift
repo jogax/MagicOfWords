@@ -490,6 +490,7 @@ public class WTGameWordList {
                 }
             }
             delegate!.startShowingWordsOverPosition(wordList: showedWords)
+            
         }
     }
     public func stopShowingWords() {

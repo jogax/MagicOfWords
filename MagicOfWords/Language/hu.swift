@@ -37,7 +37,7 @@ let huDictionary: [TextConstants: String] = [
     .tcScore:             "Pontszám",
     .tcBestScore:              "Legjobb Eredm.",
     .tcBestPlayer:        "Legjobb játékos",
-    .tcCollectedRequiredWords:  "Kötelező szavak:",
+    .tcCollectedRequiredWords:  "Kötelező szavak",
     .tcCollectedOwnWords:       "Saját szavak",
     .tcTotal:               "Összesen:",
     .tcTaskNotCompletedWithNoMoreSteps: "Nincs több lépés, feladat nem teljesült!",
@@ -57,4 +57,5 @@ let huDictionary: [TextConstants: String] = [
     .tcLength:              "Hossz",
     .tcMinutes:             "Perc",
     .tcShowAllWords:        "Mutasd az összes szót",
+    .tcWordsOverLetter:     "Szavak a betü felett",
 ]

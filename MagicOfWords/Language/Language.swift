@@ -58,7 +58,8 @@ enum TextConstants: Int {
     tcCount,
     tcLength,
     tcMinutes,
-    tcShowAllWords
+    tcShowAllWords,
+    tcWordsOverLetter
 }
 
     let LanguageEN = "en" // index 0

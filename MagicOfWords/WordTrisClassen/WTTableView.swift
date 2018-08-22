@@ -23,6 +23,9 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     var myDelegate: WTTableViewDelegate?
     override init(frame: CGRect, style: UITableViewStyle) {
         super.init(frame: frame, style: style)
+        layer.borderColor = UIColor.black.cgColor
+        layer.borderWidth = 1.0
+        layer.cornerRadius = 5.0
         self.delegate = self
         self.dataSource = self
 //        self.addBorder(toSide: .Left, withColor: UIColor.black, andThickness: 5)

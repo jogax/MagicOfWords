@@ -37,7 +37,7 @@ let deDictionary: [TextConstants: String] = [
     .tcScore:             "Punkte:",
     .tcBestScore:          "Beste Ergebnis",
     .tcBestPlayer:         "Bester Spieler",
-    .tcCollectedRequiredWords: "Pflichtwörter:",
+    .tcCollectedRequiredWords: "Pflichtwörter",
     .tcCollectedOwnWords:      "Eigene Wörter",
     .tcTotal:               "Insgesamt:",
     .tcTaskNotCompletedWithNoMoreSteps: "Keine weiteren Schritte, Aufgabe nicht erledigt!",
@@ -57,6 +57,7 @@ let deDictionary: [TextConstants: String] = [
     .tcLength:              "Len:",
     .tcMinutes:             "Min:",
     .tcShowAllWords:        "Zeige alle Wörter",
+    .tcWordsOverLetter:   "Wörter über den Buchstaben",
 ]
 
 

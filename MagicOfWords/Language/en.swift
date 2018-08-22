@@ -37,7 +37,7 @@ let enDictionary: [TextConstants: String] = [
     .tcScore:             "Score:",
     .tcBestScore:          "Best score",
     .tcBestPlayer:         "Best player",
-    .tcCollectedRequiredWords: "Mandatory words:",
+    .tcCollectedRequiredWords: "Mandatory words",
     .tcCollectedOwnWords:   "Own words",
     .tcTotal:               "Total:",
     .tcTaskNotCompletedWithNoMoreSteps: "No more steps, task not completed!",
@@ -57,4 +57,5 @@ let enDictionary: [TextConstants: String] = [
     .tcLength:              "Len:",
     .tcMinutes:             "Min:",
     .tcShowAllWords:        "Show all words",
+    .tcWordsOverLetter:   "Words over the letter",
 ]
