@@ -8,6 +8,7 @@
 
 import Foundation
 import GameKit
+import UIKit
 
 public protocol ShowFinishedGamesSceneDelegate: class {
     func backToMenuScene()
@@ -233,6 +234,9 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
         }
     }
     
+    func getHeightForHeaderInSection(tableView: UITableView, section: Int)->CGFloat {
+        return GV.onIpad ? 48 : 28
+    }
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int) {
         //        let header = headerView as? UITableViewHeaderFooterView
         //        let fontSize = GV.onIpad ? self.frame.width * 0.018 : self.frame.width * 0.040

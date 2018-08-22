@@ -107,13 +107,14 @@ let iFiveMinutes = 300
 class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordListDelegate, WTTableViewDelegate {
     func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord = SelectedWord()) {
         var longWaitAction = SKAction.wait(forDuration: 0.0)
+        let duration = 0.3
         if newWord != foundedWord {
             for letter in newWord.usedLetters {
                 let myNode = GV.gameArray[letter.col][letter.row]
                 let showRedAction = SKAction.run({
                     myNode.setColors(toColor: .myRedColor, toStatus: .noChange)
                 })
-                let waitAction = SKAction.wait(forDuration: 0.5)
+                let waitAction = SKAction.wait(forDuration: duration)
                 let showOrigAction = SKAction.run({
                     myNode.setColorByState()
                 })
@@ -126,14 +127,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 }
                 myNode.run(SKAction.sequence(sequence))
             }
-            longWaitAction = SKAction.wait(forDuration: 3.0)
+            longWaitAction = SKAction.wait(forDuration: 3 * duration)
         }
         for letter in foundedWord.usedLetters {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showGreenAction = SKAction.run({
                 myNode.setColors(toColor: .myDarkGreenColor, toStatus: .noChange)
             })
-            let waitAction = SKAction.wait(forDuration: 0.5)
+            let waitAction = SKAction.wait(forDuration: duration)
             let showOrigAction = SKAction.run({
                 myNode.setColorByState()
             })
@@ -169,58 +170,95 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 
     private func calculateColumnWidths() {
         title = ""
-        let text1 = " \(GV.language.getText(.tcWord).fixLength(length: maxLength, center: true))     "
-        let text2 = "\(GV.language.getText(.tcCount)) "
-        let text3 = "\(GV.language.getText(.tcLength)) "
-        let text4 = "\(GV.language.getText(.tcScore)) "
-        let text5 = "\(GV.language.getText(.tcMinutes)) "
-        title += text1
-        title += text2
-        title += text3
-        title += text4
-        title += text5
-        lengthOfWord = maxLength
-        lengthOfCnt = text2.length
-        lengthOfLength = text3.length
-        lengthOfScore = text4.length
-        lengthOfMin = text5.length
+        switch tableType {
+        case .ShowAllWords:
+            let text1 = " \(GV.language.getText(.tcWord).fixLength(length: maxLength, center: true))     "
+            let text2 = "\(GV.language.getText(.tcCount)) "
+            let text3 = "\(GV.language.getText(.tcLength)) "
+            let text4 = "\(GV.language.getText(.tcScore)) "
+            let text5 = "\(GV.language.getText(.tcMinutes)) "
+            title += text1
+            title += text2
+            title += text3
+            title += text4
+            title += text5
+            lengthOfWord = maxLength
+            lengthOfCnt = text2.length
+            lengthOfLength = text3.length
+            lengthOfScore = text4.length
+            lengthOfMin = text5.length
+        case .ShowWordsOverPosition:
+            let text1 = " \(GV.language.getText(.tcWord).fixLength(length: maxLength, center: true))     "
+            let text2 = "\(GV.language.getText(.tcLength)) "
+            let text3 = "\(GV.language.getText(.tcScore)) "
+            let text4 = "\(GV.language.getText(.tcMinutes)) "
+            title += text1
+            title += text2
+            title += text3
+            title += text4
+            lengthOfWord = maxLength
+            lengthOfCnt = 0
+            lengthOfLength = text2.length
+            lengthOfScore = text3.length
+            lengthOfMin = text4.length
+        default:
+            break
+        }
     }
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
         let view = UIView()
-        let lineHeight = title.height(withConstrainedWidth: 0, font: myFont!)
-        let width = title.width(withConstrainedHeight: 0, font: myFont!)
-        if section == 0 {
-            let text = GV.language.getText(.tcCollectedRequiredWords).fixLength(length: title.length, center: true)
-//            let lineHeight = title.height(withConstrainedWidth: 0, font: myFont!)
-//            let width = title.width(withConstrainedHeight: 0, font: myFont!)
-//            view.frame = CGRect(x: 50, y: 0, width: width, height: 2 * lineHeight)
-            let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
-            label1.font = myFont!
-            label1.text = text
-            view.addSubview(label1)
-        } else {
-            let text = GV.language.getText(.tcCollectedOwnWords).fixLength(length: title.length, center: true)
-            //            view.frame = CGRect(x: 50, y: 0, width: width, height: 2 * lineHeight)
-            let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
-            label1.font = myFont!
-            label1.text = text
-            view.addSubview(label1)
+        switch tableType {
+        case .ShowAllWords:
+            let lineHeight = title.height(withConstrainedWidth: 0, font: myFont!)
+            let width = title.width(withConstrainedHeight: 0, font: myFont!)
+            if section == 0 {
+                let text = GV.language.getText(.tcCollectedRequiredWords).fixLength(length: title.length, center: true)
+    //            let lineHeight = title.height(withConstrainedWidth: 0, font: myFont!)
+    //            let width = title.width(withConstrainedHeight: 0, font: myFont!)
+    //            view.frame = CGRect(x: 50, y: 0, width: width, height: 2 * lineHeight)
+                let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
+                label1.font = myFont!
+                label1.text = text
+                view.addSubview(label1)
+            } else {
+                let text = GV.language.getText(.tcCollectedOwnWords).fixLength(length: title.length, center: true)
+                //            view.frame = CGRect(x: 50, y: 0, width: width, height: 2 * lineHeight)
+                let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
+                label1.font = myFont!
+                label1.text = text
+                view.addSubview(label1)
+            }
+            let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight, width: width, height: lineHeight))
+            label2.font = myFont!
+            label2.text = title
+            view.addSubview(label2)
+        case .ShowWordsOverPosition:
+            let text = title
+            let lineHeight = text.height(withConstrainedWidth: 0, font: myFont!)
+            let width = text.width(withConstrainedHeight: 0, font: myFont!)
+            let label = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
+            label.font = myFont!
+            label.text = text
+            view.addSubview(label)
+        default:
+            break
         }
-        let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight, width: width, height: lineHeight))
-        label2.font = myFont!
-        label2.text = title
-        view.addSubview(label2)
         view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
         return view
     }
     
+    func getHeightForHeaderInSection(tableView: UITableView, section: Int)->CGFloat {
+        switch tableType {
+        case .ShowAllWords:
+            return GV.onIpad ? 48 : 28
+        case .ShowWordsOverPosition:
+            return GV.onIpad ? 24 : 20
+        default:
+            return 0
+        }
+    }
+    
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int) {
-//        let header = headerView as? UITableViewHeaderFooterView
-//        let fontSize = GV.onIpad ? self.frame.width * 0.018 : self.frame.width * 0.040
-//        header?.textLabel?.font = UIFont(name: "CourierNewPS-BoldMT", size: fontSize) // change it according to ur requirement
-//        header?.textLabel?.textAlignment = .left
-//        header?.textLabel?.textColor = UIColor.black // change it according to ur requirement
-//        header?.backgroundColor = UIColor.red //showWordsBackgroundColor
     }
     
 
@@ -233,133 +271,166 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.frame.width * (GV.onIpad ? 0.040 : 0.010)))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
-        if indexPath.section == 0 {
-            cell.addColumn(text: "  " + mandatoryWordsForShow[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
-            cell.addColumn(text: String(mandatoryWordsForShow[indexPath.row].counter).fixLength(length: lengthOfCnt)) // Counter column
-            cell.addColumn(text: String(mandatoryWordsForShow[indexPath.row].word.length).fixLength(length: lengthOfLength))
-            cell.addColumn(text: String(mandatoryWordsForShow[indexPath.row].score).fixLength(length: lengthOfScore)) // Score column
-            cell.addColumn(text: "+\(mandatoryWordsForShow[indexPath.row].minutes)".fixLength(length: lengthOfMin))
-        } else {
-            cell.addColumn(text: "  " + ownWordsForShow[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
-            cell.addColumn(text: String(ownWordsForShow[indexPath.row].counter).fixLength(length: lengthOfCnt)) // Counter column
-            cell.addColumn(text: String(ownWordsForShow[indexPath.row].word.length).fixLength(length: lengthOfLength))
-            cell.addColumn(text: String(ownWordsForShow[indexPath.row].score).fixLength(length: lengthOfScore)) // Score column
-            cell.addColumn(text: "+\(ownWordsForShow[indexPath.row].minutes)".fixLength(length: lengthOfMin))
-         }
+        switch tableType {
+        case .ShowAllWords:
+            if indexPath.section == 0 {
+                cell.addColumn(text: "  " + mandatoryWordsForShow[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
+                cell.addColumn(text: String(mandatoryWordsForShow[indexPath.row].counter).fixLength(length: lengthOfCnt)) // Counter column
+                cell.addColumn(text: String(mandatoryWordsForShow[indexPath.row].word.length).fixLength(length: lengthOfLength))
+                cell.addColumn(text: String(mandatoryWordsForShow[indexPath.row].score).fixLength(length: lengthOfScore)) // Score column
+                cell.addColumn(text: "+\(mandatoryWordsForShow[indexPath.row].minutes)".fixLength(length: lengthOfMin))
+            } else {
+                cell.addColumn(text: "  " + ownWordsForShow[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
+                cell.addColumn(text: String(ownWordsForShow[indexPath.row].counter).fixLength(length: lengthOfCnt)) // Counter column
+                cell.addColumn(text: String(ownWordsForShow[indexPath.row].word.length).fixLength(length: lengthOfLength))
+                cell.addColumn(text: String(ownWordsForShow[indexPath.row].score).fixLength(length: lengthOfScore)) // Score column
+                cell.addColumn(text: "+\(ownWordsForShow[indexPath.row].minutes)".fixLength(length: lengthOfMin))
+             }
+        case .ShowWordsOverPosition:
+            cell.addColumn(text: "  " + wordList[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
+            cell.addColumn(text: String(wordList[indexPath.row].word.length).fixLength(length: lengthOfLength))
+            cell.addColumn(text: String(wordList[indexPath.row].score).fixLength(length: lengthOfScore)) // Counter column
+        default:
+            break
+        }
         return cell
     }
     
     func getNumberOfSections() -> Int {
-        return 2
+        switch tableType {
+        case .ShowAllWords:
+            return 2
+        case .ShowWordsOverPosition:
+            return 1
+        case .None:
+            return 0
+        }
     }
     func getNumberOfRowsInSections(section: Int)->Int {
-        switch section {
-        case 0: return WTGameWordList.shared.getCountWords(mandatory: true)
-        case 1: return WTGameWordList.shared.getCountWords(mandatory: false)
-        default: return 0
+        switch tableType {
+        case .ShowAllWords:
+            switch section {
+            case 0: return WTGameWordList.shared.getCountWords(mandatory: true)
+            case 1: return WTGameWordList.shared.getCountWords(mandatory: false)
+            default: return 0
+            }
+        case .ShowWordsOverPosition:
+            return wordList.count
+        default:
+            return 0
         }
+    }
+    
+    enum TableType: Int {
+        case None = 0, ShowAllWords, ShowWordsOverPosition
     }
     
     
     let nameForSpriteWidthWords = "°°°nameForSpriteWidthWords°°°"
     var spriteToShowWords: SKSpriteNode?
+    var tableType: TableType = .None
+    var wordList = [SelectedWord]()
+    
+//    func startShowingWordsOverPositionOld(wordList: [SelectedWord]) {
+//        let sizeOfLine = myHeight * 0.027
+//        let sizeOfLines = CGFloat(wordList.count) * sizeOfLine
+//        var maxLength = 0
+//        let widthMultiplier:CGFloat = GV.onIpad ? 0.02 : 0.035
+//        for selectedWord in wordList {
+//            let word = selectedWord.word + " (" + String(selectedWord.score) + ")"
+//            maxLength = word.length > maxLength ? word.length : maxLength
+//        }
+////        let texture = SKTexture(imageNamed: "menuBackground.png")
+////        spriteToShowWords = SKSpriteNode(texture: texture)
+//        spriteToShowWords = SKSpriteNode()
+//        spriteToShowWords!.name = nameForSpriteWidthWords
+//        spriteToShowWords!.alpha = 1.0
+//        spriteToShowWords!.color = showWordsBackgroundColor
+//        spriteToShowWords!.colorBlendFactor = 0.25
+//        spriteToShowWords!.size = CGSize(width: CGFloat(maxLength) * myWidth * widthMultiplier, height: myHeight * 0.01 + sizeOfLines)
+//        spriteToShowWords!.position = CGPoint(x: myWidth * 0.5, y: myHeight * 0.95 - spriteToShowWords!.size.height / 2)
+//        spriteToShowWords!.zPosition = self.zPosition + 1000
+//        self.addChild(spriteToShowWords!)
+//        for (index, selectedWord) in wordList.enumerated(){
+//            let label = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")
+//            label.fontColor = .black
+//            label.position = CGPoint(x: 0, y: spriteToShowWords!.size.height - sizeOfLines * 0.63 - CGFloat(index + 1) * sizeOfLine * 0.7)
+//            label.verticalAlignmentMode = .center
+//            label.horizontalAlignmentMode = .center
+//            label.fontSize = self.size.width * widthMultiplier
+//            label.text = selectedWord.word + " (" + String(selectedWord.score) + ")"
+//            label.name = nameForSpriteWidthWords
+//            spriteToShowWords!.addChild(label)
+//        }
+//    }
+//
+    var showWordsOverPositionTableView: WTTableView?
     
     func startShowingWordsOverPosition(wordList: [SelectedWord]) {
-        let sizeOfLine = myHeight * 0.027
-        let sizeOfLines = CGFloat(wordList.count) * sizeOfLine
-        var maxLength = 0
-        let widthMultiplier:CGFloat = GV.onIpad ? 0.02 : 0.035
-        for selectedWord in wordList {
-            let word = selectedWord.word + " (" + String(selectedWord.score) + ")"
-            maxLength = word.length > maxLength ? word.length : maxLength
-        }
-//        let texture = SKTexture(imageNamed: "menuBackground.png")
-//        spriteToShowWords = SKSpriteNode(texture: texture)
-        spriteToShowWords = SKSpriteNode()
-        spriteToShowWords!.name = nameForSpriteWidthWords
-        spriteToShowWords!.alpha = 1.0
-        spriteToShowWords!.color = showWordsBackgroundColor
-        spriteToShowWords!.colorBlendFactor = 0.25
-        spriteToShowWords!.size = CGSize(width: CGFloat(maxLength) * myWidth * widthMultiplier, height: myHeight * 0.01 + sizeOfLines)
-        spriteToShowWords!.position = CGPoint(x: myWidth * 0.5, y: myHeight * 0.95 - spriteToShowWords!.size.height / 2)
-        spriteToShowWords!.zPosition = self.zPosition + 1000
-        self.addChild(spriteToShowWords!)
-        for (index, selectedWord) in wordList.enumerated(){
-            let label = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")
-            label.fontColor = .black
-            label.position = CGPoint(x: 0, y: spriteToShowWords!.size.height - sizeOfLines * 0.63 - CGFloat(index + 1) * sizeOfLine * 0.7)
-            label.verticalAlignmentMode = .center
-            label.horizontalAlignmentMode = .center
-            label.fontSize = self.size.width * widthMultiplier
-            label.text = selectedWord.word + " (" + String(selectedWord.score) + ")"
-            label.name = nameForSpriteWidthWords
-            spriteToShowWords!.addChild(label)
-        }
-    }
-    
-    var showWordsOverPositionTableView: WTTableView?
-    func startShowingWordsOverPositionNew(wordList: [SelectedWord]) {
         showWordsOverPositionTableView = WTTableView()
+        showingWordsInTable = true
+        tableType = .ShowWordsOverPosition
+        self.wordList = wordList
         timerIsCounting = false
-        var maxLength = 0
+        maxLength = 0
         for selectedWord in wordList {
-            let word = selectedWord.word + " (" + String(selectedWord.score) + ")"
+            let word = selectedWord.word
             maxLength = word.length > maxLength ? word.length : maxLength
         }
+        calculateColumnWidths()
         showWordsOverPositionTableView?.setDelegate(delegate: self)
         showWordsOverPositionTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-        let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(title.length) * maxLengthMultiplier), y: 100)
+        let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(title.length) * maxLengthMultiplier), y: self.frame.height * 0.08)
         let lineHeight = (myFont?.lineHeight)! * (GV.onIpad ? 1.4 : 1.4)
-        let headerframeHeight = lineHeight * 4
-        var showingWordsHeight = CGFloat(ownWordsForShow.count + mandatoryWordsForShow.count) * lineHeight
+        let headerframeHeight = lineHeight
+        var showingWordsHeight = CGFloat(wordList.count) * lineHeight
         if showingWordsHeight  > self.frame.height * 0.9 {
-            var counter = CGFloat(ownWordsForShow.count)
+            var counter = CGFloat(wordList.count)
             repeat {
                 counter -= 1
                 showingWordsHeight = lineHeight * counter
             } while showingWordsHeight + headerframeHeight > self.frame.height * 0.9
         }
-        if maxLength < GV.language.getText(.tcWord).count {
-            maxLength = GV.language.getText(.tcWord).count
+        if maxLength < title.length {
+            maxLength = title.length
         }
-        let width = CGFloat(title.length) * maxLengthMultiplier
+        let width = CGFloat(maxLength) * maxLengthMultiplier
         let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
-        showOwnWordsTableView?.frame=CGRect(origin: origin, size: size)
-        self.showOwnWordsTableView?.reloadData()
+        showWordsOverPositionTableView?.frame=CGRect(origin: origin, size: size)
+        self.showWordsOverPositionTableView?.reloadData()
         
         //        showOwnWordsTableView?.reloadData()
-        self.scene?.alpha = 0.2
-        self.scene?.view?.addSubview(showOwnWordsTableView!)
+        self.scene?.view?.addSubview(showWordsOverPositionTableView!)
 
-        let sizeOfLine = myHeight * 0.027
-        let sizeOfLines = CGFloat(wordList.count) * sizeOfLine
-         let widthMultiplier:CGFloat = GV.onIpad ? 0.02 : 0.035
-        for selectedWord in wordList {
-            let word = selectedWord.word + " (" + String(selectedWord.score) + ")"
-            maxLength = word.length > maxLength ? word.length : maxLength
-        }
+//        let sizeOfLine = myHeight * 0.027
+//        let sizeOfLines = CGFloat(wordList.count) * sizeOfLine
+//         let widthMultiplier:CGFloat = GV.onIpad ? 0.02 : 0.035
+//        for selectedWord in wordList {
+//            let word = selectedWord.word + " (" + String(selectedWord.score) + ")"
+//            maxLength = word.length > maxLength ? word.length : maxLength
+//        }
         //        let texture = SKTexture(imageNamed: "menuBackground.png")
         //        spriteToShowWords = SKSpriteNode(texture: texture)
-        spriteToShowWords = SKSpriteNode()
-        spriteToShowWords!.name = nameForSpriteWidthWords
-        spriteToShowWords!.alpha = 1.0
-        spriteToShowWords!.color = showWordsBackgroundColor
-        spriteToShowWords!.colorBlendFactor = 0.25
-        spriteToShowWords!.size = CGSize(width: CGFloat(maxLength) * myWidth * widthMultiplier, height: myHeight * 0.01 + sizeOfLines)
-        spriteToShowWords!.position = CGPoint(x: myWidth * 0.5, y: myHeight * 0.95 - spriteToShowWords!.size.height / 2)
-        spriteToShowWords!.zPosition = self.zPosition + 1000
-        self.addChild(spriteToShowWords!)
-        for (index, selectedWord) in wordList.enumerated(){
-            let label = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")
-            label.fontColor = .black
-            label.position = CGPoint(x: 0, y: spriteToShowWords!.size.height - sizeOfLines * 0.63 - CGFloat(index + 1) * sizeOfLine * 0.7)
-            label.verticalAlignmentMode = .center
-            label.horizontalAlignmentMode = .center
-            label.fontSize = self.size.width * widthMultiplier
-            label.text = selectedWord.word + " (" + String(selectedWord.score) + ")"
-            label.name = nameForSpriteWidthWords
-            spriteToShowWords!.addChild(label)
-        }
+//        spriteToShowWords = SKSpriteNode()
+//        spriteToShowWords!.name = nameForSpriteWidthWords
+//        spriteToShowWords!.alpha = 1.0
+//        spriteToShowWords!.color = showWordsBackgroundColor
+//        spriteToShowWords!.colorBlendFactor = 0.25
+//        spriteToShowWords!.size = CGSize(width: CGFloat(maxLength) * myWidth * widthMultiplier, height: myHeight * 0.01 + sizeOfLines)
+//        spriteToShowWords!.position = CGPoint(x: myWidth * 0.5, y: myHeight * 0.95 - spriteToShowWords!.size.height / 2)
+//        spriteToShowWords!.zPosition = self.zPosition + 1000
+//        self.addChild(spriteToShowWords!)
+//        for (index, selectedWord) in wordList.enumerated(){
+//            let label = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")
+//            label.fontColor = .black
+//            label.position = CGPoint(x: 0, y: spriteToShowWords!.size.height - sizeOfLines * 0.63 - CGFloat(index + 1) * sizeOfLine * 0.7)
+//            label.verticalAlignmentMode = .center
+//            label.horizontalAlignmentMode = .center
+//            label.fontSize = self.size.width * widthMultiplier
+//            label.text = selectedWord.word + " (" + String(selectedWord.score) + ")"
+//            label.name = nameForSpriteWidthWords
+//            spriteToShowWords!.addChild(label)
+//        }
     }
     func stopShowingWordsOverPosition() {
         if spriteToShowWords != nil {
@@ -774,34 +845,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 
     }
     
-//    func addOwnWordOld(word: String, creationIndex: Int, check: Bool)->Bool {
-//        var returnBool = false
-//        if realmWordList.objects(WordListModel.self).filter("word = %@", GV.aktLanguage + word.lowercased()).count == 1 {
-//            if !GV.allWords.contains(where: {$0.word == word}) {
-//                returnBool = true
-//                let myIndex = (creationIndex == NoValue ? indexOfTilesForGame : creationIndex)
-//                let ownWordToCheck = WordToCheck(word: word, countFounded: 1, mandatory: false, creationIndex: myIndex, score: 0)
-//                var lengthOfWord = ownWordToCheck.word.count
-//                lengthOfWord = lengthOfWord > 10 ? 11 : lengthOfWord
-//
-//                GV.allWords.append(ownWordToCheck)
-//                myTimer!.increaseMaxTime(value: timeIncreaseValues![lengthOfWord])
-//                createWordLabel(wordToShow: ownWordToCheck, counter: GV.countWords(mandatory: false), own: true)
-//                if check {
-//                    wtGameboard!.checkWholeWords()
-//                }
-//            }
-//        }
-//        return returnBool
-//    }
-    
     func addOwnWordNew(word: String, usedLetters: [UsedLetter])->Bool {
         var returnBool = false
         if realmWordList.objects(WordListModel.self).filter("word = %@", GV.aktLanguage + word.lowercased()).count == 1 {
             let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
             let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord)
             returnBool = boolValue
-        } else {
+        }
+//        else {
+//            blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
+//        }
+        if !returnBool {
             blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
         }
         return returnBool
@@ -1179,7 +1233,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let touchedNodes = analyzeNodes(touchLocation: firstTouchLocation, calledFrom: .start)
         if showingWordsInTable /* && !touchedNodes.showOwnWordsButton */ {
             showingWordsInTable = false
-            showOwnWordsTableView?.removeFromSuperview()
+            if tableType == .ShowAllWords {
+                showOwnWordsTableView?.removeFromSuperview()
+            } else {
+                showWordsOverPositionTableView?.removeFromSuperview()
+            }
             timerIsCounting = true
         }
 //        if touchedNodes.undo {
@@ -1340,10 +1398,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let lastPosition = ws.count - 1
 //        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
         let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .stop)
-//        if touchedNodes.showOwnWordsButton {
-//            showOwnWordsInTableView()
-//            showingWordsInTable = true
-//        }
         if touchedNodes.answer1 {
             gameboardEnabled = true
             removeNodesWith(name: MyQuestionName)
@@ -1840,6 +1894,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 
     
     private func showOwnWordsInTableView() {
+        tableType = .ShowAllWords
         showOwnWordsTableView = WTTableView()
         timerIsCounting = false
         var maxLength1 = 0
@@ -1849,10 +1904,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         calculateColumnWidths()
         showOwnWordsTableView?.setDelegate(delegate: self)
         showOwnWordsTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-//        showOwnWordsView.rowHeight = 20
-//        let indexPath = IndexPath(row: 0, section: 0)
-//        let frame = CGRect(x: 0, y: 0, width: self.frame.width * 0.8, height: self.frame.height * 0.4)//showOwnWordsTableView?.rectForRow(at: indexPath)
-        
         let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(title.length) * maxLengthMultiplier), y: 100)
         let lineHeight = (myFont?.lineHeight)! * (GV.onIpad ? 1.4 : 1.4)
         let headerframeHeight = lineHeight * 4
@@ -1871,8 +1922,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
         showOwnWordsTableView?.frame=CGRect(origin: origin, size: size)
         self.showOwnWordsTableView?.reloadData()
-
-//        showOwnWordsTableView?.reloadData()
         self.scene?.alpha = 0.2
         self.scene?.view?.addSubview(showOwnWordsTableView!)
     }

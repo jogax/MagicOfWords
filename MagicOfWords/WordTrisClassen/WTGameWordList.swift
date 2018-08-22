@@ -329,7 +329,7 @@ public class WTGameWordList {
             let changeTime = minutesForWord[selectedWord.word.length]
             delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: doAnimate, changeTime: changeTime!)
         }
-        return noCommonLetter
+        return noCommonLetter && noDiagonal
     }
     
     private func addWordToAllWords(word: String) {
