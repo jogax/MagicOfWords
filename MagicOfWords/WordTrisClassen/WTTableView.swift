@@ -26,7 +26,7 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
         super.init(frame: frame, style: style)
         layer.borderColor = UIColor.black.cgColor
         layer.borderWidth = 1.0
-        layer.cornerRadius = 5.0
+        layer.cornerRadius = 10.0
         self.delegate = self
         self.dataSource = self
 //        self.addBorder(toSide: .Left, withColor: UIColor.black, andThickness: 5)

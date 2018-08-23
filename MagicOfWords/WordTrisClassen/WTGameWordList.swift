@@ -121,8 +121,7 @@ extension SelectedWord: Equatable {
             }
             return positionsOK
         }
-        return
-            lhs.word == rhs.word && checkPositions()
+        return lhs.word == rhs.word && checkPositions()
     }
 }
 
@@ -148,7 +147,7 @@ public protocol WTGameWordListDelegate: class {
     /// Method called when a new Word is saved
     func showScore(newWord: SelectedWord, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int)
     func startShowingWordsOverPosition(wordList: [SelectedWord])
-    func stopShowingWordsOverPosition()
+//    func stopShowingWordsOverPosition()
     func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord)
 }
 
@@ -212,6 +211,16 @@ public class WTGameWordList {
         }
         return counter
     }
+    
+    public func getMinutesForWord(word: String)->Int {
+        if word.length < minutesForWord.count {
+            return minutesForWord[word.length]!
+        } else {
+            return minutesForWord[minutesForWord.count - 1]!
+        }
+    }
+    
+
  
     public func getCountFoundedWords(mandatory: Bool, countFoundedMandatory: Bool = false, countAll: Bool = false)->Int {
         var counter = 0
@@ -500,7 +509,7 @@ public class WTGameWordList {
             }
         }
         showedWords = [SelectedWord]()
-        delegate!.stopShowingWordsOverPosition()
+//        delegate!.stopShowingWordsOverPosition()
     }
     public func getWordsForShow(mandatory: Bool)->([FoundedWordWithCounter], Int) {
         var returnWords = [FoundedWordWithCounter]()
