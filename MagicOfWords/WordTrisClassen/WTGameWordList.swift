@@ -498,7 +498,10 @@ public class WTGameWordList {
     //                wordsToShow.append(selectedWord.word)
                 }
             }
-            delegate!.startShowingWordsOverPosition(wordList: showedWords)
+            delegate!.startShowingWordsOverPosition(wordList: showedWords.sorted(by: {
+                $0.word.length > $1.word.length ||
+                $0.word.length == $1.word.length && $0.score > $1.score ||
+                $0.word.length == $1.word.length && $0.score == $1.score && $0.word < $1.word}))
             
         }
     }

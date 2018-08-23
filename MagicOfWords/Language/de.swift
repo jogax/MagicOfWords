@@ -58,6 +58,7 @@ let deDictionary: [TextConstants: String] = [
     .tcMinutes:             "Min:",
     .tcShowAllWords:        "Zeige alle Wörter",
     .tcWordsOverLetter:   "Wörter über den Buchstaben",
+    .tcMe:                  "Ich",
 ]
 
 

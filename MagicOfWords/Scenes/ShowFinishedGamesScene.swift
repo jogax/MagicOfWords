@@ -35,80 +35,6 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
         showFinishedGamesInTableView()
     }
     
-//    private func createShowingItem() {
-//        let finishedGames = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusFinished, GV.language.getText(.tcAktLanguage))
-//        createHeader(text: GV.language.getText(.tcGameNumber), index: 0)
-//        createHeader(text: GV.language.getText(.tcScore), index: 1)
-//        createHeader(text: GV.language.getText(.tcBestScore), index: 2)
-//        var lineNr = 0
-//        for finishedGame in finishedGames {
-//            createItem(text: String(finishedGame.gameNumber + 1), index: 0, lineNr: lineNr)
-//            createItem(text: String(finishedGame.score), index: 1, lineNr: lineNr)
-//            createItem(text: String(0), index: 2, lineNr: lineNr)
-//            lineNr += 1
-//        }
-//        createOKButton()
-//    }
-//
-//    private func createHeader(text: String, index: Int) {
-//        let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
-//        let yPosition = self.frame.height * 0.80
-//        let xPosition = self.frame.size.width * xMultiplierTab[index]
-//        label.position = CGPoint(x: xPosition, y: yPosition)
-//        label.fontSize = self.frame.size.height * 0.018
-//        label.fontSize = UIScreen.main.bounds.height * 0.03
-//        label.fontColor = SKColor.blue
-//        label.colorBlendFactor = 0.9
-//        label.text = text
-//        label.zPosition = self.zPosition + 1
-//        label.horizontalAlignmentMode = .center
-//        label.verticalAlignmentMode = .center
-//        //        menuItem.name = String(String(score))
-//        self.addChild(label)
-//    }
-//
-//    private func createItem(text: String, index: Int, lineNr: Int) {
-//        let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
-//        let yPosition = self.frame.height * (0.75 - CGFloat(lineNr) * 0.04)
-//        let xPosition = self.frame.size.width * xMultiplierTab[index]
-//        label.position = CGPoint(x: xPosition, y: yPosition)
-//        label.fontSize = self.frame.size.height * 0.018
-//        label.fontSize = UIScreen.main.bounds.height * 0.03
-//        label.fontColor = SKColor.blue
-//        label.colorBlendFactor = 0.9
-//        label.text = text
-//        label.zPosition = self.zPosition + 1
-//        label.horizontalAlignmentMode = .center
-//        label.verticalAlignmentMode = .center
-////        menuItem.name = String(String(score))
-//        self.addChild(label)
-//    }
-//
-//    func createOKButton() {
-//        let texture = SKTexture(imageNamed: "button.png")
-//        let button = SKSpriteNode(texture: texture, color: .white, size: CGSize(width: self.size.width * 0.5, height: self.size.height * 0.2))
-//        let yPosition = self.frame.size.height * 0.20
-//        button.size = CGSize(width: self.frame.size.width * 0.4, height: self.frame.size.height * 0.1)
-//        button.position = CGPoint(x: self.frame.size.width / 2, y: yPosition)
-//        button.name = OKButtonName
-//        let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
-//        label.fontSize = self.frame.size.height / 30
-//        label.position = CGPoint(x:0, y: button.frame.height * 0.1)
-//        label.fontColor = SKColor.blue
-//        label.colorBlendFactor = 0.9
-//        label.text = GV.language.getText(.tcOK)
-//        label.zPosition = self.zPosition + 1
-//        label.horizontalAlignmentMode = .center
-//        label.verticalAlignmentMode = .center
-//        label.name = OKLabelName
-//        button.addChild(label)
-//        self.addChild(button)
-//    }
-//
-//    public func setDelegate(delegate: ShowFinishedGamesSceneDelegate) {
-//        myDelegate = delegate
-//    }
-//
     public func setDelegate(delegate: ShowFinishedGamesSceneDelegate) {
         myDelegate = delegate
     }
@@ -120,21 +46,6 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
         showGamesInTableView!.isHidden = true
         showGamesInTableView = nil
         myDelegate!.backToMenuScene()
-//        let firstTouch = touches.first
-//        let touchLocation = firstTouch!.location(in: self)
-//        let nodes = self.nodes(at: touchLocation)
-//        if nodes.count > 0 {
-//            for node in nodes {
-//                let name = node.name
-//                if name != nil {
-//                    switch name {
-//                    case OKLabelName:
-//                        myDelegate!.backToMenuScene()
-//                    default: break
-//                    }
-//                }
-//            }
-//        }
     }
     
     var showGamesInTableView: WTTableView?
@@ -148,13 +59,10 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
         calculateColumnWidths()
         showGamesInTableView?.setDelegate(delegate: self)
         showGamesInTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-        //        showOwnWordsView.rowHeight = 20
-        //        let indexPath = IndexPath(row: 0, section: 0)
-        //        let frame = CGRect(x: 0, y: 0, width: self.frame.width * 0.8, height: self.frame.height * 0.4)//showOwnWordsTableView?.rectForRow(at: indexPath)
         
-        let origin = CGPoint(x: 0.5 * (self.frame.width - CGFloat(title.length) * maxLengthMultiplier), y: 100)
-        let lineHeight = (myFont?.lineHeight)! * (GV.onIpad ? 1.5 : 1.6)
-        let headerframeHeight = lineHeight * 2
+        let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: 100)
+        let lineHeight = title.height(font: myFont!)
+        let headerframeHeight = lineHeight * 2.2
         var showingWordsHeight = CGFloat(gamesForShow.count) * lineHeight
         if showingWordsHeight  > self.frame.height * 0.9 {
             var counter = CGFloat(gamesForShow.count)
@@ -163,7 +71,7 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
                 showingWordsHeight = lineHeight * counter
             } while showingWordsHeight + headerframeHeight > self.frame.height * 0.9
         }
-        let width = CGFloat(title.length) * maxLengthMultiplier
+        let width = title.width(font: myFont!)
         let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
         showGamesInTableView?.frame=CGRect(origin: origin, size: size)
         self.showGamesInTableView?.reloadData()
@@ -182,9 +90,9 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
         let finishedGames = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusFinished, GV.language.getText(.tcAktLanguage))
         for finishedGame in finishedGames {
             var item = FinishedGameData()
-            item.gameNumber = String(finishedGame.gameNumber % 1000)
+            item.gameNumber = String((finishedGame.gameNumber % 1000) + 1)
             item.score = String(finishedGame.score)
-            (item.bestPlayer, item.bestScore) = getDataFromRealm(gameNumber: finishedGame.gameNumber)
+            (item.bestPlayer, item.bestScore) = getDataFromRealm(finishedGame: finishedGame)
             returnArray.append(item)
         }
         return returnArray
@@ -192,23 +100,23 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
     
     var lengthOfGameNumber: Int = 0
     var lengthOfScore: Int = 0
-    var lengthOfBestPlaer: Int = 0
+    var lengthOfBestPlayer: Int = 0
     var lengthOfBestScore: Int = 0
     var title = ""
     
     private func calculateColumnWidths() {
         title = ""
-        let text1 = "\(GV.language.getText(.tcGameNumber)) "
-        let text2 = "\(GV.language.getText(.tcScore)) "
-        let text3 = "\(GV.language.getText(.tcBestPlayer)) "
-        let text4 = "\(GV.language.getText(.tcBestScore)) "
+        let text1 = "  \(GV.language.getText(.tcGameNumber)) "
+        let text2 = " \(GV.language.getText(.tcScore)) "
+        let text3 = " \(GV.language.getText(.tcBestPlayer)) "
+        let text4 = " \(GV.language.getText(.tcBestScore)) "
         title += text1
         title += text2
         title += text3
         title += text4
         lengthOfGameNumber = text1.length
         lengthOfScore = text2.length
-        lengthOfBestPlaer = text3.length
+        lengthOfBestPlayer = text3.length
         lengthOfBestScore = text4.length
     }
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
@@ -238,12 +146,6 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
         return GV.onIpad ? 48 : 28
     }
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int) {
-        //        let header = headerView as? UITableViewHeaderFooterView
-        //        let fontSize = GV.onIpad ? self.frame.width * 0.018 : self.frame.width * 0.040
-        //        header?.textLabel?.font = UIFont(name: "CourierNewPS-BoldMT", size: fontSize) // change it according to ur requirement
-        //        header?.textLabel?.textAlignment = .left
-        //        header?.textLabel?.textColor = UIColor.black // change it according to ur requirement
-        //        header?.backgroundColor = UIColor.red //showWordsBackgroundColor
     }
     
     
@@ -252,14 +154,15 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
     
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
+        let color = UIColor(red: 240/255, green: 240/255, blue: 240/255,alpha: 1.0)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.frame.width * (GV.onIpad ? 0.040 : 0.010)))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
-        cell.addColumn(text: gamesForShow[indexPath.row].gameNumber.fixLength(length: lengthOfGameNumber, center: true)) // WordColumn
-        cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: lengthOfScore))
-        cell.addColumn(text: String(gamesForShow[indexPath.row].bestPlayer).fixLength(length: lengthOfBestPlaer))
-        cell.addColumn(text: String(gamesForShow[indexPath.row].bestScore).fixLength(length: lengthOfBestScore)) // Score column
+        cell.addColumn(text: (gamesForShow[indexPath.row].gameNumber).fixLength(length: lengthOfGameNumber - 2)) // GameNumber
+        cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: lengthOfScore), color: color) // My Score
+        cell.addColumn(text: String(gamesForShow[indexPath.row].bestPlayer).fixLength(length: lengthOfBestPlayer - 1)) // Best Player
+        cell.addColumn(text: String(gamesForShow[indexPath.row].bestScore).fixLength(length: lengthOfBestScore - 2), color: color) // Best Score
         return cell
     }
     
@@ -273,9 +176,13 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
         }
     }
 
+    func getHeightForRow(tableView: UITableView, indexPath: IndexPath) -> CGFloat {
+        return title.height(font: myFont!)
+    }
     
-    private func getDataFromRealm(gameNumber: Int)->(String, String) {
-        return ("", "")
+
+    private func getDataFromRealm(finishedGame: GameDataModel)->(String, String) {
+        return (GV.language.getText(.tcMe), String(finishedGame.score))
     }
 
 

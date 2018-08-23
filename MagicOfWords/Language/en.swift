@@ -58,4 +58,5 @@ let enDictionary: [TextConstants: String] = [
     .tcMinutes:             "Min:",
     .tcShowAllWords:        "Show all words",
     .tcWordsOverLetter:   "Words over the letter",
+    .tcMe:                  "Me",
 ]

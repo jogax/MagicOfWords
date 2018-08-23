@@ -58,4 +58,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcMinutes:             "Мин.",
     .tcShowAllWords:        "Покажи все слова",
     .tcWordsOverLetter:     "Слова над буквой",
+    .tcMe:                  "Я",
 ]

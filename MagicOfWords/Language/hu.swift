@@ -58,4 +58,5 @@ let huDictionary: [TextConstants: String] = [
     .tcMinutes:             "Perc",
     .tcShowAllWords:        "Mutasd az összes szót",
     .tcWordsOverLetter:     "Szavak a betü felett",
+    .tcMe:                  "Én",
 ]

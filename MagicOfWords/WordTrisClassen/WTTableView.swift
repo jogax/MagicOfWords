@@ -15,7 +15,7 @@ public protocol WTTableViewDelegate: class {
     func getNumberOfSections()->Int
     func getNumberOfRowsInSections(section: Int)->Int
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath)->UITableViewCell
-//    func geTitleForHeaderInSection(section: Int)->String?
+    func getHeightForRow(tableView: UITableView, indexPath: IndexPath)->CGFloat
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int)
     func fillHeaderView(tableView: UITableView, section: Int)->UIView
     func getHeightForHeaderInSection(tableView: UITableView, section: Int)->CGFloat
@@ -60,7 +60,7 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
         return self.myDelegate!.fillHeaderView(tableView: tableView, section: section)
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {        
-        return GV.onIpad ? 30 : 20
+        return self.myDelegate!.getHeightForRow(tableView: tableView, indexPath: indexPath)
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return self.myDelegate!.getHeightForHeaderInSection(tableView: tableView, section: section)
