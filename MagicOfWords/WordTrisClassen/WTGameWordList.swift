@@ -311,11 +311,14 @@ public class WTGameWordList {
         for savedSelectedWord in wordsInGame{
             // check if there is the same word in the table with one or more letters with the same position
             if savedSelectedWord.word == selectedWord.word {
-                for letterIndex in 0..<savedSelectedWord.word.length {
-                    if savedSelectedWord.usedLetters[letterIndex].col == selectedWord.usedLetters[letterIndex].col &&
-                        savedSelectedWord.usedLetters[letterIndex].row == selectedWord.usedLetters[letterIndex].row {
-                        commonLetters.append(savedSelectedWord.usedLetters[letterIndex])
-                        noCommonLetter = false
+                for savedLetterIndex in 0..<savedSelectedWord.word.length {
+                    for selectedLetterIndex in 0..<selectedWord.word.length {
+                        if savedSelectedWord.usedLetters[savedLetterIndex].col == selectedWord.usedLetters[selectedLetterIndex].col &&
+                            savedSelectedWord.usedLetters[savedLetterIndex].row == selectedWord.usedLetters[selectedLetterIndex].row &&
+                            savedSelectedWord.usedLetters[savedLetterIndex].letter == selectedWord.usedLetters[selectedLetterIndex].letter {
+                            commonLetters.append(savedSelectedWord.usedLetters[savedLetterIndex])
+                            noCommonLetter = false
+                        }
                     }
                 }
                 if !noCommonLetter {

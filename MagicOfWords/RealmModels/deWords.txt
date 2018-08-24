@@ -15425,6 +15425,7 @@ Fertigwarenbestände
 Fertigwerden
 Fessel
 Fesselung
+Fest
 Festakt
 Festakte
 Festaktes
@@ -46163,6 +46164,7 @@ Spekulant
 Spekulanten
 Spekulation
 Spekulationen
+Spende
 Spendenkonten
 Spendenquittung
 Spender
