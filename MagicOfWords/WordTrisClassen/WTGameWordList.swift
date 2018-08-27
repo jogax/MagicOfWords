@@ -533,7 +533,7 @@ public class WTGameWordList {
                     word: foundedWord.word,
                     counter: foundedWord.counter,
                     score: foundedWord.score,
-                    minutes: foundedWord.score > 0 ? minutesForWord[foundedWord.word.length]! : 0))
+                    minutes: foundedWord.score > 0 ? foundedWord.counter * minutesForWord[foundedWord.word.length]! : 0))
             }
         }
         

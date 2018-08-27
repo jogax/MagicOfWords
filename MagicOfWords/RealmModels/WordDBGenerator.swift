@@ -5,7 +5,7 @@
 //  Created by Jozsef Romhanyi on 31/05/2018.
 //  Copyright © 2018 Jozsef Romhanyi. All rights reserved.
 //
-#if GENERATEWORDLIST || GENERATEMANDATORY
+#if GENERATEWORDLIST || GENERATEMANDATORY || GENERATELETTERFREQUENCY
 import Foundation
 import RealmSwift
 
@@ -19,23 +19,70 @@ import RealmSwift
 let defaultConfig = Realm.Configuration(
     objectTypes: [MandatoryModel.self])
 #endif
+#if GENERATELETTERFREQUENCY
+// for Generating WordList DB
+let defaultConfig = Realm.Configuration(
+    objectTypes: [LetterStatisticModel.self])
+#endif
+
 
 var realm: Realm = try! Realm(configuration: defaultConfig)
 
 class WordDBGenerator {
     
-    init(mandatory: Bool) {
-        if mandatory {
-            generateMandatoryWords(language: "en")
-            generateMandatoryWords(language: "de")
-            generateMandatoryWords(language: "hu")
-            generateMandatoryWords(language: "ru")
+    init(mandatory: Bool = false, letterFrequency: Bool = false) {
+        if letterFrequency {
+            generateLetterFrequency(language: "en")
+            generateLetterFrequency(language: "de")
+            generateLetterFrequency(language: "hu")
+            generateLetterFrequency(language: "ru")
         } else {
-            generateWordList(language: "en")
-            generateWordList(language: "de")
-            generateWordList(language: "hu")
-            generateWordList(language: "ru")
+            if mandatory {
+                generateMandatoryWords(language: "en")
+                generateMandatoryWords(language: "de")
+                generateMandatoryWords(language: "hu")
+                generateMandatoryWords(language: "ru")
+            } else {
+                generateWordList(language: "en")
+                generateWordList(language: "de")
+                generateWordList(language: "hu")
+                generateWordList(language: "ru")
+            }
         }
+    }
+    
+    private func generateLetterFrequency(language: String) {
+        var letters = [String: Int]()
+        let words = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
+        for word in words {
+            for letter in word.word {
+                if letters[String(letter)] != nil {
+                    letters[String(letter)]! += 1
+                } else {
+                    letters[String(letter)] = 1
+                }
+            }
+        }
+        var maxFreq = 0
+        for (_, frequency) in letters {
+            maxFreq = (maxFreq < frequency ? frequency : maxFreq)
+        }
+        if maxFreq > 100000 {
+            maxFreq /= 1000
+        }
+        var primaryKey = -1
+       for (letter, frequency) in letters {
+            let model = LetterStatisticModel()
+            primaryKey += 1
+            model.primaryKey = language + String(primaryKey)
+            model.language = language
+            model.letter = letter
+            model.frequency = frequency / 1000
+            try! realm.write {
+                realm.add(model)
+            }
+        }
+
     }
     
     private func generateWordList(language: String) {

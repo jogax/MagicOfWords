@@ -10,9 +10,9 @@ import UIKit
 import RealmSwift
 
 // for Standard Using
-#if !GENERATEWORDLIST && !GENERATEMANDATORY
-let defaultConfig = Realm.Configuration(
-    objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self])
+//#if !GENERATEWORDLIST && !GENERATEMANDATORY
+//let defaultConfig = Realm.Configuration(
+//    objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self])
 
 // for Generating WordList DB
 //let defaultConfig = Realm.Configuration(
@@ -21,10 +21,12 @@ let defaultConfig = Realm.Configuration(
 // for generating Mandatory Words
 //let defaultConfig = Realm.Configuration(
 //    objectTypes: [MandatoryModel.self])
-
-var realm: Realm = try! Realm(configuration: defaultConfig)
+//var realm: Realm = try! Realm(configuration: defaultConfig)
+//#endif
+//
+#if !GENERATELETTERFREQUENCY && !GENERATEWORDLIST && !GENERATEMANDATORY
+var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
 #endif
-
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,
@@ -50,28 +52,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-//        Realm.Configuration.defaultConfiguration = Realm.Configuration(
-//            schemaVersion: 2,   // new param in PlayerModel: onlineCompetitionEnabled (Bool)
-//            
-//            migrationBlock: { migration, oldSchemaVersion in
-//                switch oldSchemaVersion {
-//                case 0, 1:
-//                    // migrate PlayerModel
-//                    migration.enumerateObjects(ofType: GameDataModel.className()) { oldObject, newObject in
-//                        if oldObject == nil {
-//                            newObject!["score"] = 0 // (oldObject!["levelID"] as! Int) / MaxColorValue
-//                        }
-//                    }
-//                    migration.enumerateObjects(ofType: BasicDataModel.className()) { oldObject, newObject in
-//                        if oldObject == nil {
-//                            newObject!["myName"] = "" // (oldObject!["levelID"] as! Int) / MaxColorValue
-//                        }
-//                    }
-//               default:
-//                    break
-//                }
-//        })
+        let config = Realm.Configuration(
+            // Set the new schema version. This must be greater than the previously used
+            // version (if you've never set a schema version before, the version is 0).
+            schemaVersion: 3,
+            
+            // Set the block which will be called automatically when opening a Realm with
+            // a schema version lower than the one set above
+            migrationBlock: { migration, oldSchemaVersion in
+                if (oldSchemaVersion < 3) {
+                    migration.deleteData(forType: GameDataModel.className())
+                    migration.deleteData(forType: RoundDataModel.className())
+                    migration.deleteData(forType: BasicDataModel.className())
+                }
+            },
+            objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self]
+
+        )
+        
+        // Tell Realm to use this new configuration object for the default Realm
+        Realm.Configuration.defaultConfiguration = config
+        
+
         return true
 
     }

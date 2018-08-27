@@ -87,6 +87,7 @@
 		20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE120330E73001682B2 /* BasicDataModel.swift */; };
 		20B28AE4203331B4001682B2 /* GameTypeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE3203331B4001682B2 /* GameTypeModel.swift */; };
 		20B28AE620333273001682B2 /* WTTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTTableView.swift */; };
+		20C2A83421343EFC002A3852 /* LetterStatisticModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C2A83321343EFC002A3852 /* LetterStatisticModel.swift */; };
 		20DA3BF220FE1DFC00EA2D55 /* StateOfWordChanging.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
@@ -189,6 +190,7 @@
 		20B28AE120330E73001682B2 /* BasicDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicDataModel.swift; sourceTree = "<group>"; };
 		20B28AE3203331B4001682B2 /* GameTypeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTypeModel.swift; sourceTree = "<group>"; };
 		20B28AE520333273001682B2 /* WTTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTTableView.swift; sourceTree = "<group>"; };
+		20C2A83321343EFC002A3852 /* LetterStatisticModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetterStatisticModel.swift; sourceTree = "<group>"; };
 		20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateOfWordChanging.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -283,6 +285,7 @@
 			children = (
 				201FB1CD20288CEA00EC9F36 /* WordListModel.swift */,
 				20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */,
+				20C2A83321343EFC002A3852 /* LetterStatisticModel.swift */,
 				2081931F202B472900406D9A /* GameDataModel.swift */,
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
@@ -528,6 +531,7 @@
 				201435D920C2FE24002D1C04 /* SettingsScene.swift in Sources */,
 				20531C6820B6EA5400E060E2 /* ShowFinishedGamesScene.swift in Sources */,
 				204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */,
+				20C2A83421343EFC002A3852 /* LetterStatisticModel.swift in Sources */,
 				20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */,
 				20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */,
 				20B28AE620333273001682B2 /* WTTableView.swift in Sources */,
@@ -692,13 +696,14 @@
 					"GENERATEWORDLIST=1",
 					"GENERATEMANDATORY=1",
 					"SHOWFINGER=1",
+					"GENERATELETTERFREQUENCY=1",
 				);
 				INFOPLIST_FILE = MagicOfWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG GENERATEWORDLISTX GENERATEMANDATORYX SHOWFINGERX";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG GENERATEWORDLISTX GENERATEMANDATORYX GENERATELETTERFREQUENCY SHOWFINGER";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

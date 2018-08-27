@@ -199,6 +199,10 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         _ = WordDBGenerator(mandatory: true)
         print("Mandatory Generated")
         #endif
+        #if GENERATELETTERFREQUENCY
+        _ = WordDBGenerator(letterFrequency: true)
+        print("Mandatory Generated")
+        #endif
             // Get the SKScene from the loaded GKScene
         generateBasicDataRecordIfNeeded()
         startMenuScene()
