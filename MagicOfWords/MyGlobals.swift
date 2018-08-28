@@ -69,6 +69,7 @@ struct GV {
     static let GameStatusFinished = 2
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()
+    static let frequencyString = ":freq:"
 
     static let language = Language()
     static let size = 10
