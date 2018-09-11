@@ -503,7 +503,7 @@ class WTGameboard: SKShapeNode {
         }
         
         if (status == .empty) { // empty block
-            if setMoveModusIfPossible() {
+            if setMoveModusIfPossible(col: col, row: row) {
                 return true
             }
         } else { // Not empty field
@@ -514,7 +514,7 @@ class WTGameboard: SKShapeNode {
                 } else {
                     if choosedWord.usedLetters.count > 0 {
                         if abs(choosedWord.usedLetters.last!.col - col) == 1 && abs(choosedWord.usedLetters.last!.row - row) == 1 {
-                            if setMoveModusIfPossible() {
+                            if setMoveModusIfPossible(col: col, row: row) {
                                 return true
                             }
                         }
@@ -526,12 +526,15 @@ class WTGameboard: SKShapeNode {
         return false
     }
     
-    private func setMoveModusIfPossible()->Bool {
+    private func setMoveModusIfPossible(col: Int, row: Int)->Bool {
         var onlyUsedLetters = true
+        var startsWithLetters = FoundedWord()
         if !moveModusStarted {
             for letter in choosedWord.usedLetters {
                 if GV.gameArray[letter.col][letter.row].status == .wholeWord {
                     onlyUsedLetters = false
+                } else if onlyUsedLetters {
+                    startsWithLetters.addLetter(letter: letter)
                 }
             }
         }
@@ -547,6 +550,35 @@ class WTGameboard: SKShapeNode {
                     return true
                 }
             }
+        } else {
+            if startsWithLetters.usedLetters.count > 0 {
+                var sameCol = true
+                var sameRow = true
+                let startCol = startsWithLetters.usedLetters.first!.col
+                let startRow = startsWithLetters.usedLetters.first!.row
+                for letter in startsWithLetters.usedLetters {
+                    sameCol = sameCol && startCol == letter.col
+                    sameRow = sameRow && startRow == letter.row
+                }
+                if sameCol || sameRow {
+                    for letter in choosedWord.usedLetters {
+                        GV.gameArray[letter.col][letter.row].changeColor()
+                    }
+                    myPiece = WTPiece(fromChoosedWord: startsWithLetters, parent: parentScene, blockSize: blockSize!)
+                    if myPiece.myType != .NotUsed {
+                        origChoosedWord = startsWithLetters
+                        if startShowingSpriteOnGameboard(shape: myPiece, col: startsWithLetters.usedLetters[0].col, row: startsWithLetters.usedLetters[0].row) {
+                            for usedLetter in startsWithLetters.usedLetters {
+                                GV.gameArray[usedLetter.col][usedLetter.row].remove()
+                            }
+                            moveModusStarted = true
+                            return true
+                        }
+                    }
+
+                }
+            }
+//            print ("letter: \(choosedWord.usedLetters[choosedWord.usedLetters.count - 1]), count: \(choosedWord.usedLetters.count), col: \(col), lastCol: \(choosedWord.usedLetters.last!.col), row: \(row), lastRow: \(choosedWord.usedLetters.last!.row)")
         }
         return false
     }
