@@ -126,8 +126,6 @@
 		201FB1D220288CEA00EC9F36 /* en.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = en.swift; sourceTree = "<group>"; };
 		201FB1D320288CEA00EC9F36 /* de.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = de.swift; sourceTree = "<group>"; };
 		201FB1D420288CEA00EC9F36 /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
-		201FB1E1202891C300EC9F36 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
-		201FB1E5202891C900EC9F36 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		20439FEE20BC40DB00D44286 /* Versions.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Versions.txt; sourceTree = "<group>"; };
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
 		204A8AD92029EE6000E9C11F /* WTScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTScene.swift; sourceTree = "<group>"; };
@@ -215,8 +213,6 @@
 			children = (
 				209D91DA20B5879400EC141E /* RealmSwift.framework */,
 				209D91D620B5877700EC141E /* Realm.framework */,
-				201FB1E5202891C900EC9F36 /* RealmSwift.framework */,
-				201FB1E1202891C300EC9F36 /* Realm.framework */,
 				201FB1B020288C2B00EC9F36 /* MagicOfWords */,
 				201FB1AF20288C2B00EC9F36 /* Products */,
 				2057BA262029F57B000DF337 /* Frameworks */,
