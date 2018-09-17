@@ -47,6 +47,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcNoMoreStepsAnswer1: "Указать",
     .tcNoMoreStepsAnswer2: "Следующий раунд",
     .tcAlphabet:           "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ", //Ъ !!!
+    .tcNickNameLetters:    "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭ",
     .tcGameNumber:          "Nr. игры",
     .tcOK:                  "OK",
     .tcChooseName:          "Выбери псевдоним!",

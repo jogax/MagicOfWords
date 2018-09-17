@@ -47,6 +47,7 @@ let huDictionary: [TextConstants: String] = [
     .tcNoMoreStepsAnswer1: "Kijelölés",
     .tcNoMoreStepsAnswer2: "Következő kör",
     .tcAlphabet:           "AÁBCDEÉFGHIÍJKLMNOÓÖŐPRSTUÚÜŰVZY",
+    .tcNickNameLetters:    "ABCDEFGHIJKLMNOPRSTUVZY",
     .tcGameNumber:          "Játék Nr.",
     .tcOK:                  "OK",
     .tcChooseName:          "Válassz egy becenevet",

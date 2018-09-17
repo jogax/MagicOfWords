@@ -37,93 +37,30 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         }
     }
     
-//    func startChooseGameType() {
-//        print("Choose game type choosed")
-//        let gameTypeScene = GameTypeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-//        if let view = self.view as! SKView? {
-//            gameTypeScene.setDelegate(delegate: self)
-//            view.presentScene(gameTypeScene)
-//        }
-//    }
-    
-//    func loadingFinished() {
-//        basicData = realm.objects(BasicDataModel.self)[0]
-//
-//        if let view = self.view as! SKView? {
-//            view.presentScene(nil)
-//        }
-////        GV.loadingScene = nil
-//        startMenuScene()
-////        if basicData!.myName == "" {
-////            getName()
-////        } else {
-////            loginToRealmSync(new: false, userName: basicData!.myName)
-//////            startMenuScene()
-////        }
-//    }
-    
-    private func loginToRealmSync(new: Bool, userName: String) {
-        let password = "@@@" + userName + "@@@"
-        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
-        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
-            if user == nil {  // create a new Account
-                let signUpCredentials = SyncCredentials.usernamePassword(username: userName, password: password, register: true)
-                SyncUser.logIn(with: signUpCredentials, server: GV.AUTH_URL) { user, error in
-                    if user == nil {
-                        print("Error, user couldn't be created")
-                    } else {
-                        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
-                        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
-                            if user == nil {
-                                print("error after register")
-                            } else {
-                                realm.beginWrite()
-                                GV.basicDataRecord.myName = userName
-                                //                print(textField.text)
-                                try! realm.commitWrite()
-                                self.startMenuScene()
-
-                                print("OK after register")
-                            }
-                        }
-                    }
-                }
-            } else {
-                if new {
-                    self.getName(exists: true)
-                } else {
-                    self.startMenuScene()
-                }
-            }
-        }
-        
-
-    }
-    
     //Create Account
     
     //Log in
-    func getName(exists: Bool = false) {
-        if exists {
-            print("hier")
-        } else {
-            let alertController = UIAlertController(title: GV.language.getText(.tcChooseName), message: "", preferredStyle: .alert)
-
-            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcReady), style: .default, handler: { //[unowned self]
-                alert -> Void in
-                let textField = alertController.textFields![0] as UITextField
-                self.loginToRealmSync(new: true, userName: textField.text!)
-    //            self.startMenuScene()
-             }))
-            alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
-                textField.placeholder = "New Item Text"
-            })
-            self.present(alertController, animated: true, completion: nil)
-        }
-    }
-    
-
+//    func getName(exists: Bool = false) {
+//        if exists {
+//            print("hier")
+//        } else {
+//            let alertController = UIAlertController(title: GV.language.getText(.tcChooseName), message: "", preferredStyle: .alert)
+//
+//            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcReady), style: .default, handler: { //[unowned self]
+//                alert -> Void in
+//                let textField = alertController.textFields![0] as UITextField
+//                self.loginToRealmSync(new: true, userName: textField.text!)
+//    //            self.startMenuScene()
+//             }))
+//            alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+//            alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
+//                textField.placeholder = "New Item Text"
+//            })
+//            self.present(alertController, animated: true, completion: nil)
+//        }
+//    }
+//
+//
     func gameFinished(start: StartType) {
         switch start {
         case .NoMore: startMenuScene(showMenu: true)
@@ -219,17 +156,152 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     
     private func generateBasicDataRecordIfNeeded() {
         try! realm.write {
+            let myName = String(UInt64(Date().timeIntervalSince1970 * 111111))
+//            let toDelete = realm.objects(BasicDataModel.self)
+//            realm.delete(toDelete)
             if realm.objects(BasicDataModel.self).count == 0 {
                 GV.basicDataRecord = BasicDataModel()
                 GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
+                GV.basicDataRecord.myName = myName
+                GV.basicDataRecord.myNickname = generateMyNickname()
                 realm.add(GV.basicDataRecord)
+                loginToRealmSync(new: true, userName: myName)
             } else {
                 GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
+                if GV.basicDataRecord.myName == "" {
+                   GV.basicDataRecord.myName = myName
+                   GV.basicDataRecord.myNickname = GV.basicDataRecord.myName
+                }
                 GV.language.setLanguage(GV.basicDataRecord.actLanguage)
+                loginToRealmSync(new: false, userName: GV.basicDataRecord.myName)
             }
         }
     }
+    
+    func generateMyNickname()->String {
+        var nickName = GV.onIpad ? "iPad" : "iPhone"
+        let letters = GV.language.getText(.tcNickNameLetters)
+        for _ in 0...4 {
+            nickName += letters.subString(startPos: Int.random(min: 0, max: letters.count - 1), length: 1)
+        }
+        for _ in 0...4 {
+            nickName += String(Int.random(min: 0, max: 9))
+        }
+        return nickName
+    }
+    
+//    let syncConfig: SyncConfiguration = SyncConfiguration(user: SyncUser.current!, realmURL: GV.REALM_URL)
+ //    var realmSync = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
+    
+//    var countAllPlayerRecords = realmSync.objects(PlayerActivity.self).count
 
+    var myUser: SyncUser? = nil
+    private func loginToRealmSync(new: Bool, userName: String) {
+        let password = "@@@" + userName + "@@@"
+//        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
+//        if let _ = SyncUser.current {
+//            // already logged in
+//            let syncConfig: SyncConfiguration = SyncConfiguration(user: SyncUser.current!, realmURL: GV.REALM_URL)
+//            let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
+//            realmSync = try! Realm(configuration: config)
+//            self.setIsOnline()
+//
+//        }
+//        else {
+//            let creds = SyncCredentials.usernamePassword(username: userName, password: password, register: true)
+//
+//            SyncUser.logIn(with: creds, server: GV.AUTH_URL, onCompletion: { [weak self](user, error) in
+//                if let _ = user {
+//                    let syncConfig: SyncConfiguration = SyncConfiguration(user: SyncUser.current!, realmURL: GV.REALM_URL)
+//                    let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
+//                    realmSync = try! Realm(configuration: config)
+//                    self?.setIsOnline()
+//
+//                } else if let error = error {
+//                    fatalError(error.localizedDescription)
+//                }
+//            })
+//        }
+        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
+        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
+            if user == nil {  // create a new Account
+                let signUpCredentials = SyncCredentials.usernamePassword(username: userName, password: password, register: true)
+                SyncUser.logIn(with: signUpCredentials, server: GV.AUTH_URL) { user, error in
+                    if user == nil {
+                        print("Error, user couldn't be created")
+                    } else {
+                        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
+                        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
+                            if user == nil {
+                                print("error after register")
+                            } else {
+                                self.myUser = user
+                                realm.beginWrite()
+                                GV.basicDataRecord.myName = userName
+                                //                print(textField.text)
+                                try! realm.commitWrite()
+                                self.setIsOnline()
+                                print("OK after register")
+                            }
+                        }
+                    }
+                }
+            } else {
+                print("OK user exists")
+                self.myUser = user
+                self.setIsOnline()
+            }
+        }
+    }
+    
+    func setIsOnline() {
+        let syncConfig: SyncConfiguration = SyncConfiguration(user: myUser!, realmURL: GV.REALM_URL)
+        let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
+        realmSync = try! Realm(configuration: config)
+
+        if playerActivity == nil {
+            playerActivity = realmSync?.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
+        }
+        try! realmSync?.write {
+            if playerActivity?.count == 0 {
+                let playerActivityItem = PlayerActivity()
+                playerActivityItem.name = GV.basicDataRecord.myName
+                playerActivityItem.nickName = GV.basicDataRecord.myNickname
+                playerActivityItem.isOnline = true
+                playerActivityItem.onlineSince = Date()
+                playerActivityItem.onlineTime = 0
+                realmSync?.add(playerActivityItem)
+            } else {
+                playerActivity![0].isOnline = true
+                playerActivity![0].onlineSince = Date()
+            }
+        }
+        setNotification()
+    }
+    
+    func setNotification() {
+        let playerActivityResult = realmSync?.objects(PlayerActivity.self).filter("name != %@", "xxxx")
+//        let subscription = playerActivityResult.subscribe()
+//        var subscribe = realmSync?.objects(PlayerActivity.self).subscribe()
+        GV.notificationToken = playerActivityResult?.observe {(changes: RealmCollectionChange) in
+        switch changes {
+        case .initial:
+            break
+        // Results are now populated and can be accessed without blocking the UI
+        case .update(_, _, _, _):// let deletions, let insertions, let modifications):
+            break
+        // Query results have changed, so apply them to the UITableView
+        case .error(let error):
+        // An error occurred while opening the Realm file on the background worker thread
+            fatalError("\(error)")
+        }
+        }
+        
+    }
+    
+
+    
+    
 
     func printFonts() {
         let fontFamilyNames = UIFont.familyNames
@@ -240,6 +312,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
             print("Font Names = [\(names)]")
         }
     }
+    
+    
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .portrait

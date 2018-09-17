@@ -9,6 +9,7 @@
 import Foundation
 import AVFoundation
 import UIKit
+import RealmSwift
 
 let exclamationMark = "!"
 public let roundSeparator = "/"
@@ -22,39 +23,6 @@ enum GameType: Int {
 let NoValue = -1
 var myWidth: CGFloat = 0
 var myHeight: CGFloat = 0 
-
-//struct WordToCheck {
-//    var word: String = ""
-//    var countFounded = 0
-//    var score = 0
-//    var mandatory = false
-//    var creationIndex = 0
-//    var founded: Bool {
-//        get {
-//            return (countFounded > 0)
-//        }
-//    }
-//    init(word: String, countFounded: Int, mandatory: Bool, creationIndex: Int, score: Int) {
-//        self.word = word
-//        self.countFounded = countFounded
-//        self.mandatory = mandatory
-//        self.creationIndex = creationIndex
-//        self.score = score
-//    }
-//    init(from: String) {
-//        let valueTab = from.components(separatedBy: "-")
-//        if valueTab.count == 2 {
-//            self.word = valueTab[0]
-//            self.creationIndex = 0
-//            if let createIndex = Int(valueTab[1]) {
-//                self.creationIndex = createIndex
-//            }
-//        }
-//    }
-//    func toString()->String {
-//        return word + "-" + String(creationIndex)
-//    }
-//}
 
 
 struct GV {
@@ -84,33 +52,15 @@ struct GV {
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static var activated = false
     static var gameArray: [[WTGameboardItem]] = [[WTGameboardItem]]()
+    static var notificationToken: NotificationToken?
 
-//    static var countMandatoryWords = 0
-//    static var allWordsX = [WordToCheck]()
-//    static func countWords(mandatory: Bool, countAll: Bool = false)->Int {
-//        var count = 0
-//        for actWord in GV.allWordsX {
-//            count += actWord.mandatory == mandatory && actWord.countFounded > 0 ? (countAll ? actWord.countFounded : 1) : 0
-//        }
-//        return count
-//    }
-//    static func allMandatoryWordsFounded()->Bool {
-//        return GV.countMandatoryWords == countWords(mandatory: true)
-//    }
-    
-//    static func getScore()->Int {
-//        var score = 0
-//        for actWord in GV.allWordsX {
-//            score += actWord.score
-//        }
-//        return score
-//    }
-    
+
 //    RealmSync Constants
     static let MY_INSTANCE_ADDRESS = "magic-of-words.us1.cloud.realm.io" // <- update this
     
     static let AUTH_URL  = URL(string: "https://\(MY_INSTANCE_ADDRESS)")!
-    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWords")!
+//    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWords")!
+    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/default")!
 }
 
 

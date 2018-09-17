@@ -26,6 +26,9 @@ import RealmSwift
 //
 #if !GENERATELETTERFREQUENCY && !GENERATEWORDLIST && !GENERATEMANDATORY
 var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
+var playerActivity: Results<PlayerActivity>? // = realmSync.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
+
 #endif
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
@@ -55,15 +58,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let config = Realm.Configuration(
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
-            schemaVersion: 3,
-            
+//            schemaVersion: 3,
+            schemaVersion: 4,
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
-                if (oldSchemaVersion < 3) {
+                switch oldSchemaVersion {
+                case 0...2:
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
+                case 3:
+                    migration.enumerateObjects(ofType: BasicDataModel.className()) { oldObject, newObject in
+                        newObject!["myNickname"] = oldObject!["myName"] 
+                    }
+                default: break
                 }
             },
             objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self]
@@ -81,6 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+        setIsOffline()
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -95,11 +105,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+//        setIsOnline()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
+    func setIsOffline() {
+        if SyncUser.current != nil {
+            try! realmSync?.write {
+                if playerActivity?.count == 0 {
+                } else {
+                    playerActivity![0].isOnline = false
+                    playerActivity![0].onlineSince = nil
+                }
+            }
+        }
+    }
+
+func setIsOnline() {
+    if SyncUser.current != nil {
+        try! realmSync?.write {
+            if playerActivity?.count == 0 {
+            } else {
+                playerActivity![0].isOnline = true
+                playerActivity![0].onlineSince = Date()
+            }
+        }
+    }
+}
+
 
 
 }

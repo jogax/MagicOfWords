@@ -49,6 +49,7 @@ enum TextConstants: Int {
     tcNoMoreStepsAnswer1,
     tcNoMoreStepsAnswer2,
     tcAlphabet,
+    tcNickNameLetters,
     tcGameNumber,
     tcOK,
     tcChooseName,
