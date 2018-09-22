@@ -50,7 +50,6 @@ let deDictionary: [TextConstants: String] = [
     .tcNickNameLetters:    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     .tcGameNumber:          "SpielNr",
     .tcOK:                  "OK",
-    .tcChooseName:          "Wähle einen Spitznamen",
     .tcReady:               "Fertig",
     .tcChooseLanguage:      "Sprache wählen",
     .tcWord:                "Wort:",
@@ -60,6 +59,13 @@ let deDictionary: [TextConstants: String] = [
     .tcShowAllWords:        "Zeige alle Wörter",
     .tcWordsOverLetter:   "Wörter über den Buchstaben",
     .tcMe:                  "Ich",
+    .tcShowRealmCloud:      "Zeige Realm Cloud",
+    .tcNickName:            "Spitzname",
+    .tcIsOnline:            "ist online",
+    .tcOnlineSince:         "Online_seit",
+    .tcOnlineTime:          "Onlinezeit",
+    .tcSetNickName:         "Spitzname ändern",
+    .tcSave:                "Speichern",
 ]
 
 

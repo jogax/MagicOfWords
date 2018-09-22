@@ -14,9 +14,14 @@ public protocol MenuSceneDelegate: class {
     func startNewGame()
     func continueGame()
     func showFinishedGames()
+    func displayCloudRecordsViewController()
 //    func startChooseGameType()
     func startSettings()
+    func chooseNickname()
 }
+
+
+
 
 class MenuScene: SKScene {
     var menuSceneDelegate: MenuSceneDelegate?
@@ -35,7 +40,11 @@ class MenuScene: SKScene {
         createMenuItem(menuInt: .tcFinished, count: count)
 //        createMenuItem(menuInt: .tcSettings, showValue: true, touchbar: false)
         createMenuItem(menuInt: .tcChooseLanguage, showValue: false, touchbar: true)
-    }
+        createMenuItem(menuInt: .tcSetNickName, showValue: false, touchbar: true)
+        #if DEBUG
+        createMenuItem(menuInt: .tcShowRealmCloud, showValue: false, touchbar: true)
+        #endif
+   }
     public func setDelegate(delegate: MenuSceneDelegate) {
         menuSceneDelegate = delegate
     }
@@ -86,9 +95,12 @@ class MenuScene: SKScene {
                     case String(TextConstants.tcChooseLanguage.rawValue):
                         menuSceneDelegate!.startSettings()
 
-//                    case String(TextConstants.tcChooseGameType.rawValue):
-//                        menuSceneDelegate!.startChooseGameType()
-//
+                    case String(TextConstants.tcShowRealmCloud.rawValue):
+                        menuSceneDelegate!.displayCloudRecordsViewController()
+
+                    case String(TextConstants.tcSetNickName.rawValue):
+                        menuSceneDelegate!.chooseNickname()
+                        
                     default: break
                     }
                 }

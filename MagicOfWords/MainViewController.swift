@@ -11,7 +11,30 @@ import SpriteKit
 import GameplayKit
 import RealmSwift
 
+
 class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, ShowFinishedGamesSceneDelegate, SettingsSceneDelegate {
+    func chooseNickname() {
+        let alertController = UIAlertController(title: GV.language.getText(.tcSetNickName), message: "", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcSave), style: .default, handler: { [unowned self]
+            alert -> Void in
+            let textField = alertController.textFields![0] as UITextField
+            self.setNickname(nickName: textField.text!)
+        }))
+        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: nil))
+        alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
+            textField.text = playerActivity![0].nickName
+        })
+        self.present(alertController, animated: true, completion: nil)
+
+    }
+    
+    func displayCloudRecordsViewController() {
+        let cloudRecordsViewController = CloudRecordsViewController()
+        
+        self.present(cloudRecordsViewController, animated: true, completion: nil)
+
+    }
+    
     var showFinishedGamesScene: ShowFinishedGamesScene?
     func backFromSettingsScene() {
     try! realm.write {
@@ -37,30 +60,6 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         }
     }
     
-    //Create Account
-    
-    //Log in
-//    func getName(exists: Bool = false) {
-//        if exists {
-//            print("hier")
-//        } else {
-//            let alertController = UIAlertController(title: GV.language.getText(.tcChooseName), message: "", preferredStyle: .alert)
-//
-//            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcReady), style: .default, handler: { //[unowned self]
-//                alert -> Void in
-//                let textField = alertController.textFields![0] as UITextField
-//                self.loginToRealmSync(new: true, userName: textField.text!)
-//    //            self.startMenuScene()
-//             }))
-//            alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-//            alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
-//                textField.placeholder = "New Item Text"
-//            })
-//            self.present(alertController, animated: true, completion: nil)
-//        }
-//    }
-//
-//
     func gameFinished(start: StartType) {
         switch start {
         case .NoMore: startMenuScene(showMenu: true)
@@ -165,16 +164,15 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
                 GV.basicDataRecord.myName = myName
                 GV.basicDataRecord.myNickname = generateMyNickname()
                 realm.add(GV.basicDataRecord)
-                loginToRealmSync(new: true, userName: myName)
             } else {
                 GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
                 if GV.basicDataRecord.myName == "" {
                    GV.basicDataRecord.myName = myName
-                   GV.basicDataRecord.myNickname = GV.basicDataRecord.myName
+                   GV.basicDataRecord.myNickname = generateMyNickname()
                 }
                 GV.language.setLanguage(GV.basicDataRecord.actLanguage)
-                loginToRealmSync(new: false, userName: GV.basicDataRecord.myName)
             }
+            loginToRealmSync()
         }
     }
     
@@ -195,33 +193,9 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     
 //    var countAllPlayerRecords = realmSync.objects(PlayerActivity.self).count
 
-    var myUser: SyncUser? = nil
-    private func loginToRealmSync(new: Bool, userName: String) {
+    private func loginToRealmSync() {
+        let userName = "magic-of-words-user"
         let password = "@@@" + userName + "@@@"
-//        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
-//        if let _ = SyncUser.current {
-//            // already logged in
-//            let syncConfig: SyncConfiguration = SyncConfiguration(user: SyncUser.current!, realmURL: GV.REALM_URL)
-//            let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
-//            realmSync = try! Realm(configuration: config)
-//            self.setIsOnline()
-//
-//        }
-//        else {
-//            let creds = SyncCredentials.usernamePassword(username: userName, password: password, register: true)
-//
-//            SyncUser.logIn(with: creds, server: GV.AUTH_URL, onCompletion: { [weak self](user, error) in
-//                if let _ = user {
-//                    let syncConfig: SyncConfiguration = SyncConfiguration(user: SyncUser.current!, realmURL: GV.REALM_URL)
-//                    let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
-//                    realmSync = try! Realm(configuration: config)
-//                    self?.setIsOnline()
-//
-//                } else if let error = error {
-//                    fatalError(error.localizedDescription)
-//                }
-//            })
-//        }
         let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
         SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
             if user == nil {  // create a new Account
@@ -235,7 +209,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
                             if user == nil {
                                 print("error after register")
                             } else {
-                                self.myUser = user
+                                
+                                GV.myUser = user
                                 realm.beginWrite()
                                 GV.basicDataRecord.myName = userName
                                 //                print(textField.text)
@@ -248,17 +223,28 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
                 }
             } else {
                 print("OK user exists")
-                self.myUser = user
+                GV.myUser = user
                 self.setIsOnline()
             }
         }
     }
     
+    func setNickname(nickName: String) {
+        if GV.myUser != nil {
+            try! realmSync?.write {
+                if playerActivity?.count == 0 {
+                } else {
+                    playerActivity![0].nickName = nickName
+                }
+            }
+
+        }
+    }
+    
     func setIsOnline() {
-        let syncConfig: SyncConfiguration = SyncConfiguration(user: myUser!, realmURL: GV.REALM_URL)
+        let syncConfig: SyncConfiguration = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL)
         let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
         realmSync = try! Realm(configuration: config)
-
         if playerActivity == nil {
             playerActivity = realmSync?.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
         }
@@ -268,12 +254,12 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
                 playerActivityItem.name = GV.basicDataRecord.myName
                 playerActivityItem.nickName = GV.basicDataRecord.myNickname
                 playerActivityItem.isOnline = true
-                playerActivityItem.onlineSince = Date()
+                playerActivityItem.onlineSince = getLocalDate()
                 playerActivityItem.onlineTime = 0
                 realmSync?.add(playerActivityItem)
             } else {
                 playerActivity![0].isOnline = true
-                playerActivity![0].onlineSince = Date()
+                playerActivity![0].onlineSince = getLocalDate()
             }
         }
         setNotification()

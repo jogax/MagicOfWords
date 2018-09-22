@@ -53,6 +53,8 @@ struct GV {
     static var activated = false
     static var gameArray: [[WTGameboardItem]] = [[WTGameboardItem]]()
     static var notificationToken: NotificationToken?
+    static var myUser: SyncUser? = nil
+
 
 
 //    RealmSync Constants

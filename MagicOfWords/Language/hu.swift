@@ -50,7 +50,6 @@ let huDictionary: [TextConstants: String] = [
     .tcNickNameLetters:    "ABCDEFGHIJKLMNOPRSTUVZY",
     .tcGameNumber:          "Játék Nr.",
     .tcOK:                  "OK",
-    .tcChooseName:          "Válassz egy becenevet",
     .tcReady:               "Kész",
     .tcChooseLanguage:      "Válassz nyelvet",
     .tcWord:                "Szó",
@@ -60,4 +59,11 @@ let huDictionary: [TextConstants: String] = [
     .tcShowAllWords:        "Mutasd az összes szót",
     .tcWordsOverLetter:     "Szavak a betü felett",
     .tcMe:                  "Én",
+    .tcShowRealmCloud:      "Mutasd a Realm Cloud-ot",
+    .tcNickName:            "Becenév",
+    .tcIsOnline:            "Online",
+    .tcOnlineSince:         "Mióta_Online",
+    .tcOnlineTime:          "Online_idő",
+    .tcSetNickName:         "Válassz becenevet",
+    .tcSave:                "Mentés"
 ]

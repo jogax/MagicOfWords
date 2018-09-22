@@ -52,7 +52,6 @@ enum TextConstants: Int {
     tcNickNameLetters,
     tcGameNumber,
     tcOK,
-    tcChooseName,
     tcReady,
     tcChooseLanguage,
     tcWord,
@@ -61,7 +60,14 @@ enum TextConstants: Int {
     tcMinutes,
     tcShowAllWords,
     tcWordsOverLetter,
-    tcMe
+    tcMe,
+    tcShowRealmCloud,
+    tcNickName,
+    tcIsOnline,
+    tcOnlineSince,
+    tcOnlineTime,
+    tcSetNickName,
+    tcSave
 }
 
     let LanguageEN = "en" // index 0

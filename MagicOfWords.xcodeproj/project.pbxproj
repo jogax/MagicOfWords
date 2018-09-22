@@ -90,6 +90,7 @@
 		20B28AE4203331B4001682B2 /* GameTypeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE3203331B4001682B2 /* GameTypeModel.swift */; };
 		20B28AE620333273001682B2 /* WTTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTTableView.swift */; };
 		20C2A83421343EFC002A3852 /* LetterStatisticModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C2A83321343EFC002A3852 /* LetterStatisticModel.swift */; };
+		20CDA669214FFEBF00160DC6 /* CloudRecordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */; };
 		20DA3BF220FE1DFC00EA2D55 /* StateOfWordChanging.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
@@ -193,6 +194,7 @@
 		20B28AE3203331B4001682B2 /* GameTypeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTypeModel.swift; sourceTree = "<group>"; };
 		20B28AE520333273001682B2 /* WTTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTTableView.swift; sourceTree = "<group>"; };
 		20C2A83321343EFC002A3852 /* LetterStatisticModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetterStatisticModel.swift; sourceTree = "<group>"; };
+		20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudRecordsViewController.swift; sourceTree = "<group>"; };
 		20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateOfWordChanging.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -238,6 +240,7 @@
 				201FB1CF20288CEA00EC9F36 /* Extensions.swift */,
 				20943C8D2092129000B34A07 /* MyQuestions.swift */,
 				201FB1CA20288CE900EC9F36 /* MainViewController.swift */,
+				20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */,
 				201FB1CC20288CEA00EC9F36 /* MyFunctions.swift */,
 				201FB1C920288CE900EC9F36 /* MyGlobals.swift */,
 				20A604B22035D93A00DC48F0 /* MyRandom.swift */,
@@ -538,6 +541,7 @@
 				20C2A83421343EFC002A3852 /* LetterStatisticModel.swift in Sources */,
 				20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */,
 				20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */,
+				20CDA669214FFEBF00160DC6 /* CloudRecordsViewController.swift in Sources */,
 				20B28AE620333273001682B2 /* WTTableView.swift in Sources */,
 				2060037020348A8800023E10 /* Grid.swift in Sources */,
 				20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */,

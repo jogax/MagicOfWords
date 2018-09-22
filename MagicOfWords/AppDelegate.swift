@@ -105,7 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-//        setIsOnline()
+        setIsOnline()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -113,11 +113,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func setIsOffline() {
-        if SyncUser.current != nil {
+        if GV.myUser != nil {
             try! realmSync?.write {
                 if playerActivity?.count == 0 {
                 } else {
+//                    let timeInterval = getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!)
                     playerActivity![0].isOnline = false
+                    playerActivity![0].onlineTime += Int(getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!))
                     playerActivity![0].onlineSince = nil
                 }
             }
@@ -125,12 +127,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 func setIsOnline() {
-    if SyncUser.current != nil {
+    if GV.myUser != nil {
         try! realmSync?.write {
             if playerActivity?.count == 0 {
             } else {
                 playerActivity![0].isOnline = true
-                playerActivity![0].onlineSince = Date()
+                playerActivity![0].onlineSince = getLocalDate()
             }
         }
     }

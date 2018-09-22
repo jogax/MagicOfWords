@@ -170,21 +170,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 
     private func calculateColumnWidths() {
         title = ""
-            let text1 = " \(GV.language.getText(.tcWord).fixLength(length: maxLength, center: true))     "
-            let text2 = "\(GV.language.getText(.tcCount)) "
-            let text3 = "\(GV.language.getText(.tcLength)) "
-            let text4 = "\(GV.language.getText(.tcScore)) "
-            let text5 = "\(GV.language.getText(.tcMinutes)) "
-            title += text1
-            title += text2
-            title += text3
-            title += text4
-            title += text5
-            lengthOfWord = maxLength
-            lengthOfCnt = text2.length
-            lengthOfLength = text3.length
-            lengthOfScore = text4.length
-            lengthOfMin = text5.length
+        let text1 = " \(GV.language.getText(.tcWord).fixLength(length: maxLength, center: true))     "
+        let text2 = "\(GV.language.getText(.tcCount)) "
+        let text3 = "\(GV.language.getText(.tcLength)) "
+        let text4 = "\(GV.language.getText(.tcScore)) "
+        let text5 = "\(GV.language.getText(.tcMinutes)) "
+        title += text1
+        title += text2
+        title += text3
+        title += text4
+        title += text5
+        lengthOfWord = maxLength
+        lengthOfCnt = text2.length
+        lengthOfLength = text3.length
+        lengthOfScore = text4.length
+        lengthOfMin = text5.length
     }
     
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
@@ -1022,7 +1022,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     @objc private func countTime(timerX: Timer) {
         let state = UIApplication.shared.applicationState
         if state == .background {
-            print("App in Background")
+//            print("App in Background")
         } else if state == .active && timerIsCounting {
             timeForGame.incrementTime()
         }

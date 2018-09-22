@@ -47,4 +47,9 @@ func / (point: CGPoint, scalar: CGFloat) -> CGPoint {
     return CGPoint(x: point.x / scalar, y: point.y / scalar)
 }
 
+func getLocalDate()->Date {
+    let UTCDate = Date()
+    return UTCDate + TimeInterval(NSTimeZone.system.secondsFromGMT(for: UTCDate))
+}
+
 
