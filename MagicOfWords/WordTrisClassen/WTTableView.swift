@@ -22,7 +22,7 @@ public protocol WTTableViewDelegate: class {
 }
 class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     var myDelegate: WTTableViewDelegate?
-    override init(frame: CGRect, style: UITableViewStyle) {
+    override init(frame: CGRect, style: UITableView.Style) {
         super.init(frame: frame, style: style)
         layer.borderColor = UIColor.black.cgColor
         layer.borderWidth = 1.0

@@ -10,14 +10,14 @@ import UIKit
 import RealmSwift
 
 class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
-    let showPlayerActivityView = WTTableView()
+    var showPlayerActivityView: WTTableView? = WTTableView()
     var headerLine = ""
     let color = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
     var lengthOfNickName = 0
     var lengthOfIsOnline = 0
-    var lengthOfOnlineSince = 0
+//    var lengthOfOnlineSince = 0
     var lengthOfOnlineTime = 0
-    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 10)
+    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
     
     func getNumberOfSections() -> Int {
         return 1
@@ -34,18 +34,14 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
 //        cell.textLabel?.text = item.name + "/" + item.nickName!
 //        //        cell.accessoryType = item.isDone ? UITableViewCellAccessoryType.checkmark : UITableViewCellAccessoryType.none
 //        return cell
+        let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.010)))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
-        cell.addColumn(text: " " + (playerActivityItems[indexPath.row].nickName?.fixLength(length: lengthOfNickName, leadingBlanks: false))!) // WordColumn
-        cell.addColumn(text: String(playerActivityItems[indexPath.row].isOnline).fixLength(length: lengthOfIsOnline), color: color) // Counter column
-        if playerActivityItems[indexPath.row].onlineSince == nil {
-            cell.addColumn(text: "".fixLength(length: 16))
-        } else {
-            cell.addColumn(text: ((playerActivityItems[indexPath.row].onlineSince?.description)?.subString(startPos: 0, length: 16))!)
-        }
-        cell.addColumn(text: String(playerActivityItems[indexPath.row].onlineTime.HourMinSec).fixLength(length: lengthOfOnlineTime), color: color) // Score column
+        cell.addColumn(text: "  " + (playerActivityItems[indexPath.row].nickName?.fixLength(length: lengthOfNickName - 4, leadingBlanks: false))!, color: actColor) // WordColumn
+        cell.addColumn(text: String(playerActivityItems[indexPath.row].isOnline).fixLength(length: lengthOfIsOnline, leadingBlanks: false), color: actColor)
+        cell.addColumn(text: String(playerActivityItems[indexPath.row].onlineTime.HourMinSec).fixLength(length: lengthOfOnlineTime, leadingBlanks: false), color: actColor)
         return cell
     }
     
@@ -77,19 +73,17 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     
     private func calculateColumnWidths() {
+        lengthOfNickName = 22
+        lengthOfOnlineTime = 15
+
         headerLine = ""
-        let text1 = " \(GV.language.getText(.tcNickName)) "
+        let text1 = "\(GV.language.getText(.tcNickName)) ".fixLength(length: lengthOfNickName, center: true)
         let text2 = "\(GV.language.getText(.tcIsOnline)) "
-        let text3 = "\(GV.language.getText(.tcOnlineSince)) "
-        let text4 = "\(GV.language.getText(.tcOnlineTime)) "
-        headerLine += text1.fixLength(length: 18, center: true)
+        let text3 = "\(GV.language.getText(.tcOnlineTime)) "
+        headerLine += text1.fixLength(length: lengthOfNickName, center: true)
         headerLine += text2
         headerLine += text3
-        headerLine += text4
-        lengthOfNickName = 18
         lengthOfIsOnline = text2.length
-        lengthOfOnlineSince = 18
-        lengthOfOnlineTime = text4.length
     }
 
     let realm: Realm
@@ -97,34 +91,33 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     var notificationToken: NotificationToken?
     var subscriptionToken: NotificationToken?
     var subscription: SyncSubscription<PlayerActivity>!
+    var OKButton: UIButton?
+
 
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         let syncConfig = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL, isPartial: true)
         self.realm = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[PlayerActivity.self]))
-        self.playerActivityItems = realm.objects(PlayerActivity.self).sorted(byKeyPath: "name", ascending: false)
+        self.playerActivityItems = realm.objects(PlayerActivity.self).sorted(byKeyPath: "nickName", ascending: true)
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    var initialLoadDone = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let myBackgroundImage = UIImageView (frame: UIScreen.main.bounds)
+        myBackgroundImage.image = UIImage(named: "magier")
+        myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
+        self.view.insertSubview(myBackgroundImage, at: 0)
+
         
-//        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(rightBarButtonDidClick))
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonDidClick))
-//        title = "To Do Item"
-        view.addSubview(showPlayerActivityView)
-        calculateColumnWidths()
-//        let origin = CGPoint(x: 0.5 * (self.view.frame.width - (headerLine.width(font: myFont!))), y: self.view.frame.height * 0.08)
-        let origin = CGPoint(x: 0.5 * (self.view.frame.width - (headerLine.width(font: myFont!))), y: 100)
-        let size = CGSize(width: headerLine.width(font: myFont!), height: headerLine.height(font: myFont!))
-        showPlayerActivityView.frame=CGRect(origin: origin, size: size)
-        showPlayerActivityView.frame = self.view.frame
-        showPlayerActivityView.setDelegate(delegate: self)
-        showPlayerActivityView.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-        subscription = playerActivityItems.subscribe(named: "myUserActivitys")
+        view.addSubview(showPlayerActivityView!)
+        showPlayerActivityView!.setDelegate(delegate: self)
+        createOKButton()
+        subscription = playerActivityItems.subscribe(named: "myUserActivitysSortedByNicknameAsc")
         subscriptionToken = subscription.observe(\.state) { [weak self]  state in
             print("in Subscription!")
             switch state {
@@ -136,7 +129,16 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
-                print("complete: count records: \(String(describing: self!.playerActivityItems.count))")
+                self!.calculateColumnWidths()
+                let origin = CGPoint(x: 0, y: 0)
+                //        let origin = CGPoint(x: 0.5 * (self.view.frame.width - (headerLine.width(font: myFont!))), y: 200)
+                let size = CGSize(width: self!.headerLine.width(font: self!.myFont!) * 1, height: self!.headerLine.height(font: self!.myFont!) * (CGFloat(self!.playerActivityItems.count + 1)))
+                let center = CGPoint(x: 0.5 * self!.view.frame.width, y: 0.5 * self!.view.frame.height)
+                self!.showPlayerActivityView!.frame=CGRect(origin: origin, size: size)
+                self!.showPlayerActivityView!.center=center
+                //        showPlayerActivityView!.frame = self.view.frame
+                self!.showPlayerActivityView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
+               print("complete: count records: \(String(describing: self!.playerActivityItems.count))")
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
@@ -152,100 +154,79 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             switch changes {
             case .initial:
                 // Results are now populated and can be accessed without blocking the UI
-                showPlayerActivityView.reloadData()
+//                showPlayerActivityView.reloadData()
+                self!.initialLoadDone = true
+                print("Initial Data displayed")
             case .update(_, let deletions, let insertions, let modifications):
-                // Query results have changed, so apply them to the UITableView
-                showPlayerActivityView.beginUpdates()
-                showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-                                     with: .automatic)
-                showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-                                     with: .automatic)
-                showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-                                     with: .automatic)
-                showPlayerActivityView.endUpdates()
+                if self!.initialLoadDone {
+                    // Query results have changed, so apply them to the UITableView
+                    if insertions.count > 0 {
+                        print("insert \(insertions.count), modify \(modifications.count) rows")
+                        showPlayerActivityView.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
+                    }
+                    showPlayerActivityView.beginUpdates()
+                    showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+                                         with: .automatic)
+                    showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+                                         with: .automatic)
+                    showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+                                         with: .automatic)
+                    showPlayerActivityView.endUpdates()
+                }
             case .error(let error):
                 // An error occurred while opening the Realm file on the background worker thread
                 fatalError("\(error)")
             }
-        }    }
+        }
+        
+    }
     
-//    @objc func addButtonDidClick() {
-//        let alertController = UIAlertController(title: "Add Item", message: "", preferredStyle: .alert)
-//
-//        alertController.addAction(UIAlertAction(title: "Save", style: .default, handler: {
-//            alert -> Void in
-//            let textField = alertController.textFields![0] as UITextField
-//            let item = Item()
-//            item.body = textField.text ?? ""
-//            try! self.realm.write {
-//                self.realm.add(item)
-//            }
-//            // do something with textField
-//        }))
-//        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-//        alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
-//            textField.placeholder = "New Item Text"
-//        })
-//        self.present(alertController, animated: true, completion: nil)
-//    }
     
-//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-//        guard editingStyle == .delete else { return }
-//        let item = items[indexPath.row]
-//        try! realm.write {
-//            realm.delete(item)
-//        }
-//    }
-//
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") ?? UITableViewCell(style: .default, reuseIdentifier: "Cell")
-//        cell.selectionStyle = .none
-//        let  item = playerActivityItems[indexPath.row]
-//        cell.textLabel?.text = item.name + "/" + item.nickName!
-////        cell.accessoryType = item.isDone ? UITableViewCellAccessoryType.checkmark : UITableViewCellAccessoryType.none
-//        return cell
-//    }
-//
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return playerActivityItems.count
-//    }
-//
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let item = items[indexPath.row]
-//        try! realm.write {
-//            item.isDone = !item.isDone
-//        }
-//    }
-//
+    func createOKButton() {
+        let buttonFrame = CGRect(x: 0, y: 0, width:self.view.frame.width * 0.2, height: self.view.frame.width * 0.1)
+        let center = CGPoint(x:self.view.frame.width * 0.5, y:self.view.frame.height * 0.2)
+        let radius = buttonFrame.height * 0.5
+        OKButton = createButton(imageName: "OK", title: "OK", frame: buttonFrame, center: center, cornerRadius: radius, enabled: true )
+        OKButton?.addTarget(self, action: #selector(self.stopShowingTable), for: .touchUpInside)
+        self.view?.addSubview(OKButton!)
+    }
+    
+    @objc func stopShowingTable() {
+        showPlayerActivityView!.isHidden = true
+        dismiss(animated: true, completion: {
+            print("Dismissed")
+        })
+    }
+
+    private func createButton(imageName: String, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool)->UIButton {
+        let button = UIButton()
+        if imageName.length > 0 {
+            let image = UIImage(named: imageName)
+            button.setImage(image, for: UIControl.State.normal)
+        }
+        if title.length > 0 {
+            button.setTitle(title, for: .normal)
+            button.setTitleColor(UIColor.black, for: .normal)
+            button.titleLabel?.font = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
+
+        }
+        button.backgroundColor = color
+        button.layer.cornerRadius = cornerRadius
+        button.alpha = enabled ? 1.0 : 0.2
+        button.isEnabled = enabled
+        button.layer.borderWidth = GV.onIpad ? 5 : 3
+        button.layer.borderColor = UIColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1.0).cgColor
+        button.frame = frame
+        button.center = center
+        return button
+    }
+    
+
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-//    @objc func rightBarButtonDidClick() {
-//        let alertController = UIAlertController(title: "Logout", message: "", preferredStyle: .alert)
-//        alertController.addAction(UIAlertAction(title: "Yes, Logout", style: .destructive, handler: {
-//            alert -> Void in
-//            SyncUser.current?.logOut()
-//            self.navigationController?.setViewControllers([WelcomeViewController()], animated: true)
-//        }))
-//        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-//        self.present(alertController, animated: true, completion: nil)
-//    }
-//
-//    deinit {
-//        notificationToken?.invalidate()
-//    }
-    
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destinationViewController.
-     // Pass the selected object to the new view controller.
-     }
-     */
     
 }

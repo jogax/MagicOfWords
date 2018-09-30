@@ -27,15 +27,14 @@ enum MyShapes: Int {
         I_Shape_6, // 14
         I_Shape_7, // 15
         I_Shape_8, // 16
-
         NotUsed
-    static var count: Int { return MyShapes.NotUsed.hashValue + 1}
+    static var count: Int { return MyShapes.NotUsed.rawValue + 1}
     func toString()->String {
-        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "L4", "T1", "O1", "I1", "I2", "I3", "I4", "NotUsed"]
+        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "L4", "T1", "O1", "O2", "I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8","NotUsed"]
         return stringType[self.rawValue]
     }
     static func toValue(name: String)->MyShapes {
-        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "L4", "T1", "O1", "I1", "I2", "I3", "I4", "NotUsed"]
+        let stringType = ["Z1", "Z2", "L1", "L2", "L3", "L4", "T1", "O1", "O2", "I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8","NotUsed"]
         return MyShapes(rawValue: stringType.index{$0 == name}!)!
     }
 

@@ -29,10 +29,11 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     }
     
     func displayCloudRecordsViewController() {
-        let cloudRecordsViewController = CloudRecordsViewController()
-        
-        self.present(cloudRecordsViewController, animated: true, completion: nil)
-
+        if GV.myUser != nil
+        {
+            let cloudRecordsViewController = CloudRecordsViewController()
+            self.present(cloudRecordsViewController, animated: true, completion: nil)
+        }
     }
     
     var showFinishedGamesScene: ShowFinishedGamesScene?
@@ -197,12 +198,16 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         let userName = "magic-of-words-user"
         let password = "@@@" + userName + "@@@"
         let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
-        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
-            if user == nil {  // create a new Account
+        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
+            var user1 = user
+            if user1 == nil {  // create a new Account
                 let signUpCredentials = SyncCredentials.usernamePassword(username: userName, password: password, register: true)
-                SyncUser.logIn(with: signUpCredentials, server: GV.AUTH_URL) { user, error in
-                    if user == nil {
-                        print("Error, user couldn't be created")
+                SyncUser.logIn(with: signUpCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
+                    if user1 == nil {
+                        user1 = SyncUser.current
+                        if user1 == nil {
+                            print("Error, user couldn't be created")
+                        }
                     } else {
                         let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
                         SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
@@ -243,6 +248,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     
     func setIsOnline() {
         let syncConfig: SyncConfiguration = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL)
+//        let syncConfig = SyncUser.current!.configuration(realmURL: GV.REALM_URL, user: GV.myUser!)
+//        let config = SyncUser.current!.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true, urlPrefix: nil)
         let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
         realmSync = try! Realm(configuration: config)
         if playerActivity == nil {
@@ -262,28 +269,28 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
                 playerActivity![0].onlineSince = getLocalDate()
             }
         }
-        setNotification()
+//        setNotification()
     }
     
-    func setNotification() {
-        let playerActivityResult = realmSync?.objects(PlayerActivity.self).filter("name != %@", "xxxx")
-//        let subscription = playerActivityResult.subscribe()
-//        var subscribe = realmSync?.objects(PlayerActivity.self).subscribe()
-        GV.notificationToken = playerActivityResult?.observe {(changes: RealmCollectionChange) in
-        switch changes {
-        case .initial:
-            break
-        // Results are now populated and can be accessed without blocking the UI
-        case .update(_, _, _, _):// let deletions, let insertions, let modifications):
-            break
-        // Query results have changed, so apply them to the UITableView
-        case .error(let error):
-        // An error occurred while opening the Realm file on the background worker thread
-            fatalError("\(error)")
-        }
-        }
-        
-    }
+//    func setNotification() {
+//        let playerActivityResult = realmSync?.objects(PlayerActivity.self).filter("name != %@", "xxxx")
+////        let subscription = playerActivityResult.subscribe()
+////        var subscribe = realmSync?.objects(PlayerActivity.self).subscribe()
+//        GV.notificationToken = playerActivityResult?.observe {(changes: RealmCollectionChange) in
+//        switch changes {
+//        case .initial:
+//            break
+//        // Results are now populated and can be accessed without blocking the UI
+//        case .update(_, _, _, _):// let deletions, let insertions, let modifications):
+//            break
+//        // Query results have changed, so apply them to the UITableView
+//        case .error(let error):
+//        // An error occurred while opening the Realm file on the background worker thread
+//            fatalError("\(error)")
+//        }
+//        }
+//
+//    }
     
 
     

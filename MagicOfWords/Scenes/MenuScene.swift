@@ -27,30 +27,45 @@ class MenuScene: SKScene {
     var menuSceneDelegate: MenuSceneDelegate?
     let enabledAlpha: CGFloat = 1.0
     let disabledAlpha: CGFloat = 0.4
+    var nickNameItem: SKLabelNode?
+    var showRealmCloudItem: SKLabelNode?
     
     override func didMove(to view: SKView) {
+        let callerName = "MenuScene"
+
         let actLanguage = GV.language.getText(.tcAktLanguage)
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
         var count = realmMandatory.objects(MandatoryModel.self).filter("language = %@", actLanguage).count
         let count1 = realm.objects(GameDataModel.self).filter("gameStatus != %d and language = %@", GV.GameStatusNew, GV.aktLanguage).count
-        createMenuItem(menuInt: .tcNewGame, firstLine: true, count: count - count1)
+        _ = createMenuItem(menuInt: .tcNewGame, firstLine: true, count: count - count1)
         count = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusPlaying, GV.aktLanguage).count
-        createMenuItem(menuInt: .tcContinue, count: count)
+        _ = createMenuItem(menuInt: .tcContinue, count: count)
         count = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusFinished, GV.aktLanguage).count
-        createMenuItem(menuInt: .tcFinished, count: count)
+        _ = createMenuItem(menuInt: .tcFinished, count: count)
 //        createMenuItem(menuInt: .tcSettings, showValue: true, touchbar: false)
-        createMenuItem(menuInt: .tcChooseLanguage, showValue: false, touchbar: true)
-        createMenuItem(menuInt: .tcSetNickName, showValue: false, touchbar: true)
+        _ = createMenuItem(menuInt: .tcChooseLanguage, showValue: false, touchbar: true)
+        nickNameItem = createMenuItem(menuInt: .tcSetNickName, showValue: false, touchbar: GV.myUser != nil)
         #if DEBUG
-        createMenuItem(menuInt: .tcShowRealmCloud, showValue: false, touchbar: true)
+        showRealmCloudItem = createMenuItem(menuInt: .tcShowRealmCloud, showValue: false, touchbar: GV.myUser != nil)
         #endif
-   }
+        if !GV.callBackMyUser.contains(where: {$0.myCaller == callerName}) {
+            GV.callBackMyUser.append(GV.CallBackStruct(caller: callerName, callBackFunction: callBackFunc()))
+        }
+  }
+    
+    public func callBackFunc() {
+        nickNameItem!.alpha = enabledAlpha
+        nickNameItem!.name = String(TextConstants.tcSetNickName.rawValue)
+        showRealmCloudItem!.alpha = enabledAlpha
+        showRealmCloudItem!.name = String(TextConstants.tcShowRealmCloud.rawValue)
+        print("callBack OK")
+    }
     public func setDelegate(delegate: MenuSceneDelegate) {
         menuSceneDelegate = delegate
     }
     var line = 0
     
-    func createMenuItem(menuInt: TextConstants, firstLine: Bool = false, count: Int = NoValue, showValue: Bool = true, touchbar: Bool = true) {
+    func createMenuItem(menuInt: TextConstants, firstLine: Bool = false, count: Int = NoValue, showValue: Bool = true, touchbar: Bool = true)->SKLabelNode {
         let texture = SKTexture(imageNamed: "button.png")
         let button = SKSpriteNode(texture: texture, color: .white, size: CGSize(width: self.size.width * 0.5, height: self.size.height * 0.2))
         line = firstLine ? 1 : line + 1
@@ -71,6 +86,7 @@ class MenuScene: SKScene {
         menuItem.name = String(menuInt.rawValue) + (touchbar ? "" : "noTouch")
         button.addChild(menuItem)
         self.addChild(button)
+        return menuItem
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if menuSceneDelegate == nil {

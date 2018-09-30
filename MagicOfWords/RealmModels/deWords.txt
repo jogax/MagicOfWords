@@ -40865,17 +40865,6 @@ Rüstungswettlauf
 Rüstungswettlaufs
 Rüstungswettläufe
 Rüstzeug
-SA
-SAS
-SD
-SDI
-SH
-SOS
-SPD
-SP÷
-SRG
-SS
-SSD
 Saal
 Saales
 Saals
@@ -51933,7 +51922,6 @@ Tyrann
 Tyrannei
 Tyrannin
 Tyranninnen
-T‹V
 UKW
 UN
 UNESCO

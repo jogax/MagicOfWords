@@ -53,7 +53,22 @@ struct GV {
     static var activated = false
     static var gameArray: [[WTGameboardItem]] = [[WTGameboardItem]]()
     static var notificationToken: NotificationToken?
-    static var myUser: SyncUser? = nil
+    static var myUser: SyncUser? = nil {
+        willSet(newValue) {
+            for callBack in callBackMyUser {
+                callBack.callBackMyUser
+            }
+        }
+    }
+    struct CallBackStruct {
+        var myCaller:String
+        var callBackMyUser: ()
+        init(caller: String, callBackFunction: ()) {
+            myCaller = caller
+            callBackMyUser = callBackFunction
+        }
+    }
+    static var callBackMyUser: Array<CallBackStruct> = []
 
 
 
@@ -62,7 +77,7 @@ struct GV {
     
     static let AUTH_URL  = URL(string: "https://\(MY_INSTANCE_ADDRESS)")!
 //    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWords")!
-    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/default")!
+    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWordsTest")!
 }
 
 

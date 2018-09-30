@@ -25,7 +25,6 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
 //        background.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
 //        addChild(background)
     override func didMove(to view: SKView) {
-        
         background.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
         let widthMultiplier = background.size.width / background.size.height
         

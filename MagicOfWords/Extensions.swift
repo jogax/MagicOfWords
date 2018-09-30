@@ -8,7 +8,7 @@
 
 import UIKit
 
-let iPhone_X = "iPhone X"
+//let iPhone_X = "iPhone X"
 
 
 public extension UIDevice {
@@ -45,8 +45,11 @@ public extension UIDevice {
         case "iPhone9,2", "iPhone9,4":                  return "iPhone 7 Plus"
         case "iPhone10,1", "iPhone10,4":                return "iPhone 8"
         case "iPhone10,2", "iPhone10,5":                return "iPhone 8 Plus"
-        case "iPhone10,3", "iPhone10,6":                return iPhone_X
-            
+        case "iPhone10,3", "iPhone10,6":                return "iPhone X"
+        case "iPhone11,2":                              return "iPhone XS"
+        case "iPhone11,4", "iPhone11,6":                return "iPhone XS Max"
+        case "iPhone11,8":                              return "iPhone XR"
+
         case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":return "iPad 2"
         case "iPad3,1", "iPad3,2", "iPad3,3":           return "iPad 3"
         case "iPad3,4", "iPad3,5", "iPad3,6":           return "iPad 4"
@@ -56,7 +59,10 @@ public extension UIDevice {
         case "iPad4,4", "iPad4,5", "iPad4,6":           return "iPad Mini 2"
         case "iPad4,7", "iPad4,8", "iPad4,9":           return "iPad Mini 3"
         case "iPad5,1", "iPad5,2":                      return "iPad Mini 4"
-        case "iPad6,7", "iPad6,8":                      return "iPad Pro"
+        case "iPad6,3", "iPad6,4":                      return "iPad Pro 9.7 Inch"
+        case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9 Inch"
+        case "iPad7,1", "iPad7,2":                      return "iPad Pro 12.9 Inch 2. Generation"
+        case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5 Inch"
         case "AppleTV5,3":                              return "Apple TV"
         case "i386", "x86_64":
             switch (width, height) {
@@ -66,7 +72,7 @@ public extension UIDevice {
             case (414, 736):                            return "iPhone 6 Plus"
             case (768, 1024):                           return "iPad Air"
             case (1024, 1366):                          return "iPad Pro"
-            case (375, 812):                            return iPhone_X
+            case (375, 812):                            return "iPhone_X"
             default:                                    return identifier
             }
         default:                                        return identifier
@@ -113,7 +119,7 @@ extension Int {
         //            hours = hours % 24
         //        }
         //        let daysString = days > 0 ? ((days < 10 ? "0":"") + String(days) + ":") : ""
-        let hoursString = hours > 0 ? String(hours) + "h " : ""
+        let hoursString = hours > 0 ? String(hours) + "h " : "0h "
         let minutesString = (minutes < 10 ? "0" : "") + String(minutes) + "m "
         let secondsString = (seconds < 10 ? "0" : "") + String(seconds) + "s"
         return hoursString + minutesString + secondsString

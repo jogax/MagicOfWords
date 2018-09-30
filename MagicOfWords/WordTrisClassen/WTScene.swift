@@ -8,6 +8,7 @@
 
 import Foundation
 import GameplayKit
+import RealmSwift
 
 public enum StartType: Int {
     case NoMore = 0, PreviousGame, NextGame, NewGame
@@ -313,7 +314,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        if changeTime < 0 {
 //            timeForGame.decrementMaxTime(value: changeTime * 60)
 //        }
-       self.totalScore = totalScore
+        self.totalScore = totalScore
         showFoundedWords()
         return
     }
@@ -397,11 +398,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     var random: MyRandom?
 //    var allWordsToShow = [AllWordsToShow]()
     var timer: Timer? = Timer()
-    var timeLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
-    var headerLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
-    var goBackLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
-    var goToPreviousGameLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
-    var goToNextGameLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+    var timeLabel = SKLabelNode()
+    var headerLabel = SKLabelNode()
+    var myScoreheaderLabel = SKLabelNode()
+    var bestScoreHeaderLabel = SKLabelNode()
+    var actScoreHeaderLabel = SKLabelNode()
+    var scoreLabel = SKLabelNode()
+    var goBackLabel = SKLabelNode()
+    var goToPreviousGameLabel = SKLabelNode()
+    var goToNextGameLabel = SKLabelNode()
     var firstTouchLocation = CGPoint(x: 0, y: 0)
 //    var scoreMandatoryWords = 0
 //    var scoreOwnWords = 0
@@ -453,6 +458,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     let undoName = "°°°undo°°°"
     let goBackName = "°°°goBack°°°"
     let headerName = "°°°header°°°"
+    let myScoreName = "°°°myScore°°°"
+    let bestScoreName = "°°°bestScore°°°"
+    let actScoreName = "°°°actScore°°°"
     let timeName = "°°°timeName°°°"
     let gameNumberName = "°°°gameNumber°°°"
     let previousName = "°°°previousGame°°°"
@@ -501,12 +509,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         wtSceneDelegate!.gameFinished(start: .NewGame)
     }
     
+    let timeInitValue = "0°origMaxTime"
     func restartThisGame() {
         realm.beginWrite()
 //        GV.playingRecord.ownWords = ""
         GV.playingRecord.pieces = ""
 //        GV.playingRecord.activityItems = ""
-        GV.playingRecord.time = "0°origMaxTime"
+        GV.playingRecord.time = timeInitValue
         GV.playingRecord.rounds.removeAll()
         GV.playingRecord.gameStatus = GV.GameStatusNew
         try! realm.commitWrite()
@@ -543,7 +552,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 GV.playingRecord = games[0]
                 realm.beginWrite()
                 GV.playingRecord.nowPlaying = true
-                GV.playingRecord.time = "0"
+                GV.playingRecord.time = timeInitValue
                 try! realm.commitWrite()
             } else {
                 let newGameNumber = realm.objects(GameDataModel.self).filter("language = %@", GV.aktLanguage).count + GV.gameNumberAdder[GV.aktLanguage]!
@@ -554,7 +563,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                         GV.playingRecord.mandatoryWords = mandatoryRecord!.mandatoryWords
                         GV.playingRecord.gameNumber = mandatoryRecord!.gameNumber
                         GV.playingRecord.language = GV.aktLanguage
-                        GV.playingRecord.time = "0"
+                        GV.playingRecord.time = timeInitValue
                         realm.add(GV.playingRecord)
                     }
                 }
@@ -626,13 +635,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         self.nextGame = next
     }
     
+    let firstLinePosition:CGFloat = 0.93
+    let secondLinePosition:CGFloat = 0.91
+    let thirdLinePosition:CGFloat = 0.89
+    let fourthLinePosition:CGFloat = 0.87
+    let fifthLinePosition:CGFloat = 0.84
+    let sixthLinePosition:CGFloat = 0.82
+    
     private func createHeader() {
+        let fontSize = self.frame.size.height * 0.0175
         if self.childNode(withName: timeName) == nil {
             timeLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
-            let YPosition: CGFloat = self.frame.height * 0.92
-            let xPosition = self.frame.size.width * 0.8
+            let YPosition: CGFloat = self.frame.height * firstLinePosition
+            let xPosition = self.frame.size.width * 0.85
             timeLabel.position = CGPoint(x: xPosition, y: YPosition)
-            timeLabel.fontSize = self.frame.size.height * 0.0175
+            timeLabel.fontSize = fontSize
             timeLabel.fontColor = .black
             timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.time.HourMinSec)
             timeLabel.horizontalAlignmentMode = .right
@@ -641,20 +658,61 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         }
 
         if self.childNode(withName: headerName) == nil {
-            let fontSize = self.frame.size.height * 0.0175
-            let YPosition: CGFloat = self.frame.height * 0.90
-            let text = GV.language.getText(.tcHeader, values: String(GV.playingRecord.gameNumber + 1), String(0), String(0))
+            let YPosition: CGFloat = self.frame.height * firstLinePosition
+            let text = GV.language.getText(.tcHeader, values: String(GV.playingRecord.gameNumber + 1), String(0))
             headerLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
             headerLabel.name = String(headerName)
             headerLabel.fontSize = fontSize
-            headerLabel.position = CGPoint(x: self.frame.size.width * 0.5, y: YPosition)
+            headerLabel.position = CGPoint(x: self.frame.size.width * 0.3, y: YPosition)
             headerLabel.horizontalAlignmentMode = .center
             headerLabel.fontColor = SKColor.black
             self.addChild(headerLabel)
         }
         
+        let xPosMultiplierForScore:CGFloat = 0.11
         
+        if self.childNode(withName: myScoreName) == nil {
+            let YPosition: CGFloat = self.frame.height * secondLinePosition
+            let text = GV.language.getText(.tcMyScoreHeader, values: String(GV.playingRecord.score))
+            myScoreheaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
+            myScoreheaderLabel.text = text
+            myScoreheaderLabel.name = String(headerName)
+            myScoreheaderLabel.fontSize = fontSize
+            myScoreheaderLabel.position = CGPoint(x: self.frame.size.width * xPosMultiplierForScore, y: YPosition)
+            myScoreheaderLabel.horizontalAlignmentMode = .left
+            myScoreheaderLabel.fontColor = SKColor.black
+            self.addChild(myScoreheaderLabel)
+        }
+        
+        if self.childNode(withName: bestScoreName) == nil {
+            let YPosition: CGFloat = self.frame.height * thirdLinePosition
+//            let text = GV.language.getText(.tcBestScoreHeader, values: bestOnlineRecord!.player, bestOnlineRecord!.score)
+            let text = GV.language.getText(.tcBestScoreHeader, values: "Bestplayer", "1000")
+            bestScoreHeaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
+            bestScoreHeaderLabel.text = text
+            bestScoreHeaderLabel.name = String(headerName)
+            bestScoreHeaderLabel.fontSize = fontSize
+            bestScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * xPosMultiplierForScore, y: YPosition)
+            bestScoreHeaderLabel.horizontalAlignmentMode = .left
+            bestScoreHeaderLabel.fontColor = SKColor.black
+            self.addChild(bestScoreHeaderLabel)
+        }
+
+//        if self.childNode(withName: actScoreName) == nil {
+//            let YPosition: CGFloat = self.frame.height * fourthLinePosition
+////            let text = GV.language.getText(.tcActScoreHeader, values: String(actOnlinePlayer), String(actOnlineScore))
+//            let text = GV.language.getText(.tcActScoreHeader, values: "actPlayer", "500")
+//            actScoreHeaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
+//            actScoreHeaderLabel.text = text
+//            actScoreHeaderLabel.name = String(headerName)
+//            actScoreHeaderLabel.fontSize = fontSize
+//            actScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * xPosMultiplierForScore, y: YPosition)
+//            actScoreHeaderLabel.horizontalAlignmentMode = .left
+//            actScoreHeaderLabel.fontColor = SKColor.black
+//            self.addChild(actScoreHeaderLabel)
+//        }
+
    }
     
     override func update(_ currentTime: TimeInterval) {
@@ -665,8 +723,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     private func modifyHeader() {
         let gameNumber = GV.playingRecord.gameNumber - GV.gameNumberAdder[GV.aktLanguage]!
-        let text = GV.language.getText(.tcHeader, values: String(gameNumber + 1), String(GV.playingRecord.rounds.count), String(totalScore))
-        headerLabel.text = text
+        let headerText = GV.language.getText(.tcHeader, values: String(gameNumber + 1), String(GV.playingRecord.rounds.count))
+        headerLabel.text = headerText
+        let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(totalScore))
+        myScoreheaderLabel.text = scoreText
     }
 
     func scrollOwnWords(up: Bool) {
@@ -808,8 +868,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let title = GV.language.getText(.tcShowAllWords)
         let wordLength = title.width(font: myTitleFont!)
         let wordHeight = title.height(font: myTitleFont!)
-        let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 2)
-        ownHeaderYPos = self.frame.height - ownHeader.frame.midY + frame.height
+        let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
+        ownHeaderYPos = self.frame.height - ownHeader.frame.maxY + frame.height
         let center = CGPoint(x:self.frame.width * 0.5, y: ownHeaderYPos) //self.frame.height * 0.20)
         let radius = frame.height * 0.5
         allWordsButton = createButton(imageName: "", title: title, frame: frame, center: center, cornerRadius: radius, enabled: true )
@@ -849,7 +909,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let button = UIButton()
         if imageName.length > 0 {
             let image = UIImage(named: imageName)
-            button.setImage(image, for: UIControlState.normal)
+            button.setImage(image, for: UIControl.State.normal)
         }
         if title.length > 0 {
             button.setTitle(title, for: .normal)
@@ -889,7 +949,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     private func createWordLabel(wordToShow: WordWithCounter, counter: Int) {
         let xPositionMultiplier = [0.2, 0.5, 0.8]
-        let mandatoryYPositionMultiplier:CGFloat = 0.86
+        let mandatoryYPositionMultiplier:CGFloat = sixthLinePosition
 //        let ownYPositionMultiplier:CGFloat = 0.80 // orig
         let distance: CGFloat = 0.02
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
@@ -897,24 +957,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let wordColumn = (counter - 1) % countWordsInRow
         let value = wordRow * distance
         var yPosition: CGFloat = 0
-//        let showWord = true
-//        if !own {
-            yPosition = self.frame.height * (mandatoryYPositionMultiplier - value)
-//        }
-//        else {
-//            let minY = wtGameboard!.children[0].frame.maxY
-//            var maxY:CGFloat = 0
-//            let ownHeader: SKNode? = self.childNode(withName: ownWordsHeaderName)
-//            if ownHeader != nil {
-//                let headerPosY = ownHeader!.position.y
-//                maxY = headerPosY
-//            }
-//
-//            yPosition = self.frame.height * (ownYPositionMultiplier - value)
-//            if yPosition <= minY || yPosition >= maxY{
-//                showWord = false
-//            }
-//        }
+
+        yPosition = self.frame.height * (mandatoryYPositionMultiplier - value)
         let xPosition = self.frame.size.width * CGFloat(xPositionMultiplier[wordColumn])
         label.position = CGPoint(x: xPosition, y: yPosition)
         label.fontSize = self.frame.size.height * 0.0175
@@ -939,10 +983,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //    }
 //    
     private func createLabel(word: String, first: Bool, name: String) {
-        let ownYPosition: [CGFloat] = [0.82, 0.80, 0.78]
+//        let ownYPosition: [CGFloat] = [0.02, 0.04, 0.06]
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
-        let yIndex = (WTGameWordList.shared.getCountWords(mandatory: true) / countWordsInRow) - 2
-        let yPosition = self.frame.height * (first ? 0.88 : ownYPosition[yIndex])
+//        let yIndex = (WTGameWordList.shared.getCountWords(mandatory: true) / countWordsInRow) - 2
+        let yPosition = self.frame.height * (fifthLinePosition - (first ? 0 : 0.06))
         let xPosition = self.frame.size.width * 0.5
         label.position = CGPoint(x: xPosition, y: yPosition)
         label.fontSize = self.frame.size.height * 0.018
@@ -962,6 +1006,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
         generateArrayOfWordPieces(new: new)
         indexOfTilesForGame = 0
+//        getOnlineRecords()
         ws = Array(repeating: WTPiece(), count: 3)
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
@@ -1008,6 +1053,69 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
         countTime(timerX: Timer())
     }
+    
+    var bestPlayerNickname = ""
+    var bestScore = 0
+    var actPlayer = ""
+    var actScore = 0
+    
+//    let bestOnlineRecords: Results<BestScoreSync>
+//    var notificationToken: NotificationToken?
+//    var subscriptionToken: NotificationToken?
+//    var subscription: SyncSubscription<bestOnlineRecords>!
+    
+    
+//    private func getOnlineRecords() {
+//        let gameNumber = GV.playingRecord.gameNumber % 1000 + 1
+//        bestOnlineRecords = realmSync!.objects(BestScoreSync.self).filter("CombinedPrimary BEGINSWITH %@", "\(gameNumber)\(GV.aktLanguage)").sorted(byKeyPath: "score", ascending: false)
+//        subscription = bestOnlineRecords.subscribe(named: "myBestScores")
+//        subscriptionToken = subscription.observe(\.state) { [weak self]  state in
+//            print("in Subscription!")
+//            switch state {
+//            case .creating:
+//                print("creating")
+//            // The subscription has not yet been written to the Realm
+//            case .pending:
+//                print("pending")
+//                // The subscription has been written to the Realm and is waiting
+//            // to be processed by the server
+//            case .complete:
+//                print("complete: count records: \(String(describing: self!.bestOnlineRecords.count))")
+//                // The subscription has been processed by the server and all objects
+//            // matching the query are in the local Realm
+//            case .invalidated:
+//                print("invalitdated")
+//            // The subscription has been removed
+//            case .error(let error):
+//                print("error: \(error)")
+//                // An error occurred while processing the subscription
+//            }
+//        }
+////        notificationToken = bestOnlineRecords.observe { [weak self] (changes) in
+////            switch changes {
+////            case .initial:
+////                // Results are now populated and can be accessed without blocking the UI
+////                let bestPlayer = self!.bestOnlineRecords.first!.playerName
+////                bestPlayerNickname =
+////            case .update(_, let deletions, let insertions, let modifications):
+////                // Query results have changed, so apply them to the UITableView
+////                if insertions.count > 0 {
+////                    bestOnlineRecords.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
+////                }
+////                bestOnlineRecords.beginUpdates()
+////                showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+////                                                  with: .automatic)
+////                showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+////                                                  with: .automatic)
+////                showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+////                                                  with: .automatic)
+////                showPlayerActivityView.endUpdates()
+////            case .error(let error):
+////                // An error occurred while opening the Realm file on the background worker thread
+////                fatalError("\(error)")
+////            }
+////        }
+//    }
     
     private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
         return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d and language = %@",
@@ -1310,6 +1418,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
     //                activityItems.append(activityItem)
                     saveActualState()
+                    saveToRealmCloud()
                 }
             }
         } else if moved {
@@ -1371,6 +1480,35 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        checkIfGameFinished()
     }
     
+    var bestScoreSync: BestScoreSync!
+    private func saveToRealmCloud() {
+        if realmSync != nil {
+            try! realmSync!.write {
+                let gameNumber = String(GV.playingRecord.gameNumber % 1000 + 1)
+                let language = GV.language.getText(.tcAktLanguage)
+                let myName = GV.basicDataRecord.myName
+                let combinedPrimary = gameNumber + language + myName
+                let bestScoreSyncs = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimary)
+                if bestScoreSyncs.count > 0 {
+                    bestScoreSync = bestScoreSyncs[0]
+                }
+                if bestScoreSync == nil {
+                    bestScoreSync = BestScoreSync()
+                    bestScoreSync.gameNumber = gameNumber
+                    bestScoreSync.language = language
+                    bestScoreSync.playerName = myName
+                    bestScoreSync.combinedPrimary = gameNumber + language + myName
+                    bestScoreSync.finished = false
+                    bestScoreSync.owner = playerActivity?[0]
+                    realmSync!.add(bestScoreSync)
+                }
+                bestScoreSync.score = WTGameWordList.shared.getScore(forAll:true)
+                bestScoreSync.usedTime = timeForGame.time
+                print ("owner nickName: \(String(describing: bestScoreSync.owner!.nickName!))")                
+            }
+        }
+    }
+    
     private func checkIfGameFinished()->Bool {
 //        if GV.allMandatoryWordsFounded() {
         if WTGameWordList.shared.gameFinished() {
@@ -1380,7 +1518,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             GV.playingRecord.nowPlaying = false
             GV.playingRecord.pieces = ""
 //            GV.playingRecord.activityItems = ""
-            GV.playingRecord.time = "0"
+            GV.playingRecord.time = timeInitValue
             GV.playingRecord.rounds.removeAll()
             try! realm.commitWrite()
             enabled = false
@@ -1411,6 +1549,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        }
         try! realm.write {
 //            GV.playingRecord.ownWords = tempOwnWords
+            GV.playingRecord.score = WTGameWordList.shared.getScore()
             GV.playingRecord.pieces = pieces
             GV.playingRecord.gameStatus = GV.GameStatusPlaying
             var rounds: RoundDataModel
@@ -1535,18 +1674,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 let actItem = activityRoundItem[activityRoundItem.count - 1].activityItems.last!
                 let selectedWord = SelectedWord(word: actItem.choosedWord.word, usedLetters: actItem.choosedWord.usedLetters)
                 WTGameWordList.shared.removeLastWord(selectedWord: selectedWord)
-//                if let index = GV.allWords.index(where: {$0.word == actItem.choosedWord.word}) {
-//                    GV.allWords.remove(at: index)
-//                }
-//                if let label = self.childNode(withName: actItem.choosedWord.word)! as? SKLabelNode {
-//                    label.removeFromParent() // This word is no more known
-//                }
-//                var lengthOfWord = actItem.choosedWord.word.count
-//                lengthOfWord = lengthOfWord > 10 ? 11 : lengthOfWord
-//                myTimer!.decreaseMaxTime(value: timeIncreaseValues![lengthOfWord])
-//                wtGameboard!.checkWholeWords()
+                saveActualState()
+                saveToRealmCloud()
                 activityRoundItem[activityRoundItem.count - 1].activityItems.removeLast()
-//                showLastOwnWords()
                 modifyHeader()
             }
         }
@@ -1607,6 +1737,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 addPieceAsChild(pieceIndex: index, piece: tileForGame)
                 
             }
+        }
+        if activityRoundItem.count == 0 {
+            activityRoundItem.append(ActivityRound())
+            activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
         }
         if activityRoundItem[0].activityItems.count > 0 {
 //            undoSprite.alpha = 1.0
@@ -1765,7 +1899,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         // calculating letterFrequency
         for record in letterFrequencyRecords {
             let separatedValues = record.word.components(separatedBy: itemSeparator)
-            letterFrequencyTable[separatedValues[1].uppercased()] = Int(Double(separatedValues[2])!)
+            let char = separatedValues[1].uppercased()
+            let specChar = char == " " || char == "," || char == "<" || char == "." || char == "÷" || char == "È" || char == "Ò" || char == "'"
+            if !specChar {
+                letterFrequencyTable[separatedValues[1].uppercased()] = Int(Double(separatedValues[2])!)
+            } else {
+                print(char)
+            }
         }
         // fill mandatoryLetterFrequencyTable with 0 for all letters
         for (letter, _) in letterFrequencyTable {
@@ -1813,6 +1953,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         for index in 0..<MyShapes.count - 1 {
             guard let type = MyShapes(rawValue: index) else {
                 return ""
+            }
+            if type == .NotUsed {
+                break
             }
             let length = myForms[type]![0].count
             switch length {
