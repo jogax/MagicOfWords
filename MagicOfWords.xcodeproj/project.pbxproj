@@ -75,10 +75,6 @@
 		208D085620C42F4000954E63 /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 208D085520C42F3400954E63 /* Mandatory.realm */; };
 		20943C8E2092129000B34A07 /* MyQuestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20943C8D2092129000B34A07 /* MyQuestions.swift */; };
 		2098BB8E20601B0B00C3641B /* magier.png in Resources */ = {isa = PBXBuildFile; fileRef = 2098BB8D20601B0B00C3641B /* magier.png */; };
-		209D91D720B5877700EC141E /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209D91D620B5877700EC141E /* Realm.framework */; };
-		209D91D820B5877700EC141E /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 209D91D620B5877700EC141E /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		209D91DB20B5879400EC141E /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209D91DA20B5879400EC141E /* RealmSwift.framework */; };
-		209D91DC20B5879400EC141E /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 209D91DA20B5879400EC141E /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A604B22035D93A00DC48F0 /* MyRandom.swift */; };
 		20A6913D203088FF00AB47C0 /* enWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20A6913C203088FF00AB47C0 /* enWords.txt */; };
 		20A6914020309B9F00AB47C0 /* WTPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6913F20309B9F00AB47C0 /* WTPiece.swift */; };
@@ -90,7 +86,9 @@
 		20B28AE620333273001682B2 /* WTTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTTableView.swift */; };
 		20C2A83421343EFC002A3852 /* LetterStatisticModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C2A83321343EFC002A3852 /* LetterStatisticModel.swift */; };
 		20CDA669214FFEBF00160DC6 /* CloudRecordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */; };
-		20DA3BF220FE1DFC00EA2D55 /* StateOfWordChanging.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */; };
+		20F176052162688300AF37D7 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20F176042162688300AF37D7 /* Realm.framework */; };
+		20F176072162688F00AF37D7 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20F176062162688E00AF37D7 /* RealmSwift.framework */; };
+		20F17609216269DB00AF37D7 /* StateOfWordChanging.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F17608216269DB00AF37D7 /* StateOfWordChanging.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -101,8 +99,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				209D91DC20B5879400EC141E /* RealmSwift.framework in Embed Frameworks */,
-				209D91D820B5877700EC141E /* Realm.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -180,8 +176,6 @@
 		208D085520C42F3400954E63 /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
 		20943C8D2092129000B34A07 /* MyQuestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyQuestions.swift; sourceTree = "<group>"; };
 		2098BB8D20601B0B00C3641B /* magier.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = magier.png; path = MagicOfWords/Pictures/magier.png; sourceTree = SOURCE_ROOT; };
-		209D91D620B5877700EC141E /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
-		209D91DA20B5879400EC141E /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		20A604B22035D93A00DC48F0 /* MyRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRandom.swift; sourceTree = "<group>"; };
 		20A6913C203088FF00AB47C0 /* enWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enWords.txt; sourceTree = "<group>"; };
 		20A6913F20309B9F00AB47C0 /* WTPiece.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTPiece.swift; sourceTree = "<group>"; };
@@ -193,7 +187,9 @@
 		20B28AE520333273001682B2 /* WTTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTTableView.swift; sourceTree = "<group>"; };
 		20C2A83321343EFC002A3852 /* LetterStatisticModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetterStatisticModel.swift; sourceTree = "<group>"; };
 		20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudRecordsViewController.swift; sourceTree = "<group>"; };
-		20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateOfWordChanging.txt; sourceTree = "<group>"; };
+		20F176042162688300AF37D7 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
+		20F176062162688E00AF37D7 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
+		20F17608216269DB00AF37D7 /* StateOfWordChanging.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateOfWordChanging.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -202,10 +198,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				209D91D720B5877700EC141E /* Realm.framework in Frameworks */,
 				2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */,
-				209D91DB20B5879400EC141E /* RealmSwift.framework in Frameworks */,
+				20F176072162688F00AF37D7 /* RealmSwift.framework in Frameworks */,
 				2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */,
+				20F176052162688300AF37D7 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,8 +211,8 @@
 		201FB1A520288C2B00EC9F36 = {
 			isa = PBXGroup;
 			children = (
-				209D91DA20B5879400EC141E /* RealmSwift.framework */,
-				209D91D620B5877700EC141E /* Realm.framework */,
+				20F176042162688300AF37D7 /* Realm.framework */,
+				20F176062162688E00AF37D7 /* RealmSwift.framework */,
 				201FB1B020288C2B00EC9F36 /* MagicOfWords */,
 				201FB1AF20288C2B00EC9F36 /* Products */,
 				2057BA262029F57B000DF337 /* Frameworks */,
@@ -302,7 +298,7 @@
 				205184FA20615B5C00E7FAF4 /* enGameData.txt */,
 				205184F62061525C00E7FAF4 /* huGameData.txt */,
 				205184F4206150AC00E7FAF4 /* ruGameData.txt */,
-				20DA3BF120FE1DFC00EA2D55 /* StateOfWordChanging.txt */,
+				20F17608216269DB00AF37D7 /* StateOfWordChanging.txt */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
 			);
 			path = RealmModels;
@@ -386,7 +382,7 @@
 				201FB1AB20288C2B00EC9F36 /* Frameworks */,
 				201FB1AC20288C2B00EC9F36 /* Resources */,
 				209D91D920B5877700EC141E /* Embed Frameworks */,
-				209D91DD20B588D400EC141E /* ShellScript */,
+				20F1760A21626C6000AF37D7 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -448,7 +444,6 @@
 				2055CB6B20C59AFB005F57E3 /* WordList.realm in Resources */,
 				20552DC6211F1EFA00C54538 /* whiteSprite1101.png in Resources */,
 				208D085620C42F4000954E63 /* Mandatory.realm in Resources */,
-				20DA3BF220FE1DFC00EA2D55 /* StateOfWordChanging.txt in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				20552DBF211F1EFA00C54538 /* whiteSprite1010.png in Resources */,
 				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
@@ -486,24 +481,31 @@
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
 				20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
+				20F17609216269DB00AF37D7 /* StateOfWordChanging.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		209D91DD20B588D400EC141E /* ShellScript */ = {
+		20F1760A21626C6000AF37D7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
+			inputFileListPaths = (
+			);
 			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/Realm.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/RealmSwift.framework",
+			);
+			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
+			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

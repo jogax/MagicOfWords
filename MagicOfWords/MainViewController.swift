@@ -173,7 +173,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
                 }
                 GV.language.setLanguage(GV.basicDataRecord.actLanguage)
             }
-            loginToRealmSync()
+//            loginToRealmSync()
         }
     }
     
@@ -194,45 +194,45 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     
 //    var countAllPlayerRecords = realmSync.objects(PlayerActivity.self).count
 
-    private func loginToRealmSync() {
-        let userName = "magic-of-words-user"
-        let password = "@@@" + userName + "@@@"
-        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
-        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
-            var user1 = user
-            if user1 == nil {  // create a new Account
-                let signUpCredentials = SyncCredentials.usernamePassword(username: userName, password: password, register: true)
-                SyncUser.logIn(with: signUpCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
-                    if user1 == nil {
-                        user1 = SyncUser.current
-                        if user1 == nil {
-                            print("Error, user couldn't be created")
-                        }
-                    } else {
-                        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
-                        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
-                            if user == nil {
-                                print("error after register")
-                            } else {
-                                
-                                GV.myUser = user
-                                realm.beginWrite()
-                                GV.basicDataRecord.myName = userName
-                                //                print(textField.text)
-                                try! realm.commitWrite()
-                                self.setIsOnline()
-                                print("OK after register")
-                            }
-                        }
-                    }
-                }
-            } else {
-                print("OK user exists")
-                GV.myUser = user
-                self.setIsOnline()
-            }
-        }
-    }
+//    private func loginToRealmSync() {
+//        let userName = "magic-of-words-user"
+//        let password = "@@@" + userName + "@@@"
+//        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
+//        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
+//            var user1 = user
+//            if user1 == nil {  // create a new Account
+//                let signUpCredentials = SyncCredentials.usernamePassword(username: userName, password: password, register: true)
+//                SyncUser.logIn(with: signUpCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
+//                    if user1 == nil {
+//                        user1 = SyncUser.current
+//                        if user1 == nil {
+//                            print("Error, user couldn't be created")
+//                        }
+//                    } else {
+//                        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
+//                        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
+//                            if user == nil {
+//                                print("error after register")
+//                            } else {
+//                                
+//                                GV.myUser = user
+//                                realm.beginWrite()
+//                                GV.basicDataRecord.myName = userName
+//                                //                print(textField.text)
+//                                try! realm.commitWrite()
+//                                self.setIsOnline()
+//                                print("OK after register")
+//                            }
+//                        }
+//                    }
+//                }
+//            } else {
+//                print("OK user exists")
+//                GV.myUser = user
+//                self.setIsOnline()
+//            }
+//        }
+//    }
     
     func setNickname(nickName: String) {
         if GV.myUser != nil {

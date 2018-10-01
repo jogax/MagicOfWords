@@ -81,7 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Tell Realm to use this new configuration object for the default Realm
         Realm.Configuration.defaultConfiguration = config
-        
+        loginToRealmSync()
 
         return true
 
@@ -112,6 +112,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
+    private func loginToRealmSync() {
+        let userName = "magic-of-words-user"
+        let password = "@@@" + userName + "@@@"
+        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
+        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
+            var user1 = user
+            if user1 == nil {
+                if SyncUser.current != nil {
+                    GV.myUser = SyncUser.current!
+                    self.setConnection()
+               }
+            } else {
+                print("OK user exists")
+                GV.myUser = user
+                self.setConnection()
+            }
+       }
+    }
+
+    
     func setIsOffline() {
         if GV.myUser != nil {
             try! realmSync?.write {
@@ -125,6 +145,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
+    
+    func setConnection() {
+        if GV.myUser == nil {
+            return
+        }
+        let syncConfig: SyncConfiguration = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL)
+        //        let syncConfig = SyncUser.current!.configuration(realmURL: GV.REALM_URL, user: GV.myUser!)
+        //        let config = SyncUser.current!.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true, urlPrefix: nil)
+        let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
+        realmSync = try! Realm(configuration: config)
+        if playerActivity == nil {
+            playerActivity = realmSync?.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
+        }
+        if playerActivity?.count == 0 {
+             try! realmSync?.write {
+                let playerActivityItem = PlayerActivity()
+                playerActivityItem.name = GV.basicDataRecord.myName
+                playerActivityItem.nickName = GV.basicDataRecord.myNickname
+                playerActivityItem.isOnline = true
+                playerActivityItem.onlineSince = getLocalDate()
+                playerActivityItem.onlineTime = 0
+                realmSync?.add(playerActivityItem)
+            }
+       } else {
+            setIsOnline()
+       }
+        //        setNotification()
+    }
+
 
 func setIsOnline() {
     if GV.myUser != nil {
