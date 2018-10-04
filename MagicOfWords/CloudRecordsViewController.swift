@@ -15,7 +15,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     let color = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
     var lengthOfNickName = 0
     var lengthOfIsOnline = 0
-//    var lengthOfOnlineSince = 0
+    //    var lengthOfOnlineSince = 0
     var lengthOfOnlineTime = 0
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
     
@@ -28,12 +28,12 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") ?? UITableViewCell(style: .default, reuseIdentifier: "Cell")
-//        cell.selectionStyle = .none
-//        let  item = playerActivityItems[indexPath.row]
-//        cell.textLabel?.text = item.name + "/" + item.nickName!
-//        //        cell.accessoryType = item.isDone ? UITableViewCellAccessoryType.checkmark : UITableViewCellAccessoryType.none
-//        return cell
+        //        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") ?? UITableViewCell(style: .default, reuseIdentifier: "Cell")
+        //        cell.selectionStyle = .none
+        //        let  item = playerActivityItems[indexPath.row]
+        //        cell.textLabel?.text = item.name + "/" + item.nickName!
+        //        //        cell.accessoryType = item.isDone ? UITableViewCellAccessoryType.checkmark : UITableViewCellAccessoryType.none
+        //        return cell
         let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: myFont!)
@@ -75,7 +75,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     private func calculateColumnWidths() {
         lengthOfNickName = 22
         lengthOfOnlineTime = 15
-
+        
         headerLine = ""
         let text1 = "\(GV.language.getText(.tcNickName)) ".fixLength(length: lengthOfNickName, center: true)
         let text2 = "\(GV.language.getText(.tcIsOnline)) "
@@ -85,19 +85,20 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         headerLine += text3
         lengthOfIsOnline = text2.length
     }
-
-    let realm: Realm
+    
+    //    let realm: Realm
     let playerActivityItems: Results<PlayerActivity>
     var notificationToken: NotificationToken?
     var subscriptionToken: NotificationToken?
     var subscription: SyncSubscription<PlayerActivity>!
     var OKButton: UIButton?
-
-
+    
+    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        let syncConfig = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL, isPartial: true)
-        self.realm = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[PlayerActivity.self]))
-        self.playerActivityItems = realm.objects(PlayerActivity.self).sorted(byKeyPath: "nickName", ascending: true)
+        //        let syncConfig = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL, isPartial: true)
+        //        self.realm = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[PlayerActivity.self]))
+        self.playerActivityItems = RealmService.objects(PlayerActivity.self).filter("isOnline == true").sorted(byKeyPath: "nickName", ascending: true)
+        //       self.playerActivityItems = RealmService.objects(PlayerActivity.self).sorted(byKeyPath: "nickName", ascending: true)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -112,12 +113,12 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         myBackgroundImage.image = UIImage(named: "magier")
         myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
         self.view.insertSubview(myBackgroundImage, at: 0)
-
+        
         
         view.addSubview(showPlayerActivityView!)
         showPlayerActivityView!.setDelegate(delegate: self)
         createOKButton()
-        subscription = playerActivityItems.subscribe(named: "myUserActivitysSortedByNicknameAsc")
+        subscription = playerActivityItems.subscribe(named: "myUserActivitysSortedByNicknameAscOnline")
         subscriptionToken = subscription.observe(\.state) { [weak self]  state in
             print("in Subscription!")
             switch state {
@@ -138,7 +139,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 self!.showPlayerActivityView!.center=center
                 //        showPlayerActivityView!.frame = self.view.frame
                 self!.showPlayerActivityView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-               print("complete: count records: \(String(describing: self!.playerActivityItems.count))")
+                print("complete: count records: \(String(describing: self!.playerActivityItems.count))")
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
@@ -154,23 +155,25 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             switch changes {
             case .initial:
                 // Results are now populated and can be accessed without blocking the UI
-//                showPlayerActivityView.reloadData()
+                //                showPlayerActivityView.reloadData()
                 self!.initialLoadDone = true
                 print("Initial Data displayed")
             case .update(_, let deletions, let insertions, let modifications):
                 if self!.initialLoadDone {
                     // Query results have changed, so apply them to the UITableView
                     if insertions.count > 0 {
-                        print("insert \(insertions.count), modify \(modifications.count) rows")
                         showPlayerActivityView.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
+                    }
+                    if deletions.count > 0 {
+                        showPlayerActivityView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
                     }
                     showPlayerActivityView.beginUpdates()
                     showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-                                         with: .automatic)
+                                                      with: .automatic)
                     showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-                                         with: .automatic)
+                                                      with: .automatic)
                     showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-                                         with: .automatic)
+                                                      with: .automatic)
                     showPlayerActivityView.endUpdates()
                 }
             case .error(let error):
@@ -197,7 +200,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             print("Dismissed")
         })
     }
-
+    
     private func createButton(imageName: String, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool)->UIButton {
         let button = UIButton()
         if imageName.length > 0 {
@@ -208,7 +211,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             button.setTitle(title, for: .normal)
             button.setTitleColor(UIColor.black, for: .normal)
             button.titleLabel?.font = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
-
+            
         }
         button.backgroundColor = color
         button.layer.cornerRadius = cornerRadius
@@ -221,7 +224,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         return button
     }
     
-
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

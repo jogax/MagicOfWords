@@ -15,7 +15,7 @@ public protocol MenuSceneDelegate: class {
     func continueGame()
     func showFinishedGames()
     func displayCloudRecordsViewController()
-//    func startChooseGameType()
+    //    func startChooseGameType()
     func startSettings()
     func chooseNickname()
 }
@@ -32,7 +32,7 @@ class MenuScene: SKScene {
     
     override func didMove(to view: SKView) {
         let callerName = "MenuScene"
-
+        
         let actLanguage = GV.language.getText(.tcAktLanguage)
         self.backgroundColor = SKColor(red: 255/255, green: 220/255, blue: 208/255, alpha: 1)
         var count = realmMandatory.objects(MandatoryModel.self).filter("language = %@", actLanguage).count
@@ -42,7 +42,7 @@ class MenuScene: SKScene {
         _ = createMenuItem(menuInt: .tcContinue, count: count)
         count = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusFinished, GV.aktLanguage).count
         _ = createMenuItem(menuInt: .tcFinished, count: count)
-//        createMenuItem(menuInt: .tcSettings, showValue: true, touchbar: false)
+        //        createMenuItem(menuInt: .tcSettings, showValue: true, touchbar: false)
         _ = createMenuItem(menuInt: .tcChooseLanguage, showValue: false, touchbar: true)
         nickNameItem = createMenuItem(menuInt: .tcSetNickName, showValue: false, touchbar: GV.myUser != nil)
         #if DEBUG
@@ -51,7 +51,7 @@ class MenuScene: SKScene {
         if !GV.callBackMyUser.contains(where: {$0.myCaller == callerName}) {
             GV.callBackMyUser.append(GV.CallBackStruct(caller: callerName, callBackFunction: callBackFunc()))
         }
-  }
+    }
     
     public func callBackFunc() {
         nickNameItem!.alpha = enabledAlpha
@@ -104,16 +104,16 @@ class MenuScene: SKScene {
                         menuSceneDelegate!.startNewGame()
                     case String(TextConstants.tcContinue.rawValue):
                         menuSceneDelegate!.continueGame()
-                    
+                        
                     case String(TextConstants.tcFinished.rawValue):
                         menuSceneDelegate!.showFinishedGames()
-                    
+                        
                     case String(TextConstants.tcChooseLanguage.rawValue):
                         menuSceneDelegate!.startSettings()
-
+                        
                     case String(TextConstants.tcShowRealmCloud.rawValue):
                         menuSceneDelegate!.displayCloudRecordsViewController()
-
+                        
                     case String(TextConstants.tcSetNickName.rawValue):
                         menuSceneDelegate!.chooseNickname()
                         
