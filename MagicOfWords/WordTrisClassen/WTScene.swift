@@ -1479,33 +1479,89 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         startShapeIndex = -1
 //        checkIfGameFinished()
     }
-    
-    var bestScoreSync: BestScoreSync!
+    var bestScoreSyncRecord: BestScoreSync?
+    var bestScoreSync: Results<BestScoreSync>?
+    var notificationToken: NotificationToken?
+    var subscriptionToken: NotificationToken?
+    var subscription: SyncSubscription<BestScoreSync>?
+
     private func saveToRealmCloud() {
         if realmSync != nil {
-            try! realmSync!.write {
                 let gameNumber = String(GV.playingRecord.gameNumber % 1000 + 1)
                 let language = GV.language.getText(.tcAktLanguage)
                 let myName = GV.basicDataRecord.myName
                 let combinedPrimary = gameNumber + language + myName
-                let bestScoreSyncs = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimary)
-                if bestScoreSyncs.count > 0 {
-                    bestScoreSync = bestScoreSyncs[0]
+                bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimary)
+            
+            subscription = bestScoreSync!.subscribe(named: "MyScoreRecord")
+            subscriptionToken = subscription!.observe(\.state) { [weak self]  state in
+                    print("in Subscription!")
+                    switch state {
+                    case .creating:
+                        print("creating")
+                    // The subscription has not yet been written to the Realm
+                    case .pending:
+                        print("pending")
+                        // The subscription has been written to the Realm and is waiting
+                    // to be processed by the server
+                    case .complete:
+                        try! realmSync!.write {
+                            if self!.bestScoreSync!.count > 0 {
+                                self!.bestScoreSyncRecord = self!.bestScoreSync![0]
+                            }
+                        if self!.bestScoreSyncRecord == nil {
+                            self!.bestScoreSyncRecord = BestScoreSync()
+                            self!.bestScoreSyncRecord!.gameNumber = gameNumber
+                            self!.bestScoreSyncRecord!.language = language
+                            self!.bestScoreSyncRecord!.playerName = myName
+                            self!.bestScoreSyncRecord!.combinedPrimary = gameNumber + language + myName
+                            self!.bestScoreSyncRecord!.finished = false
+                            self!.bestScoreSyncRecord!.owner = playerActivity?[0]
+                            realmSync!.add(self!.bestScoreSyncRecord!)
+                        }
+                            self!.bestScoreSyncRecord!.score = WTGameWordList.shared.getScore(forAll:true)
+                        self!.bestScoreSyncRecord!.usedTime = self!.timeForGame.time
+                        print ("owner nickName: \(String(describing: self!.bestScoreSyncRecord!.owner!.nickName!))")
+                    }
+                   case .invalidated:
+                        print("invalitdated")
+                    // The subscription has been removed
+                    case .error(let error):
+                        print("error: \(error)")
+                        // An error occurred while processing the subscription
+                    }
                 }
-                if bestScoreSync == nil {
-                    bestScoreSync = BestScoreSync()
-                    bestScoreSync.gameNumber = gameNumber
-                    bestScoreSync.language = language
-                    bestScoreSync.playerName = myName
-                    bestScoreSync.combinedPrimary = gameNumber + language + myName
-                    bestScoreSync.finished = false
-                    bestScoreSync.owner = playerActivity?[0]
-                    realmSync!.add(bestScoreSync)
-                }
-                bestScoreSync.score = WTGameWordList.shared.getScore(forAll:true)
-                bestScoreSync.usedTime = timeForGame.time
-                print ("owner nickName: \(String(describing: bestScoreSync.owner!.nickName!))")                
-            }
+//            notificationToken = bestScoreSync!.observe { [weak self] (changes) in
+//                switch changes {
+//                case .initial:
+//                    // Results are now populated and can be accessed without blocking the UI
+//                    //                showPlayerActivityView.reloadData()
+//                    self!.initialLoadDone = true
+//                    print("Initial Data displayed")
+//                case .update(_, let deletions, let insertions, let modifications):
+//                    if self!.initialLoadDone {
+//                        // Query results have changed, so apply them to the UITableView
+//                        if insertions.count > 0 {
+//                            showPlayerActivityView.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
+//                        }
+//                        if deletions.count > 0 {
+//                            showPlayerActivityView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
+//                        }
+//                        showPlayerActivityView.beginUpdates()
+//                        showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+//                                                          with: .automatic)
+//                        showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+//                                                          with: .automatic)
+//                        showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+//                                                          with: .automatic)
+//                        showPlayerActivityView.endUpdates()
+//                    }
+//                case .error(let error):
+//                    // An error occurred while opening the Realm file on the background worker thread
+//                    fatalError("\(error)")
+//                }
+//            }
+
         }
     }
     

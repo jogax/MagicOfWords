@@ -169,6 +169,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 playerActivityItem.onlineSince = getLocalDate()
                 playerActivityItem.onlineTime = 0
                 realmSync?.add(playerActivityItem)
+                setIsOnline()
             }
         } else {
             setIsOnline()
