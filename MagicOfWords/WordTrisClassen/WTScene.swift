@@ -1555,15 +1555,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                             self!.bestScoreForGameRecord = BestScoreForGame()
                             self!.bestScoreForGameRecord!.gameNumber = gameNumber
                             self!.bestScoreForGameRecord!.language = language
-                            self!.bestScoreForGameRecord!.bestPlayerName = myName
+//                            self!.bestScoreForGameRecord!.bestPlayerName = myName
                             self!.bestScoreForGameRecord!.combinedPrimary = gameNumber + language
                             self!.bestScoreForGameRecord!.bestScore = 0
+                            self!.bestScoreForGameRecord!.owner = playerActivity?[0]
                             realmSync!.add(self!.bestScoreForGameRecord!)
                         }
                         if WTGameWordList.shared.getScore(forAll:true) > self!.bestScoreForGameRecord!.bestScore {
-                            self!.bestScoreForGameRecord!.bestPlayerName = myName
+//                            self!.bestScoreForGameRecord!.bestPlayerName = myName
                             self!.bestScoreForGameRecord!.bestScore = WTGameWordList.shared.getScore(forAll:true)
                             self!.bestScoreForGameRecord!.timeStamp = Date()
+                            self!.bestScoreForGameRecord!.owner = playerActivity?[0]
                         }
                      }
                 case .invalidated:
