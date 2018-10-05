@@ -20,11 +20,15 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
     
     func getNumberOfSections() -> Int {
-        return 1
+        return 2
     }
     
     func getNumberOfRowsInSections(section: Int) -> Int {
-        return playerActivityItems.count
+        switch section {
+        case 0: return playerActivityItems.count
+        case 1: return 0
+        default: return 0
+        }
     }
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
@@ -98,6 +102,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         //        let syncConfig = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL, isPartial: true)
         //        self.realm = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[PlayerActivity.self]))
         self.playerActivityItems = RealmService.objects(PlayerActivity.self).filter("isOnline == true").sorted(byKeyPath: "nickName", ascending: true)
+//        self.gameRecords = RealmService.objects(BestScoreForGame.self).filter("isOnline == true").sorted(byKeyPath: "nickName", ascending: true)
         //       self.playerActivityItems = RealmService.objects(PlayerActivity.self).sorted(byKeyPath: "nickName", ascending: true)
         super.init(nibName: nil, bundle: nil)
     }

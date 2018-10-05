@@ -1480,22 +1480,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        checkIfGameFinished()
     }
     var bestScoreSyncRecord: BestScoreSync?
+    var bestScoreForGameRecord: BestScoreForGame?
     var bestScoreSync: Results<BestScoreSync>?
+    var bestScoreForGame: Results<BestScoreForGame>?
     var notificationToken: NotificationToken?
     var subscriptionToken: NotificationToken?
-    var subscription: SyncSubscription<BestScoreSync>?
+    var bestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
+    var bestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
 
     private func saveToRealmCloud() {
         if realmSync != nil {
                 let gameNumber = String(GV.playingRecord.gameNumber % 1000 + 1)
                 let language = GV.language.getText(.tcAktLanguage)
                 let myName = GV.basicDataRecord.myName
-                let combinedPrimary = gameNumber + language + myName
-                bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimary)
-            
-            subscription = bestScoreSync!.subscribe(named: "MyScoreRecord")
-            subscriptionToken = subscription!.observe(\.state) { [weak self]  state in
-                    print("in Subscription!")
+                let combinedPrimarySync = gameNumber + language + myName
+                let combinedPrimaryForGame = gameNumber + language
+                bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimarySync)
+                bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
+            bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "My\(language)ScoreRecord")
+            subscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
+//                    print("in Subscription!")
                     switch state {
                     case .creating:
                         print("creating")
@@ -1519,7 +1523,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                             self!.bestScoreSyncRecord!.owner = playerActivity?[0]
                             realmSync!.add(self!.bestScoreSyncRecord!)
                         }
-                            self!.bestScoreSyncRecord!.score = WTGameWordList.shared.getScore(forAll:true)
+                        self!.bestScoreSyncRecord!.score = WTGameWordList.shared.getScore(forAll:true)
                         self!.bestScoreSyncRecord!.usedTime = self!.timeForGame.time
                         print ("owner nickName: \(String(describing: self!.bestScoreSyncRecord!.owner!.nickName!))")
                     }
@@ -1531,36 +1535,45 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                         // An error occurred while processing the subscription
                     }
                 }
-//            notificationToken = bestScoreSync!.observe { [weak self] (changes) in
-//                switch changes {
-//                case .initial:
-//                    // Results are now populated and can be accessed without blocking the UI
-//                    //                showPlayerActivityView.reloadData()
-//                    self!.initialLoadDone = true
-//                    print("Initial Data displayed")
-//                case .update(_, let deletions, let insertions, let modifications):
-//                    if self!.initialLoadDone {
-//                        // Query results have changed, so apply them to the UITableView
-//                        if insertions.count > 0 {
-//                            showPlayerActivityView.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
-//                        }
-//                        if deletions.count > 0 {
-//                            showPlayerActivityView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
-//                        }
-//                        showPlayerActivityView.beginUpdates()
-//                        showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-//                                                          with: .automatic)
-//                        showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-//                                                          with: .automatic)
-//                        showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-//                                                          with: .automatic)
-//                        showPlayerActivityView.endUpdates()
-//                    }
-//                case .error(let error):
-//                    // An error occurred while opening the Realm file on the background worker thread
-//                    fatalError("\(error)")
-//                }
-//            }
+            bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "My\(language)BestScoreForGameRecord")
+            subscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
+//                print("in Subscription!")
+                switch state {
+                case .creating:
+                    print("creating")
+                // The subscription has not yet been written to the Realm
+                case .pending:
+                    print("pending")
+                    // The subscription has been written to the Realm and is waiting
+                // to be processed by the server
+                case .complete:
+                    try! realmSync!.write {
+                        if self!.bestScoreForGame!.count > 0 {
+                            self!.bestScoreForGameRecord = self!.bestScoreForGame![0]
+                        }
+                        if self!.bestScoreForGameRecord == nil {
+                            self!.bestScoreForGameRecord = BestScoreForGame()
+                            self!.bestScoreForGameRecord!.gameNumber = gameNumber
+                            self!.bestScoreForGameRecord!.language = language
+                            self!.bestScoreForGameRecord!.bestPlayerName = myName
+                            self!.bestScoreForGameRecord!.combinedPrimary = gameNumber + language
+                            self!.bestScoreForGameRecord!.bestScore = 0
+                            realmSync!.add(self!.bestScoreForGameRecord!)
+                        }
+                        if WTGameWordList.shared.getScore(forAll:true) > self!.bestScoreForGameRecord!.bestScore {
+                            self!.bestScoreForGameRecord!.bestPlayerName = myName
+                            self!.bestScoreForGameRecord!.bestScore = WTGameWordList.shared.getScore(forAll:true)
+                            self!.bestScoreForGameRecord!.timeStamp = Date()
+                        }
+                     }
+                case .invalidated:
+                    print("invalitdated")
+                // The subscription has been removed
+                case .error(let error):
+                    print("error: \(error)")
+                    // An error occurred while processing the subscription
+                }
+            }
 
         }
     }
@@ -1806,113 +1819,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        wtGameboard!.checkWholeWords()
     }
     
-//    private func generateArrayOfWordPiecesOld()->String {
-//        let gameNumber =  GV.playingRecord.gameNumber
-//        let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
-//        let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
-//        let random = MyRandom(gameNumber: gameNumber)
-//        func getLetters( from: inout [String], archiv: inout [String])->[String] {
-//            
-//            if from.count == 0 {
-//                repeat {
-//                    let archivIndex = random.getRandomInt(0, max: archiv.count - 1)
-//                    let item = archiv[archivIndex]
-//                    archiv.remove(at: archivIndex)
-//                    from.append(item)
-//                } while archiv.count > 0
-////                for item in archiv {
-////                    from.append(item)
-////                }
-////                archiv.removeAll()
-//            }
-//            let index = random.getRandomInt(0, max: from.count - 1)
-//            let temp = from[index]
-//            var piece = [String]()
-//            piece.append(temp.subString(startPos:0, length: 1))
-//            if temp.count == 2 {
-//                piece.append(temp.subString(startPos:1, length: 1))
-//            }
-//            archiv.append(temp)
-//            from.remove(at: index)
-//            return piece
-//        }
-//        tilesForGame.removeAll()
-//        var oneLetterPieces = [String]()
-//        var oneLetterPiecesArchiv = [String]()
-//        var twoLetterPieces = [String]()
-//        var twoLetterPiecesArchiv = [String]()
-//        for word in words {
-//            for letter in word {
-//                oneLetterPieces.append(String(letter).uppercased())
-//            }
-////            for index in 0..<word.count - 1 {
-////                twoLetterPieces.append(word.subString(startPos: index, length: 2).uppercased())
-////            }
-////
-//            for index in 0..<word.count / 2 {
-//                if !twoLetterPieces.contains(where: {$0 == word.subString(startPos: index * 2, length: 2).uppercased()}) {
-//                    twoLetterPieces.append(word.subString(startPos: index * 2, length: 2).uppercased())
-//                }
-//            }
-//        }
-//        for letter in String(GV.language.getText(.tcAlphabet)) {
-//            if !oneLetterPieces.contains(where: {$0 == String(letter)}) {
-//                oneLetterPieces.append(String(letter))
-//            }
-//        }
-//        var typesWithLen1 = [MyShapes]()
-//        var typesWithLen2 = [MyShapes]()
-//        var typesWithLen3 = [MyShapes]()
-//        var typesWithLen4 = [MyShapes]()
-//        
-//        for index in 0..<MyShapes.count - 1 {
-//            guard let type = MyShapes(rawValue: index) else {
-//                return ""
-//            }
-//            let length = myForms[type]![0].count
-//            switch length {
-//            case 1: typesWithLen1.append(type)
-//            case 2: typesWithLen2.append(type)
-//            case 3: typesWithLen3.append(type)
-//            case 4: typesWithLen4.append(type)
-//            default: break
-//            }
-//        }
-////        let lengths = [1,1,1,1,1,2,2,2,2,2,2,3,3,4]
-//        let lengths = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3]
-////        let lengths = [1,1,2,2,3,3,3,3]
-//        var generateLength = 0
-//        repeat {
-//            let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
-//            var tileType = MyShapes.NotUsed
-//            var letters = [String]()
-//            switch tileLength {
-//            case 1: tileType = typesWithLen1[0]
-//            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
-//            case 2: tileType = typesWithLen2[0]
-//            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-//            case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
-//            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-//            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
-//            case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
-//            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-//            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-//            default: break
-//            }
-//            let rotateIndex = random.getRandomInt(0, max: 3)
-//            
-//            //            let tileForGameItem = TilesForGame(type: tileType, rotateIndex: rotateIndex, letters: letters)
-//            let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
-//            tilesForGame.append(tileForGameItem)
-//            generateLength += tileLength
-//        } while generateLength < 1000
-//        var generatedArrayInStringForm = ""
-//        for tile in tilesForGame {
-//            generatedArrayInStringForm += tile.toString() + "°"
-//        }
-//        return generatedArrayInStringForm
-//    }
-//
     private func generateArrayOfWordPieces()->String {
         let gameNumber =  GV.playingRecord.gameNumber
         let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
