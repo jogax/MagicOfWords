@@ -729,23 +729,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         myScoreheaderLabel.text = scoreText
     }
 
-    func scrollOwnWords(up: Bool) {
-        if up {
-            showingOwnWordsIndex += countWordsInRow
-            let countOwnWords = WTGameWordList.shared.getCountWords(mandatory: false)
-            if showingOwnWordsIndex + countShowingOwnWords > countOwnWords {
-                let countShowedRows = countShowingOwnWords / countWordsInRow
-                let startRow = countOwnWords / countWordsInRow - countShowedRows + 1
-                showingOwnWordsIndex =  startRow * countWordsInRow
-            }
-        } else {
-            showingOwnWordsIndex -= countWordsInRow
-            if showingOwnWordsIndex < 0 {
-                showingOwnWordsIndex = 0
-            }
-        }
-        showFoundedWords()
-    }
+//    func scrollOwnWords(up: Bool) {
+//        if up {
+//            showingOwnWordsIndex += countWordsInRow
+//            let countOwnWords = WTGameWordList.shared.getCountWords(mandatory: false)
+//            if showingOwnWordsIndex + countShowingOwnWords > countOwnWords {
+//                let countShowedRows = countShowingOwnWords / countWordsInRow
+//                let startRow = countOwnWords / countWordsInRow - countShowedRows + 1
+//                showingOwnWordsIndex =  startRow * countWordsInRow
+//            }
+//        } else {
+//            showingOwnWordsIndex -= countWordsInRow
+//            if showingOwnWordsIndex < 0 {
+//                showingOwnWordsIndex = 0
+//            }
+//        }
+//        showFoundedWords()
+//    }
     func showFoundedWords() {
         let myMandatoryWords = WTGameWordList.shared.getMandatoryWords()
         for actWord in myMandatoryWords {
@@ -1497,56 +1497,34 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 let combinedPrimaryForGame = gameNumber + language
                 bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimarySync)
                 bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
-            bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "My\(language)ScoreRecord")
-            subscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
+                bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "My\(language)ScoreRecord")
+                subscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
 //                    print("in Subscription!")
-                    switch state {
-                    case .creating:
-                        print("creating")
-                    // The subscription has not yet been written to the Realm
-                    case .pending:
-                        print("pending")
-                        // The subscription has been written to the Realm and is waiting
-                    // to be processed by the server
-                    case .complete:
-                        try! realmSync!.write {
+                    if state == .complete {
+                         try! realmSync!.write {
                             if self!.bestScoreSync!.count > 0 {
                                 self!.bestScoreSyncRecord = self!.bestScoreSync![0]
                             }
-                        if self!.bestScoreSyncRecord == nil {
-                            self!.bestScoreSyncRecord = BestScoreSync()
-                            self!.bestScoreSyncRecord!.gameNumber = gameNumber
-                            self!.bestScoreSyncRecord!.language = language
-                            self!.bestScoreSyncRecord!.playerName = myName
-                            self!.bestScoreSyncRecord!.combinedPrimary = gameNumber + language + myName
-                            self!.bestScoreSyncRecord!.finished = false
-                            self!.bestScoreSyncRecord!.owner = playerActivity?[0]
-                            realmSync!.add(self!.bestScoreSyncRecord!)
+                            if self!.bestScoreSyncRecord == nil {
+                                self!.bestScoreSyncRecord = BestScoreSync()
+                                self!.bestScoreSyncRecord!.gameNumber = gameNumber
+                                self!.bestScoreSyncRecord!.language = language
+                                self!.bestScoreSyncRecord!.playerName = myName
+                                self!.bestScoreSyncRecord!.combinedPrimary = gameNumber + language + myName
+                                self!.bestScoreSyncRecord!.finished = false
+                                self!.bestScoreSyncRecord!.owner = playerActivity?[0]
+                                realmSync!.add(self!.bestScoreSyncRecord!)
+                            }
+                            self!.bestScoreSyncRecord!.score = WTGameWordList.shared.getScore(forAll:true)
+                            self!.bestScoreSyncRecord!.usedTime = self!.timeForGame.time
+                            print ("owner nickName: \(String(describing: self!.bestScoreSyncRecord!.owner!.nickName!))")
                         }
-                        self!.bestScoreSyncRecord!.score = WTGameWordList.shared.getScore(forAll:true)
-                        self!.bestScoreSyncRecord!.usedTime = self!.timeForGame.time
-                        print ("owner nickName: \(String(describing: self!.bestScoreSyncRecord!.owner!.nickName!))")
-                    }
-                   case .invalidated:
-                        print("invalitdated")
-                    // The subscription has been removed
-                    case .error(let error):
-                        print("error: \(error)")
-                        // An error occurred while processing the subscription
                     }
                 }
             bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "My\(language)BestScoreForGameRecord")
             subscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
 //                print("in Subscription!")
-                switch state {
-                case .creating:
-                    print("creating")
-                // The subscription has not yet been written to the Realm
-                case .pending:
-                    print("pending")
-                    // The subscription has been written to the Realm and is waiting
-                // to be processed by the server
-                case .complete:
+                if state == .complete {
                     try! realmSync!.write {
                         if self!.bestScoreForGame!.count > 0 {
                             self!.bestScoreForGameRecord = self!.bestScoreForGame![0]
@@ -1568,12 +1546,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                             self!.bestScoreForGameRecord!.owner = playerActivity?[0]
                         }
                      }
-                case .invalidated:
-                    print("invalitdated")
-                // The subscription has been removed
-                case .error(let error):
-                    print("error: \(error)")
-                    // An error occurred while processing the subscription
                 }
             }
 

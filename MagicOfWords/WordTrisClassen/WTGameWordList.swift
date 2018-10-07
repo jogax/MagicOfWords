@@ -339,7 +339,9 @@ public class WTGameWordList {
             addWordToAllWords(word: selectedWord.word)
             let newScore = getActualScore()
             let changeTime = minutesForWord[selectedWord.word.length]
-            delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: doAnimate, changeTime: changeTime!)
+            if doAnimate { // only when new word added, not in init
+                delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: doAnimate, changeTime: changeTime!)
+            }
         }
         return noCommonLetter && noDiagonal
     }
