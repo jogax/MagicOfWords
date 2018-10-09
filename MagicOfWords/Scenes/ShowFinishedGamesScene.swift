@@ -162,6 +162,7 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
         cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: lengthOfScore), color: color) // My Score
         cell.addColumn(text: String(gamesForShow[indexPath.row].bestPlayer).fixLength(length: lengthOfBestPlayer - 1)) // Best Player
         cell.addColumn(text: String(gamesForShow[indexPath.row].bestScore).fixLength(length: lengthOfBestScore - 2), color: color) // Best Score
+        cell.addButton(image: UIImage())
         return cell
     }
     

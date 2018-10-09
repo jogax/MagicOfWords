@@ -244,6 +244,9 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
             }
             
         }
+        try! realm.write {
+            GV.basicDataRecord.myNickname = nickName
+        }
     }
     
     //    func setIsOnline() {
