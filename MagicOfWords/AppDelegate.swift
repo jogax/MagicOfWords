@@ -169,12 +169,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 playerActivityItem.onlineSince = getLocalDate()
                 playerActivityItem.onlineTime = 0
                 realmSync?.add(playerActivityItem)
-                setIsOnline()
             }
-        } else {
-            setIsOnline()
         }
-        //        setNotification()
+        setIsOnline()
     }
     
     
@@ -193,14 +190,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
 }
-var RealmService = ReferenceRealm.shared.realm
-
-private class ReferenceRealm {
-    static let shared = ReferenceRealm()
-    
-    lazy var realm: Realm = {
-        let syncUserConfig = SyncUser.current?.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true)
-        let realm = try! Realm(configuration: syncUserConfig!)
-        return realm
-    }()
-}
+//var RealmService = ReferenceRealm.shared.realm
+//
+//private class ReferenceRealm {
+//    static let shared = ReferenceRealm()
+//    
+//    lazy var realm: Realm = {
+//        let syncUserConfig = SyncUser.current?.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true)
+//        let realm = try! Realm(configuration: syncUserConfig!)
+//        return realm
+//    }()
+//}

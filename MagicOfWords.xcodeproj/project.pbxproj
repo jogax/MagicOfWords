@@ -56,6 +56,7 @@
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
 		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */; };
+		205850F42170D2C900D89B9A /* RealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205850F32170D2C900D89B9A /* RealmManager.swift */; };
 		205CF7EB2129A21000C1B89D /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EA2129A21000C1B89D /* finger.png */; };
 		205CF7ED2129BC9300C1B89D /* back.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EC2129BC9300C1B89D /* back.png */; };
 		205CF7F02129BF4B00C1B89D /* previousGame.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EE2129BF4B00C1B89D /* previousGame.png */; };
@@ -158,6 +159,7 @@
 		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2057BA292029F591000DF337 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePackageScene.swift; sourceTree = "<group>"; };
+		205850F32170D2C900D89B9A /* RealmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmManager.swift; sourceTree = "<group>"; };
 		205CF7EA2129A21000C1B89D /* finger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = finger.png; path = MagicOfWords/Pictures/finger.png; sourceTree = SOURCE_ROOT; };
 		205CF7EC2129BC9300C1B89D /* back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = back.png; path = MagicOfWords/Pictures/back.png; sourceTree = SOURCE_ROOT; };
 		205CF7EE2129BF4B00C1B89D /* previousGame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = previousGame.png; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				201FB1C920288CE900EC9F36 /* MyGlobals.swift */,
 				20A604B22035D93A00DC48F0 /* MyRandom.swift */,
 				201FB1B120288C2B00EC9F36 /* AppDelegate.swift */,
+				205850F32170D2C900D89B9A /* RealmManager.swift */,
 				201FB1BB20288C2B00EC9F36 /* Main.storyboard */,
 				201FB1BE20288C2B00EC9F36 /* Assets.xcassets */,
 				201FB1C020288C2B00EC9F36 /* LaunchScreen.storyboard */,
@@ -534,6 +537,7 @@
 				2065252620FD212C00F0BC46 /* WTGameWordList.swift in Sources */,
 				205627ED214AA716006B9357 /* BestScoreSync.swift in Sources */,
 				2060036E20347FF400023E10 /* WTGameboardItem.swift in Sources */,
+				205850F42170D2C900D89B9A /* RealmManager.swift in Sources */,
 				208144202167B65500496AFC /* BestScoreForGame.swift in Sources */,
 				20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */,
 				201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */,

@@ -485,7 +485,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         self.backgroundColor = bgColor
 //        GV.allWords = [WordToCheck]()
         getPlayingRecord(new: new, next: .NextGame)
-//        createHeader()
+        createHeader()
 //        createUndo(enabled: true)
         createGoBackButton()
         wtGameFinishedSprite.setDelegate(delegate: self)
@@ -643,7 +643,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     let sixthLinePosition:CGFloat = 0.82
     
     private func createHeader() {
-        let fontSize = self.frame.size.height * 0.0175
+        let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.035
         if self.childNode(withName: timeName) == nil {
             timeLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
             let YPosition: CGFloat = self.frame.height * firstLinePosition
@@ -675,32 +675,32 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         
         if self.childNode(withName: myScoreName) == nil {
             let YPosition: CGFloat = self.frame.height * secondLinePosition
-            let text = GV.language.getText(.tcMyScoreHeader, values: myName, String(GV.playingRecord.score))
+            let text = GV.language.getText(.tcMyScoreHeader, values: String(GV.playingRecord.score).fixLength(length:6), myName)
             myScoreheaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
             myScoreheaderLabel.text = text
-            myScoreheaderLabel.name = String(headerName)
+            myScoreheaderLabel.name = String(myScoreName)
             myScoreheaderLabel.fontSize = fontSize
             myScoreheaderLabel.position = CGPoint(x: self.frame.size.width * xPosMultiplierForScore, y: YPosition)
             myScoreheaderLabel.horizontalAlignmentMode = .left
             myScoreheaderLabel.fontColor = SKColor.black
             self.addChild(myScoreheaderLabel)
         }
-        var bestName = "nobody"
-        var bestScore = 0
-        if let record = bestScoreForGameRecord {
-            if let owner = record.owner {
-                bestName = owner.nickName!
-            }
-            bestScore = record.bestScore
-        }
+        let bestName = "nobody"
+        let bestScore = 0
+//        if bestScoreForGame!.count > 0 {
+//            if let owner = record.owner {
+//                bestName = owner.nickName!
+//            }
+//            bestScore = record.bestScore
+//        }
 
         if self.childNode(withName: bestScoreName) == nil {
             let YPosition: CGFloat = self.frame.height * thirdLinePosition
 //            let text = GV.language.getText(.tcBestScoreHeader, values: bestOnlineRecord!.player, bestOnlineRecord!.score)
-            let text = GV.language.getText(.tcBestScoreHeader, values: bestName, String(bestScore))
+            let text = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:6), bestName)
             bestScoreHeaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
             bestScoreHeaderLabel.text = text
-            bestScoreHeaderLabel.name = String(headerName)
+            bestScoreHeaderLabel.name = String(bestScoreName)
             bestScoreHeaderLabel.fontSize = fontSize
             bestScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * xPosMultiplierForScore, y: YPosition)
             bestScoreHeaderLabel.horizontalAlignmentMode = .left
@@ -736,18 +736,30 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 waitingForSynceRecords = true
             }
         }
-        if syncedRecordsOK && !headerCreated {
-            createHeader()
-            headerCreated = true
-        }
+//        if !headerCreated {
+//            createHeader()
+//            headerCreated = true
+//        }
     }
     
     private func modifyHeader() {
         let gameNumber = GV.playingRecord.gameNumber - GV.gameNumberAdder[GV.aktLanguage]!
         let headerText = GV.language.getText(.tcHeader, values: String(gameNumber + 1), String(GV.playingRecord.rounds.count))
         headerLabel.text = headerText
-        let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(totalScore))
-        myScoreheaderLabel.text = scoreText
+        let score = String(WTGameWordList.shared.getScore(forAll: true))
+        let scoreText = GV.language.getText(.tcMyScoreHeader, values: score.fixLength(length:6), GV.basicDataRecord.myNickname)
+        let myScorelabel = self.childNode(withName: myScoreName) as? SKLabelNode
+        if myScorelabel != nil {
+            myScorelabel!.text = scoreText
+        }
+ 
+        if bestScoreForGame != nil && bestScoreForGame!.count > 0 {
+            let bestName = bestScoreForGame![0].owner!.nickName
+            let bestScore = bestScoreForGame![0].bestScore
+            let bestScoretext = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:6), bestName!)
+            let bestScorelabel = self.childNode(withName: bestScoreName) as? SKLabelNode
+            bestScorelabel!.text = bestScoretext
+        }
     }
 
 //    func scrollOwnWords(up: Bool) {
@@ -1056,7 +1068,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 self.addChild(ws[index])
             }
         }
-        modifyHeader()
+//        modifyHeader()
         createGoToPreviousGameButton(enabled: hasPreviousRecords(playingRecord: GV.playingRecord))
         createGoToNextGameButton(enabled: hasNextRecords(playingRecord: GV.playingRecord))
         createShowAllWordsButton()
@@ -1501,18 +1513,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         startShapeIndex = -1
 //        checkIfGameFinished()
     }
-    var bestScoreSyncRecord: BestScoreSync?
-    var bestScoreForGameRecord: BestScoreForGame? {
-        willSet(newValue) {
-            if bestScoreForGameRecord != newValue {
-                print("bestScore record changed")
-            }
-        }
-    }
     var bestScoreSync: Results<BestScoreSync>?
     var bestScoreForGame: Results<BestScoreForGame>?
     var notificationToken: NotificationToken?
-    var subscriptionToken: NotificationToken?
+    var bestScoreSubscriptionToken: NotificationToken?
+    var forGameSubscriptionToken: NotificationToken?
+    var bestScoreForGameToken: NotificationToken?
     var bestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
     var bestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
     var syncedRecordsOK = false
@@ -1522,120 +1528,92 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         if realmSync != nil {
             let gameNumber = String(GV.playingRecord.gameNumber % 1000 + 1)
             let language = GV.language.getText(.tcAktLanguage)
-//            let myName = GV.basicDataRecord.myName
-//            let combinedPrimarySync = gameNumber + language + myName
+            let myName = GV.basicDataRecord.myName
+            let combinedPrimarySync = gameNumber + language + myName
             let combinedPrimaryForGame = gameNumber + language
-            bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
-//            if bestScoreForGame!.count == 0 {
-//                try! realmSync!.write {
-//                    self.bestScoreForGameRecord = BestScoreForGame()
-//                    self.bestScoreForGameRecord!.gameNumber = gameNumber
-//                    self.bestScoreForGameRecord!.language = language
-//                    //                            self!.bestScoreForGameRecord!.bestPlayerName = myName
-//                    self.bestScoreForGameRecord!.combinedPrimary = gameNumber + language
-//                    self.bestScoreForGameRecord!.bestScore = 0
-//                    self.bestScoreForGameRecord!.owner = playerActivity?[0]
-//                    realmSync!.add(self.bestScoreForGameRecord!)
-//                    bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
-//               }
-//            }
-            bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "My\(gameNumber)\(language)BestScoreForGameRecord")
-            subscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
-                //                print("in Subscription!")
+            bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimarySync)
+            bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "MyScoreRecord:\(combinedPrimarySync)")
+            bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
+                //                    print("in Subscription!")
                 if state == .complete {
-                    if self!.bestScoreForGame!.count > 0 {
-                        self!.bestScoreForGameRecord = self!.bestScoreForGame![0]
-                    }
-                    if self!.bestScoreForGameRecord == nil {
-                        try! realmSync!.write {
-                            self!.bestScoreForGameRecord = BestScoreForGame()
-                            self!.bestScoreForGameRecord!.gameNumber = gameNumber
-                            self!.bestScoreForGameRecord!.language = language
-                            //                            self!.bestScoreForGameRecord!.bestPlayerName = myName
-                            self!.bestScoreForGameRecord!.combinedPrimary = gameNumber + language
-                            self!.bestScoreForGameRecord!.bestScore = 0
-                            self!.bestScoreForGameRecord!.owner = playerActivity?[0]
-                            realmSync!.add(self!.bestScoreForGameRecord!)
+                    try! realmSync!.write {
+                        if self!.bestScoreSync!.count == 0 {
+                            let bestScoreSyncRecord = BestScoreSync()
+                            bestScoreSyncRecord.gameNumber = gameNumber
+                            bestScoreSyncRecord.language = language
+                            bestScoreSyncRecord.playerName = myName
+                            bestScoreSyncRecord.combinedPrimary = combinedPrimarySync
+                            bestScoreSyncRecord.finished = false
+                            bestScoreSyncRecord.score = 0
+                            bestScoreSyncRecord.usedTime = 0
+                            bestScoreSyncRecord.owner = playerActivity?[0]
+                            realmSync!.add(bestScoreSyncRecord)
                         }
                     }
-                    self!.syncedRecordsOK = self!.bestScoreForGameRecord != nil
+                } else {
+                    print("state: \(state)")
+                }
+                
+            }
+            bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
+
+            bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "ForGameRecord:\(combinedPrimaryForGame)")
+            forGameSubscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
+                //                print("in Subscription!")
+                if state == .complete {
+                    if self!.bestScoreForGame!.count == 0 {
+                        try! realmSync!.write {
+                            let bestScoreForGameRecord = BestScoreForGame()
+                            bestScoreForGameRecord.gameNumber = gameNumber
+                            bestScoreForGameRecord.language = language
+                            bestScoreForGameRecord.combinedPrimary = combinedPrimaryForGame
+                            bestScoreForGameRecord.bestScore = 0
+                            bestScoreForGameRecord.owner = playerActivity?[0]
+                            realmSync!.add(bestScoreForGameRecord)
+                        }
+                    }
+                    self!.syncedRecordsOK = self!.bestScoreForGame!.count > 0
                     self!.waitingForSynceRecords = !self!.syncedRecordsOK
+                    self!.bestScoreForGameToken = self!.bestScoreForGame!.observe { [weak self] (changes) in
+                        switch changes {
+                        case .initial:
+                            // Results are now populated and can be accessed without blocking the UI
+                            //                showPlayerActivityView.reloadData()
+                            self!.modifyHeader()
+                            print("Initial Data displayed")
+                        case .update(_, _, _, let modifications):
+                            if modifications.count > 0 {
+                                print("modified: \(self!.bestScoreForGame![0].bestScore)")
+                                self!.modifyHeader()
+                            }
+                        case .error(let error):
+                            // An error occurred while opening the Realm file on the background worker thread
+                            fatalError("\(error)")
+                        }
+                    }
+                    
                 } else {
                     print("state: \(state)")
                 }
             }
+            
+
         }
     }
 
     private func saveToRealmCloud(finished: Bool = false) {
-        if realmSync != nil {
-                let gameNumber = String(GV.playingRecord.gameNumber % 1000 + 1)
-                let language = GV.language.getText(.tcAktLanguage)
-                let myName = GV.basicDataRecord.myName
-                let combinedPrimarySync = gameNumber + language + myName
-                let combinedPrimaryForGame = gameNumber + language
-                bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimarySync)
-                bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
-                bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "My\(gameNumber)\(language)ScoreRecord")
-                subscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
-//                    print("in Subscription!")
-                    if state == .complete {
-                         try! realmSync!.write {
-                            if self!.bestScoreSync!.count > 0 {
-                                self!.bestScoreSyncRecord = self!.bestScoreSync![0]
-                            }
-                            if self!.bestScoreSyncRecord == nil {
-                                self!.bestScoreSyncRecord = BestScoreSync()
-                                self!.bestScoreSyncRecord!.gameNumber = gameNumber
-                                self!.bestScoreSyncRecord!.language = language
-                                self!.bestScoreSyncRecord!.playerName = myName
-                                self!.bestScoreSyncRecord!.combinedPrimary = gameNumber + language + myName
-                                self!.bestScoreSyncRecord!.finished = finished
-                                self!.bestScoreSyncRecord!.owner = playerActivity?[0]
-                                realmSync!.add(self!.bestScoreSyncRecord!)
-                            }
-                            self!.bestScoreSyncRecord!.score = WTGameWordList.shared.getScore(forAll:true)
-                            self!.bestScoreSyncRecord!.usedTime = self!.timeForGame.time
-                            print ("owner nickName: \(String(describing: self!.bestScoreSyncRecord!.owner!.nickName!))")
-                        }
-                    } else {
-                        print("state: \(state)")
-                    }
-
-                }
-            bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "My\(gameNumber)\(language)BestScoreForGameRecord")
-            subscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
-//                print("in Subscription!")
-                if state == .complete {
-                    try! realmSync!.write {
-                        if self!.bestScoreForGame!.count > 0 {
-                            self!.bestScoreForGameRecord = self!.bestScoreForGame![0]
-                        }
-                        if self!.bestScoreForGameRecord == nil {
-                            self!.bestScoreForGameRecord = BestScoreForGame()
-                            self!.bestScoreForGameRecord!.gameNumber = gameNumber
-                            self!.bestScoreForGameRecord!.language = language
-//                            self!.bestScoreForGameRecord!.bestPlayerName = myName
-                            self!.bestScoreForGameRecord!.combinedPrimary = gameNumber + language
-                            self!.bestScoreForGameRecord!.bestScore = 0
-                            self!.bestScoreForGameRecord!.owner = playerActivity?[0]
-                            realmSync!.add(self!.bestScoreForGameRecord!)
-                        }
-                        if WTGameWordList.shared.getScore(forAll:true) > self!.bestScoreForGameRecord!.bestScore {
-//                            self!.bestScoreForGameRecord!.bestPlayerName = myName
-                            self!.bestScoreForGameRecord!.bestScore = WTGameWordList.shared.getScore(forAll:true)
-                            self!.bestScoreForGameRecord!.timeStamp = Date()
-                            self!.bestScoreForGameRecord!.owner = playerActivity?[0]
-                        }
-                     }
-                } else {
-                    print("state: \(state)")
+        if self.syncedRecordsOK {
+            try! realmSync!.write {
+                self.bestScoreSync![0].score = WTGameWordList.shared.getScore(forAll:true)
+                self.bestScoreSync![0].usedTime = self.timeForGame.time
+                if WTGameWordList.shared.getScore(forAll:true) > self.bestScoreForGame![0].bestScore {
+                    self.bestScoreForGame![0].bestScore = WTGameWordList.shared.getScore(forAll:true)
+                    self.bestScoreForGame![0].timeStamp = Date()
+                    self.bestScoreForGame![0].owner = playerActivity?[0]
                 }
             }
-
         }
     }
-    
     private func checkIfGameFinished()->Bool {
 //        if GV.allMandatoryWordsFounded() {
         if WTGameWordList.shared.gameFinished() {
@@ -1878,56 +1856,54 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     }
     
     private func generateArrayOfWordPieces()->String {
+        var allLettersTable = [String]()
+        var origAllLettersTable = [String]()
         let gameNumber =  GV.playingRecord.gameNumber
         let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
         let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
         let random = MyRandom(gameNumber: gameNumber)
-        func getLetters( from: inout [String], archiv: inout [String])->[String] {
-            
-            if from.count == 0 {
-                repeat {
-                    let archivIndex = random.getRandomInt(0, max: archiv.count - 1)
-                    let item = archiv[archivIndex]
-                    archiv.remove(at: archivIndex)
-                    from.append(item)
-                } while archiv.count > 0
-                //                for item in archiv {
-                //                    from.append(item)
-                //                }
-                //                archiv.removeAll()
-            }
-            let index = random.getRandomInt(0, max: from.count - 1)
-            let temp = from[index]
+        func getLetters(length: Int)->[String] {
             var piece = [String]()
-            piece.append(temp.subString(startPos:0, length: 1))
-            if temp.count == 2 {
-                piece.append(temp.subString(startPos:1, length: 1))
+            for _ in 0..<length {
+                if allLettersTable.count == 0 {
+                    allLettersTable = origAllLettersTable
+                }
+                let index = random.getRandomInt(0, max: allLettersTable.count - 1)
+                let letter = allLettersTable[index]
+                allLettersTable.remove(at: index)
+                piece.append(letter)
             }
-            archiv.append(temp)
-            from.remove(at: index)
             return piece
         }
         tilesForGame.removeAll()
         var oneLetterPieces = [String]()
-        var oneLetterPiecesArchiv = [String]()
-        var twoLetterPieces = [String]()
-        var twoLetterPiecesArchiv = [String]()
+//        var oneLetterPiecesArchiv = [String]()
+//        var twoLetterPieces = [String]()
+//        var twoLetterPiecesArchiv = [String]()
         var letterFrequencyTable = [String:Int]()
         var mandatoryLetterFrequencyTable = [String:Int]()
         var countMandatoryLetters = 0
-        let letterFrequencyRecords = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", GV.language.getText(.tcAktLanguage) + GV.frequencyString)
+//        let letterFrequencyRecords = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", GV.language.getText(.tcAktLanguage) + GV.frequencyString)
         // calculating letterFrequency
-        for record in letterFrequencyRecords {
-            let separatedValues = record.word.components(separatedBy: itemSeparator)
-            let char = separatedValues[1].uppercased()
-            let specChar = char == " " || char == "," || char == "<" || char == "." || char == "÷" || char == "È" || char == "Ò" || char == "'"
-            if !specChar {
-                letterFrequencyTable[separatedValues[1].uppercased()] = Int(Double(separatedValues[2])!)
-            } else {
-                print(char)
-            }
-        }
+//        for record in letterFrequencyRecords {
+//            let separatedValues = record.word.components(separatedBy: itemSeparator)
+//            let char = separatedValues[1].uppercased()
+//            let specChar = char == " " || char == "," || char == "<" || char == "." || char == "÷" || char == "È" || char == "Ò" || char == "'"
+//            if !specChar {
+//                letterFrequencyTable[separatedValues[1].uppercased()] = Int(Double(separatedValues[2])!)
+//            } else {
+//                print(char)
+//            }
+//        }
         // fill mandatoryLetterFrequencyTable with 0 for all letters
+        let innerSeparator = "°"
+        let letterSeparator = "/"
+        let letterFrequency = GV.language.getText(.tcFrequency)
+        let letterTable = letterFrequency.components(separatedBy: letterSeparator)
+        for letterWithFrequency in letterTable {
+            let letterComponents = letterWithFrequency.components(separatedBy:innerSeparator)
+            letterFrequencyTable[letterComponents[0]] = Int(letterComponents[1])
+        }
         for (letter, _) in letterFrequencyTable {
             mandatoryLetterFrequencyTable[letter] = 0
         }
@@ -1947,19 +1923,32 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             mandatoryLetterFrequencyTable[letter] = newValue
             allProcent += newValue
         }
-        
-        for word in words {
-            for index in 0..<word.count / 2 {
-                if !twoLetterPieces.contains(where: {$0 == word.subString(startPos: index * 2, length: 2).uppercased()}) {
-                    twoLetterPieces.append(word.subString(startPos: index * 2, length: 2).uppercased())
-                    for letter in twoLetterPieces.last! {
-                        if mandatoryLetterFrequencyTable[String(letter)]! > 0 {
-                            mandatoryLetterFrequencyTable[String(letter)]! -= 1
-                        }
-                    }
-                }
+        for (letter, frequency) in letterFrequencyTable {
+            if mandatoryLetterFrequencyTable[letter]! > frequency {
+                letterFrequencyTable[letter] = mandatoryLetterFrequencyTable[letter]
             }
         }
+        for (letter, frequency) in letterFrequencyTable {
+            for _ in 0..<frequency {
+                origAllLettersTable.append(letter)
+            }
+        }
+        allLettersTable = origAllLettersTable
+        
+
+        
+//        for word in words {
+//            for index in 0..<word.count / 2 {
+//                if !twoLetterPieces.contains(where: {$0 == word.subString(startPos: index * 2, length: 2).uppercased()}) {
+//                    twoLetterPieces.append(word.subString(startPos: index * 2, length: 2).uppercased())
+//                    for letter in twoLetterPieces.last! {
+//                        if mandatoryLetterFrequencyTable[String(letter)]! > 0 {
+//                            mandatoryLetterFrequencyTable[String(letter)]! -= 1
+//                        }
+//                    }
+//                }
+//            }
+//        }
         for (letter, counter) in mandatoryLetterFrequencyTable {
             for _ in 0..<counter {
                 oneLetterPieces.append(String(letter))
@@ -1995,6 +1984,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             default:      lengths.append(4)
             }
         }
+
         var generateLength = 0
         repeat {
             let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
@@ -2002,15 +1992,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             var letters = [String]()
             switch tileLength {
             case 1: tileType = typesWithLen1[0]
-            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
+            letters += getLetters(length: 1)
             case 2: tileType = typesWithLen2[0]
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+            letters += getLetters(length: 2)
             case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
+            letters += getLetters(length:3)
             case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
+            letters += getLetters(length:4)
             default: break
             }
             let rotateIndex = random.getRandomInt(0, max: 3)
