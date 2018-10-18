@@ -20,6 +20,11 @@ let itemInnerSeparator = "^"
 enum GameType: Int {
     case WordTris = 1, SearchWords, NoMoreGames
 }
+
+enum GameDifficulty: Int {
+    case Easy = 0, Medium, Hard, VeryHard
+}
+
 let NoValue = -1
 var myWidth: CGFloat = 0
 var myHeight: CGFloat = 0 
