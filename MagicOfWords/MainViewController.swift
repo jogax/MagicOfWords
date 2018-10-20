@@ -10,19 +10,26 @@ import UIKit
 import SpriteKit
 import GameplayKit
 import RealmSwift
+import Reachability
 
 
 class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, ShowFinishedGamesSceneDelegate, SettingsSceneDelegate {
     func chooseNickname() {
-        let alertController = UIAlertController(title: GV.language.getText(.tcSetNickName), message: "", preferredStyle: .alert)
+        let alertController = UIAlertController(title: GV.language.getText(.tcSetNickName),
+                                                message: GV.language.getText(.tcAddCodeRecommended),
+                                                preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: GV.language.getText(.tcSave), style: .default, handler: { [unowned self]
             alert -> Void in
-            let textField = alertController.textFields![0] as UITextField
-            self.setNickname(nickName: textField.text!)
+            let nickNameField = alertController.textFields![0] as UITextField
+            let keyWordField = alertController.textFields![0] as UITextField
+           self.setNickname(nickName: nickName.text!, keyWord: keyWordField.text)
         }))
-        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
         alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
             textField.text = playerActivity![0].nickName
+        })
+        alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
+            textField.text = GV.basicDataRecord.keyWord == "" ? GV.language.getText(.tcKeyWord) : GV.basicDataRecord.keyWord
         })
         self.present(alertController, animated: true, completion: nil)
         
@@ -141,6 +148,30 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         startMenuScene()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: reachability)
+        do{
+            try reachability.startNotifier()
+        }catch{
+            print("could not start reachability notifier")
+        }
+    }
+    
+    
+    @objc func reachabilityChanged(note: Notification) {
+        
+        let reachability = note.object as! Reachability
+        
+        switch reachability.connection {
+        case .wifi:
+            GV.connectedToInternet = true
+        case .cellular:
+            GV.connectedToInternet = true
+        case .none:
+            GV.connectedToInternet = false
+        }
+    }
+    
     func startMenuScene(showMenu: Bool = false) {
         let menuScene = MenuScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
@@ -234,14 +265,19 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     //        }
     //    }
     
-    func setNickname(nickName: String) {
+    var playerActivityByNickName: Results<PlayerActivity>?
+    func setNickname(nickName: String, keyWord: String) {
         if GV.myUser != nil {
-            try! realmSync?.write {
-                if playerActivity?.count == 0 {
-                } else {
-                    playerActivity![0].nickName = nickName
+            playerActivityByNickName = realmSync?.objects(PlayerActivity.self).filter("nickName = %@ and name != %@", nickName, GV.basicDataRecord.myName)
+            if playerActivityByNickName!.count == 0 {
+                try! realmSync?.write {
+                    if playerActivity?.count == 0 {
+                    } else {
+                        playerActivity![0].nickName = nickName
+                    }
                 }
             }
+        } else {
             
         }
         try! realm.write {

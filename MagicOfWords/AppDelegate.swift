@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import Reachability
 
 // for Standard Using
 //#if !GENERATEWORDLIST && !GENERATEMANDATORY
@@ -29,12 +30,11 @@ var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfigur
 #endif
 var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
 var playerActivity: Results<PlayerActivity>? // = realmSync.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
-
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,
     objectTypes: [WordListModel.self])
-
+let reachability = Reachability()!
 // Open the Realm with the configuration
 let realmWordList:Realm = try! Realm(configuration: wordListConfig)
 
@@ -59,7 +59,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 5,
+            schemaVersion: 6,
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
@@ -82,6 +82,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Tell Realm to use this new configuration object for the default Realm
         Realm.Configuration.defaultConfiguration = config
         loginToRealmSync()
+        reachability.whenReachable = { reachability in
+            if reachability.connection == .wifi {
+                print("Reachable via WiFi")
+            } else {
+                print("Reachable via Cellular")
+            }
+        }
+        reachability.whenUnreachable = { _ in
+            print("Not reachable")
+        }
+        
+        do {
+            try reachability.startNotifier()
+        } catch {
+            print("Unable to start notifier")
+        }
         
         return true
         

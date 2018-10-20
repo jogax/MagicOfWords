@@ -14,6 +14,7 @@ class PlayerActivity: Object {
     // Specify properties to ignore (Realm won't persist these)
     @objc dynamic var name: String = UUID().uuidString
     @objc dynamic var nickName: String?
+    @objc dynamic var keyWord: String?
     @objc dynamic var isOnline: Bool = false
     @objc dynamic var onlineSince: Date?
     @objc dynamic var onlineTime: Int = 0

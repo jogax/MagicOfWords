@@ -70,4 +70,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcOnlineTime:          "Время_в_сети  ",
     .tcSetNickName:         "Выбери псевдоним",
     .tcSave:                "Сохранить",
+    .tcAddCodeRecommended:  "Если вы добавите ключевое слово, вы можете использовать один и тот же псевдоним на всех ваших устройствах",
+    .tcKeyWord:             "Добавить ключевое слово ...",
 ]

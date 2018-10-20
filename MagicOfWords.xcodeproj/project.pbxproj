@@ -23,6 +23,7 @@
 		201FB1DE20288CEA00EC9F36 /* en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D220288CEA00EC9F36 /* en.swift */; };
 		201FB1DF20288CEA00EC9F36 /* de.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D320288CEA00EC9F36 /* de.swift */; };
 		201FB1E020288CEA00EC9F36 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D420288CEA00EC9F36 /* Language.swift */; };
+		20437F9A217B793100F16F99 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20437F99217B793100F16F99 /* Reachability.framework */; };
 		20439FEF20BC40DB00D44286 /* Versions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20439FEE20BC40DB00D44286 /* Versions.txt */; };
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
 		204A8ADA2029EE6000E9C11F /* WTScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WTScene.swift */; };
@@ -126,6 +127,7 @@
 		201FB1D220288CEA00EC9F36 /* en.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = en.swift; sourceTree = "<group>"; };
 		201FB1D320288CEA00EC9F36 /* de.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = de.swift; sourceTree = "<group>"; };
 		201FB1D420288CEA00EC9F36 /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
+		20437F99217B793100F16F99 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		20439FEE20BC40DB00D44286 /* Versions.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Versions.txt; sourceTree = "<group>"; };
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
 		204A8AD92029EE6000E9C11F /* WTScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTScene.swift; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20437F9A217B793100F16F99 /* Reachability.framework in Frameworks */,
 				2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */,
 				20F176072162688F00AF37D7 /* RealmSwift.framework in Frameworks */,
 				2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */,
@@ -313,6 +316,7 @@
 		2057BA262029F57B000DF337 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				20437F99217B793100F16F99 /* Reachability.framework */,
 				2057BA292029F591000DF337 /* GameKit.framework */,
 				2057BA272029F57B000DF337 /* StoreKit.framework */,
 			);
@@ -504,6 +508,7 @@
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/iOS/Realm.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/RealmSwift.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/Reachability.framework",
 			);
 			outputFileListPaths = (
 			);

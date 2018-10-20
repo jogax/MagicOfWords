@@ -69,5 +69,7 @@ let huDictionary: [TextConstants: String] = [
     .tcOnlineSince:         "Mióta_Online",
     .tcOnlineTime:          "Online_idő  ",
     .tcSetNickName:         "Válassz becenevet",
-    .tcSave:                "Mentés"
+    .tcSave:                "Mentés",
+    .tcAddCodeRecommended:  "Ha hozzáad egy kulcsszót, akkor ugyanazt a becenevet használhatja az összes eszközén",
+    .tcKeyWord:             "Kulcsszó hozzáadása ...",
 ]

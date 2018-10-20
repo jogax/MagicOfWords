@@ -53,6 +53,7 @@ struct GV {
 //    static var loadingScene: LoadingScene?
     static var gameNumber = 0
 //    static var gameType = 0
+    static var connectedToInternet = false
     static let onIpad = UIDevice.current.model.hasSuffix("iPad")
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static var activated = false

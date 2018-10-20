@@ -70,4 +70,6 @@ let enDictionary: [TextConstants: String] = [
     .tcOnlineTime:          "Online_time  ",
     .tcSetNickName:         "Choose a nickname",
     .tcSave:                "Save",
+    .tcAddCodeRecommended:  "If you add a keyword, you can use the same nickname on all of your devices",
+    .tcKeyWord:             "Add a keyword...",
 ]

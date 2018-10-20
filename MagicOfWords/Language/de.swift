@@ -70,6 +70,8 @@ let deDictionary: [TextConstants: String] = [
     .tcOnlineTime:          "Onlinezeit  ",
     .tcSetNickName:         "Spitzname ändern",
     .tcSave:                "Speichern",
+    .tcAddCodeRecommended:  "Wenn Sie ein Keyword hinzufügen, können Sie auf allen Ihren Geräten denselben Benutzernamen verwenden",
+    .tcKeyWord:             "Fügen Sie ein Keyword hinzu ...",
 ]
 
 

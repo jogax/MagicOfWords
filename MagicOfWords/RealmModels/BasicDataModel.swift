@@ -14,6 +14,7 @@ class BasicDataModel: Object {
     @objc dynamic var actLanguage = ""
     @objc dynamic var myName = ""
     @objc dynamic var myNickname = ""
+    @objc dynamic var keyWord = ""
     @objc dynamic var difficulty = 0
     override  class func primaryKey() -> String {
         return "ID"

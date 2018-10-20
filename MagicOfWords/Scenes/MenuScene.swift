@@ -44,7 +44,7 @@ class MenuScene: SKScene {
         _ = createMenuItem(menuInt: .tcFinished, count: count)
         //        createMenuItem(menuInt: .tcSettings, showValue: true, touchbar: false)
         _ = createMenuItem(menuInt: .tcChooseLanguage, showValue: false, touchbar: true)
-        nickNameItem = createMenuItem(menuInt: .tcSetNickName, showValue: false, touchbar: GV.myUser != nil)
+        nickNameItem = createMenuItem(menuInt: .tcSetNickName, showValue: false, touchbar: /*GV.myUser != nil*/ GV.connectedToInternet)
         #if DEBUG
         showRealmCloudItem = createMenuItem(menuInt: .tcShowRealmCloud, showValue: false, touchbar: GV.myUser != nil)
         #endif

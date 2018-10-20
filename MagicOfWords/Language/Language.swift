@@ -71,7 +71,9 @@ enum TextConstants: Int {
     tcOnlineSince,
     tcOnlineTime,
     tcSetNickName,
-    tcSave
+    tcSave,
+    tcAddCodeRecommended,
+    tcKeyWord
 }
 
     let LanguageEN = "en" // index 0
