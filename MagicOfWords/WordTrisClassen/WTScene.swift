@@ -1559,7 +1559,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 
             }
             bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
-
             bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "ForGameRecord:\(combinedPrimaryForGame)")
             forGameSubscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
                 //                print("in Subscription!")

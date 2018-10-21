@@ -28,8 +28,8 @@ import Reachability
 #if !GENERATELETTERFREQUENCY && !GENERATEWORDLIST && !GENERATEMANDATORY
 var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
 #endif
-var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
 var playerActivity: Results<PlayerActivity>? // = realmSync.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
+var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,
@@ -161,7 +161,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
-    
+    var playerActivitySubscription: SyncSubscription<PlayerActivity>?
+    var playerActivityToken: NotificationToken?
+
     func setConnection() {
         if GV.myUser == nil {
             return
@@ -174,17 +176,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //        let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
         realmSync = RealmService
         if playerActivity == nil {
-            playerActivity = realmSync?.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
-        }
-        if playerActivity?.count == 0 {
-            try! realmSync?.write {
-                let playerActivityItem = PlayerActivity()
-                playerActivityItem.name = GV.basicDataRecord.myName
-                playerActivityItem.nickName = GV.basicDataRecord.myNickname
-                playerActivityItem.isOnline = true
-                playerActivityItem.onlineSince = getLocalDate()
-                playerActivityItem.onlineTime = 0
-                realmSync?.add(playerActivityItem)
+            playerActivity = realmSync!.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
+            playerActivitySubscription = playerActivity!.subscribe(named: "PlayerActivity:\(GV.basicDataRecord.myName)")
+            playerActivityToken = playerActivitySubscription!.observe(\.state) { /*[weak self]*/  state in
+                //                    print("in Subscription!")
+                if state == .complete {
+                    if playerActivity?.count == 0 {
+                        try! realmSync?.write {
+                            let playerActivityItem = PlayerActivity()
+                            playerActivityItem.name = GV.basicDataRecord.myName
+                            playerActivityItem.nickName = GV.basicDataRecord.myNickname
+                            playerActivityItem.isOnline = true
+                            playerActivityItem.onlineSince = getLocalDate()
+                            playerActivityItem.onlineTime = 0
+                            realmSync?.add(playerActivityItem)
+                        }
+                    }
+                } else {
+                    print("state: \(state)")
+                }
             }
         }
         setIsOnline()

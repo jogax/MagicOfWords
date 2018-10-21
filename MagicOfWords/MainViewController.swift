@@ -14,6 +14,7 @@ import Reachability
 
 
 class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, ShowFinishedGamesSceneDelegate, SettingsSceneDelegate {
+    
     func chooseNickname() {
         let alertController = UIAlertController(title: GV.language.getText(.tcSetNickName),
                                                 message: GV.language.getText(.tcAddCodeRecommended),
@@ -21,15 +22,19 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         alertController.addAction(UIAlertAction(title: GV.language.getText(.tcSave), style: .default, handler: { [unowned self]
             alert -> Void in
             let nickNameField = alertController.textFields![0] as UITextField
-            let keyWordField = alertController.textFields![0] as UITextField
-           self.setNickname(nickName: nickName.text!, keyWord: keyWordField.text)
+            let keyWordField = alertController.textFields![1] as UITextField
+            self.setNickname(nickName: nickNameField.text!, keyWord: keyWordField.text!)
         }))
-        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
+        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: nil))
         alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
             textField.text = playerActivity![0].nickName
         })
         alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
-            textField.text = GV.basicDataRecord.keyWord == "" ? GV.language.getText(.tcKeyWord) : GV.basicDataRecord.keyWord
+            if GV.basicDataRecord.keyWord == "" {
+                textField.placeholder = GV.language.getText(.tcKeyWord)
+            } else {
+                textField.text = GV.basicDataRecord.keyWord
+            }
         })
         self.present(alertController, animated: true, completion: nil)
         
@@ -266,24 +271,65 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     //    }
     
     var playerActivityByNickName: Results<PlayerActivity>?
+    var playerActivityByNickNameSubscription: SyncSubscription<PlayerActivity>?
+    var playerActivityByNickNameToken: NotificationToken?
     func setNickname(nickName: String, keyWord: String) {
+        if playerActivity!.count == 0 {
+            return
+        }
         if GV.myUser != nil {
+            playerActivity = realmSync!.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
             playerActivityByNickName = realmSync?.objects(PlayerActivity.self).filter("nickName = %@ and name != %@", nickName, GV.basicDataRecord.myName)
-            if playerActivityByNickName!.count == 0 {
-                try! realmSync?.write {
-                    if playerActivity?.count == 0 {
+            playerActivityByNickNameSubscription = playerActivityByNickName!.subscribe(named: "PlayerActivityByNickName:\(nickName)")
+            playerActivityByNickNameToken = playerActivityByNickNameSubscription!.observe(\.state) { [weak self]  state in
+                if state == .complete {
+                    if self!.playerActivityByNickName!.count == 0 {
+                        try! realmSync?.write {
+                            playerActivity![0].nickName = nickName
+                            playerActivity![0].keyWord = keyWord
+                        }
+                        try! realm.write {
+                            GV.basicDataRecord.myNickname = nickName
+                            GV.basicDataRecord.keyWord = keyWord
+                        }
                     } else {
-                        playerActivity![0].nickName = nickName
+                        if self!.playerActivityByNickName![0].keyWord == nil || self!.playerActivityByNickName![0].keyWord == "" {
+                            let alertController = UIAlertController(title: GV.language.getText(.tcNicknameUsed),
+                                                                    message: GV.language.getText(.tcNicknameActivating),
+                                                                    preferredStyle: .alert)
+                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: nil))
+                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
+                            self!.present(alertController, animated: true, completion: nil)
+                        } else {
+                            if self!.playerActivityByNickName![0].keyWord == keyWord {
+                                try! realmSync?.write {
+                                    playerActivity![0].nickName = nickName
+                                    playerActivity![0].keyWord = keyWord
+                                }
+                                try! realm.write {
+                                    GV.basicDataRecord.myNickname = nickName
+                                    GV.basicDataRecord.keyWord = keyWord
+                                }
+                            } else {
+                                let alertController = UIAlertController(title: GV.language.getText(.tcNicknameUsed),
+                                                                        message: GV.language.getText(.tcAddKeyWord),
+                                                                        preferredStyle: .alert)
+                                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: nil))
+                                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
+                                self!.present(alertController, animated: true, completion: nil)
+                            }
+                        }
                     }
+                    self!.playerActivityByNickNameSubscription!.unsubscribe()
+                    self!.playerActivityByNickNameToken!.invalidate()
+                } else {
+                    print("state: \(state)")
                 }
             }
         } else {
             
         }
-        try! realm.write {
-            GV.basicDataRecord.myNickname = nickName
-        }
-    }
+     }
     
     //    func setIsOnline() {
     ////        let syncConfig: SyncConfiguration = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL)

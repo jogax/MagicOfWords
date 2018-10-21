@@ -72,4 +72,7 @@ let huDictionary: [TextConstants: String] = [
     .tcSave:                "Mentés",
     .tcAddCodeRecommended:  "Ha hozzáad egy kulcsszót, akkor ugyanazt a becenevet használhatja az összes eszközén",
     .tcKeyWord:             "Kulcsszó hozzáadása ...",
+    .tcNicknameUsed:        "A becenevet másik eszközön használják!",
+    .tcNicknameActivating:  "Ha ez a te másik eszközöd, nyisd meg az eszközt, és adj egy kulcsszót becenévhez!",
+    .tcAddKeyWord:          "Ha ez a te másik eszközöd, írd be itt ugyanazt a kulcsszót, egyébként válassz más becenevet!"
 ]

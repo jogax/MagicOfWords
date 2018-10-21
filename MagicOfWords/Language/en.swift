@@ -72,4 +72,7 @@ let enDictionary: [TextConstants: String] = [
     .tcSave:                "Save",
     .tcAddCodeRecommended:  "If you add a keyword, you can use the same nickname on all of your devices",
     .tcKeyWord:             "Add a keyword...",
+    .tcNicknameUsed:        "Nickname is used on another device!",
+    .tcNicknameActivating:  "If this is your device, open it and add a keyword to the nickname!",
+    .tcAddKeyWord:          "If this is your device, add hier the same keyword otherwise choose another nickname!"
 ]

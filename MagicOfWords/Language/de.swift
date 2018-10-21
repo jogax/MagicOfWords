@@ -72,6 +72,9 @@ let deDictionary: [TextConstants: String] = [
     .tcSave:                "Speichern",
     .tcAddCodeRecommended:  "Wenn Sie ein Keyword hinzufügen, können Sie auf allen Ihren Geräten denselben Benutzernamen verwenden",
     .tcKeyWord:             "Fügen Sie ein Keyword hinzu ...",
+    .tcNicknameUsed:        "Spitzname wird auf einem anderen Gerät verwendet!",
+    .tcNicknameActivating:  "Wenn dies Ihr Gerät ist, öffnen Sie es und fügen Sie ein Schlüsselwort dem Spitzname hinzu!",
+    .tcAddKeyWord:          "Wenn dies Ihr Gerät ist, fügen Sie hier dasselbe Schlüsselwort hinzu, ansonsten wählen Sie einen anderen Spitznamen!"
 ]
 
 
