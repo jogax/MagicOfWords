@@ -38,7 +38,7 @@ let enDictionary: [TextConstants: String] = [
     .tcWordsToCollect:    "Words to collect: (% / % / % / %)",
     .tcOwnWords:          "My own words (% / % / %)",
     .tcNoMoreSteps:       "Congratulations, you've finished the game!",
-    .tcBestScore:          "Best score",
+    .tcBestScore:          "Best scores",
     .tcBestPlayer:         "Best player",
     .tcCollectedRequiredWords: "Mandatory words",
     .tcCollectedOwnWords:   "Own words",
@@ -74,5 +74,6 @@ let enDictionary: [TextConstants: String] = [
     .tcKeyWord:             "Add a keyword...",
     .tcNicknameUsed:        "Nickname is used on another device!",
     .tcNicknameActivating:  "If this is your device, open it and add a keyword to the nickname!",
-    .tcAddKeyWord:          "If this is your device, add hier the same keyword otherwise choose another nickname!"
+    .tcAddKeyWord:          "If this is your device, add hier the same keyword otherwise choose another nickname!",
+    .tcChooseAction:        "Choose please!",
 ]

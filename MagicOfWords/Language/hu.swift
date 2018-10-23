@@ -38,7 +38,7 @@ let huDictionary: [TextConstants: String] = [
     .tcWordsToCollect:    "Kirakandó szavak: (% / % / % / %)",
     .tcOwnWords:          "Saját szavaim (% / % / %)",
     .tcNoMoreSteps:       "Gratulálok, befejezted a játékot!",
-    .tcBestScore:              "Legjobb Eredm.",
+    .tcBestScore:         "Legjobb eredmények",
     .tcBestPlayer:        "Legjobb játékos",
     .tcCollectedRequiredWords:  "Kötelező szavak",
     .tcCollectedOwnWords:       "Saját szavak",
@@ -74,5 +74,6 @@ let huDictionary: [TextConstants: String] = [
     .tcKeyWord:             "Kulcsszó hozzáadása ...",
     .tcNicknameUsed:        "A becenevet másik eszközön használják!",
     .tcNicknameActivating:  "Ha ez a te másik eszközöd, nyisd meg az eszközt, és adj egy kulcsszót becenévhez!",
-    .tcAddKeyWord:          "Ha ez a te másik eszközöd, írd be itt ugyanazt a kulcsszót, egyébként válassz más becenevet!"
+    .tcAddKeyWord:          "Ha ez a te másik eszközöd, írd be itt ugyanazt a kulcsszót, egyébként válassz más becenevet!",
+    .tcChooseAction:        "Válassz!",
 ]

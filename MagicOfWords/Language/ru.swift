@@ -39,7 +39,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcOwnWords:          "Мои слова (% / % / %)",
     .tcNoMoreSteps:       "Поздравляю, ты закончил игру!",
     .tcBestPlayer:        "Лучший игрок",
-    .tcBestScore:             "Лучшие очки:",
+    .tcBestScore:         "Лучшие результаты",
     .tcCollectedRequiredWords: "Обязательные слова",
     .tcCollectedOwnWords:      "Собственные слова",
     .tcTotal:               "Всего:",
@@ -74,5 +74,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcKeyWord:             "Добавить ключевое слово ...",
     .tcNicknameUsed:        "Псевдоним используется на другом устройстве!",
     .tcNicknameActivating:  "Если это твоё устройство, открой его и добавь ключевое слово к псевдониму!",
-    .tcAddKeyWord:          "Если это твоё устройство, добавь тут то же ключевое слово, иначе выбери другой псевдоним!"
+    .tcAddKeyWord:          "Если это твоё устройство, добавь тут то же ключевое слово, иначе выбери другой псевдоним!",
+    .tcChooseAction:        "Выбери пожалуйста!",
 ]

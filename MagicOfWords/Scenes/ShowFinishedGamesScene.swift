@@ -9,6 +9,7 @@
 import Foundation
 import GameKit
 import UIKit
+import RealmSwift
 
 public protocol ShowFinishedGamesSceneDelegate: class {
     func backToMenuScene()
@@ -91,7 +92,7 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
             var item = FinishedGameData()
             item.gameNumber = String((finishedGame.gameNumber % 1000) + 1)
             item.score = String(finishedGame.score)
-            (item.bestPlayer, item.bestScore) = getDataFromRealm(finishedGame: finishedGame)
+            (item.bestPlayer, item.bestScore) = getDataFromRealmCloud(finishedGame: finishedGame)
             returnArray.append(item)
         }
         return returnArray
@@ -181,8 +182,32 @@ class ShowFinishedGamesScene: SKScene, WTTableViewDelegate {
     }
     
 
-    private func getDataFromRealm(finishedGame: GameDataModel)->(String, String) {
-        return (GV.language.getText(.tcMe), String(finishedGame.score))
+    private func getDataFromRealmCloud(finishedGame: GameDataModel)->(String, String) {
+        var bestPlayerName = ""
+        var bestScore = ""
+        if GV.myUser != nil {
+            var bestScoreForGame: Results<BestScoreForGame>?
+//            var bestScoreForGameToken: NotificationToken?
+            var bestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
+            var forGameSubscriptionToken: NotificationToken?
+            let combinedPrimaryForGame = String((finishedGame.gameNumber % 1000) + 1) + finishedGame.language
+            bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
+            bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "FinishedRecord:\(combinedPrimaryForGame)")
+            forGameSubscriptionToken = bestScoreForGameSubscription!.observe(\.state) { state in
+                if state == .complete {
+                    if bestScoreForGame!.count > 0 {
+                        bestPlayerName = bestScoreForGame![0].owner!.nickName!
+                        bestScore = String(bestScoreForGame![0].bestScore)
+                    }
+                    bestScoreForGameSubscription!.unsubscribe()
+
+                } else {
+                    print("state: \(state)")
+                    bestScoreForGameSubscription!.unsubscribe()
+                }
+            }
+        }
+        return (bestPlayerName, bestScore)
     }
 
 

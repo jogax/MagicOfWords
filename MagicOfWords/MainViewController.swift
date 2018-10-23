@@ -11,9 +11,10 @@ import SpriteKit
 import GameplayKit
 import RealmSwift
 import Reachability
+import Security
 
 
-class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, ShowFinishedGamesSceneDelegate, SettingsSceneDelegate {
+class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelegate, ShowFinishedGamesSceneDelegate /*SettingsSceneDelegate*/ {
     
     func chooseNickname() {
         let alertController = UIAlertController(title: GV.language.getText(.tcSetNickName),
@@ -53,8 +54,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         try! realm.write {
             GV.basicDataRecord.actLanguage = GV.aktLanguage
         }
-        
-        startMenuScene()
+        showMenu()
+//        startMenuScene()
     }
     
     func backToMenuScene() {
@@ -62,7 +63,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
             showFinishedGamesScene!.removeFromParent()
             showFinishedGamesScene = nil
         }
-        startMenuScene()
+        showMenu()
+//        startMenuScene()
     }
     
     func showFinishedGames() {
@@ -75,7 +77,7 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     
     func gameFinished(start: StartType) {
         switch start {
-        case .NoMore: startMenuScene(showMenu: true)
+        case .NoMore: showMenu() //startMenuScene(showMenu: true)
         case .PreviousGame, .NextGame: startWTScene(new: false, next: start)
         case .NewGame: startWTScene(new: true, next: .NoMore)
         }
@@ -91,7 +93,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
     
     func cancelChooeseGameType() {
         print("cancel choosed")
-        startMenuScene()
+        showMenu()
+//        startMenuScene()
     }
     
     func xxx() {
@@ -125,17 +128,82 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         startWTScene(new: false, next: .NoMore)
     }
     
-    func startSettings() {
-        let settingsScene = SettingsScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        if let view = self.view as! SKView? {
-            settingsScene.setDelegate(delegate: self)
-            view.presentScene(settingsScene)
-        } else {
-            continueGame()
+    func chooseLanguage() {
+//        let settingsScene = SettingsScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+//        if let view = self.view as! SKView? {
+//            settingsScene.setDelegate(delegate: self)
+//            view.presentScene(settingsScene)
+//        } else {
+//            continueGame()
+//        }
+        //        createMenuItem(menuInt: .tcEnglish, firstLine: true, isActLanguage: GV.language.getText(.tcEnglishShort) == GV.aktLanguage)
+        //        createMenuItem(menuInt: .tcGerman, isActLanguage: GV.language.getText(.tcGermanShort) == GV.aktLanguage)
+        //        createMenuItem(menuInt: .tcHungarian, isActLanguage: GV.language.getText(.tcHungarianShort) == GV.aktLanguage)
+        //        createMenuItem(menuInt: .tcRussian, isActLanguage: GV.language.getText(.tcRussianShort) == GV.aktLanguage)
+        let alertController = UIAlertController(title: GV.language.getText(.tcChooseLanguage),
+                                                message: "",
+                                                preferredStyle: .alert)
+        let englishAction = UIAlertAction(title: GV.language.getText(.tcEnglish), style: .default, handler: {
+            alert -> Void in
+                GV.language.setLanguage(GV.language.getText(.tcEnglishShort))
+                self.showMenu()
+            })
+        if GV.language.getText(.tcEnglishShort) == GV.aktLanguage {
+            englishAction.setValue(UIColor.red, forKey: "TitleTextColor")
         }
+        alertController.addAction(englishAction)
+        
+        let germanAction = UIAlertAction(title: GV.language.getText(.tcGerman), style: .default, handler: {
+            alert -> Void in
+            GV.language.setLanguage(GV.language.getText(.tcGermanShort))
+            self.showMenu()
+        })
+        if GV.language.getText(.tcGermanShort) == GV.aktLanguage {
+            germanAction.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
+        alertController.addAction(germanAction)
+        
+        let hungarianAction = UIAlertAction(title: GV.language.getText(.tcHungarian), style: .default, handler: {
+            alert -> Void in
+            GV.language.setLanguage(GV.language.getText(.tcHungarianShort))
+            self.showMenu()
+        })
+        if GV.language.getText(.tcHungarianShort) == GV.aktLanguage {
+            hungarianAction.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
+        alertController.addAction(hungarianAction)
+        
+        let russianAction = UIAlertAction(title: GV.language.getText(.tcRussian), style: .default, handler: {
+            alert -> Void in
+            GV.language.setLanguage(GV.language.getText(.tcRussianShort))
+            self.showMenu()
+        })
+        if GV.language.getText(.tcRussianShort) == GV.aktLanguage {
+            russianAction.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
+        alertController.addAction(russianAction)
+        let subview = (alertController.view.subviews.first?.subviews.first?.subviews.first!)! as UIView
+        subview.layer.cornerRadius = 15
+        subview.backgroundColor = UIColor(red: (255/255.0), green: (224/255.0), blue: (224/255.0), alpha: 1.0)
+
+        present(alertController, animated: true, completion: nil)
+//        GV.language.setLanguage(GV.language.getText(.tcEnglishShort))
+        //                    case String(TextConstants.tcGerman.rawValue):
+        //                        GV.language.setLanguage(GV.language.getText(.tcGermanShort))
+        //
+        //                    case String(TextConstants.tcHungarian.rawValue):
+        //                        GV.language.setLanguage(GV.language.getText(.tcHungarianShort))
+        //
+        //                    case String(TextConstants.tcRussian.rawValue):
+        //                        GV.language.setLanguage(GV.language.getText(.tcRussianShort))
+        //
+        //                   case String(TextConstants.tcCancel.rawValue):
+        //                        settingsSceneDelegate!.backFromSettingsScene()
+        //
     }
     
-    override func viewDidLoad() {
+//    override func viewDidLoad() {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
         myHeight = self.view.frame.size.height
         myWidth = self.view.frame.size.width
@@ -150,7 +218,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         #endif
         // Get the SKScene from the loaded GKScene
         generateBasicDataRecordIfNeeded()
-        startMenuScene()
+        showMenu()
+//        startMenuScene()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -161,6 +230,8 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
             print("could not start reachability notifier")
         }
     }
+    
+    
     
     
     @objc func reachabilityChanged(note: Notification) {
@@ -177,18 +248,58 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         }
     }
     
-    func startMenuScene(showMenu: Bool = false) {
-        let menuScene = MenuScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        if let view = self.view as! SKView? {
-            let actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
-            if showMenu || actGames.count == 0 {
-                menuScene.setDelegate(delegate: self)
-                view.presentScene(menuScene)
-            } else {
-                continueGame()
-            }
+    func showMenu() {
+        let alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
+                                                message: "",
+                                                preferredStyle: .alert)
+        var count = realm.objects(GameDataModel.self).filter("gameStatus != %d and language = %@", GV.GameStatusNew, GV.aktLanguage).count
+        if count > 0 {
+            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcNewGame), style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.startNewGame()
+            }))
         }
+        count = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusPlaying, GV.aktLanguage).count
+        if count > 0 {
+            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcContinue), style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.continueGame()
+            }))
+        }
+        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.showFinishedGames()
+        }))
+        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.chooseLanguage()
+        }))
+        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.chooseNickname()
+        }))
+        #if DEBUG
+        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.displayCloudRecordsViewController()
+        }))
+        #endif
+        present(alertController, animated: true, completion: nil)
+
     }
+    
+//    func startMenuScene1(showMenu: Bool = false) {
+//        let menuScene = MenuScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+//        if let view = self.view as! SKView? {
+//            let actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
+//            if showMenu || actGames.count == 0 {
+//                menuScene.setDelegate(delegate: self)
+//                view.presentScene(menuScene)
+//            } else {
+//                continueGame()
+//            }
+//        }
+//    }
     
     private func generateBasicDataRecordIfNeeded() {
         try! realm.write {
@@ -224,51 +335,6 @@ class MainViewController: UIViewController, MenuSceneDelegate, WTSceneDelegate, 
         }
         return nickName
     }
-    
-    //    let syncConfig: SyncConfiguration = SyncConfiguration(user: SyncUser.current!, realmURL: GV.REALM_URL)
-    //    var realmSync = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
-    
-    //    var countAllPlayerRecords = realmSync.objects(PlayerActivity.self).count
-    
-    //    private func loginToRealmSync() {
-    //        let userName = "magic-of-words-user"
-    //        let password = "@@@" + userName + "@@@"
-    //        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
-    //        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
-    //            var user1 = user
-    //            if user1 == nil {  // create a new Account
-    //                let signUpCredentials = SyncCredentials.usernamePassword(username: userName, password: password, register: true)
-    //                SyncUser.logIn(with: signUpCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
-    //                    if user1 == nil {
-    //                        user1 = SyncUser.current
-    //                        if user1 == nil {
-    //                            print("Error, user couldn't be created")
-    //                        }
-    //                    } else {
-    //                        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
-    //                        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL) { user, error in
-    //                            if user == nil {
-    //                                print("error after register")
-    //                            } else {
-    //
-    //                                GV.myUser = user
-    //                                realm.beginWrite()
-    //                                GV.basicDataRecord.myName = userName
-    //                                //                print(textField.text)
-    //                                try! realm.commitWrite()
-    //                                self.setIsOnline()
-    //                                print("OK after register")
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //            } else {
-    //                print("OK user exists")
-    //                GV.myUser = user
-    //                self.setIsOnline()
-    //            }
-    //        }
-    //    }
     
     var playerActivityByNickName: Results<PlayerActivity>?
     var playerActivityByNickNameSubscription: SyncSubscription<PlayerActivity>?

@@ -38,7 +38,7 @@ let deDictionary: [TextConstants: String] = [
     .tcWordsToCollect:    "Zu sammelnde Wörter: (% / % / % / %)",
     .tcOwnWords:          "Eigene Wörter (% / % / %)",
     .tcNoMoreSteps:       "Herzlichen Glückwunsch, du hast das Spiel beendet!",
-    .tcBestScore:          "Beste Ergebnis",
+    .tcBestScore:          "Beste Ergebnisse",
     .tcBestPlayer:         "Bester Spieler",
     .tcCollectedRequiredWords: "Pflichtwörter",
     .tcCollectedOwnWords:      "Eigene Wörter",
@@ -74,7 +74,8 @@ let deDictionary: [TextConstants: String] = [
     .tcKeyWord:             "Fügen Sie ein Keyword hinzu ...",
     .tcNicknameUsed:        "Spitzname wird auf einem anderen Gerät verwendet!",
     .tcNicknameActivating:  "Wenn dies Ihr Gerät ist, öffnen Sie es und fügen Sie ein Schlüsselwort dem Spitzname hinzu!",
-    .tcAddKeyWord:          "Wenn dies Ihr Gerät ist, fügen Sie hier dasselbe Schlüsselwort hinzu, ansonsten wählen Sie einen anderen Spitznamen!"
+    .tcAddKeyWord:          "Wenn dies Ihr Gerät ist, fügen Sie hier dasselbe Schlüsselwort hinzu, ansonsten wählen Sie einen anderen Spitznamen!",
+    .tcChooseAction:        "Bitte wählen!",
 ]
 
 

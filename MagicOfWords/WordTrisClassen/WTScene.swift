@@ -1517,12 +1517,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        checkIfGameFinished()
     }
     var bestScoreSync: Results<BestScoreSync>?
-    var bestScoreForGame: Results<BestScoreForGame>?
     var notificationToken: NotificationToken?
     var bestScoreSubscriptionToken: NotificationToken?
     var forGameSubscriptionToken: NotificationToken?
-    var bestScoreForGameToken: NotificationToken?
     var bestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
+    var bestScoreForGame: Results<BestScoreForGame>?
+    var bestScoreForGameToken: NotificationToken?
     var bestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
     var syncedRecordsOK = false
     var waitingForSynceRecords = false
