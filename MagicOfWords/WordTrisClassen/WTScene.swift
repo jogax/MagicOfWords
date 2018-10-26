@@ -11,7 +11,7 @@ import GameplayKit
 import RealmSwift
 
 public enum StartType: Int {
-    case NoMore = 0, PreviousGame, NextGame, NewGame
+    case NoMore = 0, PreviousGame, NextGame, NewGame, GameNumber
 }
 
 
@@ -217,6 +217,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         return view
     }
     
+    func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
+        
+    }
+
     func getHeightForHeaderInSection(tableView: UITableView, section: Int)->CGFloat {
         return GV.onIpad ? 48 : 35
     }
@@ -423,6 +427,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //    var roundIndexes = [Int]()
     var new: Bool = true
     var nextGame: StartType = .NoMore
+    var newGameNumber: Int = 0
     var startTouchedNodes = TouchedNodes()
     var wtGameFinishedSprite = WTGameFinished()
 
@@ -485,7 +490,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         self.addChild(wtGameFinishedSprite)
         self.backgroundColor = bgColor
 //        GV.allWords = [WordToCheck]()
-        getPlayingRecord(new: new, next: .NextGame)
+        getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber)
         createHeader()
 //        createUndo(enabled: true)
         createGoBackButton()
@@ -536,7 +541,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        }
 //    }
 //
-    private func getPlayingRecord(new: Bool, next: StartType) {
+    private func getPlayingRecord(new: Bool, next: StartType, gameNumber: Int) {
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
         if new {
             let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusNew, GV.aktLanguage)
@@ -556,7 +561,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 GV.playingRecord.time = timeInitValue
                 try! realm.commitWrite()
             } else {
-                let newGameNumber = realm.objects(GameDataModel.self).filter("language = %@", GV.aktLanguage).count + GV.gameNumberAdder[GV.aktLanguage]!
+                let newGameNumber = realm.objects(GameDataModel.self).filter("language = %@", GV.aktLanguage).count
                 let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", newGameNumber, GV.aktLanguage).first!
                 if mandatoryRecord != nil {
                     try! realm.write {
@@ -569,6 +574,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     }
                 }
             }
+        } else if next == .GameNumber {
+            if actGames.count > 0 {
+                for actGame in actGames {
+                    try! realm.write {
+                        actGame.nowPlaying = false
+                    }
+                }
+            }
+            GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.aktLanguage).first!
         } else {
             var first = true
             if actGames.count > 0 {
@@ -631,9 +645,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         wtSceneDelegate = delegate
     }
     
-    public func setGameArt(new: Bool, next: StartType) {
+    public func setGameArt(new: Bool = false, next: StartType = .NoMore, gameNumber: Int = 0) {
         self.new = new
         self.nextGame = next
+        self.newGameNumber = gameNumber
     }
     
     let firstLinePosition:CGFloat = 0.93
@@ -660,7 +675,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 
         if self.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * firstLinePosition
-            let gameNumber = GV.playingRecord.gameNumber - GV.gameNumberAdder[GV.aktLanguage]!
+            let gameNumber = GV.playingRecord.gameNumber
             let text = GV.language.getText(.tcHeader, values: String(gameNumber), String(0))
             headerLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
@@ -745,7 +760,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     }
     
     private func modifyHeader() {
-        let gameNumber = GV.playingRecord.gameNumber - GV.gameNumberAdder[GV.aktLanguage]!
+        let gameNumber = GV.playingRecord.gameNumber
         let headerText = GV.language.getText(.tcHeader, values: String(gameNumber + 1), String(GV.playingRecord.rounds.count))
         headerLabel.text = headerText
         let score = String(WTGameWordList.shared.getScore(forAll: true))
@@ -848,12 +863,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         wtSceneDelegate!.gameFinished(start: .PreviousGame)
     }
     
-    @objc func showAllWordsInTableView() {
-        stopShowingTableIfNeeded()
-        showOwnWordsInTableView()
-        showingWordsInTable = true
-    }
-
     @objc func goNextGame() {
         stopShowingTableIfNeeded()
         timer!.invalidate()
@@ -861,6 +870,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         removeAllSubviews()
         wtSceneDelegate!.gameFinished(start: .NextGame)
     }
+    
+    @objc func showAllWordsInTableView() {
+        stopShowingTableIfNeeded()
+        showOwnWordsInTableView()
+        showingWordsInTable = true
+    }
+    
     var goToPreviousGameButton: UIButton?
     var goToNextGameButton: UIButton?
     var undoButton: UIButton?
@@ -1656,7 +1672,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        }
         try! realm.write {
 //            GV.playingRecord.ownWords = tempOwnWords
-            GV.playingRecord.score = WTGameWordList.shared.getScore()
+            GV.playingRecord.score = WTGameWordList.shared.getScore(forAll: true)
             GV.playingRecord.pieces = pieces
             GV.playingRecord.gameStatus = GV.GameStatusPlaying
             var rounds: RoundDataModel

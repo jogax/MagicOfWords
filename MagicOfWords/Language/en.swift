@@ -52,7 +52,7 @@ let enDictionary: [TextConstants: String] = [
     .tcAlphabet:           "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     .tcFrequency:           "A°8/B°2/C°4/D°3/E°11/F°1/G°2/H°3/I°8/J°1/K°1/L°5/M°3/N°7/O°7/P°3/Q°0/R°7/S°10/T°7/U°3/V°1/W°1/X°0/Y°1/Z°0",
     .tcNickNameLetters:    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    .tcGameNumber:          "GameNr",
+    .tcGameNumber:          "Game",
     .tcOK:                  "OK",
     .tcReady:               "Done",
     .tcChooseLanguage:      "Choose language",
@@ -76,4 +76,8 @@ let enDictionary: [TextConstants: String] = [
     .tcNicknameActivating:  "If this is your device, open it and add a keyword to the nickname!",
     .tcAddKeyWord:          "If this is your device, add hier the same keyword otherwise choose another nickname!",
     .tcChooseAction:        "Choose please!",
+    .tcTableOfBestscores:   "Table of best scores",
+    .tcGamesToContinue:     "Choose game to continue",
+    .tcBestPlayerHeader:    "Best",
+    .tcMyHeader:            "My Score",
 ]

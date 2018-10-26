@@ -59,7 +59,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 6,
+            schemaVersion: 7,
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
@@ -72,7 +72,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     migration.enumerateObjects(ofType: BasicDataModel.className()) { oldObject, newObject in
                         newObject!["myNickname"] = oldObject!["myName"]
                     }
-                default: break
+                default: migration.enumerateObjects(ofType: GameDataModel.className()) { oldObject, newObject in
+                    print("oldObject: \(oldObject!["language"] as! String), \(String(oldObject!["gameNumber"] as! Int))")
+                    newObject!["combinedKey"] = oldObject!["language"] as! String + String((oldObject!["gameNumber"] as! Int) % 1000)
+                    newObject!["gameNumber"] = Int(oldObject!["gameNumber"] as! Int % 1000)
+                    }
+
                 }
         },
             objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self]

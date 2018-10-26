@@ -39,7 +39,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcOwnWords:          "Мои слова (% / % / %)",
     .tcNoMoreSteps:       "Поздравляю, ты закончил игру!",
     .tcBestPlayer:        "Лучший игрок",
-    .tcBestScore:         "Лучшие результаты",
+    .tcBestScore:         "Лучшие очки",
     .tcCollectedRequiredWords: "Обязательные слова",
     .tcCollectedOwnWords:      "Собственные слова",
     .tcTotal:               "Всего:",
@@ -52,7 +52,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcAlphabet:           "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ", //Ъ !!!
     .tcFrequency:           "А°10/Б°2/В°3/Г°2/Д°3/Е°8/Ё°1/Ж°1/З°2/И°9/Й°1/К°5/Л°4/М°3/Н°7/О°10/П°3/Р°7/С°5/Т°7/У°2/Ф°1/Х°1/Ц°1/Ч°1/Ш°1/Щ°1/Ы°1/Ь°2/Э°1/Ю°0/Я°1",
     .tcNickNameLetters:    "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭ",
-    .tcGameNumber:          "Nr. игры",
+    .tcGameNumber:          "Игра",
     .tcOK:                  "OK",
     .tcReady:               "Готово",
     .tcChooseLanguage:      "Выбери язык",
@@ -76,4 +76,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcNicknameActivating:  "Если это твоё устройство, открой его и добавь ключевое слово к псевдониму!",
     .tcAddKeyWord:          "Если это твоё устройство, добавь тут то же ключевое слово, иначе выбери другой псевдоним!",
     .tcChooseAction:        "Выбери пожалуйста!",
+    .tcTableOfBestscores:   "Таблица лучших результатов",
+    .tcGamesToContinue:     "Выберите игру для продолжения",
+    .tcBestPlayerHeader:    "Лучшие очки",
+    .tcMyHeader:            "Мои очки",
 ]

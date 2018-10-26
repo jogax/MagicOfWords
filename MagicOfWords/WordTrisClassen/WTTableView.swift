@@ -19,6 +19,7 @@ public protocol WTTableViewDelegate: class {
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int)
     func fillHeaderView(tableView: UITableView, section: Int)->UIView
     func getHeightForHeaderInSection(tableView: UITableView, section: Int)->CGFloat
+    func didSelectedRow(tableView: UITableView, indexPath: IndexPath)
 }
 class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     var myDelegate: WTTableViewDelegate?
@@ -51,7 +52,7 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
 //        return self.myDelegate!.geTitleForHeaderInSection(section: section)
 //    }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("You selected cell #\(indexPath.row)!")
+        self.myDelegate!.didSelectedRow(tableView: tableView, indexPath: indexPath)
     }
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         self.myDelegate!.setHeaderView(tableView: tableView, headerView: view, section: section)

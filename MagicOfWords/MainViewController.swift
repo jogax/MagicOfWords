@@ -14,7 +14,7 @@ import Reachability
 import Security
 
 
-class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelegate, ShowFinishedGamesSceneDelegate /*SettingsSceneDelegate*/ {
+class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelegate, ShowGamesSceneDelegate /*SettingsSceneDelegate*/ {
     
     func chooseNickname() {
         let alertController = UIAlertController(title: GV.language.getText(.tcSetNickName),
@@ -25,8 +25,12 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             let nickNameField = alertController.textFields![0] as UITextField
             let keyWordField = alertController.textFields![1] as UITextField
             self.setNickname(nickName: nickNameField.text!, keyWord: keyWordField.text!)
+            self.showMenu()
         }))
-        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: { [unowned self]
+            alert -> Void in
+            self.showMenu()
+        }))
         alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
             textField.text = playerActivity![0].nickName
         })
@@ -49,7 +53,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         }
     }
     
-    var showFinishedGamesScene: ShowFinishedGamesScene?
+    var showGamesScene: ShowGamesScene?
     func backFromSettingsScene() {
         try! realm.write {
             GV.basicDataRecord.actLanguage = GV.aktLanguage
@@ -58,33 +62,39 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
 //        startMenuScene()
     }
     
-    func backToMenuScene() {
-        if showFinishedGamesScene != nil {
-            showFinishedGamesScene!.removeFromParent()
-            showFinishedGamesScene = nil
+    func backToMenuScene(gameNumberSelected: Bool = false, gameNumber: Int = 0) {
+        if showGamesScene != nil {
+            showGamesScene!.removeFromParent()
+            showGamesScene = nil
         }
-        showMenu()
+        if gameNumberSelected {
+            startWTScene(new: false, next: .GameNumber, gameNumber: gameNumber)
+        } else {
+            showMenu()
+        }
 //        startMenuScene()
     }
     
-    func showFinishedGames() {
-        showFinishedGamesScene = ShowFinishedGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        showFinishedGamesScene!.setDelegate(delegate: self)
+    func showGames(all: Bool) {
+        showGamesScene = ShowGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        showGamesScene!.setDelegate(delegate: self)
+        showGamesScene!.setSelect(all: all)
         if let view = self.view as! SKView? {
-            view.presentScene(showFinishedGamesScene!)
+            view.presentScene(showGamesScene!)
         }
     }
     
     func gameFinished(start: StartType) {
         switch start {
         case .NoMore: showMenu() //startMenuScene(showMenu: true)
-        case .PreviousGame, .NextGame: startWTScene(new: false, next: start)
-        case .NewGame: startWTScene(new: true, next: .NoMore)
+        case .PreviousGame, .NextGame: startWTScene(new: false, next: start, gameNumber: 0)
+        case .NewGame: startWTScene(new: true, next: .NoMore, gameNumber: 0)
+        case .GameNumber: startWTScene(new: true, next: .NoMore, gameNumber: 0)
         }
     }
     
     func wtGame() {
-        startWTScene(new: true, next: .NoMore)
+        startWTScene(new: true, next: .NoMore, gameNumber: 0)
     }
     
     func findWords() {
@@ -101,11 +111,11 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         return
     }
     
-    func startWTScene(new: Bool, next: StartType) {
+    func startWTScene(new: Bool, next: StartType, gameNumber: Int) {
         let wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
             wtScene.setDelegate(delegate: self)
-            wtScene.setGameArt(new: new, next: next)
+            wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber)
             view.presentScene(wtScene)
         }
         
@@ -121,11 +131,11 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     func startNewGame() {
-        startWTScene(new: true, next: .NoMore)
+        startWTScene(new: true, next: .NoMore, gameNumber: 0)
     }
     
     func continueGame() {
-        startWTScene(new: false, next: .NoMore)
+        startWTScene(new: false, next: .NoMore, gameNumber: 0)
     }
     
     func chooseLanguage() {
@@ -249,41 +259,71 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     func showMenu() {
+        let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
                                                 message: "",
                                                 preferredStyle: .alert)
-        var count = realm.objects(GameDataModel.self).filter("gameStatus != %d and language = %@", GV.GameStatusNew, GV.aktLanguage).count
-        if count > 0 {
-            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcNewGame), style: .default, handler: { [unowned self]
-                alert -> Void in
-                self.startNewGame()
-            }))
-        }
-        count = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusPlaying, GV.aktLanguage).count
-        if count > 0 {
-            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcContinue), style: .default, handler: { [unowned self]
-                alert -> Void in
-                self.continueGame()
-            }))
-        }
-        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
+        let countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@", GV.aktLanguage).count
+        let countExistingGames = realm.objects(GameDataModel.self).filter("language = %@", GV.aktLanguage).count
+        let countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameStatus = %@", GV.aktLanguage, GV.GameStatusPlaying).count
+        let newOK = countMandatory - countExistingGames > 0
+        let continueOK = countContinueGames > 0
+        //--------------------- newGameAction ---------------------
+        let newGameAction = UIAlertAction(title: "\(GV.language.getText(.tcNewGame)) (\(countMandatory - countExistingGames)) ", style: .default, handler: { [unowned self]
             alert -> Void in
-            self.showFinishedGames()
-        }))
-        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+            if newOK {
+                self.startNewGame()
+            }
+        })
+        if !newOK {
+            newGameAction.setValue(disabledColor, forKey: "TitleTextColor")
+        }
+        alertController.addAction(newGameAction)
+        //--------------------- continueAction ---------------------
+        let continueAction = UIAlertAction(title: "\(GV.language.getText(.tcContinue))", style: .default, handler: { [unowned self]
+            alert -> Void in
+            if continueOK {
+                self.showGames(all: false)
+            }
+        })
+        if !continueOK {
+            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
+        }
+        alertController.addAction(continueAction)
+        //--------------------- bestScoreAction ---------------------
+        let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.showGames(all: true)
+        })
+        alertController.addAction(bestScoreAction)
+        //--------------------- chooseLanguageAction ---------------------
+        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
             alert -> Void in
             self.chooseLanguage()
-        }))
-        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
+        })
+        alertController.addAction(chooseLanguageAction)
+        //--------------------- nickNameAction ---------------------
+        let nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
             alert -> Void in
-            self.chooseNickname()
-        }))
+            if GV.connectedToInternet {
+                self.chooseNickname()
+            } else {
+                self.showMenu()
+            }
+        })
+        if !GV.connectedToInternet {
+            nickNameAction.setValue(disabledColor, forKey: "TitleTextColor")
+        }
+        alertController.addAction(nickNameAction)
         #if DEBUG
-        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
+        //--------------------- showRealmCloudAction ---------------------
+        let showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
             alert -> Void in
             self.displayCloudRecordsViewController()
-        }))
+        })
+        alertController.addAction(showRealmCloudAction)
         #endif
+        //--------------------- Present alert ---------------------
         present(alertController, animated: true, completion: nil)
 
     }

@@ -18,7 +18,10 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     //    var lengthOfOnlineSince = 0
     var lengthOfOnlineTime = 0
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
-    
+    func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
+        
+    }
+
     func getNumberOfSections() -> Int {
         return 2
     }

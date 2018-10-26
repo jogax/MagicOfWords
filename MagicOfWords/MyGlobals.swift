@@ -31,7 +31,6 @@ var myHeight: CGFloat = 0
 
 
 struct GV {
-    static let gameNumberAdder: [String:Int] = ["en": 0, "de": 10000, "hu":20000, "ru": 30000]
     static var aktLanguage: String {
         get {
             return GV.language.getText(.tcAktLanguage)

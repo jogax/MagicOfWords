@@ -38,8 +38,8 @@ let deDictionary: [TextConstants: String] = [
     .tcWordsToCollect:    "Zu sammelnde Wörter: (% / % / % / %)",
     .tcOwnWords:          "Eigene Wörter (% / % / %)",
     .tcNoMoreSteps:       "Herzlichen Glückwunsch, du hast das Spiel beendet!",
-    .tcBestScore:          "Beste Ergebnisse",
-    .tcBestPlayer:         "Bester Spieler",
+    .tcBestScore:          "Beste Erg.",
+    .tcBestPlayer:         "Bester Sp.",
     .tcCollectedRequiredWords: "Pflichtwörter",
     .tcCollectedOwnWords:      "Eigene Wörter",
     .tcTotal:               "Insgesamt:",
@@ -52,7 +52,7 @@ let deDictionary: [TextConstants: String] = [
     .tcAlphabet:           "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜẞ",
     .tcFrequency:           "A°6/B°2/C°3/D°2/E°15/F°2/G°4/H°4/I°6/J°0/K°3/L°4/M°2/N°9/O°3/P°2/Q°0/R°8/S°8/T°7/U°4/V°1/W°1/X°0/Y°0/Z°1/Ä°1/Ö°0/Ü°1/ẞ°0",
     .tcNickNameLetters:    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    .tcGameNumber:          "SpielNr",
+    .tcGameNumber:          "Spiel",
     .tcOK:                  "OK",
     .tcReady:               "Fertig",
     .tcChooseLanguage:      "Sprache wählen",
@@ -76,6 +76,10 @@ let deDictionary: [TextConstants: String] = [
     .tcNicknameActivating:  "Wenn dies Ihr Gerät ist, öffnen Sie es und fügen Sie ein Schlüsselwort dem Spitzname hinzu!",
     .tcAddKeyWord:          "Wenn dies Ihr Gerät ist, fügen Sie hier dasselbe Schlüsselwort hinzu, ansonsten wählen Sie einen anderen Spitznamen!",
     .tcChooseAction:        "Bitte wählen!",
+    .tcTableOfBestscores:   "Tabelle der besten Ergebnisse",
+    .tcGamesToContinue:     "Wähle ein Spiel um fortzufahren",
+    .tcBestPlayerHeader:    "Beste Erg.",
+    .tcMyHeader:            "Mein Erg.",
 ]
 
 
