@@ -165,7 +165,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // Results are now populated and can be accessed without blocking the UI
                 //                showPlayerActivityView.reloadData()
                 self!.initialLoadDone = true
-                print("Initial Data displayed")
+//                print("Initial Data displayed")
             case .update(_, let deletions, let insertions, let modifications):
                 if self!.initialLoadDone {
                     // Query results have changed, so apply them to the UITableView

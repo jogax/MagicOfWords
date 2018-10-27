@@ -47,7 +47,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         background.size = CGSize(width: self.size.height * widthMultiplier, height: self.size.height)
         addChild(background)
 //        self.backgroundColor = SKColor(red: 200/255, green: 220/255, blue: 208/255, alpha: 1)
-        self.allResultsItems = RealmService.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@", GV.aktLanguage).sorted(byKeyPath: "combinedPrimary", ascending: true)
+        self.allResultsItems = RealmService.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@", GV.aktLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
 
         showFinishedGamesInTableView()
     }
@@ -67,6 +67,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     private func goBack(gameNumberSelected: Bool, gameNumber: Int) {
         showGamesInTableView!.isHidden = true
         showGamesInTableView = nil
+        subscription.unsubscribe()
          if myDelegate == nil {
             return
         }
@@ -132,9 +133,10 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 // Results are now populated and can be accessed without blocking the UI
                 //                showPlayerActivityView.reloadData()
                 self!.initialLoadDone = true
-                print("Initial Data displayed")
+//                print("Initial Data displayed")
             case .update(_, let deletions, let insertions, let modifications):
-                if self!.initialLoadDone {
+                 self!.gamesForShow = self!.getGamesForShow()
+                 if self!.initialLoadDone {
                     // Query results have changed, so apply them to the UITableView
                     if insertions.count > 0 {
                         showGamesInTableView.frame.size.height += CGFloat(insertions.count) * self!.title.height(font: self!.myFont!)
@@ -179,14 +181,14 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
             returnArray.append(item)
         }
         for bestGame in allResultsItems! {
-            if let index =  returnArray.index(where: {$0.gameNumber == bestGame.gameNumber}) {
+            if let index =  returnArray.index(where: {Int($0.gameNumber) == bestGame.gameNumber}) {
                 if bestGame.owner != nil {
                     returnArray[index].bestPlayer = bestGame.owner!.nickName!
                     returnArray[index].bestScore = String(bestGame.bestScore)
                 }
             } else if showAll {
                 var item = FinishedGameData()
-                item.gameNumber = bestGame.gameNumber
+                item.gameNumber = String(bestGame.gameNumber)
                 item.score = notExists
                 item.bestPlayer = bestGame.owner!.nickName!
                 item.bestScore  = String(bestGame.bestScore)

@@ -213,8 +213,17 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
 //    override func viewDidLoad() {
+    var countMandatory = 0
+    var countExistingGames = 0
+    var countContinueGames = 0
+    private func getRecordCounts() {
+        countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@", GV.aktLanguage).count
+        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@", GV.aktLanguage).count
+        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameStatus = %@", GV.aktLanguage, GV.GameStatusPlaying).count
+    }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
+        getRecordCounts()
         myHeight = self.view.frame.size.height
         myWidth = self.view.frame.size.width
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
@@ -228,7 +237,11 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         #endif
         // Get the SKScene from the loaded GKScene
         generateBasicDataRecordIfNeeded()
-        showMenu()
+        if countContinueGames > 0 {
+            startWTScene(new: false, next: .NoMore, gameNumber: 0)
+        } else {
+            showMenu()
+        }
 //        startMenuScene()
     }
     
@@ -263,9 +276,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
                                                 message: "",
                                                 preferredStyle: .alert)
-        let countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@", GV.aktLanguage).count
-        let countExistingGames = realm.objects(GameDataModel.self).filter("language = %@", GV.aktLanguage).count
-        let countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameStatus = %@", GV.aktLanguage, GV.GameStatusPlaying).count
+
         let newOK = countMandatory - countExistingGames > 0
         let continueOK = countContinueGames > 0
         //--------------------- newGameAction ---------------------
@@ -283,7 +294,8 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         let continueAction = UIAlertAction(title: "\(GV.language.getText(.tcContinue))", style: .default, handler: { [unowned self]
             alert -> Void in
             if continueOK {
-                self.showGames(all: false)
+//                self.showGames(all: false)
+                self.startWTScene(new: false, next: .NoMore, gameNumber: 0)
             }
         })
         if !continueOK {

@@ -582,7 +582,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     }
                 }
             }
-            GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.aktLanguage).first!
+            let games = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.aktLanguage)
+            if games.count > 0 {
+                GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.aktLanguage).first!
+                try! realm.write() {
+                    GV.playingRecord.nowPlaying = true
+                }
+            }
         } else {
             var first = true
             if actGames.count > 0 {
@@ -603,39 +609,41 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 }
             }
             let playedNowGame = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
+            var actGameNumber = playedNowGame.first!.gameNumber
             if playedNowGame.count > 0 {
-                let actGameNumber = playedNowGame.first!.gameNumber
                 switch nextGame {
                 case .NoMore:
-                    GV.playingRecord = playedNowGame[0]
+                    break
                 case .PreviousGame:
                     let previousRecords = realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d",
                                                                                   GV.GameStatusPlaying, actGameNumber)
                     if previousRecords.count == 1 {
-                        GV.playingRecord = previousRecords[0]
+                        actGameNumber = previousRecords[0].gameNumber
                     } else if let record = Array(previousRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).last {
-                        GV.playingRecord = record
+                        actGameNumber = record.gameNumber
                     } else {
-                        GV.playingRecord = playedNowGame.first!
+                        break
                     }
                 case .NextGame:
                     let nextRecords = realm.objects(GameDataModel.self).filter(" gameStatus = %d and gameNumber > %d",
                                                                                    GV.GameStatusPlaying, actGameNumber)
                     if nextRecords.count == 1 {
-                        GV.playingRecord = nextRecords[0]
+                        actGameNumber = nextRecords[0].gameNumber
                     } else if let record = Array(nextRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).first {
-                        GV.playingRecord = record
+                        actGameNumber = record.gameNumber
                     } else {
-                        GV.playingRecord = playedNowGame.first!
+                        break
                     }
 
                 default:
                     break
                 }
-                realm.beginWrite()
-                playedNowGame.first!.nowPlaying = false
-                GV.playingRecord.nowPlaying = true
-                try! realm.commitWrite()
+                try! realm.write() {
+                    playedNowGame.first!.nowPlaying = false
+                    GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@",
+                        actGameNumber, GV.aktLanguage).first!
+                    GV.playingRecord.nowPlaying = true
+                }
             }
             
         }
@@ -850,23 +858,29 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     }
     @objc func goBackTapped() {
         stopShowingTableIfNeeded()
-        timer!.invalidate()
-        timer = nil
+        if timer != nil {
+            timer!.invalidate()
+            timer = nil
+        }
         removeAllSubviews()
         wtSceneDelegate!.gameFinished(start: .NoMore)
     }
     @objc func goPreviousGame() {
         stopShowingTableIfNeeded()
-        timer!.invalidate()
-        timer = nil
+        if timer != nil {
+            timer!.invalidate()
+            timer = nil
+        }
         removeAllSubviews()
         wtSceneDelegate!.gameFinished(start: .PreviousGame)
     }
     
     @objc func goNextGame() {
         stopShowingTableIfNeeded()
-        timer!.invalidate()
-        timer = nil
+        if timer != nil {
+            timer!.invalidate()
+            timer = nil
+        }
         removeAllSubviews()
         wtSceneDelegate!.gameFinished(start: .NextGame)
     }
@@ -1545,11 +1559,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     private func getSyncedRecords() {
         if realmSync != nil {
-            let gameNumber = String(GV.playingRecord.gameNumber % 1000 + 1)
+            let gameNumber = GV.playingRecord.gameNumber % 1000 + 1
             let language = GV.language.getText(.tcAktLanguage)
             let myName = GV.basicDataRecord.myName
-            let combinedPrimarySync = gameNumber + language + myName
-            let combinedPrimaryForGame = gameNumber + language
+            let combinedPrimarySync = String(gameNumber) + language + myName
+            let combinedPrimaryForGame = String(gameNumber) + language
             bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimarySync)
             bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "MyScoreRecord:\(combinedPrimarySync)")
             bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
@@ -1598,10 +1612,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                             // Results are now populated and can be accessed without blocking the UI
                             //                showPlayerActivityView.reloadData()
                             self!.modifyHeader()
-                            print("Initial Data displayed")
+//                            print("Initial Data displayed")
                         case .update(_, _, _, let modifications):
                             if modifications.count > 0 {
-                                print("modified: \(self!.bestScoreForGame![0].bestScore)")
+//                                print("modified: \(self!.bestScoreForGame![0].bestScore)")
                                 self!.modifyHeader()
                             }
                         case .error(let error):

@@ -82,7 +82,7 @@ struct GV {
     
     static let AUTH_URL  = URL(string: "https://\(MY_INSTANCE_ADDRESS)")!
 //    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWords")!
-    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWordsTest")!
+    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWordsTest1")!
 }
 
 
