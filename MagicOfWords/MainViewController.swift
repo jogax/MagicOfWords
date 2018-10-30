@@ -56,7 +56,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     var showGamesScene: ShowGamesScene?
     func backFromSettingsScene() {
         try! realm.write {
-            GV.basicDataRecord.actLanguage = GV.aktLanguage
+            GV.basicDataRecord.actLanguage = GV.actLanguage
         }
         showMenu()
 //        startMenuScene()
@@ -139,56 +139,49 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     func chooseLanguage() {
-//        let settingsScene = SettingsScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-//        if let view = self.view as! SKView? {
-//            settingsScene.setDelegate(delegate: self)
-//            view.presentScene(settingsScene)
-//        } else {
-//            continueGame()
-//        }
-        //        createMenuItem(menuInt: .tcEnglish, firstLine: true, isActLanguage: GV.language.getText(.tcEnglishShort) == GV.aktLanguage)
-        //        createMenuItem(menuInt: .tcGerman, isActLanguage: GV.language.getText(.tcGermanShort) == GV.aktLanguage)
-        //        createMenuItem(menuInt: .tcHungarian, isActLanguage: GV.language.getText(.tcHungarianShort) == GV.aktLanguage)
-        //        createMenuItem(menuInt: .tcRussian, isActLanguage: GV.language.getText(.tcRussianShort) == GV.aktLanguage)
+        func setLanguage(language: String) {
+            GV.language.setLanguage(language)
+            try! realm.write() {
+                GV.basicDataRecord.actLanguage = language
+            }
+            self.getRecordCounts()
+            self.showMenu()
+        }
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseLanguage),
                                                 message: "",
                                                 preferredStyle: .alert)
         let englishAction = UIAlertAction(title: GV.language.getText(.tcEnglish), style: .default, handler: {
             alert -> Void in
-                GV.language.setLanguage(GV.language.getText(.tcEnglishShort))
-                self.showMenu()
+            setLanguage(language: GV.language.getText(.tcEnglishShort))
             })
-        if GV.language.getText(.tcEnglishShort) == GV.aktLanguage {
+        if GV.language.getText(.tcEnglishShort) == GV.actLanguage {
             englishAction.setValue(UIColor.red, forKey: "TitleTextColor")
         }
         alertController.addAction(englishAction)
         
         let germanAction = UIAlertAction(title: GV.language.getText(.tcGerman), style: .default, handler: {
             alert -> Void in
-            GV.language.setLanguage(GV.language.getText(.tcGermanShort))
-            self.showMenu()
+            setLanguage(language: GV.language.getText(.tcGermanShort))
         })
-        if GV.language.getText(.tcGermanShort) == GV.aktLanguage {
+        if GV.language.getText(.tcGermanShort) == GV.actLanguage {
             germanAction.setValue(UIColor.red, forKey: "TitleTextColor")
         }
         alertController.addAction(germanAction)
         
         let hungarianAction = UIAlertAction(title: GV.language.getText(.tcHungarian), style: .default, handler: {
             alert -> Void in
-            GV.language.setLanguage(GV.language.getText(.tcHungarianShort))
-            self.showMenu()
+            setLanguage(language: GV.language.getText(.tcHungarianShort))
         })
-        if GV.language.getText(.tcHungarianShort) == GV.aktLanguage {
+        if GV.language.getText(.tcHungarianShort) == GV.actLanguage {
             hungarianAction.setValue(UIColor.red, forKey: "TitleTextColor")
         }
         alertController.addAction(hungarianAction)
         
         let russianAction = UIAlertAction(title: GV.language.getText(.tcRussian), style: .default, handler: {
             alert -> Void in
-            GV.language.setLanguage(GV.language.getText(.tcRussianShort))
-            self.showMenu()
+            setLanguage(language: GV.language.getText(.tcRussianShort))
         })
-        if GV.language.getText(.tcRussianShort) == GV.aktLanguage {
+        if GV.language.getText(.tcRussianShort) == GV.actLanguage {
             russianAction.setValue(UIColor.red, forKey: "TitleTextColor")
         }
         alertController.addAction(russianAction)
@@ -217,16 +210,18 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     var countExistingGames = 0
     var countContinueGames = 0
     private func getRecordCounts() {
-        countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@", GV.aktLanguage).count
-        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@", GV.aktLanguage).count
-        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameStatus = %@", GV.aktLanguage, GV.GameStatusPlaying).count
+        countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@", GV.actLanguage).count
+        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage).count
+        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameStatus = %@", GV.actLanguage, GV.GameStatusPlaying).count
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
-        getRecordCounts()
+//        printDEWordsSorted()
+        print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
+//       readNewTextFile()
+//        printOrigDEData()
         myHeight = self.view.frame.size.height
         myWidth = self.view.frame.size.width
-        print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         #if GENERATEWORDLIST
         _ = WordDBGenerator(mandatory: false)
         print("WordList Generated")
@@ -235,9 +230,11 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         _ = WordDBGenerator(mandatory: true)
         print("Mandatory Generated")
         #endif
+//        readNewTextFile()
         // Get the SKScene from the loaded GKScene
         generateBasicDataRecordIfNeeded()
-        if countContinueGames > 0 {
+        getRecordCounts()
+       if countContinueGames > 0 {
             startWTScene(new: false, next: .NoMore, gameNumber: 0)
         } else {
             showMenu()
@@ -509,10 +506,73 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         }
     }
     
-    
+    private func readNewTextFile() {
+        let wordFileURL = Bundle.main.path(forResource: "deutschWords", ofType: "txt")
+//        let outFileUrl = Bundle.main.path(forResource: "deutschWordsOut", ofType: "txt")
+        let fileName = "deutschWordsOut.txt"
+        let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
+
+//        if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+//
+//            let fileURL = dir.appendingPathComponent(file)
+//
+            //writing
+        
+            //reading
+            var wordsFile = ""
+            do {
+                wordsFile = try String(contentsOfFile: wordFileURL!, encoding: String.Encoding.macOSRoman)
+            } catch let error as NSError {
+                print("Failed reading from URL: \(String(describing: wordFileURL)), Error: " + error.localizedDescription)
+            }
+            let wordList = wordsFile.components(separatedBy: .newlines)
+            var text = ""
+            for word in wordList {
+                if word.subString(startPos: 0, length: 1) != "#" {
+                    let firstCharUpper = word.subString(startPos: 0, length: 1).uppercased()
+                    if word.subString(startPos: 0, length: 1) == firstCharUpper {
+                        if let idx = word.index(of: " ") {
+                            let newWord = word[..<idx] + "\r\n"
+                            text += newWord
+                       }
+                    }
+                }
+             }
+        let data = Data(text.utf8)
+        do {
+            try data.write(to: url, options: .atomic)
+        } catch {
+            print(error)
+        }
+
+    }
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .portrait
     }
-    
+    func printDEWordsSorted() {
+        let deWords = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH de").sorted(byKeyPath: "word", ascending: true)
+        for deWord in deWords {
+            print(deWord.word.subString(startPos: 2, length: deWord.word.length - 2))
+        }
+    }
+    func printOrigDEData() {
+        let dataFileURL = Bundle.main.path(forResource: "deutschWords", ofType: "txt")
+        var gameDataFile = ""
+        do {
+            gameDataFile = try String(contentsOfFile: dataFileURL!, encoding: String.Encoding.utf8)
+        } catch let error as NSError {
+            print("Failed reading from URL: \(String(describing: dataFileURL)), Error: " + error.localizedDescription)
+        }
+        let myLines = gameDataFile.components(separatedBy: .newlines)
+        for line in myLines {
+            if !line.begins(with: "#") {
+                if line.subString(startPos: 0, length: 1).uppercased() == line.subString(startPos: 0, length: 1) {
+                    let index = line.index(of: )
+                    print(line)
+                }
+            }
+        }
+        
+    }
 }

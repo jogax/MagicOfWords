@@ -32,10 +32,15 @@ class WordDBGenerator {
             generateMandatoryWords(language: "hu")
             generateMandatoryWords(language: "ru")
         } else {
-            generateWordList(language: "en")
+            print("Start")
             generateWordList(language: "de")
+            print("DE ready")
+            generateWordList(language: "en")
+            print("EN ready")
             generateWordList(language: "hu")
+            print("HU ready")
             generateWordList(language: "ru")
+            print("RU ready")
         }
     }
 
@@ -44,6 +49,7 @@ class WordDBGenerator {
     var primaryKey = -1
 
     private func generateWordList(language: String) {
+        let notDELanguage = language != GV.language.getText(.tcGermanShort)
         countLetters = 0
         letters = [String: Int]()
         let wordFileURL = Bundle.main.path(forResource: "\(language)Words", ofType: "txt")
@@ -58,11 +64,15 @@ class WordDBGenerator {
         for word in wordList {
             let charset = CharacterSet(charactersIn: "-!") // words with "-", "!" are not computed
             if word.rangeOfCharacter(from: charset) == nil {
-                generateLetterFrequency(language: language, word: word.lowercased())
-                let wordModel = WordListModel()
-                wordModel.word = (language + word).lowercased()
-                try! realm.write {
-                    realm.add(wordModel)
+                if notDELanguage || word.subString(startPos: 0, length: 1).uppercased() == word.subString(startPos: 0, length: 1) {
+                    generateLetterFrequency(language: language, word: word.lowercased())
+                    let wordModel = WordListModel()
+                    wordModel.word = (language + word).lowercased()
+                    if realm.objects(WordListModel.self).filter("word = %d", wordModel.word).count == 0 {
+                        try! realm.write {
+                            realm.add(wordModel)
+                        }
+                    }
                 }
             }
         }
@@ -117,7 +127,8 @@ class WordDBGenerator {
                 } while index < maxIndex
                 lineToSave.removeLast()
                 let mandatoryModel = MandatoryModel()
-                mandatoryModel.gameNumber = Int(gameNumber)! + GV.gameNumberAdder[language]!
+                mandatoryModel.combinedKey = language + gameNumber
+                mandatoryModel.gameNumber = Int(gameNumber)!
                 mandatoryModel.language = language
                 mandatoryModel.mandatoryWords = lineToSave
                 try! realm.write {

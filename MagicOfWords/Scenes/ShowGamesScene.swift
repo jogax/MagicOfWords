@@ -47,7 +47,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         background.size = CGSize(width: self.size.height * widthMultiplier, height: self.size.height)
         addChild(background)
 //        self.backgroundColor = SKColor(red: 200/255, green: 220/255, blue: 208/255, alpha: 1)
-        self.allResultsItems = RealmService.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@", GV.aktLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+        self.allResultsItems = RealmService.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
 
         showFinishedGamesInTableView()
     }
@@ -103,7 +103,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         self.showGamesInTableView?.reloadData()
         
         self.scene?.view?.addSubview(showGamesInTableView!)
-        subscription = allResultsItems!.subscribe(named: "allResults_\(GV.aktLanguage)")
+        subscription = allResultsItems!.subscribe(named: "allResults_\(GV.actLanguage)")
         subscriptionToken = subscription.observe(\.state) { [weak self]  state in
             print("state: \(state)")
            if state == .complete {
@@ -136,7 +136,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
 //                print("Initial Data displayed")
             case .update(_, let deletions, let insertions, let modifications):
                  self!.gamesForShow = self!.getGamesForShow()
-                 if self!.initialLoadDone {
+//                 if self!.initialLoadDone {
                     // Query results have changed, so apply them to the UITableView
                     if insertions.count > 0 {
                         showGamesInTableView.frame.size.height += CGFloat(insertions.count) * self!.title.height(font: self!.myFont!)
@@ -152,7 +152,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                     showGamesInTableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
                                                       with: .automatic)
                     showGamesInTableView.endUpdates()
-                }
+//                }
             case .error(let error):
                 // An error occurred while opening the Realm file on the background worker thread
                 fatalError("\(error)")

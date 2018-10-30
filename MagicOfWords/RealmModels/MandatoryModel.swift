@@ -12,11 +12,12 @@ import RealmSwift
 
 class MandatoryModel: Object {
 //    @objc dynamic var gameType = 0
+    @objc dynamic var combinedKey = ""
     @objc dynamic var gameNumber = 0
     @objc dynamic var language = ""
     @objc dynamic var mandatoryWords = ""
     override  class func primaryKey() -> String {
-        return "gameNumber"
+        return "combinedKey"
     }
     
     

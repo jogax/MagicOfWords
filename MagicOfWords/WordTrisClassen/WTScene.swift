@@ -330,7 +330,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let balloon = SKSpriteNode(imageNamed: "balloon.png")
         let widthMultiplier: CGFloat = 0.1 + CGFloat(textOnBalloon.length) * (GV.onIpad ? 0.015 : 0.030)
         balloon.size = CGSize(width: self.frame.size.width * widthMultiplier, height: self.frame.size.width * 0.10)
-        balloon.zPosition = 100
+        balloon.zPosition = 1000
 //        let startPosY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
         let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
 //        let startPosY = startPos.y
@@ -542,9 +542,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //    }
 //
     private func getPlayingRecord(new: Bool, next: StartType, gameNumber: Int) {
-        var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
+        var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.actLanguage)
         if new {
-            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusNew, GV.aktLanguage)
+            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusNew, GV.actLanguage)
             /// reset all records with nowPlaying status
             if actGames.count > 0 {
                 try! realm.write {
@@ -561,14 +561,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 GV.playingRecord.time = timeInitValue
                 try! realm.commitWrite()
             } else {
-                let newGameNumber = realm.objects(GameDataModel.self).filter("language = %@", GV.aktLanguage).count
-                let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", newGameNumber, GV.aktLanguage).first!
+                let newGameNumber = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage).count
+                let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", newGameNumber, GV.actLanguage).first!
                 if mandatoryRecord != nil {
                     try! realm.write {
                         GV.playingRecord = GameDataModel()
+                        GV.playingRecord.combinedKey = GV.actLanguage + String(newGameNumber)
                         GV.playingRecord.mandatoryWords = mandatoryRecord!.mandatoryWords
-                        GV.playingRecord.gameNumber = mandatoryRecord!.gameNumber
-                        GV.playingRecord.language = GV.aktLanguage
+                        GV.playingRecord.gameNumber = newGameNumber
+                        GV.playingRecord.language = GV.actLanguage
                         GV.playingRecord.time = timeInitValue
                         realm.add(GV.playingRecord)
                     }
@@ -582,9 +583,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     }
                 }
             }
-            let games = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.aktLanguage)
+            let games = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.actLanguage)
             if games.count > 0 {
-                GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.aktLanguage).first!
+                GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.actLanguage).first!
                 try! realm.write() {
                     GV.playingRecord.nowPlaying = true
                 }
@@ -601,14 +602,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     first = false
                 }
             } else {
-                actGames = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusPlaying, GV.aktLanguage)
+                actGames = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusPlaying, GV.actLanguage)
                 if actGames.count > 0 {
                     try! realm.write {
                         actGames[0].nowPlaying = true
                     }
                 }
             }
-            let playedNowGame = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
+            let playedNowGame = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.actLanguage)
             var actGameNumber = playedNowGame.first!.gameNumber
             if playedNowGame.count > 0 {
                 switch nextGame {
@@ -641,7 +642,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 try! realm.write() {
                     playedNowGame.first!.nowPlaying = false
                     GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@",
-                        actGameNumber, GV.aktLanguage).first!
+                        actGameNumber, GV.actLanguage).first!
                     GV.playingRecord.nowPlaying = true
                 }
             }
@@ -828,7 +829,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     func addOwnWordNew(word: String, usedLetters: [UsedLetter])->Bool {
         var returnBool = false
-        if realmWordList.objects(WordListModel.self).filter("word = %@", GV.aktLanguage + word.lowercased()).count == 1 {
+        if realmWordList.objects(WordListModel.self).filter("word = %@", GV.actLanguage + word.lowercased()).count == 1 {
             let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
             let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord)
             returnBool = boolValue
@@ -1186,12 +1187,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
         return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d and language = %@",
-            GV.GameStatusPlaying, playingRecord.gameNumber, GV.aktLanguage).count > 0
+            GV.GameStatusPlaying, playingRecord.gameNumber, GV.actLanguage).count > 0
     }
     
     private func hasNextRecords(playingRecord: GameDataModel)->Bool {
         return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber > %d and language = %@",
-            GV.GameStatusPlaying, playingRecord.gameNumber, GV.aktLanguage).count > 0
+            GV.GameStatusPlaying, playingRecord.gameNumber, GV.actLanguage).count > 0
     }
     
     @objc private func countTime(timerX: Timer) {
@@ -2234,6 +2235,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let button = SKSpriteNode(texture: texture, color: .white, size: mySize)
         button.position = position
         button.name = name
+        button.zPosition = 1
         button.addChild(createLabel(withText: withText, position: CGPoint(x:0, y:10), fontSize: self.size.width * 0.03, name: name + "Label"))
         return button
         

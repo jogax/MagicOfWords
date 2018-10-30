@@ -31,7 +31,7 @@ var myHeight: CGFloat = 0
 
 
 struct GV {
-    static var aktLanguage: String {
+    static var actLanguage: String {
         get {
             return GV.language.getText(.tcAktLanguage)
         }

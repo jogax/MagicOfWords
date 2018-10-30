@@ -377,10 +377,14 @@ extension String {
     }
     
     func subString(startPos: Int, length: Int) -> String {
-        let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
-        let indexEndOfText = self.index(self.startIndex, offsetBy: startPos + length)
-        let returnString = self[indexStartOfText..<indexEndOfText]
-        return String(returnString)
+        if self.length > 0 {
+            let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
+            let indexEndOfText = self.index(self.startIndex, offsetBy: startPos + length)
+            let returnString = self[indexStartOfText..<indexEndOfText]
+            return String(returnString)
+        } else {
+            return ""
+        }
     }
     
     func begins(with: String)->Bool {
@@ -427,6 +431,13 @@ extension String {
         
         return ceil(boundingBox.width)
     }
+    
+//    public func index(of char: Character) -> Int? {
+//        if let idx = self.index(of: char) {
+//            return idx
+//        }
+//        return nil
+//    }
 
 }
 extension NSAttributedString {

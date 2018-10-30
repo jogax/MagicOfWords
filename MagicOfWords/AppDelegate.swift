@@ -26,6 +26,7 @@ import Reachability
 //#endif
 //
 #if !GENERATELETTERFREQUENCY && !GENERATEWORDLIST && !GENERATEMANDATORY
+
 var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
 #endif
 var playerActivity: Results<PlayerActivity>? // = realmSync.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
@@ -55,6 +56,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+//        Compressing Realm DB if neaded
+//        let config1 = Realm.Configuration(shouldCompactOnLaunch: { totalBytes, usedBytes in
+//            // totalBytes refers to the size of the file on disk in bytes (data + free space)
+//            // usedBytes refers to the number of bytes used by data in the file
+//
+//            // Compact if the file is over 100MB in size and less than 50% 'used'
+//            let tenMB = 10 * 1024 * 1024
+//            return (totalBytes > tenMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+//        })
+//        do {
+//            // Realm is compacted on the first open if the configuration block conditions were met.
+//            _ = try Realm(configuration: config1)
+//        } catch {
+//            print("error")
+//            // handle error compacting or opening Realm
+//        }
         let config = Realm.Configuration(
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
