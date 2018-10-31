@@ -75,13 +75,15 @@ enum TextConstants: Int {
     tcAddCodeRecommended,
     tcKeyWord,
     tcNicknameUsed,
+    tcNicknameUsedwithout,
     tcNicknameActivating,
     tcAddKeyWord,
     tcChooseAction,
     tcTableOfBestscores,
     tcGamesToContinue,
     tcBestPlayerHeader,
-    tcMyHeader
+    tcMyHeader,
+    tcMyNickName
 }
 
     let LanguageEN = "en" // index 0

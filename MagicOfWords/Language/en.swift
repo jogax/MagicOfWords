@@ -72,7 +72,8 @@ let enDictionary: [TextConstants: String] = [
     .tcSave:                "Save",
     .tcAddCodeRecommended:  "If you add a keyword, you can use the same nickname on all of your devices",
     .tcKeyWord:             "Add a keyword...",
-    .tcNicknameUsed:        "Nickname is used on another device!",
+    .tcNicknameUsed:        "Nickname '%' is used on another device!",
+    .tcNicknameUsedwithout: "Nickname '%' is used on another device without keyword!",
     .tcNicknameActivating:  "If this is your device, open it and add a keyword to the nickname!",
     .tcAddKeyWord:          "If this is your device, add hier the same keyword otherwise choose another nickname!",
     .tcChooseAction:        "Choose please!",
@@ -80,4 +81,5 @@ let enDictionary: [TextConstants: String] = [
     .tcGamesToContinue:     "Choose game to continue",
     .tcBestPlayerHeader:    "Best",
     .tcMyHeader:            "My Score",
+    .tcMyNickName:          "My nickname: %",
 ]

@@ -25,7 +25,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             let nickNameField = alertController.textFields![0] as UITextField
             let keyWordField = alertController.textFields![1] as UITextField
             self.setNickname(nickName: nickNameField.text!, keyWord: keyWordField.text!)
-            self.showMenu()
+//            self.showMenu()
         }))
         alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: { [unowned self]
             alert -> Void in
@@ -85,6 +85,10 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     func gameFinished(start: StartType) {
+        if let view = self.view as! SKView? {
+            view.presentScene(nil)
+        }
+        showBackgroundPicture()
         switch start {
         case .NoMore: showMenu() //startMenuScene(showMenu: true)
         case .PreviousGame, .NextGame: startWTScene(new: false, next: start, gameNumber: 0)
@@ -144,8 +148,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             try! realm.write() {
                 GV.basicDataRecord.actLanguage = language
             }
-            self.getRecordCounts()
-            self.showMenu()
+             self.showMenu()
         }
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseLanguage),
                                                 message: "",
@@ -209,6 +212,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     var countMandatory = 0
     var countExistingGames = 0
     var countContinueGames = 0
+    
     private func getRecordCounts() {
         countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@", GV.actLanguage).count
         countExistingGames = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage).count
@@ -216,6 +220,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
+        showBackgroundPicture()
 //        printDEWordsSorted()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
 //       readNewTextFile()
@@ -233,13 +238,20 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
 //        readNewTextFile()
         // Get the SKScene from the loaded GKScene
         generateBasicDataRecordIfNeeded()
-        getRecordCounts()
+//        getRecordCounts()
        if countContinueGames > 0 {
             startWTScene(new: false, next: .NoMore, gameNumber: 0)
         } else {
             showMenu()
         }
 //        startMenuScene()
+    }
+    
+    private func showBackgroundPicture() {
+        let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
+        backgroundImage.image = UIImage(named: "magier.png")
+        backgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
+        self.view.insertSubview(backgroundImage, at: 0)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -269,9 +281,10 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     func showMenu() {
+        getRecordCounts()
         let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
-                                                message: "",
+                                                message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname),
                                                 preferredStyle: .alert)
 
         let newOK = countMandatory - countExistingGames > 0
@@ -374,7 +387,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     func generateMyNickname()->String {
-        var nickName = GV.onIpad ? "iPad" : "iPhone"
+        var nickName = GV.onIpad ? "Pd" : "Ph"
         let letters = GV.language.getText(.tcNickNameLetters)
         for _ in 0...4 {
             nickName += letters.subString(startPos: Int.random(min: 0, max: letters.count - 1), length: 1)
@@ -388,6 +401,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     var playerActivityByNickName: Results<PlayerActivity>?
     var playerActivityByNickNameSubscription: SyncSubscription<PlayerActivity>?
     var playerActivityByNickNameToken: NotificationToken?
+    
     func setNickname(nickName: String, keyWord: String) {
         if playerActivity!.count == 0 {
             return
@@ -407,13 +421,17 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                             GV.basicDataRecord.myNickname = nickName
                             GV.basicDataRecord.keyWord = keyWord
                         }
+                        self!.showMenu()
                     } else {
                         if self!.playerActivityByNickName![0].keyWord == nil || self!.playerActivityByNickName![0].keyWord == "" {
-                            let alertController = UIAlertController(title: GV.language.getText(.tcNicknameUsed),
+                            let alertController = UIAlertController(title: GV.language.getText(.tcNicknameUsedwithout, values: nickName),
                                                                     message: GV.language.getText(.tcNicknameActivating),
                                                                     preferredStyle: .alert)
-                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: nil))
-                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
+                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: {alert -> Void in
+                                self!.showMenu()
+                                //            self.showMenu()
+                            }))
+//                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
                             self!.present(alertController, animated: true, completion: nil)
                         } else {
                             if self!.playerActivityByNickName![0].keyWord == keyWord {
@@ -425,12 +443,17 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                                     GV.basicDataRecord.myNickname = nickName
                                     GV.basicDataRecord.keyWord = keyWord
                                 }
+                                self!.showMenu()
                             } else {
-                                let alertController = UIAlertController(title: GV.language.getText(.tcNicknameUsed),
+                                let alertController = UIAlertController(title: GV.language.getText(.tcNicknameUsed, values: nickName),
                                                                         message: GV.language.getText(.tcAddKeyWord),
                                                                         preferredStyle: .alert)
-                                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: nil))
-                                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
+                                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: {
+                                    alert -> Void in
+                                    self!.showMenu()
+                                    //            self.showMenu()
+                                }))
+//                                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
                                 self!.present(alertController, animated: true, completion: nil)
                             }
                         }
@@ -568,7 +591,6 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         for line in myLines {
             if !line.begins(with: "#") {
                 if line.subString(startPos: 0, length: 1).uppercased() == line.subString(startPos: 0, length: 1) {
-                    let index = line.index(of: )
                     print(line)
                 }
             }

@@ -148,6 +148,38 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 //        showPlayerActivityView!.frame = self.view.frame
                 self!.showPlayerActivityView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
                 print("complete: count records: \(String(describing: self!.playerActivityItems.count))")
+                self!.notificationToken = self!.playerActivityItems.observe { [weak self] (changes) in
+                    guard let showPlayerActivityView = self?.showPlayerActivityView else { return }
+                    switch changes {
+                    case .initial:
+                        // Results are now populated and can be accessed without blocking the UI
+                        //                showPlayerActivityView.reloadData()
+                        self!.initialLoadDone = true
+                    //                print("Initial Data displayed")
+                    case .update(_, let deletions, let insertions, let modifications):
+                        if self!.initialLoadDone {
+                            // Query results have changed, so apply them to the UITableView
+                            if insertions.count > 0 {
+                                showPlayerActivityView.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
+                            }
+                            if deletions.count > 0 {
+                                showPlayerActivityView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
+                            }
+                            showPlayerActivityView.beginUpdates()
+                            showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+                                                              with: .automatic)
+                            showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+                                                              with: .automatic)
+                            showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+                                                              with: .automatic)
+                            showPlayerActivityView.endUpdates()
+                        }
+                    case .error(let error):
+                        // An error occurred while opening the Realm file on the background worker thread
+                        fatalError("\(error)")
+                    }
+                }
+
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
@@ -156,37 +188,6 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             case .error(let error):
                 print("error: \(error)")
                 // An error occurred while processing the subscription
-            }
-        }
-        notificationToken = playerActivityItems.observe { [weak self] (changes) in
-            guard let showPlayerActivityView = self?.showPlayerActivityView else { return }
-            switch changes {
-            case .initial:
-                // Results are now populated and can be accessed without blocking the UI
-                //                showPlayerActivityView.reloadData()
-                self!.initialLoadDone = true
-//                print("Initial Data displayed")
-            case .update(_, let deletions, let insertions, let modifications):
-                if self!.initialLoadDone {
-                    // Query results have changed, so apply them to the UITableView
-                    if insertions.count > 0 {
-                        showPlayerActivityView.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
-                    }
-                    if deletions.count > 0 {
-                        showPlayerActivityView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
-                    }
-                    showPlayerActivityView.beginUpdates()
-                    showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-                                                      with: .automatic)
-                    showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-                                                      with: .automatic)
-                    showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-                                                      with: .automatic)
-                    showPlayerActivityView.endUpdates()
-                }
-            case .error(let error):
-                // An error occurred while opening the Realm file on the background worker thread
-                fatalError("\(error)")
             }
         }
         

@@ -72,7 +72,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcSave:                "Сохранить",
     .tcAddCodeRecommended:  "Если ты добавишь ключевое слово, ты можешь использовать один и тот же псевдоним на всех твоих устройствах",
     .tcKeyWord:             "Добавить ключевое слово ...",
-    .tcNicknameUsed:        "Псевдоним используется на другом устройстве!",
+    .tcNicknameUsed:        "Псевдоним '%' используется на другом устройстве!",
+    .tcNicknameUsedwithout: "Псевдоним '%' используется на другом устройстве без ключевого слова!",
     .tcNicknameActivating:  "Если это твоё устройство, открой его и добавь ключевое слово к псевдониму!",
     .tcAddKeyWord:          "Если это твоё устройство, добавь тут то же ключевое слово, иначе выбери другой псевдоним!",
     .tcChooseAction:        "Выбери пожалуйста!",
@@ -80,4 +81,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcGamesToContinue:     "Выберите игру для продолжения",
     .tcBestPlayerHeader:    "Лучшие очки",
     .tcMyHeader:            "Мои очки",
+    .tcMyNickName:          "Мой псевдоним: %",
 ]

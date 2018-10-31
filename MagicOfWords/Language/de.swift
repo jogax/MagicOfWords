@@ -72,7 +72,8 @@ let deDictionary: [TextConstants: String] = [
     .tcSave:                "Speichern",
     .tcAddCodeRecommended:  "Wenn Sie ein Keyword hinzufügen, können Sie auf allen Ihren Geräten denselben Benutzernamen verwenden",
     .tcKeyWord:             "Fügen Sie ein Keyword hinzu ...",
-    .tcNicknameUsed:        "Spitzname wird auf einem anderen Gerät verwendet!",
+    .tcNicknameUsed:        "Spitzname '%' wird auf einem anderen Gerät verwendet!",
+    .tcNicknameUsedwithout: "Spitzname '%' wird auf einem anderen Gerät verwendet ohne Schlüsselwort!",
     .tcNicknameActivating:  "Wenn dies Ihr Gerät ist, öffnen Sie es und fügen Sie ein Schlüsselwort dem Spitzname hinzu!",
     .tcAddKeyWord:          "Wenn dies Ihr Gerät ist, fügen Sie hier dasselbe Schlüsselwort hinzu, ansonsten wählen Sie einen anderen Spitznamen!",
     .tcChooseAction:        "Bitte wählen!",
@@ -80,6 +81,7 @@ let deDictionary: [TextConstants: String] = [
     .tcGamesToContinue:     "Wähle ein Spiel um fortzufahren",
     .tcBestPlayerHeader:    "Beste Erg.",
     .tcMyHeader:            "Mein Erg.",
+    .tcMyNickName:          "Mein Spitzname: %",
 ]
 
 

@@ -616,8 +616,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 case .NoMore:
                     break
                 case .PreviousGame:
-                    let previousRecords = realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d",
-                                                                                  GV.GameStatusPlaying, actGameNumber)
+                    let previousRecords = realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d and language = %@",
+                       GV.GameStatusPlaying, actGameNumber, GV.actLanguage)
                     if previousRecords.count == 1 {
                         actGameNumber = previousRecords[0].gameNumber
                     } else if let record = Array(previousRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).last {
@@ -626,8 +626,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                         break
                     }
                 case .NextGame:
-                    let nextRecords = realm.objects(GameDataModel.self).filter(" gameStatus = %d and gameNumber > %d",
-                                                                                   GV.GameStatusPlaying, actGameNumber)
+                    let nextRecords = realm.objects(GameDataModel.self).filter(" gameStatus = %d and gameNumber > %d and language = %@",
+                       GV.GameStatusPlaying, actGameNumber, GV.actLanguage)
                     if nextRecords.count == 1 {
                         actGameNumber = nextRecords[0].gameNumber
                     } else if let record = Array(nextRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).first {

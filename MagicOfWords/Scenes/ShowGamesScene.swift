@@ -43,7 +43,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     override func didMove(to view: SKView) {
         background.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
         let widthMultiplier = background.size.width / background.size.height
-        
+        lineHeight =  "A".height(font: myFont!) * 1.25
         background.size = CGSize(width: self.size.height * widthMultiplier, height: self.size.height)
         addChild(background)
 //        self.backgroundColor = SKColor(red: 200/255, green: 220/255, blue: 208/255, alpha: 1)
@@ -77,6 +77,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     var showGamesInTableView: WTTableView?
     var gamesForShow = [FinishedGameData]()
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
+    var lineHeight: CGFloat = 0
     var realmLoadingCompleted = false
     
     private func showFinishedGamesInTableView() {
@@ -87,7 +88,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
 //        showGamesInTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
         
         let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: 100)
-        let lineHeight = title.height(font: myFont!)
+//        let lineHeight = title.height(font: myFont!)
         let headerframeHeight = lineHeight * 2.2
         var showingWordsHeight = CGFloat(gamesForShow.count) * lineHeight
         if showingWordsHeight  > self.frame.height * 0.9 {
@@ -111,51 +112,55 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 self!.calculateColumnWidths()
                 let origin = CGPoint(x: 0, y: 0)
                 //        let origin = CGPoint(x: 0.5 * (self.view.frame.width - (headerLine.width(font: myFont!))), y: 200)
-                let heightOfLine =  self!.title.height(font: self!.myFont!) * 1.12
-                let size = CGSize(width: self!.title.width(font: self!.myFont!) * 1, height: heightOfLine * CGFloat(self!.gamesForShow.count + 2))
+//                let heightOfLine =  self!.title.height(font: self!.myFont!) * 1.12
+            let size = CGSize(width: self!.title.width(font: self!.myFont!) * 1, height: self!.lineHeight * CGFloat(self!.gamesForShow.count + 2))
                 let center = CGPoint(x: 0.5 * self!.view!.frame.width, y: 0.5 * self!.view!.frame.height)
                 self!.showGamesInTableView!.frame=CGRect(origin: origin, size: size)
                 self!.showGamesInTableView!.center=center
                 //        showPlayerActivityView!.frame = self.view.frame
                 self!.showGamesInTableView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-                self!.showGamesInTableView!.reloadData()
                 self!.realmLoadingCompleted = true
-            } else {
-            }
-        }
-        notificationToken = allResultsItems!.observe { [weak self] (changes) in
-            if !self!.realmLoadingCompleted {
-                return
-            }
-            guard let showGamesInTableView = self?.showGamesInTableView else { return }
-            switch changes {
-            case .initial:
-                // Results are now populated and can be accessed without blocking the UI
-                //                showPlayerActivityView.reloadData()
-                self!.initialLoadDone = true
-//                print("Initial Data displayed")
-            case .update(_, let deletions, let insertions, let modifications):
-                 self!.gamesForShow = self!.getGamesForShow()
-//                 if self!.initialLoadDone {
+            self!.notificationToken = self!.allResultsItems!.observe { [weak self] (changes) in
+//                print("changes: \(changes)")
+                if !self!.realmLoadingCompleted {
+                    print("return -> realmLoadingCompleted not completed")
+                    return
+                }
+                guard let showGamesInTableView = self?.showGamesInTableView else { return }
+                switch changes {
+                case .initial:
+                    // Results are now populated and can be accessed without blocking the UI
+                    //                showPlayerActivityView.reloadData()
+                    self!.initialLoadDone = true
+                    self!.showGamesInTableView!.reloadData()
+                    print("Initial Data displayed")
+                case .update(_, let deletions, let insertions, let modifications):
+//                    print("deletions: \(deletions), insertions: \(insertions), modifications: \(modifications)")
+                    self!.gamesForShow = self!.getGamesForShow()
+                    //                 if self!.initialLoadDone {
                     // Query results have changed, so apply them to the UITableView
                     if insertions.count > 0 {
-                        showGamesInTableView.frame.size.height += CGFloat(insertions.count) * self!.title.height(font: self!.myFont!)
+                        showGamesInTableView.frame.size.height += CGFloat(insertions.count) * self!.lineHeight //self!.title.height(font: self!.myFont!)
                     }
                     if deletions.count > 0 {
-                        showGamesInTableView.frame.size.height -= CGFloat(deletions.count) * self!.title.height(font: self!.myFont!)
+                        showGamesInTableView.frame.size.height -= CGFloat(deletions.count) * self!.lineHeight //self!.title.height(font: self!.myFont!)
                     }
                     showGamesInTableView.beginUpdates()
                     showGamesInTableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-                                                      with: .automatic)
+                                                    with: .automatic)
                     showGamesInTableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-                                                      with: .automatic)
+                                                    with: .automatic)
                     showGamesInTableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-                                                      with: .automatic)
+                                                    with: .automatic)
                     showGamesInTableView.endUpdates()
-//                }
-            case .error(let error):
-                // An error occurred while opening the Realm file on the background worker thread
-                fatalError("\(error)")
+                //                }
+                case .error(let error):
+                    // An error occurred while opening the Realm file on the background worker thread
+                    fatalError("\(error)")
+                }
+            }
+
+            } else {
             }
         }
 
@@ -257,15 +262,15 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
-        let color = UIColor(red: 240/255, green: 240/255, blue: 240/255,alpha: 1.0)
+//        let color = UIColor(red: 240/255, green: 240/255, blue: 240/255,alpha: 1.0)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: myFont!)
-        cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.frame.width * (GV.onIpad ? 0.040 : 0.010)))
+        cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: lineHeight/*self.frame.height * (GV.onIpad ? 0.040 : 0.010)*/))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
         cell.addColumn(text: (gamesForShow[indexPath.row].gameNumber).fixLength(length: lengthOfGameNumber - 2)) // GameNumber
-        cell.addColumn(text: String(gamesForShow[indexPath.row].bestPlayer).fixLength(length: 12), color: color) // Best Player
+        cell.addColumn(text: String(gamesForShow[indexPath.row].bestPlayer).fixLength(length: 12)/*, color: color*/) // Best Player
         cell.addColumn(text: String(gamesForShow[indexPath.row].bestScore).fixLength(length: 7)) // Best Score
-        cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: 8), color: color) // My Score
+        cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: 8)/*, color: color*/) // My Score
         cell.addButton(image: UIImage())
         return cell
     }
@@ -281,7 +286,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     }
 
     func getHeightForRow(tableView: UITableView, indexPath: IndexPath) -> CGFloat {
-        return title.height(font: myFont!) * 1.12
+        return lineHeight//title.height(font: myFont!) * 1.15//1.12
     }
     
 
