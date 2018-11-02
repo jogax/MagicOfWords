@@ -33,6 +33,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     var subscriptionToken: NotificationToken?
     var subscription: SyncSubscription<BestScoreForGame>!
     var showAll = true
+    var parentViewController: UIViewController?
 
 //    override func didMoveToView(view: SKView) {
 //        background.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
@@ -52,8 +53,9 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         showFinishedGamesInTableView()
     }
     
-    public func setDelegate(delegate: ShowGamesSceneDelegate) {
+    public func setDelegate(delegate: ShowGamesSceneDelegate, controller: UIViewController) {
         myDelegate = delegate
+        parentViewController = controller
     }
     
     public func setSelect(all: Bool) {
@@ -67,7 +69,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     private func goBack(gameNumberSelected: Bool, gameNumber: Int) {
         showGamesInTableView!.isHidden = true
         showGamesInTableView = nil
-        subscription.unsubscribe()
+//        subscription.unsubscribe()
          if myDelegate == nil {
             return
         }
@@ -101,6 +103,8 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         let width = title.width(font: myFont!)
         let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
         showGamesInTableView?.frame=CGRect(origin: origin, size: size)
+        let center = CGPoint(x: 0.5 * view!.frame.width, y: 0.5 * self.view!.frame.height)
+        self.showGamesInTableView!.center=center
         self.showGamesInTableView?.reloadData()
         
         self.scene?.view?.addSubview(showGamesInTableView!)
@@ -114,10 +118,11 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 //        let origin = CGPoint(x: 0.5 * (self.view.frame.width - (headerLine.width(font: myFont!))), y: 200)
 //                let heightOfLine =  self!.title.height(font: self!.myFont!) * 1.12
             let size = CGSize(width: self!.title.width(font: self!.myFont!) * 1, height: self!.lineHeight * CGFloat(self!.gamesForShow.count + 2))
-                let center = CGPoint(x: 0.5 * self!.view!.frame.width, y: 0.5 * self!.view!.frame.height)
                 self!.showGamesInTableView!.frame=CGRect(origin: origin, size: size)
-                self!.showGamesInTableView!.center=center
+
                 //        showPlayerActivityView!.frame = self.view.frame
+            let center = CGPoint(x: 0.5 * self!.view!.frame.width, y: 0.5 * self!.view!.frame.height)
+            self!.showGamesInTableView!.center=center
                 self!.showGamesInTableView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
                 self!.realmLoadingCompleted = true
             self!.notificationToken = self!.allResultsItems!.observe { [weak self] (changes) in
@@ -188,6 +193,12 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         for bestGame in allResultsItems! {
             if let index =  returnArray.index(where: {Int($0.gameNumber) == bestGame.gameNumber}) {
                 if bestGame.owner != nil {
+                    if bestGame.bestScore < Int(returnArray[index].score)! {
+                        try! realmSync!.write() {
+                            bestGame.bestScore = Int(returnArray[index].score)!
+                            bestGame.owner = playerActivity!.first!
+                        }
+                    }
                     returnArray[index].bestPlayer = bestGame.owner!.nickName!
                     returnArray[index].bestScore = String(bestGame.bestScore)
                 }
@@ -246,7 +257,21 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
         if let number = Int(gamesForShow[indexPath.row].gameNumber) {
             let gameNumber = number - 1
-            goBack(gameNumberSelected: true, gameNumber: gameNumber)
+            let combinedKey = GV.actLanguage + String(gameNumber)
+            let choosedGame = realm.objects(GameDataModel.self).filter("combinedKey = %@", combinedKey)
+            if choosedGame.count == 1 && choosedGame.first!.gameStatus == GV.GameStatusFinished {
+                let alertController = UIAlertController(title: GV.language.getText(.tcGameIsFinished, values: String(number)),
+                                                        message: GV.language.getText(.tcRestartGameQuestion),
+                                                        preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcRestart), style: .default, handler: { [unowned self]
+                    alert -> Void in
+                    self.goBack(gameNumberSelected: true, gameNumber: gameNumber)
+                }))
+                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: nil))
+                self.parentViewController!.present(alertController, animated: true, completion: nil)
+            } else {
+                goBack(gameNumberSelected: true, gameNumber: gameNumber)
+            }
         }
     }
     

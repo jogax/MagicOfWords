@@ -82,4 +82,8 @@ let enDictionary: [TextConstants: String] = [
     .tcBestPlayerHeader:    "Best",
     .tcMyHeader:            "My Score",
     .tcMyNickName:          "My nickname: %",
+    .tcGameIsFinished:      "The game % is already finished!",
+    .tcRestartGameQuestion: "If you restart, the score will be deleted!",
+    .tcRestartGame:         "Restart",
+
 ]

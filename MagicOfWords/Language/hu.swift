@@ -82,4 +82,6 @@ let huDictionary: [TextConstants: String] = [
     .tcBestPlayerHeader:    "Legjobb eredm.",
     .tcMyHeader:            "Saját eredm.",
     .tcMyNickName:          "Becenevem: %",
-]
+    .tcGameIsFinished:      "A %. játék már be lett fejezve!",
+    .tcRestartGameQuestion: "Ha újrainditod, a pontszám törlődik!",
+    .tcRestartGame:         "Újraindítás",]

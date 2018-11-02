@@ -77,7 +77,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     
     func showGames(all: Bool) {
         showGamesScene = ShowGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        showGamesScene!.setDelegate(delegate: self)
+        showGamesScene!.setDelegate(delegate: self, controller: self)
         showGamesScene!.setSelect(all: all)
         if let view = self.view as! SKView? {
             view.presentScene(showGamesScene!)
@@ -273,13 +273,25 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         switch reachability.connection {
         case .wifi:
             GV.connectedToInternet = true
+            if nickNameAction != nil {
+                nickNameAction!.isEnabled = true
+            }
         case .cellular:
             GV.connectedToInternet = true
+            if nickNameAction != nil {
+                nickNameAction!.isEnabled = true
+            }
         case .none:
             GV.connectedToInternet = false
+            if nickNameAction != nil {
+                nickNameAction!.isEnabled = false
+            }
         }
     }
+
+    var nickNameAction: UIAlertAction?
     
+
     func showMenu() {
         getRecordCounts()
         let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
@@ -325,7 +337,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         })
         alertController.addAction(chooseLanguageAction)
         //--------------------- nickNameAction ---------------------
-        let nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
+        nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
             alert -> Void in
             if GV.connectedToInternet {
                 self.chooseNickname()
@@ -333,10 +345,8 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                 self.showMenu()
             }
         })
-        if !GV.connectedToInternet {
-            nickNameAction.setValue(disabledColor, forKey: "TitleTextColor")
-        }
-        alertController.addAction(nickNameAction)
+        nickNameAction!.isEnabled = GV.connectedToInternet
+        alertController.addAction(nickNameAction!)
         #if DEBUG
         //--------------------- showRealmCloudAction ---------------------
         let showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]

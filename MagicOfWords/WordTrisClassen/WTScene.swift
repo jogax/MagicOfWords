@@ -542,6 +542,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //    }
 //
     private func getPlayingRecord(new: Bool, next: StartType, gameNumber: Int) {
+        func createPlayingRecord(gameNumber: Int) {
+            let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.actLanguage).first!
+            if mandatoryRecord != nil {
+                try! realm.write {
+                    GV.playingRecord = GameDataModel()
+                    GV.playingRecord.combinedKey = GV.actLanguage + String(gameNumber)
+                    GV.playingRecord.mandatoryWords = mandatoryRecord!.mandatoryWords
+                    GV.playingRecord.gameNumber = gameNumber
+                    GV.playingRecord.language = GV.actLanguage
+                    GV.playingRecord.time = timeInitValue
+                    realm.add(GV.playingRecord)
+                }
+            }
+        }
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.actLanguage)
         if new {
             let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusNew, GV.actLanguage)
@@ -556,24 +570,35 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //            wtGameWordList = WTGameWordList(delegate: self)
             if games.count > 0 {
                 GV.playingRecord = games[0]
-                realm.beginWrite()
-                GV.playingRecord.nowPlaying = true
-                GV.playingRecord.time = timeInitValue
-                try! realm.commitWrite()
-            } else {
-                let newGameNumber = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage).count
-                let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", newGameNumber, GV.actLanguage).first!
-                if mandatoryRecord != nil {
-                    try! realm.write {
-                        GV.playingRecord = GameDataModel()
-                        GV.playingRecord.combinedKey = GV.actLanguage + String(newGameNumber)
-                        GV.playingRecord.mandatoryWords = mandatoryRecord!.mandatoryWords
-                        GV.playingRecord.gameNumber = newGameNumber
-                        GV.playingRecord.language = GV.actLanguage
-                        GV.playingRecord.time = timeInitValue
-                        realm.add(GV.playingRecord)
-                    }
+                try! realm.write() {
+                    GV.playingRecord.nowPlaying = true
+                    GV.playingRecord.time = timeInitValue
                 }
+            } else {
+                var oldGameNumber = 0
+                var newGameNumber = 0
+                let playedGames = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage)
+                for playedGame in playedGames {
+                    if playedGame.gameNumber - oldGameNumber > 1 {
+                        newGameNumber = oldGameNumber + 1
+                        break
+                    }
+                    oldGameNumber = playedGame.gameNumber
+                    newGameNumber = oldGameNumber + 1
+                }
+                createPlayingRecord(gameNumber: newGameNumber)
+//                let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", newGameNumber, GV.actLanguage).first!
+//                if mandatoryRecord != nil {
+//                    try! realm.write {
+//                        GV.playingRecord = GameDataModel()
+//                        GV.playingRecord.combinedKey = GV.actLanguage + String(newGameNumber)
+//                        GV.playingRecord.mandatoryWords = mandatoryRecord!.mandatoryWords
+//                        GV.playingRecord.gameNumber = newGameNumber
+//                        GV.playingRecord.language = GV.actLanguage
+//                        GV.playingRecord.time = timeInitValue
+//                        realm.add(GV.playingRecord)
+//                    }
+//                }
             }
         } else if next == .GameNumber {
             if actGames.count > 0 {
@@ -583,12 +608,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     }
                 }
             }
-            let games = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.actLanguage)
+            let games = realm.objects(GameDataModel.self).filter("combinedKey = %d", GV.actLanguage + String(gameNumber))
             if games.count > 0 {
-                GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.actLanguage).first!
+                GV.playingRecord = games.first!
                 try! realm.write() {
                     GV.playingRecord.nowPlaying = true
                 }
+            } else {
+                createPlayingRecord(gameNumber: gameNumber)
             }
         } else {
             var first = true
@@ -1071,6 +1098,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         myTimer = MyTimer(time: timeForGame)
         addChild(myTimer!)
         wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
+
         generateArrayOfWordPieces(new: new)
         indexOfTilesForGame = 0
 //        getOnlineRecords()
@@ -1215,10 +1243,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     
     private func generateArrayOfWordPieces(new: Bool) {
         if new || GV.playingRecord.pieces.count == 0 {
+            let pieces = generateArrayOfWordPieces()
             try! realm.write {
-                GV.playingRecord.pieces = generateArrayOfWordPieces()
+                GV.playingRecord.pieces = pieces
             }
-        }
+       }
         tilesForGame.removeAll()
         let piecesToPlay = GV.playingRecord.pieces.components(separatedBy: "°")
         for index in 0..<piecesToPlay.count {

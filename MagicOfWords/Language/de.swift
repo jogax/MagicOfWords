@@ -82,6 +82,9 @@ let deDictionary: [TextConstants: String] = [
     .tcBestPlayerHeader:    "Beste Erg.",
     .tcMyHeader:            "Mein Erg.",
     .tcMyNickName:          "Mein Spitzname: %",
+    .tcGameIsFinished:      "Das Spiel % ist bereits beendet!",
+    .tcRestartGameQuestion: "Wenn Sie neu starten, die Punkte werden gelöscht!",
+    .tcRestartGame:         "Neustart",
 ]
 
 
