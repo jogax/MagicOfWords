@@ -227,6 +227,10 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
 //        printOrigDEData()
         myHeight = self.view.frame.size.height
         myWidth = self.view.frame.size.width
+        #if CREATEMANDATORY
+        _ = WordDBGenerator(create: true)
+        #endif
+
         #if GENERATEWORDLIST
         _ = WordDBGenerator(mandatory: false)
         print("WordList Generated")
@@ -238,6 +242,10 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
 //        readNewTextFile()
         // Get the SKScene from the loaded GKScene
         generateBasicDataRecordIfNeeded()
+//        generatingMandatoryWords(language: "de")
+//        generatingMandatoryWords(language: "hu")
+//        generatingMandatoryWords(language: "ru")
+//        checkMandatoryWords()
 //        getRecordCounts()
        if countContinueGames > 0 {
             startWTScene(new: false, next: .NoMore, gameNumber: 0)
@@ -607,4 +615,26 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         }
         
     }
+    func checkMandatoryWords() {
+        for language in ["en", "de","hu","ru"] {
+            let mandatoryRecords = realmMandatory.objects(MandatoryModel.self).filter("language = %@",language)
+            for mandatoryRecord in mandatoryRecords {
+                let words = mandatoryRecord.mandatoryWords.components(separatedBy: "°")
+                if words.count > 6 {
+                    print("words too long: \(words) ================================")
+                }
+                for word in words {
+                    if word.length < 5 {
+                        print("word too short: \(word)")
+                    }
+                    let toSearch = "\(language)\(word.lowercased())"
+                    if realmWordList.objects(WordListModel.self).filter("word = %@", toSearch).count == 0 {
+                        print("\(word) --> not found in Database!")
+                    }
+                    
+                }
+            }
+        }
+    }
+
 }

@@ -1934,8 +1934,6 @@ asztalfiók
 asztalfutó
 asztalféle
 asztalfő
-asztali bor
-asztali számítógép
 asztalitenisz
 asztalkendő
 asztalközép

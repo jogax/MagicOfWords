@@ -546,9 +546,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.actLanguage).first!
             if mandatoryRecord != nil {
                 try! realm.write {
+                    let components = mandatoryRecord!.mandatoryWords.components(separatedBy: "°")
+                    var newString = ""
+                    for index in 0...5 {
+                        newString += components[index] + "°"
+                    }
+                    newString.removeLast()
                     GV.playingRecord = GameDataModel()
                     GV.playingRecord.combinedKey = GV.actLanguage + String(gameNumber)
-                    GV.playingRecord.mandatoryWords = mandatoryRecord!.mandatoryWords
+                    GV.playingRecord.mandatoryWords = newString
                     GV.playingRecord.gameNumber = gameNumber
                     GV.playingRecord.language = GV.actLanguage
                     GV.playingRecord.time = timeInitValue
@@ -1917,7 +1923,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        wtGameboard!.checkWholeWords()
     }
     
-    private func generateArrayOfWordPieces()->String {
+    private func generateArrayOfWordPiecesOld()->String {
         let gameNumber =  GV.playingRecord.gameNumber
         let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
         let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
@@ -2058,7 +2064,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         return generatedArrayInStringForm
     }
 
-    private func generateArrayOfWordPiecesOld()->String {
+    private func generateArrayOfWordPieces()->String {
         var allLettersTable = [String]()
         var origAllLettersTable = [String]()
         let gameNumber =  GV.playingRecord.gameNumber
@@ -2140,7 +2146,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         allLettersTable = origAllLettersTable
         
 
-        
+        var count = 1
         for word in words {
             for index in 0..<word.count / 2 {
                 if !twoLetterPieces.contains(where: {$0 == word.subString(startPos: index * 2, length: 2).uppercased()}) {
@@ -2151,6 +2157,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //                        }
 //                    }
                 }
+            }
+            count += 1
+            if count > 6 {
+                break
             }
         }
         for (letter, counter) in mandatoryLetterFrequencyTable {

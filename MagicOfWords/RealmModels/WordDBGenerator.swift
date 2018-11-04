@@ -5,7 +5,7 @@
 //  Created by Jozsef Romhanyi on 31/05/2018.
 //  Copyright © 2018 Jozsef Romhanyi. All rights reserved.
 //
-#if GENERATEWORDLIST || GENERATEMANDATORY || GENERATELETTERFREQUENCY
+#if GENERATEWORDLIST || GENERATEMANDATORY || GENERATELETTERFREQUENCY || CREATEMANDATORY
 import Foundation
 import RealmSwift
 
@@ -20,13 +20,24 @@ let defaultConfig = Realm.Configuration(
     objectTypes: [MandatoryModel.self])
 #endif
 
+#if CREATEMANDATORY
+// for generating Mandatory Words
+let defaultConfig = Realm.Configuration(
+    objectTypes: [MandatoryModel.self])
+#endif
+
 
 var realm: Realm = try! Realm(configuration: defaultConfig)
 
 class WordDBGenerator {
     
-    init(mandatory: Bool) {
-        if mandatory {
+    init(mandatory: Bool = false, create: Bool = false) {
+        if create {
+            generatingMandatoryWords(language: "en")
+            generatingMandatoryWords(language: "de")
+            generatingMandatoryWords(language: "hu")
+            generatingMandatoryWords(language: "ru")
+        } else if mandatory {
             generateMandatoryWords(language: "en")
             generateMandatoryWords(language: "de")
             generateMandatoryWords(language: "hu")
@@ -137,6 +148,59 @@ class WordDBGenerator {
             }
         }
     }
+    
+    func generatingMandatoryWords(language: String) {
+        let words = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
+        let sortedWords =  Array(words).sorted(by: {$0.word.length < $1.word.length})
+        var minIndex = 0
+        var maxIndex = 0
+        repeat {
+            for index in 0..<sortedWords.count {
+                if minIndex == 0 && sortedWords[index].word.length == 7 {
+                    minIndex = index
+                }
+                if minIndex != 0 && sortedWords[index].word.length < 14 {
+                    maxIndex = index
+                }
+            }
+        } while maxIndex == 0
+        var wordTable = [String]()
+        var wordsToPrint = [String]()
+        let random = MyRandom(gameNumber: 0)
+        repeat {
+            let wordIndex = random.getRandomInt(minIndex, max: maxIndex)
+            let word = sortedWords[wordIndex]
+            let wLength = word.word.length
+            let search = word.word.subString(startPos: 2, length: wLength - 2)
+            if let _ = wordTable.index(where: { $0 == search }) {
+                
+            } else {
+                wordTable.append(word.word.subString(startPos: 2, length: wLength - 2))
+            }
+        } while wordTable.count < 10000
+        var index = 0
+        for gameNumber in 0...999 {
+            var text = ""
+            for _ in 0...7 {
+                text += wordTable[index] + "°"
+                index += 1
+            }
+            text.removeLast()
+            let mandatoryRecord = MandatoryModel()
+            let combinedKey:String = language + String(gameNumber)
+            mandatoryRecord.combinedKey = combinedKey
+            mandatoryRecord.gameNumber = gameNumber
+            mandatoryRecord.language = language
+            mandatoryRecord.mandatoryWords = text
+            try! realm.write() {
+                realm.add(mandatoryRecord)
+            }
+            wordsToPrint.append(text)
+        }
+        
+        print(wordsToPrint)
+    }
+
 
 }
 #endif
