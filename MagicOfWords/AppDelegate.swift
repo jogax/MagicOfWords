@@ -25,7 +25,7 @@ import Reachability
 //var realm: Realm = try! Realm(configuration: defaultConfig)
 //#endif
 //
-#if !GENERATELETTERFREQUENCY && !GENERATEWORDLIST && !GENERATEMANDATORY && !CREATEMANDATORY
+#if !GENERATELETTERFREQUENCY && !GENERATEWORDLIST && !GENERATEMANDATORY && !CREATEMANDATORY && !CREATEWORDLIST
 
 var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
 #endif
@@ -98,6 +98,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
         },
             objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self]
+//            objectTypes: [WordListModel.self]
         )
         
         // Tell Realm to use this new configuration object for the default Realm

@@ -558,6 +558,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     GV.playingRecord.gameNumber = gameNumber
                     GV.playingRecord.language = GV.actLanguage
                     GV.playingRecord.time = timeInitValue
+                    GV.playingRecord.nowPlaying = true
                     realm.add(GV.playingRecord)
                 }
             }

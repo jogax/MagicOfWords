@@ -5,7 +5,7 @@
 //  Created by Jozsef Romhanyi on 31/05/2018.
 //  Copyright © 2018 Jozsef Romhanyi. All rights reserved.
 //
-#if GENERATEWORDLIST || GENERATEMANDATORY || GENERATELETTERFREQUENCY || CREATEMANDATORY
+#if GENERATEWORDLIST || GENERATEMANDATORY || GENERATELETTERFREQUENCY || CREATEMANDATORY || CREATEWORDLIST
 import Foundation
 import RealmSwift
 
@@ -26,17 +26,30 @@ let defaultConfig = Realm.Configuration(
     objectTypes: [MandatoryModel.self])
 #endif
 
+#if CREATEWORDLIST
+// for generating Mandatory Words
+let defaultConfig = Realm.Configuration(
+    objectTypes: [WordListModel.self])
+#endif
+
+
 
 var realm: Realm = try! Realm(configuration: defaultConfig)
 
 class WordDBGenerator {
     
     init(mandatory: Bool = false, create: Bool = false) {
-        if create {
+        if create && mandatory {
             generatingMandatoryWords(language: "en")
             generatingMandatoryWords(language: "de")
             generatingMandatoryWords(language: "hu")
             generatingMandatoryWords(language: "ru")
+        } else if create && !mandatory {
+            generatingWordList(language: "en")
+            generatingWordList(language: "de")
+            generatingWordList(language: "hu")
+            generatingWordList(language: "ru")
+
         } else if mandatory {
             generateMandatoryWords(language: "en")
             generateMandatoryWords(language: "de")
@@ -199,6 +212,20 @@ class WordDBGenerator {
         }
         
         print(wordsToPrint)
+    }
+    func generatingWordList(language: String) {
+        let words = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
+        let sortedWords =  Array(words).sorted(by: {$0.word < $1.word})
+        var wordsToPrint = [String]()
+        for word in sortedWords {
+            try! realm.write() {
+                let wordListRecord = WordListModel()
+                wordListRecord.word = word.word
+                realm.add(wordListRecord)
+            }
+//            wordsToPrint.append(word.word)
+        }
+//        print(wordsToPrint)
     }
 
 
