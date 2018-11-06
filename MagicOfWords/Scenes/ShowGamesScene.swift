@@ -20,6 +20,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         var bestPlayer = ""
         var bestScore = ""
         var score = ""
+        var finished = false
     }
 
     let xMultiplierTab: [CGFloat] = [0.3, 0.5, 0.8]
@@ -188,6 +189,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
             item.score = String(game.score)
             item.bestPlayer = notExists
             item.bestScore = notExists
+            item.finished = game.gameStatus == GV.GameStatusFinished
             returnArray.append(item)
         }
         for bestGame in allResultsItems! {
@@ -296,7 +298,10 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         cell.addColumn(text: String(gamesForShow[indexPath.row].bestPlayer).fixLength(length: 12)/*, color: color*/) // Best Player
         cell.addColumn(text: String(gamesForShow[indexPath.row].bestScore).fixLength(length: 7)) // Best Score
         cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: 8)/*, color: color*/) // My Score
-        cell.addButton(image: UIImage())
+        if gamesForShow[indexPath.row].finished {
+            let image = UIImage(named: "hook.png")
+            cell.addButton(image: image!)
+        }
         return cell
     }
     

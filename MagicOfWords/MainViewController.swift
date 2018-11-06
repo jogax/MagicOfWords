@@ -120,6 +120,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         if let view = self.view as! SKView? {
             wtScene.setDelegate(delegate: self)
             wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber)
+            wtScene.parentViewController = self
             view.presentScene(wtScene)
         }
         
@@ -249,7 +250,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
 //        generatingMandatoryWords(language: "de")
 //        generatingMandatoryWords(language: "hu")
 //        generatingMandatoryWords(language: "ru")
-        checkMandatoryWords()
+//        checkMandatoryWords()
 //        getRecordCounts()
        if countContinueGames > 0 {
             startWTScene(new: false, next: .NoMore, gameNumber: 0)

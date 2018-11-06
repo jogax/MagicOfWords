@@ -62,14 +62,14 @@ class CustomTableViewCell: UITableViewCell {
     }
     
     public func addButton(image: UIImage, text: String = "", color: UIColor = .white) {
-        let letter = "A"
         var posForColumn: CGFloat = 2
         for subView in boxView.subviews {
             posForColumn += subView.frame.width
         }
         let button = UIButton()
         button.setImage(image, for: UIControl.State.normal)
-        button.frame = CGRect(x: 0, y: 0, width: 10, height: letter.height(font: myFont) * 1.3)
+        button.frame = CGRect(x: posForColumn, y: 5, width: image.size.width * 0.1, height: image.size.height * 0.1)
+        boxView.addSubview(button)
     }
     
     required init?(coder aDecoder: NSCoder) {

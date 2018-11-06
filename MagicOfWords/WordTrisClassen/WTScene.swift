@@ -306,6 +306,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     var tableType: TableType = .None
     var wordList = [SelectedWord]()
     var showWordsOverPositionTableView: WTTableView?
+    var parentViewController: UIViewController?
     
 
     func showScore(newWord: SelectedWord, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int) {
@@ -1448,13 +1449,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                     }
                 }
             }
-            if name == answer1Name {
-               touchedNodes.answer1 = true
-            } else if name == answer2Name {
-                touchedNodes.answer2 = true
-//            } else if name == ownWordsBackgroundName {
-//                touchedNodes.ownWordsBackground = true
-            }
+//            if name == answer1Name {
+//               touchedNodes.answer1 = true
+//            } else if name == answer2Name {
+//                touchedNodes.answer2 = true
+////            } else if name == ownWordsBackgroundName {
+////                touchedNodes.ownWordsBackground = true
+//            }
         }
 //        if touchedNodes.GRow == -1 {
 //            for node in nodes1 {
@@ -1468,6 +1469,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
 //        }
         return touchedNodes
     }
+    let answer1Name = "Answer1"
+    let answer2Name = "Answer2"
+    let MyQuestionName = "MyQuestion"
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if wtSceneDelegate == nil {
@@ -1482,34 +1486,34 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         let lastPosition = ws.count - 1
 //        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
         let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .stop)
-        if touchedNodes.answer1 {
-            gameboardEnabled = true
-            removeNodesWith(name: MyQuestionName)
-            self.addChild(createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer2), position:CGPoint(x: self.size.width * 0.5, y: self.size.height * 0.94), name: answer2Name))
-        }
-        if touchedNodes.answer2 {
-            wtGameboard!.clearGreenFieldsForNextRound()
-            if !checkFreePlace() {
-                showGameFinished(status: .NoMoreSteps)
-            } else {
-//                roundIndexes.append(activityItems.count - 1)
-                realm.beginWrite()
-                let newRound = RoundDataModel()
-//                newRound.index = activityItems.count - 1
-                newRound.gameArray = wtGameboard!.gameArrayToString()
-                GV.playingRecord.rounds.append(newRound)
-                timeForGame.incrementMaxTime(value: iHalfHour)
-                WTGameWordList.shared.addNewRound()
-                activityRoundItem.append(ActivityRound())
-                activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
-                try! realm.commitWrite()
-                modifyHeader()
-            }
-            enabled = true
-            gameboardEnabled = false
-            removeNodesWith(name: MyQuestionName)
-            removeNodesWith(name: answer2Name)
-       }
+//        if touchedNodes.answer1 {
+//            gameboardEnabled = true
+//            removeNodesWith(name: MyQuestionName)
+//            self.addChild(createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer2), position:CGPoint(x: self.size.width * 0.5, y: self.size.height * 0.94), name: answer2Name))
+//        }
+//        if touchedNodes.answer2 {
+//            wtGameboard!.clearGreenFieldsForNextRound()
+//            if !checkFreePlace() {
+//                showGameFinished(status: .NoMoreSteps)
+//            } else {
+////                roundIndexes.append(activityItems.count - 1)
+//                realm.beginWrite()
+//                let newRound = RoundDataModel()
+////                newRound.index = activityItems.count - 1
+//                newRound.gameArray = wtGameboard!.gameArrayToString()
+//                GV.playingRecord.rounds.append(newRound)
+//                timeForGame.incrementMaxTime(value: iHalfHour)
+//                WTGameWordList.shared.addNewRound()
+//                activityRoundItem.append(ActivityRound())
+//                activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
+//                try! realm.commitWrite()
+//                modifyHeader()
+//            }
+//            enabled = true
+//            gameboardEnabled = false
+//            removeNodesWith(name: MyQuestionName)
+//            removeNodesWith(name: answer2Name)
+//       }
         if inChoosingOwnWord {
             if movingSprite {
                 movingSprite = false
@@ -1562,10 +1566,45 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 let freePlaceFound = checkFreePlace()
 //                checkIfGameFinished()
                 if !freePlaceFound {
-                    let question = MyQuestion(question: .NoMoreSteps, parentSize: self.size)
-                    question.position = CGPoint(x:self.size.width * 0.5, y: self.size.height * 0.5)
-                    self.addChild(question)
-                    enabled = false
+//                    let question = MyQuestion(question: .NoMoreSteps, parentSize: self.size)
+//                    question.position = CGPoint(x:self.size.width * 0.5, y: self.size.height * 0.5)
+//                    self.addChild(question)
+//                    enabled = false
+                    let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
+                                                            message: GV.language.getText(.tcNoMoreStepsQuestion2),
+                                                            preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer1), style: .default, handler: {alert -> Void in
+                        self.gameboardEnabled = true
+//                        removeNodesWith(name: MyQuestionName)
+                        self.addChild(self.createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer2), position:CGPoint(x: self.size.width * 0.5, y: self.size.height * 0.94), name: self.answer2Name))
+                    }))
+                    alertController.addAction(UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
+                        self.wtGameboard!.clearGreenFieldsForNextRound()
+                        if !self.checkFreePlace() {
+                            self.showGameFinished(status: .NoMoreSteps)
+                        } else {
+                            //                roundIndexes.append(activityItems.count - 1)
+                            realm.beginWrite()
+                            let newRound = RoundDataModel()
+                            //                newRound.index = activityItems.count - 1
+                            newRound.gameArray = self.wtGameboard!.gameArrayToString()
+                            GV.playingRecord.rounds.append(newRound)
+                            self.timeForGame.incrementMaxTime(value: iHalfHour)
+                            WTGameWordList.shared.addNewRound()
+                            self.activityRoundItem.append(ActivityRound())
+                            self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
+                            try! realm.commitWrite()
+                            self.modifyHeader()
+                        }
+                        self.enabled = true
+                        self.gameboardEnabled = false
+                        self.removeNodesWith(name: self.MyQuestionName)
+                        self.removeNodesWith(name: self.answer2Name)
+                    }))                   //                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
+//                    self.present(alertController, animated: true, completion: nil)
+                    self.parentViewController!.present(alertController, animated: true, completion: nil)
+
+
                 }
                saveActualState()
             } else {
