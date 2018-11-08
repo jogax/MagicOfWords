@@ -472,6 +472,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     let gameNumberName = "°°°gameNumber°°°"
     let previousName = "°°°previousGame°°°"
     let nextName = "°°°nextGame°°°"
+    let answer1ButtonName = "°°°answer1ButtonName°°°"
 //    let ownWordsBackgroundName = "°°°ownWordsBackgroundName°°°"
     let ownWordsButtonName = "°°°ownWordsButtonName°°°"
 
@@ -1006,7 +1007,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
         self.view?.addSubview(undoButton!)
     }
     
-    private func createButton(imageName: String, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool)->UIButton {
+    private func createButton(imageName: String, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool, color: UIColor? = nil )->UIButton {
         let button = UIButton()
         if imageName.length > 0 {
             let image = UIImage(named: imageName)
@@ -1017,7 +1018,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
             button.setTitleColor(UIColor.black, for: .normal)
             button.titleLabel?.font = myTitleFont
         }
-        button.backgroundColor = bgColor
+        button.backgroundColor = color == nil ? bgColor : color
         button.layer.cornerRadius = cornerRadius
         button.alpha = enabled ? 1.0 : 0.2
         button.isEnabled = enabled
@@ -1564,47 +1565,31 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
                 ws[lastPosition].setPieceFromPosition(index: lastPosition)
                 self.addChild(ws[lastPosition])
                 let freePlaceFound = checkFreePlace()
+
 //                checkIfGameFinished()
-                if !freePlaceFound {
-//                    let question = MyQuestion(question: .NoMoreSteps, parentSize: self.size)
-//                    question.position = CGPoint(x:self.size.width * 0.5, y: self.size.height * 0.5)
-//                    self.addChild(question)
-//                    enabled = false
+                let answer1Action =  UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer1), style: .default, handler: {alert -> Void in
+                    self.gameboardEnabled = true
+                    let title = GV.language.getText(.tcNoMoreStepsAnswer2)
+                    let wordLength = title.width(font: self.myTitleFont!)
+                    let wordHeight = title.height(font: self.myTitleFont!)
+                    let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
+                    let answer1ButtonPos = self.frame.height * 0.05
+                    let center = CGPoint(x:self.frame.width * 0.5, y: answer1ButtonPos) //self.frame.height * 0.20)
+                    let radius = frame.height * 0.5
+                    self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .green)
+                    self.answer1Button!.addTarget(self, action: #selector(self.startNextRound), for: .touchUpInside)
+                    self.view?.addSubview(self.answer1Button!)
+                })
+                let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
+                    self.startNextRound()
+                })
+               if !freePlaceFound {
                     let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
                                                             message: GV.language.getText(.tcNoMoreStepsQuestion2),
                                                             preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer1), style: .default, handler: {alert -> Void in
-                        self.gameboardEnabled = true
-//                        removeNodesWith(name: MyQuestionName)
-                        self.addChild(self.createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer2), position:CGPoint(x: self.size.width * 0.5, y: self.size.height * 0.94), name: self.answer2Name))
-                    }))
-                    alertController.addAction(UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
-                        self.wtGameboard!.clearGreenFieldsForNextRound()
-                        if !self.checkFreePlace() {
-                            self.showGameFinished(status: .NoMoreSteps)
-                        } else {
-                            //                roundIndexes.append(activityItems.count - 1)
-                            realm.beginWrite()
-                            let newRound = RoundDataModel()
-                            //                newRound.index = activityItems.count - 1
-                            newRound.gameArray = self.wtGameboard!.gameArrayToString()
-                            GV.playingRecord.rounds.append(newRound)
-                            self.timeForGame.incrementMaxTime(value: iHalfHour)
-                            WTGameWordList.shared.addNewRound()
-                            self.activityRoundItem.append(ActivityRound())
-                            self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
-                            try! realm.commitWrite()
-                            self.modifyHeader()
-                        }
-                        self.enabled = true
-                        self.gameboardEnabled = false
-                        self.removeNodesWith(name: self.MyQuestionName)
-                        self.removeNodesWith(name: self.answer2Name)
-                    }))                   //                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
-//                    self.present(alertController, animated: true, completion: nil)
+                    alertController.addAction(answer1Action)
+                    alertController.addAction(answer2Action)
                     self.parentViewController!.present(alertController, animated: true, completion: nil)
-
-
                 }
                saveActualState()
             } else {
@@ -1632,6 +1617,37 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameFinishedDelegate, WTGameWordL
     var bestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
     var syncedRecordsOK = false
     var waitingForSynceRecords = false
+    var answer1Button: UIButton?
+    
+    @objc private func startNextRound() {
+        if answer1Button != nil {
+            answer1Button!.removeFromSuperview()
+            answer1Button = nil
+        }
+        removeNodesWith(name: answer1ButtonName)
+        self.wtGameboard!.clearGreenFieldsForNextRound()
+        if !self.checkFreePlace() {
+            self.showGameFinished(status: .NoMoreSteps)
+        } else {
+            //                roundIndexes.append(activityItems.count - 1)
+            realm.beginWrite()
+            let newRound = RoundDataModel()
+            //                newRound.index = activityItems.count - 1
+            newRound.gameArray = self.wtGameboard!.gameArrayToString()
+            GV.playingRecord.rounds.append(newRound)
+            self.timeForGame.incrementMaxTime(value: iHalfHour)
+            WTGameWordList.shared.addNewRound()
+            self.activityRoundItem.append(ActivityRound())
+            self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
+            try! realm.commitWrite()
+            self.modifyHeader()
+        }
+        self.enabled = true
+        self.gameboardEnabled = false
+        self.removeNodesWith(name: self.MyQuestionName)
+        self.removeNodesWith(name: self.answer2Name)
+    }
+
     
     private func getSyncedRecords() {
         if realmSync != nil {

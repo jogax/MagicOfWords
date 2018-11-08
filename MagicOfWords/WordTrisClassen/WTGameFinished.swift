@@ -31,7 +31,7 @@ struct WTResults {
         self.countUsedLetters = 0
         self.allAroundScore = 0
     }
-    
+
 }
 
 public protocol WTGameFinishedDelegate: class {
@@ -59,7 +59,7 @@ class WTGameFinished: SKSpriteNode {
         self.isHidden = true
         self.zPosition = 10
     }
-    
+
     public func showFinish(status: GameFinisheStatus) {
         if !resultsOnScreen {
             self.status = status
@@ -87,7 +87,7 @@ class WTGameFinished: SKSpriteNode {
             createLabel(text: String(results.countOwnWords), positionIndex: 6)
             createLabel(text: GV.language.getText(.tcScore), positionIndex: 7)
             createLabel(text: String(results.scoreOwnWords), positionIndex: 8)
-            
+
             createLabel(text: GV.language.getText(.tcTotal), positionIndex: 9)
             createLabel(text: String(results.scoreOwnWords + results.scoreMandatoryWords), positionIndex: 10)
 
@@ -96,7 +96,7 @@ class WTGameFinished: SKSpriteNode {
         }
 
   }
-    
+
     private func getResults()->Bool {
         for actWord in WTGameWordList.shared.allWords {
             if actWord.mandatory {
@@ -110,7 +110,7 @@ class WTGameFinished: SKSpriteNode {
         }
         return WTGameWordList.shared.gameFinished()
     }
-    
+
     private func createHeaderLabel(line: Int, text: String) {
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
         label.text = text
@@ -130,14 +130,14 @@ class WTGameFinished: SKSpriteNode {
         //        (self.parent as! SKScene).addChild(label)
         self.addChild(label)
     }
-    
+
     private func createLabel(text: String, positionIndex: Int) {
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
         let column1Value:CGFloat = 0.07
         let column2Value:CGFloat = 0.55
         let column3Value:CGFloat = 0.60
         let column4Value:CGFloat = 0.85
-        
+
         let row1Value:CGFloat = 0.50
         let row2Value:CGFloat = 0.46
         let row3Value:CGFloat = 0.42
@@ -154,7 +154,7 @@ class WTGameFinished: SKSpriteNode {
             (x: column2Value, y: row2Value, fixLength: 3),  // 6 = Countwords
             (x: column3Value, y: row2Value, fixLength: 0),  // 7 = Score
             (x: column4Value, y: row2Value, fixLength: 6),  // 8 = ScoreValue
-            
+
             (x: column1Value, y: row3Value, fixLength: 0), // 9 = Total
             (x: column4Value, y: row3Value, fixLength: 7), // 10 = Total Score
 
@@ -177,7 +177,7 @@ class WTGameFinished: SKSpriteNode {
 //        (self.parent as! SKScene).addChild(label)
         self.addChild(label)
     }
-    
+
     private func createButton() {
         let texture = SKTexture(imageNamed: "button.png")
         let button = SKSpriteNode(texture: texture, color: .white, size: CGSize(width: self.size.width * 0.5, height: self.size.height * 0.2))
@@ -199,11 +199,11 @@ class WTGameFinished: SKSpriteNode {
         button.addChild(label)
         self.addChild(button)
     }
-    
+
     public func setDelegate(delegate: WTGameFinishedDelegate) {
         myDelegate = delegate
     }
-    
+
     public func OKButtonPressed() {
         if status == .OK {
             myDelegate!.startNewGame()
@@ -212,7 +212,7 @@ class WTGameFinished: SKSpriteNode {
         myDelegate!.restartThisGame()
         self.removeFromParent()
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
