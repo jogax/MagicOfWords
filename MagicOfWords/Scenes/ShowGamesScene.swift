@@ -225,7 +225,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         title = ""
         let text1 = "  \(GV.language.getText(.tcGameNumber)) "
         let text2 = " \(GV.language.getText(.tcBestPlayerHeader)) ".fixLength(length: 20, center: true)
-        let text3 = " \(GV.language.getText(.tcMyHeader)) ".fixLength(length:10, center: true)
+        let text3 = " \(GV.language.getText(.tcMyHeader)) ".fixLength(length:15, center: true)
         title += text1
         title += text2
         title += text3
@@ -240,7 +240,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
             //            let fontSize = GV.onIpad ? self.frame.width * 0.020 : self.frame.width * 0.040
             //            let myFont = UIFont(name: "CourierNewPS-BoldMT", size: fontSize) // change it according to ur requirement
             let lineHeight = (myFont?.lineHeight)!// * (GV.onIpad ? 1.5 : 2.0)
-            let width = lineHeight * CGFloat(title.length)
+            let width = CGFloat(title.width(font: myFont!)) //lineHeight * CGFloat(title.length)
             //            view.frame = CGRect(x: 50, y: 0, width: width, height: 2 * lineHeight)
             let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
             label1.font = myFont!

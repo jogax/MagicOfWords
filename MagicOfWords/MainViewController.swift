@@ -247,7 +247,6 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
 //        readNewTextFile()
         // Get the SKScene from the loaded GKScene
         generateBasicDataRecordIfNeeded()
-//        generatingMandatoryWords(language: "de")
 //        generatingMandatoryWords(language: "hu")
 //        generatingMandatoryWords(language: "ru")
 //        checkMandatoryWords()
@@ -259,6 +258,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         }
 //        startMenuScene()
     }
+    
     
     private func showBackgroundPicture() {
         let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
@@ -334,7 +334,8 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             }
         })
         if !continueOK {
-            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
+            continueAction.isEnabled = false
+//            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
         }
         alertController.addAction(continueAction)
         //--------------------- bestScoreAction ---------------------
@@ -352,13 +353,13 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         //--------------------- nickNameAction ---------------------
         nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
             alert -> Void in
-            if GV.connectedToInternet {
+            if GV.connectedToInternet && playerActivity != nil {
                 self.chooseNickname()
             } else {
                 self.showMenu()
             }
         })
-        nickNameAction!.isEnabled = GV.connectedToInternet
+        nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
         alertController.addAction(nickNameAction!)
         #if DEBUG
         //--------------------- showRealmCloudAction ---------------------
@@ -372,19 +373,6 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         present(alertController, animated: true, completion: nil)
 
     }
-    
-//    func startMenuScene1(showMenu: Bool = false) {
-//        let menuScene = MenuScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-//        if let view = self.view as! SKView? {
-//            let actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.aktLanguage)
-//            if showMenu || actGames.count == 0 {
-//                menuScene.setDelegate(delegate: self)
-//                view.presentScene(menuScene)
-//            } else {
-//                continueGame()
-//            }
-//        }
-//    }
     
     private func generateBasicDataRecordIfNeeded() {
         try! realm.write {
@@ -491,56 +479,6 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             
         }
      }
-    
-    //    func setIsOnline() {
-    ////        let syncConfig: SyncConfiguration = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL)
-    ////        let syncConfig = SyncUser.current!.configuration(realmURL: GV.REALM_URL, user: GV.myUser!)
-    ////        let config = SyncUser.current!.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true, urlPrefix: nil)
-    ////        let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
-    //        realmSync = try! Realm(configuration: config)
-    //        if playerActivity == nil {
-    //            playerActivity = realmSync?.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
-    //        }
-    //        try! realmSync?.write {
-    //            if playerActivity?.count == 0 {
-    //                let playerActivityItem = PlayerActivity()
-    //                playerActivityItem.name = GV.basicDataRecord.myName
-    //                playerActivityItem.nickName = GV.basicDataRecord.myNickname
-    //                playerActivityItem.isOnline = true
-    //                playerActivityItem.onlineSince = getLocalDate()
-    //                playerActivityItem.onlineTime = 0
-    //                realmSync?.add(playerActivityItem)
-    //            } else {
-    //                playerActivity![0].isOnline = true
-    //                playerActivity![0].onlineSince = getLocalDate()
-    //            }
-    //        }
-    ////        setNotification()
-    //    }
-    
-    //    func setNotification() {
-    //        let playerActivityResult = realmSync?.objects(PlayerActivity.self).filter("name != %@", "xxxx")
-    ////        let subscription = playerActivityResult.subscribe()
-    ////        var subscribe = realmSync?.objects(PlayerActivity.self).subscribe()
-    //        GV.notificationToken = playerActivityResult?.observe {(changes: RealmCollectionChange) in
-    //        switch changes {
-    //        case .initial:
-    //            break
-    //        // Results are now populated and can be accessed without blocking the UI
-    //        case .update(_, _, _, _):// let deletions, let insertions, let modifications):
-    //            break
-    //        // Query results have changed, so apply them to the UITableView
-    //        case .error(let error):
-    //        // An error occurred while opening the Realm file on the background worker thread
-    //            fatalError("\(error)")
-    //        }
-    //        }
-    //
-    //    }
-    
-    
-    
-    
     
     func printFonts() {
         let fontFamilyNames = UIFont.familyNames

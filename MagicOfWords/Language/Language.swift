@@ -39,7 +39,7 @@ enum TextConstants: Int {
 //    tcActScoreHeader,
     tcWordsToCollect,
     tcOwnWords,
-    tcNoMoreSteps,
+    tcGameFinished,
     tcBestPlayer,
     tcBestScore,
     tcCollectedRequiredWords,

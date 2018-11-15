@@ -20,6 +20,7 @@ class GameDataModel: Object {
     @objc dynamic var pieces = ""
     @objc dynamic var score = 0  // Score
     @objc dynamic var time = ""
+    @objc dynamic var synced = false
     let rounds = List<RoundDataModel>()
     override  class func primaryKey() -> String {
         return "combinedKey"

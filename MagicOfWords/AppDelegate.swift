@@ -76,21 +76,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 7,
+            schemaVersion: 8,
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
                 switch oldSchemaVersion {
-                case 0...2:
+                case 0...3:
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
-                case 3:
-                    migration.enumerateObjects(ofType: BasicDataModel.className()) { oldObject, newObject in
-                        newObject!["myNickname"] = oldObject!["myName"]
-                    }
                 default: migration.enumerateObjects(ofType: GameDataModel.className()) { oldObject, newObject in
-                    print("oldObject: \(oldObject!["language"] as! String), \(String(oldObject!["gameNumber"] as! Int))")
                     newObject!["combinedKey"] = oldObject!["language"] as! String + String((oldObject!["gameNumber"] as! Int) % 1000)
                     newObject!["gameNumber"] = Int(oldObject!["gameNumber"] as! Int % 1000)
                     }
@@ -232,10 +227,114 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     playerActivity![0].onlineSince = getLocalDate()
                 }
             }
+            checkSyncedDB()
         }
     }
     
+    var bestScoreSync: Results<BestScoreSync>?
+    var notificationToken: NotificationToken?
+    var bestScoreSubscriptionToken: NotificationToken?
+    var forGameSubscriptionToken: NotificationToken?
+    var bestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
+    var bestScoreForGame: Results<BestScoreForGame>?
+    var bestScoreForGameToken: NotificationToken?
+    var bestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
+    var syncedRecordsOK = false
+    var waitingForSynceRecords = false
+    var answer1Button: UIButton?
     
+    
+    private func checkSyncedDB() {
+        let language = GV.language.getText(.tcAktLanguage)
+        let myName = GV.basicDataRecord.myName
+        let combinedPrimarySync = language + myName
+        let combinedPrimaryForGame = language
+// this block sets the local DB to NotSynced
+//  ==================================
+        let myGameRecords = realm.objects(GameDataModel.self).filter("language = %@ and synced = true", language).sorted(byKeyPath: "gameNumber", ascending: true)
+        try! realm.write() {
+            for record in myGameRecords {
+                record.synced = false
+            }
+        }
+        //  ==================================
+        if realmSync != nil {
+            let myGameRecords = realm.objects(GameDataModel.self).filter("language = %@ and synced = false", language).sorted(byKeyPath: "gameNumber", ascending: true)
+            if myGameRecords.count > 0 {
+                bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary ENDSWITH %@", combinedPrimarySync)
+                bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "AllMyScoreRecords:\(combinedPrimarySync)")
+                bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
+                    //                    print("in Subscription!")
+                    if state == .complete {
+                        for record in myGameRecords {
+                            let actGameNumber = record.gameNumber + 1
+                            let syncedRecord = self!.bestScoreSync!.filter("gameNumber = %@", actGameNumber)
+                            if syncedRecord.count == 0 {
+                                try! realmSync!.write {
+                                    let bestScoreSyncRecord = BestScoreSync()
+                                    bestScoreSyncRecord.gameNumber = actGameNumber
+                                    bestScoreSyncRecord.language = language
+                                    bestScoreSyncRecord.playerName = myName
+                                    bestScoreSyncRecord.combinedPrimary = String(actGameNumber) + combinedPrimarySync
+                                    bestScoreSyncRecord.finished = record.gameStatus == GV.GameStatusFinished
+                                    bestScoreSyncRecord.score = record.score
+                                    bestScoreSyncRecord.owner = playerActivity?[0]
+                                    realmSync!.add(bestScoreSyncRecord)
+                                }
+                                try! realm.write() {
+                                    record.synced = true
+                                }
+                            } else {
+                                if syncedRecord.first!.score < record.score {
+                                    try! realmSync!.write {
+                                        syncedRecord.first!.finished = record.gameStatus == GV.GameStatusFinished
+                                        syncedRecord.first!.score = record.score
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        print("state: \(state)")
+                    }
+                }
+                bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@", combinedPrimaryForGame)
+                bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "AllGameRecords:\(combinedPrimaryForGame)")
+                forGameSubscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
+                    //                print("in Subscription!")
+                    if state == .complete {
+                        for record in myGameRecords {
+                            try! realm.write() {
+                                record.synced = true
+                            }
+                            let actGameNumber = record.gameNumber + 1
+                            let syncedRecord = self!.bestScoreForGame!.filter("gameNumber = %@", actGameNumber)
+                            if syncedRecord.count == 0 {
+                                try! realmSync!.write {
+                                    let bestScoreSyncRecord = BestScoreForGame()
+                                    bestScoreSyncRecord.gameNumber = actGameNumber
+                                    bestScoreSyncRecord.language = language
+                                    bestScoreSyncRecord.combinedPrimary = String(actGameNumber) + combinedPrimaryForGame
+                                    bestScoreSyncRecord.bestScore = record.score
+                                    bestScoreSyncRecord.owner = playerActivity?[0]
+                                    realmSync!.add(bestScoreSyncRecord)
+                                }
+                            } else {
+                                if syncedRecord.first!.bestScore < record.score {
+                                    try! realmSync!.write {
+                                        syncedRecord.first!.bestScore = record.score
+                                    }
+                                }
+                            }
+                            
+                        }
+                    } else {
+                        print("state: \(state)")
+                    }
+                }
+            }
+        }
+    }
+
     
 }
 //var RealmService = ReferenceRealm.shared.realm
