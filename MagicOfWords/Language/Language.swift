@@ -87,7 +87,9 @@ enum TextConstants: Int {
     tcMyNickName,
     tcGameIsFinished,
     tcRestartGameQuestion,
-    tcRestartGame
+    tcRestartGame,
+    tcShowWordlistHeader,
+    tcSearchingWord
 }
 
     let LanguageEN = "en" // index 0

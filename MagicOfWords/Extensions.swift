@@ -376,6 +376,10 @@ extension String {
         return returnString
     }
     
+    func char(from: Int)->String {
+        return subString(startPos:from, length: 1)
+    }
+    
     func subString(startPos: Int, length: Int) -> String {
         if self.length > 0 {
             let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)

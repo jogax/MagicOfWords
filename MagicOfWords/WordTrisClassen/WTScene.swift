@@ -172,13 +172,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             case OK = 0, TimeOut, NoMoreSteps
         }
 
-    private func calculateColumnWidths() {
+    private func calculateColumnWidths(showCount: Bool = true) {
         title = ""
         let text1 = " \(GV.language.getText(.tcWord).fixLength(length: maxLength, center: true))     "
-        let text2 = "\(GV.language.getText(.tcCount)) "
+        let text2 = showCount ? "\(GV.language.getText(.tcCount)) " : ""
         let text3 = "\(GV.language.getText(.tcLength)) "
         let text4 = "\(GV.language.getText(.tcScore)) "
-        let text5 = "\(GV.language.getText(.tcMinutes)) "
+        let text5 = showCount ? "\(GV.language.getText(.tcMinutes)) " : ""
         title += text1
         title += text2
         title += text3
@@ -193,9 +193,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
         var text: String = ""
+        var text0: String = ""
         let lineHeight = title.height(font: myFont!)
-        let width = title.width(withConstrainedHeight: 0, font: myFont!)
+        let yPos0: CGFloat = 0
+        var yPos1: CGFloat = 0
+        var yPos2: CGFloat = lineHeight
         let view = UIView()
+        var width:CGFloat = title.width(withConstrainedHeight: 0, font: myFont!)
+        var length: Int = 0
         switch tableType {
         case .ShowAllWords:
             if section == 0 {
@@ -205,14 +210,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         case .ShowWordsOverPosition:
             text = GV.language.getText(.tcWordsOverLetter).fixLength(length: title.length, center: true)
+        case .ShowFoundedWords:
+            let header0 = GV.language.getText(.tcSearchingWord, values: searchingWord)
+            let header1 = GV.language.getText(.tcShowWordlistHeader, values: String(listOfFoundedWords.count))
+            (width, length) = calculateTableViewWidth(header0: header0, header1: header1, header2: title)
+            text = header1.fixLength(length: length, center: true)
+            text0 = header0.fixLength(length: length, center: true)
         default:
             break
         }
-        let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
+        if tableType == .ShowFoundedWords {
+             let label0 = UILabel(frame: CGRect(x: 0, y: yPos0, width: width, height: lineHeight))
+            label0.font = myFont!
+            label0.text = text0
+            yPos1 = lineHeight
+            yPos2 = 2 * lineHeight
+            view.addSubview(label0)
+        }
+        let label1 = UILabel(frame: CGRect(x: 0, y: yPos1, width: width, height: lineHeight))
         label1.font = myFont!
         label1.text = text
         view.addSubview(label1)
-        let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight, width: width, height: lineHeight))
+        let label2 = UILabel(frame: CGRect(x: 0, y: yPos2, width: width, height: lineHeight))
         label2.font = myFont!
         label2.text = title
         view.addSubview(label2)
@@ -225,6 +244,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     func getHeightForHeaderInSection(tableView: UITableView, section: Int)->CGFloat {
+        if tableType == .ShowFoundedWords {
+            return GV.onIpad ? 72 : 53
+        }
         return GV.onIpad ? 48 : 35
     }
     
@@ -259,10 +281,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
              }
         case .ShowWordsOverPosition:
             cell.addColumn(text: "  " + wordList[indexPath.row].word.fixLength(length: lengthOfWord + 2, leadingBlanks: false)) // WordColumn
-            cell.addColumn(text: String(1).fixLength(length: lengthOfCnt - 1), color: color) // Counter column
+            cell.addColumn(text: String(1).fixLength(length: lengthOfCnt - 1), color: color)
             cell.addColumn(text: String(wordList[indexPath.row].word.length).fixLength(length: lengthOfLength - 1))
-            cell.addColumn(text: String(wordList[indexPath.row].score).fixLength(length: lengthOfScore + 1), color: color) // Counter column
+            cell.addColumn(text: String(wordList[indexPath.row].score).fixLength(length: lengthOfScore + 1), color: color)
             cell.addColumn(text: "+\(WTGameWordList.shared.getMinutesForWord(word: wordList[indexPath.row].word))".fixLength(length: lengthOfMin - 1))
+        case .ShowFoundedWords:
+            cell.addColumn(text: "  " + listOfFoundedWords[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false))
+            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].length).fixLength(length: lengthOfLength))
+            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].score).fixLength(length: lengthOfScore), color: color)
         default:
             break
         }
@@ -297,7 +323,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         case .ShowWordsOverPosition:
             return wordList.count
         case .ShowFoundedWords:
-            return wordList.count
+            return listOfFoundedWords.count
         default:
             return 0
         }
@@ -307,12 +333,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         case None = 0, ShowAllWords, ShowWordsOverPosition, ShowFoundedWords
     }
     
-    
     let nameForSpriteWidthWords = "°°°nameForSpriteWidthWords°°°"
     var spriteToShowWords: SKSpriteNode?
     var tableType: TableType = .None
     var wordList = [SelectedWord]()
-    var listOfFoundedWords = [String]()
+    var listOfFoundedWords = [LineOfFoundedWords]()
     var showWordsOverPositionTableView: WTTableView?
     var showFoundedWordsTableView: WTTableView?
     var parentViewController: UIViewController?
@@ -448,6 +473,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var moved = false
 //    var ownWordsScrolling = false
     var inChoosingOwnWord = false
+    var inDefiningSearchingWord = false
     var movedIndex = 0
     var countShowingOwnWords = 0
     var ownWordsScrollingStartPos = CGPoint(x:0, y:0)
@@ -916,135 +942,99 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         removeAllSubviews()
         wtSceneDelegate!.gameFinished(start: .NoMore)
     }
+    
+    var searchingWord = ""
 
     @objc func wordListTapped() {
-        let wordToSearch = "????nyas?"
-        let language = "hu"
-        var startsWith = ""
-        var endsWith = ""
-        var contains = [String]()
-        var questionMarks = [Int]()
-        var countQuestionMarks = 0
-        var onStart = true
-        var containsIndex = 0
-        var founded = [String]()
-        var lastLetterQestion = false
-        for letter in wordToSearch {
-            if onStart && letter != "?" {
-                startsWith += String(letter)
-            }
-            if letter == "?" {
-                if !lastLetterQestion {
-                    onStart = false
-                    if endsWith.length > 0 {
-                        contains.append(endsWith)
-                        endsWith = ""
-                    }
-                    countQuestionMarks = 1
-                    lastLetterQestion = true
-                } else {
-                    countQuestionMarks += 1
-                }
-            }
-            if !onStart && letter != "?" && letter != "*" {
-                lastLetterQestion = false
-                if countQuestionMarks > 0 {
-                    questionMarks.append(countQuestionMarks)
-                    countQuestionMarks = 0
-                }
-                endsWith += String(letter)
-            }
-        }
-        if countQuestionMarks > 0 {
-            questionMarks.append(countQuestionMarks)
-            countQuestionMarks = 0
-        }
-        if endsWith == "" && contains.count > 0 && !lastLetterQestion {
-            endsWith = contains.last!
-            contains.removeLast()
-        }
-        var wordIndex = 0
-        
-        func wordFilter(_ word: WordListModel)->Bool {
-            if word.word.subString(startPos: 0, length: 2) == language {
-                let actWord = word.word.subString(startPos: 2, length: word.word.length - 2)
-                if actWord.length != wordToSearch.length && endsWith.length > 0 {
-                    return false
-                }
-                if actWord.length >= startsWith.length {
-//                    if actWord == "kutyaszán" {
-//                        print(actWord)
-//                    }
-                    if actWord.subString(startPos:0, length: startsWith.length) == startsWith {
-                        wordIndex = startsWith.length
-                        if contains.count > 0 {
-                            for index in 0..<contains.count {
-                                wordIndex += questionMarks[index]
-                                if actWord.length >= wordIndex + contains[index].length {
-                                    if !(actWord.subString(startPos: wordIndex, length: contains[index].length) == contains[index]) {
-                                        return false
-                                    }
-                                } else {
-                                    return false
-                                }
-                                wordIndex += contains[index].length
-                            }
-                        }
-                        if endsWith.length > 0 {
-                            wordIndex += questionMarks.last!
-                            if actWord.subString(startPos: wordIndex, length: actWord.length - wordIndex) == endsWith {
-                                founded.append(actWord)
-                                return true
-                            }
-                        } else {
-//                            if actWord.length - wordIndex == questionMarks.last! {
-                                founded.append(actWord)
-                                return true
-//                            }
-                        }
-                    }
-                }
-            }
-            return false
-        }
-        print("startsWith: \(startsWith), contains: \(contains), endsWith: \(endsWith), questionMarks: \(questionMarks)")
-
-        let _ = realmWordList.objects(WordListModel.self).filter(wordFilter).count
-        print("count Words: \(founded.count)")
-        print("\(founded)")
-        showFoundedWords(wordList: founded)
+        listOfFoundedWords = [LineOfFoundedWords]()
+        inDefiningSearchingWord = true
+        searchingWord = ""
+        showMyFoundedWords()
     }
     
-    func showFoundedWords(wordList: [String]) {
-        if wordList.count == 0 {
-            return
+    private func addLetterToSearchingWord(letter: String) {
+        listOfFoundedWords = [LineOfFoundedWords]()
+        searchingWord += letter.lowercased()
+        showFoundedWordsTableView?.removeFromSuperview()
+        showFoundedWordsTableView = nil
+        showSearchResults()
+    }
+
+    func showSearchResults() {
+        func wordFilter(_ word: WordListModel)->Bool {
+
+//            if word.word.subString(startPos: 0, length: 2) != language {
+//                return false
+//            }
+            let actWord = word.word.subString(startPos: 2, length: word.word.length - 2)
+//            if actWord == "морская камбала" {
+//                print(actWord)
+//            }
+            if actWord.length < searchingWord.length || (actWord.length > searchingWord.length && !searchingWord.ends(with: "*")) {
+                return false
+            }
+
+            for pos in 0..<searchingWord.length {
+                let actSearchingChar = searchingWord.char(from: pos)
+                let actChar = actWord.char(from: pos)
+                if !(actSearchingChar == "?" || actSearchingChar == "*" || actSearchingChar == actChar) {
+                    return false
+                }
+            }
+            if let _: Range<String.Index> = actWord.range(of: " ") {
+                return false
+            }
+            
+            let element = LineOfFoundedWords(actWord)
+            listOfFoundedWords.append(element)
+            return true
         }
+        if searchingWord.length > 1 {
+            let allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", GV.actLanguage)
+            let _ = allWordsForLanguage.filter(wordFilter).count
+        }
+        showMyFoundedWords()
+    }
+    
+    func getSearchingWord() {
+        searchingWord = ""
+    }
+    
+    func showMyFoundedWords() {
+//        if listOfFoundedWords.count == 0 {
+//            return
+//        }
         tableType = .ShowFoundedWords
         showFoundedWordsTableView = WTTableView()
 
         timerIsCounting = false
         maxLength = 0
-        for word in wordList {
+        for word in listOfFoundedWords {
             maxLength = word.length > maxLength ? word.length : maxLength
         }
-//        calculateColumnWidths()
+        calculateColumnWidths(showCount: false)
+        let header1 = GV.language.getText(.tcShowWordlistHeader, values: String(listOfFoundedWords.count))
+        let header0 = GV.language.getText(.tcSearchingWord, values: searchingWord)
+//        maxLength = maxLength > header1.length ? maxLength : header1.length
         showFoundedWordsTableView?.setDelegate(delegate: self)
         showFoundedWordsTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-        let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: self.frame.height * 0.08)
+        let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: self.frame.height * 0.04)
         let lineHeight = title.height(font: myFont!)
-        let headerframeHeight = lineHeight * 2.2
-        var showingWordsHeight = CGFloat(wordList.count) * lineHeight
-        if showingWordsHeight  > self.frame.height * 0.9 {
-            var counter = CGFloat(wordList.count)
+        let headerframeHeight = lineHeight * 3.2
+        var showingWordsHeight = CGFloat(listOfFoundedWords.count) * lineHeight * 1.1
+        let maxHeight = 0.25 * self.frame.height
+        if showingWordsHeight  > maxHeight {
+            var counter = CGFloat(listOfFoundedWords.count)
             repeat {
                 counter -= 1
                 showingWordsHeight = lineHeight * counter
-            } while showingWordsHeight + headerframeHeight > self.frame.height * 0.9
+            } while showingWordsHeight + headerframeHeight > maxHeight
         }
         if maxLength < title.length {
             maxLength = title.length
         }
-        let width = title.width(font: myFont!)
+        var width: CGFloat = 0
+        (width, _) = calculateTableViewWidth(header0: header0, header1: header1, header2: title)
         let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
         showFoundedWordsTableView?.frame=CGRect(origin: origin, size: size)
         self.showFoundedWordsTableView?.reloadData()
@@ -1052,6 +1042,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         //        showOwnWordsTableView?.reloadData()
         self.scene?.view?.addSubview(showFoundedWordsTableView!)
         
+    }
+    
+    private func calculateTableViewWidth(header0: String, header1: String, header2: String)->(width: CGFloat, length:Int) {
+        var header = header0
+        if header1.length > header.length {
+            header = header1
+        }
+        if header2.length > header.length {
+            header = header2
+        }
+
+        return ((header + " ").width(font: myFont!), header.length)
     }
 
 
@@ -1656,35 +1658,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let lastPosition = ws.count - 1
 //        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
         let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .stop)
-//        if touchedNodes.answer1 {
-//            gameboardEnabled = true
-//            removeNodesWith(name: MyQuestionName)
-//            self.addChild(createButton(withText: GV.language.getText(.tcNoMoreStepsAnswer2), position:CGPoint(x: self.size.width * 0.5, y: self.size.height * 0.94), name: answer2Name))
-//        }
-//        if touchedNodes.answer2 {
-//            wtGameboard!.clearGreenFieldsForNextRound()
-//            if !checkFreePlace() {
-//                showGameFinished(status: .NoMoreSteps)
-//            } else {
-////                roundIndexes.append(activityItems.count - 1)
-//                realm.beginWrite()
-//                let newRound = RoundDataModel()
-////                newRound.index = activityItems.count - 1
-//                newRound.gameArray = wtGameboard!.gameArrayToString()
-//                GV.playingRecord.rounds.append(newRound)
-//                timeForGame.incrementMaxTime(value: iHalfHour)
-//                WTGameWordList.shared.addNewRound()
-//                activityRoundItem.append(ActivityRound())
-//                activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
-//                try! realm.commitWrite()
-//                modifyHeader()
-//            }
-//            enabled = true
-//            gameboardEnabled = false
-//            removeNodesWith(name: MyQuestionName)
-//            removeNodesWith(name: answer2Name)
-//       }
-        if inChoosingOwnWord {
+        if inDefiningSearchingWord {
+            if (touchedNodes.col >= 0 && touchedNodes.col < 10) && (touchedNodes.row + 2 >= 0 && touchedNodes.row + 2 < 10) {
+                var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.row + 2].letter
+                choosedLetter = choosedLetter == " " ? "?" : choosedLetter
+                addLetterToSearchingWord(letter: choosedLetter)
+            } else {
+                showFoundedWordsTableView?.removeFromSuperview()
+                showFoundedWordsTableView = nil
+                wtGameboard!.clear()
+            }
+        } else if inChoosingOwnWord {
             if movingSprite {
                 movingSprite = false
                 let row = touchedNodes.row + 2 == 10 ? 9 : touchedNodes.row + 2

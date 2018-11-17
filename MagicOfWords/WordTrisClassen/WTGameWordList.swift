@@ -29,6 +29,25 @@ public struct ConnectionType {
         self.bottom = bottom
     }
 }
+
+public struct LineOfFoundedWords {
+    var word = ""
+    var score: Int {
+        get {
+            let score = (word.length > 25 ? maxScore : pointsForWord[word.length]!)
+            return score
+        }
+    }
+    var length: Int {
+        get {
+            return word.length
+        }
+    }
+    init(_ word: String) {
+       self.word = word
+    }
+}
+
 public struct SelectedWord {
     var word: String = ""
     var usedLetters = [UsedLetter]()
@@ -36,10 +55,6 @@ public struct SelectedWord {
 //    var mandatory = false
     var score: Int {
         get {
-            //var countUsing = 0
-            //for letter in usedLetters {
-            //    countUsing += GV.gameArray[letter.col][letter.row].getCountOccurences()
-            //}
             let score = (word.length > 25 ? maxScore : pointsForWord[word.length]!)
             return score
         }
