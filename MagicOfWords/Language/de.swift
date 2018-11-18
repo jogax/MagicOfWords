@@ -86,8 +86,8 @@ let deDictionary: [TextConstants: String] = [
     .tcGameIsFinished:      "Das Spiel % ist bereits beendet!",
     .tcRestartGameQuestion: "Wenn Sie neu starten, die Punkte werden gelöscht!",
     .tcRestartGame:         "Neustart",
-    .tcShowWordlistHeader:  "Liste der gefundenen Wörter (%)",
-    .tcSearchingWord:       "Suchwort: %",
+    .tcShowWordlistHeader:  " Liste der gefundenen Wörter (%)",
+    .tcSearchingWord:       " Suchwort: %",
 ]
 
 

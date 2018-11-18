@@ -86,6 +86,6 @@ let enDictionary: [TextConstants: String] = [
     .tcGameIsFinished:      "The game % is already finished!",
     .tcRestartGameQuestion: "If you restart, the score will be deleted!",
     .tcRestartGame:         "Restart",
-    .tcShowWordlistHeader:  "List of found words (%)",
-    .tcSearchingWord:       "Searching word: %",
+    .tcShowWordlistHeader:  " List of found words (%)",
+    .tcSearchingWord:       " Searching word: %",
 ]

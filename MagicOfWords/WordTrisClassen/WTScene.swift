@@ -174,7 +174,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     private func calculateColumnWidths(showCount: Bool = true) {
         title = ""
-        let text1 = " \(GV.language.getText(.tcWord).fixLength(length: maxLength, center: true))     "
+        let fixlength = 15
+        lengthOfWord = maxLength < fixlength ? fixlength : maxLength
+        let text1 = " \(GV.language.getText(.tcWord).fixLength(length: lengthOfWord, center: true))     "
         let text2 = showCount ? "\(GV.language.getText(.tcCount)) " : ""
         let text3 = "\(GV.language.getText(.tcLength)) "
         let text4 = "\(GV.language.getText(.tcScore)) "
@@ -184,13 +186,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         title += text3
         title += text4
         title += text5
-        lengthOfWord = maxLength
+//        lengthOfWord = maxLength
         lengthOfCnt = text2.length
         lengthOfLength = text3.length
         lengthOfScore = text4.length
         lengthOfMin = text5.length
     }
     
+    let myLightBlue = UIColor(red: 204/255, green: 255/255, blue: 255/255, alpha: 1.0)
+    let myLightBlue1 = UIColor(red: 204/255, green: 202/255, blue: 255/255, alpha: 1.0)
+
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
         var text: String = ""
         var text0: String = ""
@@ -235,7 +240,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         label2.font = myFont!
         label2.text = title
         view.addSubview(label2)
-        view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
+        if tableType == .ShowFoundedWords {
+            view.backgroundColor = myLightBlue
+        } else {
+            view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
+        }
         return view
     }
     
@@ -262,8 +271,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: myFont!)
-        cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.frame.width * (GV.onIpad ? 0.040 : 0.010)))
-        cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
+//        cell.setCellSize(size: CGSize(width: tableView.frame.width /* * (GV.onIpad ? 0.040 : 0.010)*/, height: self.frame.width * (GV.onIpad ? 0.040 : 0.010)))
+        cell.setCellSize(size: CGSize(width: 0 /*tableView.frame.width * (GV.onIpad ? 0.040 : 0.010)*/, height: self.frame.width * (GV.onIpad ? 0.050 : 0.010)))
+        if tableType == .ShowFoundedWords {
+            cell.setBGColor(color: myLightBlue)
+        } else {
+            cell.setBGColor(color: UIColor.white) 
+        }
         switch tableType {
         case .ShowAllWords:
             if indexPath.section == 0 {
@@ -286,9 +300,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             cell.addColumn(text: String(wordList[indexPath.row].score).fixLength(length: lengthOfScore + 1), color: color)
             cell.addColumn(text: "+\(WTGameWordList.shared.getMinutesForWord(word: wordList[indexPath.row].word))".fixLength(length: lengthOfMin - 1))
         case .ShowFoundedWords:
-            cell.addColumn(text: "  " + listOfFoundedWords[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false))
-            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].length).fixLength(length: lengthOfLength))
-            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].score).fixLength(length: lengthOfScore), color: color)
+            cell.addColumn(text: "  " + listOfFoundedWords[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false), color: myLightBlue)
+            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].length).fixLength(length: lengthOfLength), color: myLightBlue1)
+            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].score).fixLength(length: lengthOfScore), color: myLightBlue)
         default:
             break
         }
@@ -944,8 +958,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     var searchingWord = ""
-
+    var wtGameboardMovedBy: CGFloat = 0
     @objc func wordListTapped() {
+        print(wtGameboard!.position)
+        // move the gameboard down
+        wtGameboardMovedBy = self.frame.height * 0.18
+        wtGameboard!.position = CGPoint(x: wtGameboard!.position.x, y: wtGameboard!.position.y - wtGameboardMovedBy)
+        // hide the bottom buttons
+        ws[0].isHidden = true
+        ws[1].isHidden = true
+        ws[2].isHidden = true
+        goToPreviousGameButton!.isHidden = true
+        goToNextGameButton!.isHidden = true
+        wordListButton!.isHidden = true
         listOfFoundedWords = [LineOfFoundedWords]()
         inDefiningSearchingWord = true
         searchingWord = ""
@@ -989,9 +1014,53 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             listOfFoundedWords.append(element)
             return true
         }
+        var beginswith = GV.actLanguage
+        var endswith = ""
+        var contains = ""
+        var containsIndex = 0
+        for pos in 0..<searchingWord.length {
+            let actSearchingChar = searchingWord.char(from: pos)
+            if actSearchingChar == "?" || actSearchingChar == "*" {
+                containsIndex = pos
+                break
+            }
+            beginswith += actSearchingChar
+        }
+        repeat {
+            containsIndex += 1
+            if containsIndex >= searchingWord.length {
+                break
+            }
+        } while (searchingWord.char(from: containsIndex) == "?" || searchingWord.char(from: containsIndex) == "*")
+        
+        if containsIndex < searchingWord.length {
+            var lastIndex = 0
+            for pos in containsIndex..<searchingWord.length {
+                let actSearchingChar = searchingWord.char(from: pos)
+                if actSearchingChar == "?" || actSearchingChar == "*" {
+                    break
+                }
+                contains += actSearchingChar
+                lastIndex = pos
+            }
+            if lastIndex + 1 == searchingWord.length {
+                endswith = contains
+                contains = ""
+            }
+        }
+        var allWordsForLanguage: Results<WordListModel>?
         if searchingWord.length > 1 {
-            let allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", GV.actLanguage)
-            let _ = allWordsForLanguage.filter(wordFilter).count
+            if beginswith.length > 2 {
+                allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", beginswith)
+            } else if contains.length > 0 {
+                allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word CONTAINS %@", beginswith, contains)
+            } else if endswith.length > 0 {
+                allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word ENDSWITH %@", beginswith, endswith)
+            } else {
+                allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", beginswith)
+            }
+            
+            let _ = allWordsForLanguage!.filter(wordFilter).count
         }
         showMyFoundedWords()
     }
@@ -1015,6 +1084,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         calculateColumnWidths(showCount: false)
         let header1 = GV.language.getText(.tcShowWordlistHeader, values: String(listOfFoundedWords.count))
         let header0 = GV.language.getText(.tcSearchingWord, values: searchingWord)
+        showFoundedWordsTableView?.backgroundColor = myLightBlue1
 //        maxLength = maxLength > header1.length ? maxLength : header1.length
         showFoundedWordsTableView?.setDelegate(delegate: self)
         showFoundedWordsTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
@@ -1022,7 +1092,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let lineHeight = title.height(font: myFont!)
         let headerframeHeight = lineHeight * 3.2
         var showingWordsHeight = CGFloat(listOfFoundedWords.count) * lineHeight * 1.1
-        let maxHeight = 0.25 * self.frame.height
+        let maxHeight = (GV.onIpad ? 0.20 : 0.35) * self.frame.height
         if showingWordsHeight  > maxHeight {
             var counter = CGFloat(listOfFoundedWords.count)
             repeat {
@@ -1035,7 +1105,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         var width: CGFloat = 0
         (width, _) = calculateTableViewWidth(header0: header0, header1: header1, header2: title)
-        let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
+        let size = CGSize(width: width, height: maxHeight)//showingWordsHeight + headerframeHeight)
         showFoundedWordsTableView?.frame=CGRect(origin: origin, size: size)
         self.showFoundedWordsTableView?.reloadData()
         
@@ -1657,8 +1727,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let nodes = self.nodes(at: touchLocation)
         let lastPosition = ws.count - 1
 //        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
-        let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .stop)
+        var touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .stop)
         if inDefiningSearchingWord {
+            let origLocation = CGPoint(x: touchLocation.x, y: touchLocation.y + wtGameboardMovedBy)
+            touchedNodes = analyzeNodes(touchLocation: origLocation, calledFrom: .stop)
             if (touchedNodes.col >= 0 && touchedNodes.col < 10) && (touchedNodes.row + 2 >= 0 && touchedNodes.row + 2 < 10) {
                 var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.row + 2].letter
                 choosedLetter = choosedLetter == " " ? "?" : choosedLetter

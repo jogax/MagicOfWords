@@ -86,6 +86,6 @@ let huDictionary: [TextConstants: String] = [
     .tcGameIsFinished:      "A %. játék már be lett fejezve!",
     .tcRestartGameQuestion: "Ha újrainditod, a pontszám törlődik!",
     .tcRestartGame:         "Újraindítás",
-    .tcShowWordlistHeader:  "A talált szavak listája (%)",
-    .tcSearchingWord:       "Kereső szó: %",
+    .tcShowWordlistHeader:  " A talált szavak listája (%)",
+    .tcSearchingWord:       " Kereső szó: %",
 ]

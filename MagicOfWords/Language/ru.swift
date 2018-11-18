@@ -86,6 +86,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcGameIsFinished:      "Игра % уже закончена!",
     .tcRestartGameQuestion: "При перезапуске очки будут удалены!",
     .tcRestartGame:         "Запуск",
-    .tcShowWordlistHeader:  "Список найденных слов (%)",
-    .tcSearchingWord:       "Поисковое слово: %",
+    .tcShowWordlistHeader:  " Список найденных слов (%)",
+    .tcSearchingWord:       " Поисковое слово: %",
 ]
