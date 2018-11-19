@@ -468,6 +468,7 @@ extension UIColor {
 }
 
 //extension UIImage {
+
 //    public func imageRotatedByDegrees(_ degrees: CGFloat, flip: Bool) -> UIImage {
 //       self.transform( = CGAffineTransform(rotationAngle: CGFloat.pi)
 //        //        let radiansToDegrees: (CGFloat) -> CGFloat = {

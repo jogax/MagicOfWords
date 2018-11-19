@@ -23,7 +23,8 @@
 		201FB1DE20288CEA00EC9F36 /* en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D220288CEA00EC9F36 /* en.swift */; };
 		201FB1DF20288CEA00EC9F36 /* de.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D320288CEA00EC9F36 /* de.swift */; };
 		201FB1E020288CEA00EC9F36 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D420288CEA00EC9F36 /* Language.swift */; };
-		203DB9A3219880F600DB9122 /* wordList.png in Resources */ = {isa = PBXBuildFile; fileRef = 203DB9A2219880F600DB9122 /* wordList.png */; };
+		20395F5D21A2FE4E00947D7F /* retype.png in Resources */ = {isa = PBXBuildFile; fileRef = 20395F5C21A2FE4E00947D7F /* retype.png */; };
+		20395F5F21A31D4300947D7F /* search.png in Resources */ = {isa = PBXBuildFile; fileRef = 20395F5E21A31D4300947D7F /* search.png */; };
 		20437F9A217B793100F16F99 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20437F99217B793100F16F99 /* Reachability.framework */; };
 		20439FEF20BC40DB00D44286 /* Versions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20439FEE20BC40DB00D44286 /* Versions.txt */; };
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
@@ -129,7 +130,8 @@
 		201FB1D220288CEA00EC9F36 /* en.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = en.swift; sourceTree = "<group>"; };
 		201FB1D320288CEA00EC9F36 /* de.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = de.swift; sourceTree = "<group>"; };
 		201FB1D420288CEA00EC9F36 /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
-		203DB9A2219880F600DB9122 /* wordList.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = wordList.png; path = MagicOfWords/Pictures/wordList.png; sourceTree = SOURCE_ROOT; };
+		20395F5C21A2FE4E00947D7F /* retype.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = retype.png; sourceTree = "<group>"; };
+		20395F5E21A31D4300947D7F /* search.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = search.png; sourceTree = "<group>"; };
 		20437F99217B793100F16F99 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		20439FEE20BC40DB00D44286 /* Versions.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Versions.txt; sourceTree = "<group>"; };
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
@@ -330,13 +332,14 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				20395F5E21A31D4300947D7F /* search.png */,
+				20395F5C21A2FE4E00947D7F /* retype.png */,
 				2051A54D2191E376001AD00B /* hook.png */,
 				205CF7EC2129BC9300C1B89D /* back.png */,
 				205CF7EF2129BF4B00C1B89D /* nextGame.png */,
 				205CF7EE2129BF4B00C1B89D /* previousGame.png */,
 				205CF7EA2129A21000C1B89D /* finger.png */,
 				208173E02103577800960800 /* balloon.png */,
-				203DB9A2219880F600DB9122 /* wordList.png */,
 				20B04BB120935CC2008F99A2 /* menuBackground.png */,
 				20552DBA211F1EFA00C54538 /* whiteSprite0000.png */,
 				20552DB9211F1EFA00C54538 /* whiteSprite0001.png */,
@@ -492,15 +495,16 @@
 				20552DC9211F1EFA00C54538 /* whiteSprite0001.png in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
 				205CF7ED2129BC9300C1B89D /* back.png in Resources */,
-				203DB9A3219880F600DB9122 /* wordList.png in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
 				204BB45D2063E9E000CDF085 /* undo.png in Resources */,
 				205234E5218796C200B9935F /* WordList.realm in Resources */,
+				20395F5D21A2FE4E00947D7F /* retype.png in Resources */,
 				20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
 				20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
 				20F17609216269DB00AF37D7 /* StateOfWordChanging.txt in Resources */,
+				20395F5F21A31D4300947D7F /* search.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
