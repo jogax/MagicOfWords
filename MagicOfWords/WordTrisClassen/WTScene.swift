@@ -219,6 +219,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let header0 = GV.language.getText(.tcSearchingWord, values: searchingWord)
             let header1 = GV.language.getText(.tcShowWordlistHeader, values: String(listOfFoundedWords.count))
             (width, length) = calculateTableViewWidth(header0: header0, header1: header1, header2: title)
+            let optimalLength = Int(tableView.frame.width / "A".width(font: myFont!))
+            length = length < optimalLength ? optimalLength : length
             text = header1.fixLength(length: length, center: true)
             text0 = header0.fixLength(length: length, center: true)
         default:
@@ -301,8 +303,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             cell.addColumn(text: "+\(WTGameWordList.shared.getMinutesForWord(word: wordList[indexPath.row].word))".fixLength(length: lengthOfMin - 1))
         case .ShowFoundedWords:
             cell.addColumn(text: "  " + listOfFoundedWords[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false), color: myLightBlue)
-            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].length).fixLength(length: lengthOfLength), color: myLightBlue1)
+            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].length).fixLength(length: lengthOfLength), color: myLightBlue)
             cell.addColumn(text: String(listOfFoundedWords[indexPath.row].score).fixLength(length: lengthOfScore), color: myLightBlue)
+            let restLength = Int(tableView.frame.width / "A".width(font:myFont!)) - lengthOfWord - lengthOfLength - lengthOfScore
+            let spaces = " "
+            cell.addColumn(text: spaces.fixLength(length: restLength), color: myLightBlue)
         default:
             break
         }
@@ -543,6 +548,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        GV.allWords = [WordToCheck]()
         getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber)
         createHeader()
+        buttonHeight = self.frame.width * 0.08
 //        createUndo(enabled: true)
         createGoBackButton()
 //        wtGameFinishedSprite.setDelegate(delegate: self)
@@ -960,7 +966,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var wtGameboardMovedBy: CGFloat = 0
     
     @objc func wordListTapped() {
-
+        sortUp = true
         listOfFoundedWords = [LineOfFoundedWords]()
         searchingWord = ""
         showMyFoundedWords()
@@ -971,32 +977,40 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var questionMarkButton: UIButton?
     var starButton: UIButton?
     var retypeButton: UIButton?
+    var sortButton: UIButton?
     
     private func createButtons() {
-        let yPos = showFoundedWordsTableView!.frame.maxY + self.frame.width * 0.09 / 2
-        let frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.08, height: self.frame.width * 0.08)
-        let radius = self.frame.width * 0.04
-        let xPos1 = showFoundedWordsTableView!.frame.minX + self.frame.width * 0.08 / 2
+        let radius = showFoundedWordsTableView!.frame.size.width / 12
+        let buttonCenterDistance = (showFoundedWordsTableView!.frame.size.width - 2 * radius) / 4
+        let buttonFrameWidth = 2 * radius
+        let buttonFrame = CGRect(x: 0, y: 0, width:buttonFrameWidth, height: buttonFrameWidth)
+        let yPos = showFoundedWordsTableView!.frame.maxY + radius * 1.2
+        let xPos1 = showFoundedWordsTableView!.frame.minX + radius
         let center1 = CGPoint(x: xPos1, y:yPos)
-        doneButton = createButton(imageName: "hook.png", imageSize: 0.6, title: "", frame: frame, center: center1, cornerRadius: radius, enabled: enabled)
+        doneButton = createButton(imageName: "hook.png", imageSize: 0.6, title: "", frame: buttonFrame, center: center1, cornerRadius: radius, enabled: enabled)
         doneButton?.addTarget(self, action: #selector(self.doneButtonTapped), for: .touchUpInside)
         self.view?.addSubview(doneButton!)
-        let xPos2 = showFoundedWordsTableView!.frame.midX - self.frame.width * 0.085 / 2
+        let xPos2 = showFoundedWordsTableView!.frame.minX + radius + buttonCenterDistance
         let center2 = CGPoint(x: xPos2, y:yPos)
-        questionMarkButton = createButton(imageName: "", title: "?", frame: frame, center: center2, cornerRadius: radius, enabled: enabled)
+        questionMarkButton = createButton(imageName: "", title: "?", frame: buttonFrame, center: center2, cornerRadius: radius, enabled: enabled)
         questionMarkButton?.addTarget(self, action: #selector(self.questionMarkTapped), for: .touchUpInside)
         self.view?.addSubview(questionMarkButton!)
-        let xPos3 = showFoundedWordsTableView!.frame.midX + self.frame.width * 0.085 / 2
+        let xPos3 = showFoundedWordsTableView!.frame.minX + radius + buttonCenterDistance * 2
         let center3 = CGPoint(x: xPos3, y:yPos)
-        starButton = createButton(imageName: "", title: "*", frame: frame, center: center3, cornerRadius: radius, enabled: enabled)
+        starButton = createButton(imageName: "", title: "*", frame: buttonFrame, center: center3, cornerRadius: radius, enabled: enabled)
         starButton?.addTarget(self, action: #selector(self.starButtonTapped), for: .touchUpInside)
         self.view?.addSubview(starButton!)
-        let xPos4 = showFoundedWordsTableView!.frame.maxX - self.frame.width * 0.08 / 2
+        let xPos4 = showFoundedWordsTableView!.frame.minX + radius + buttonCenterDistance * 3
         let center4 = CGPoint(x: xPos4, y:yPos)
-        retypeButton = createButton(imageName: "retype.png", imageSize: 0.6, title: "", frame: frame, center: center4, cornerRadius: radius, enabled: enabled)
+        retypeButton = createButton(imageName: "retype.png", imageSize: 0.6, title: "", frame: buttonFrame, center: center4, cornerRadius: radius, enabled: enabled)
         retypeButton?.addTarget(self, action: #selector(self.retypeButtonTapped), for: .touchUpInside)
         self.view?.addSubview(retypeButton!)
-    }
+        let xPos5 = showFoundedWordsTableView!.frame.minX + radius + buttonCenterDistance * 4
+        let center5 = CGPoint(x: xPos5, y:yPos)
+        sortButton = createButton(imageName: "sortdown.png", imageSize: 0.6, title: "", frame: buttonFrame, center: center5, cornerRadius: radius, enabled: enabled)
+        sortButton!.addTarget(self, action: #selector(self.sortButtonTapped), for: .touchUpInside)
+        self.view?.addSubview(sortButton!)
+   }
     
     @objc func doneButtonTapped() {
         hideScreen(hide: false)
@@ -1006,15 +1020,35 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc func questionMarkTapped() {
+        sortUp = true
+        setSortButtonImage()
         addLetterToSearchingWord(letter: "?")
     }
     
     @objc func starButtonTapped() {
+        sortUp = true
+        setSortButtonImage()
         addLetterToSearchingWord(letter: "*")
     }
     
     @objc func retypeButtonTapped() {
+        sortUp = true
+        setSortButtonImage()
         removeLastLetterFromSearchingWord()
+    }
+    
+    @objc func sortButtonTapped() {
+        showFoundedWordsTableView?.removeFromSuperview()
+        showFoundedWordsTableView = nil
+        sortUp = !sortUp
+        setSortButtonImage()
+        showSearchResults()
+     }
+    
+    private func setSortButtonImage() {
+        var image = UIImage()
+        image = UIImage(named: sortUp ? "sortdown.png" : "sortup.png")!
+        sortButton!.setImage(image, for: UIControl.State.normal)
     }
     
     private func hideScreen(hide: Bool) {
@@ -1035,10 +1069,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             questionMarkButton!.removeFromSuperview()
             starButton!.removeFromSuperview()
             retypeButton!.removeFromSuperview()
+            sortButton!.removeFromSuperview()
             doneButton = nil
             questionMarkButton = nil
             starButton = nil
             retypeButton = nil
+            sortButton = nil
         }
         pieceArray[0].isHidden = hide
         pieceArray[1].isHidden = hide
@@ -1053,7 +1089,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func addLetterToSearchingWord(letter: String) {
-        listOfFoundedWords = [LineOfFoundedWords]()
         searchingWord += letter.lowercased()
         showFoundedWordsTableView?.removeFromSuperview()
         showFoundedWordsTableView = nil
@@ -1061,7 +1096,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     private func removeLastLetterFromSearchingWord() {
-        listOfFoundedWords = [LineOfFoundedWords]()
         if searchingWord.length > 0 {
             searchingWord.removeLast()
         }
@@ -1069,6 +1103,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         showFoundedWordsTableView = nil
         showSearchResults()
     }
+    
+    var sortUp = true
     
     func showSearchResults() {
         func wordFilter(_ word: WordListModel)->Bool {
@@ -1103,6 +1139,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var endswith = ""
         var contains = ""
         var containsIndex = 0
+        listOfFoundedWords = [LineOfFoundedWords]()
         for pos in 0..<searchingWord.length {
             let actSearchingChar = searchingWord.char(from: pos)
             if actSearchingChar == "?" || actSearchingChar == "*" {
@@ -1147,6 +1184,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             
             let _ = allWordsForLanguage!.filter(wordFilter).count
         }
+        if sortUp {
+            listOfFoundedWords = listOfFoundedWords.sorted(by: {$0.length < $1.length || ($0.length == $1.length && $0.word < $1.word)})
+        } else {
+            listOfFoundedWords = listOfFoundedWords.sorted(by: {$0.length > $1.length || ($0.length == $1.length && $0.word > $1.word)})
+        }
         showMyFoundedWords()
     }
     
@@ -1169,11 +1211,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         calculateColumnWidths(showCount: false)
         let header1 = GV.language.getText(.tcShowWordlistHeader, values: String(listOfFoundedWords.count))
         let header0 = GV.language.getText(.tcSearchingWord, values: searchingWord)
-        showFoundedWordsTableView?.backgroundColor = myLightBlue1
+        showFoundedWordsTableView?.backgroundColor = myLightBlue
 //        maxLength = maxLength > header1.length ? maxLength : header1.length
         showFoundedWordsTableView?.setDelegate(delegate: self)
         showFoundedWordsTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-        let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: self.frame.height * 0.03)
         let lineHeight = title.height(font: myFont!)
         let headerframeHeight = lineHeight * 3.2
         var showingWordsHeight = CGFloat(listOfFoundedWords.count) * lineHeight * 1.1
@@ -1188,9 +1229,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if maxLength < title.length {
             maxLength = title.length
         }
+//        let optimalWidth = self.frame.width * 0.4
         var width: CGFloat = 0
         (width, _) = calculateTableViewWidth(header0: header0, header1: header1, header2: title)
+//        width = width < optimalWidth ? optimalWidth : width
         let size = CGSize(width: width, height: maxHeight)//showingWordsHeight + headerframeHeight)
+        let origin = CGPoint(x: 0.5 * (self.frame.width - width), y: self.frame.height * 0.03)
         showFoundedWordsTableView?.frame=CGRect(origin: origin, size: size)
         self.showFoundedWordsTableView?.reloadData()
         
@@ -1244,13 +1288,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var allWordsButton: UIButton?
     var goBackButton: UIButton?
     var wordListButton: UIButton?
+    var buttonHeight = CGFloat(0)
 
     func createGoToPreviousGameButton(enabled: Bool) {
         if goToPreviousGameButton != nil {
             goToPreviousGameButton?.removeFromSuperview()
             goToPreviousGameButton = nil
         }
-        let frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.09, height: self.frame.width * 0.09)
+        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.08, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
         goToPreviousGameButton = createButton(imageName: "previousGame", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled )
@@ -1263,7 +1308,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             goToNextGameButton?.removeFromSuperview()
             goToNextGameButton = nil
         }
-        let frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.09, height: self.frame.width * 0.09)
+        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.92, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
         goToNextGameButton = createButton(imageName: "nextGame", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled )
@@ -1298,8 +1343,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             wordListButton?.removeFromSuperview()
             wordListButton = nil
         }
-        let frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.08, height: self.frame.width * 0.08)
-        let center = CGPoint(x:self.frame.width * 0.75, y: allWordsButtonCenter.y)
+        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
+        let center = CGPoint(x: allWordsButton!.frame.maxX + buttonHeight, y: allWordsButtonCenter.y)
         let radius = self.frame.width * 0.04
         wordListButton = createButton(imageName: "search", imageSize: 0.7, title: "", frame: frame, center: center, cornerRadius: radius, enabled: true)
         wordListButton!.addTarget(self, action: #selector(self.wordListTapped), for: .touchUpInside)
@@ -1314,7 +1359,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             goBackButton?.removeFromSuperview()
             goBackButton = nil
         }
-        let frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.08, height: self.frame.width * 0.08)
+        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.05, y:self.frame.height * 0.08)
         let radius = self.frame.width * 0.04
         goBackButton = createButton(imageName: "back", title: "", frame: frame, center: center, cornerRadius: radius, enabled: true)
@@ -1328,7 +1373,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             undoButton = nil
         }
         let enabled = activityRoundItem[0].activityItems.count > 0
-        let frame = CGRect(x: 0, y: 0, width:self.frame.width * 0.08, height: self.frame.width * 0.08)
+        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.95, y:self.frame.height * 0.08)
         let radius = self.frame.width * 0.04
         undoButton = createButton(imageName: "undo", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled)
