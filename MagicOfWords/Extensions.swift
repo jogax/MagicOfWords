@@ -194,8 +194,8 @@ extension Int {
             shifted = shifted >> 1
         }
         let offset = len == 0 ? 0 : string.count - len - len / spacing
-        let startPos = string.index(string.startIndex, offsetBy: offset)
-        let returnString = String(string[startPos...])
+        let at = string.index(string.startIndex, offsetBy: offset)
+        let returnString = String(string[at...])
         return returnString
     }
     
@@ -308,6 +308,17 @@ public extension Float {
 
 
 extension String {
+    
+    func index(from: Int, of: String)->Int? {
+        let length = of.length
+        for ind in from..<self.length - length + 1 {
+            if self.subString(at: ind, length: length) == of {
+                return ind
+            }
+        }
+        return nil
+    }
+    
     func replace(_ what: String, values: [String])->String {
         let toArray = self.components(separatedBy: what)
         var endString = ""
@@ -361,14 +372,14 @@ extension String {
         return String(repeating: character, count: padCount) + self
     }
     
-    func mySubString(startPos: Int) -> String.SubSequence {
-        let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
+    func endingSubString(at: Int) -> String.SubSequence {
+        let indexStartOfText = self.index(self.startIndex, offsetBy: at)
         return self[indexStartOfText...]
     }
 
-    mutating func subString(startPos: Int, length: Int, remove: Bool) -> String.SubSequence {
-        let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
-        let indexEndOfText = self.index(self.startIndex, offsetBy: startPos + length)
+    mutating func subString(at: Int, length: Int, remove: Bool) -> String.SubSequence {
+        let indexStartOfText = self.index(self.startIndex, offsetBy: at)
+        let indexEndOfText = self.index(self.startIndex, offsetBy: at + length)
         let returnString = self[indexStartOfText..<indexEndOfText]
         if remove {
             self.removeSubrange(indexStartOfText..<indexEndOfText)
@@ -377,13 +388,17 @@ extension String {
     }
     
     func char(from: Int)->String {
-        return subString(startPos:from, length: 1)
+        return subString(at:from, length: 1)
     }
     
-    func subString(startPos: Int, length: Int) -> String {
+    func firstChar()->String {
+        return subString(at:0, length: 1)
+    }
+    
+    func subString(at: Int, length: Int) -> String {
         if self.length > 0 {
-            let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
-            let indexEndOfText = self.index(self.startIndex, offsetBy: startPos + length)
+            let indexStartOfText = self.index(self.startIndex, offsetBy: at)
+            let indexEndOfText = self.index(self.startIndex, offsetBy: at + length)
             let returnString = self[indexStartOfText..<indexEndOfText]
             return String(returnString)
         } else {
@@ -392,7 +407,7 @@ extension String {
     }
     
     func begins(with: String)->Bool {
-        return self.subString(startPos: 0, length: with.count) == with
+        return self.subString(at: 0, length: with.count) == with
     }
     func ends(with: String)->Bool {
         let indexStartOfText = self.index(self.endIndex, offsetBy: -with.count)

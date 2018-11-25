@@ -401,7 +401,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         var nickName = GV.onIpad ? "Pd" : "Ph"
         let letters = GV.language.getText(.tcNickNameLetters)
         for _ in 0...4 {
-            nickName += letters.subString(startPos: Int.random(min: 0, max: letters.count - 1), length: 1)
+            nickName += letters.subString(at: Int.random(min: 0, max: letters.count - 1), length: 1)
         }
         for _ in 0...4 {
             nickName += String(Int.random(min: 0, max: 9))
@@ -512,9 +512,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             let wordList = wordsFile.components(separatedBy: .newlines)
             var text = ""
             for word in wordList {
-                if word.subString(startPos: 0, length: 1) != "#" {
-                    let firstCharUpper = word.subString(startPos: 0, length: 1).uppercased()
-                    if word.subString(startPos: 0, length: 1) == firstCharUpper {
+                if word.subString(at: 0, length: 1) != "#" {
+                    let firstCharUpper = word.subString(at: 0, length: 1).uppercased()
+                    if word.subString(at: 0, length: 1) == firstCharUpper {
                         if let idx = word.index(of: " ") {
                             let newWord = word[..<idx] + "\r\n"
                             text += newWord
@@ -537,7 +537,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     func printDEWordsSorted() {
         let deWords = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH de").sorted(byKeyPath: "word", ascending: true)
         for deWord in deWords {
-            print(deWord.word.subString(startPos: 2, length: deWord.word.length - 2))
+            print(deWord.word.subString(at: 2, length: deWord.word.length - 2))
         }
     }
     func printOrigDEData() {
@@ -551,7 +551,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         let myLines = gameDataFile.components(separatedBy: .newlines)
         for line in myLines {
             if !line.begins(with: "#") {
-                if line.subString(startPos: 0, length: 1).uppercased() == line.subString(startPos: 0, length: 1) {
+                if line.subString(at: 0, length: 1).uppercased() == line.subString(at: 0, length: 1) {
                     print(line)
                 }
             }

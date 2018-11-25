@@ -75,7 +75,7 @@ public struct SelectedWord {
                 if let iColRow = Int(valueTab[index]) {
                     let col = iColRow / 10
                     let row = iColRow % 10
-                    self.usedLetters.append(UsedLetter(col: col, row: row, letter: word.subString(startPos: index - 1, length: 1)))
+                    self.usedLetters.append(UsedLetter(col: col, row: row, letter: word.subString(at: index - 1, length: 1)))
                 }
             }
         }

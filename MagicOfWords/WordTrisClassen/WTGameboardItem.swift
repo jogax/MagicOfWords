@@ -239,7 +239,7 @@ class WTGameboardItem: SKSpriteNode {
         var status: ItemStatus = .empty
         var letter = emptyLetter
         remove()
-        if let rawStatus = Int(from.subString(startPos: 0, length: 1)) {
+        if let rawStatus = Int(from.subString(at: 0, length: 1)) {
             if let itemStatus = ItemStatus(rawValue: rawStatus) {
                 status = itemStatus
                 if let toColor = colorToStatus[status] {
@@ -247,7 +247,7 @@ class WTGameboardItem: SKSpriteNode {
                 }
             }
         }
-        letter = from.subString(startPos: 1, length: 1)
+        letter = from.subString(at: 1, length: 1)
         if letter == emptyLetter {
             color = .myWhiteColor
         }

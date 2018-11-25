@@ -69,9 +69,9 @@ struct ActivityItem {
                 var usedLetters = [UsedLetter]()
                 var index = 0
                 repeat {
-                    let col = Int(usedLettersString.subString(startPos: index, length: 1))
-                    let row = Int(usedLettersString.subString(startPos: index + 1, length: 1))
-                    let letter = usedLettersString.subString(startPos: index + 2, length: 1)
+                    let col = Int(usedLettersString.subString(at: index, length: 1))
+                    let row = Int(usedLettersString.subString(at: index + 1, length: 1))
+                    let letter = usedLettersString.subString(at: index + 2, length: 1)
                     if col != nil && row != nil {
                         usedLetters.append(UsedLetter(col: col!, row: row!, letter: letter))
                     }
@@ -385,7 +385,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let widthMultiplier: CGFloat = 0.1 + CGFloat(textOnBalloon.length) * (GV.onIpad ? 0.015 : 0.030)
         balloon.size = CGSize(width: self.frame.size.width * widthMultiplier, height: self.frame.size.width * 0.10)
         balloon.zPosition = 1000
-//        let startPosY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
+//        let atY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
         let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
 //        let startPosY = startPos.y
         let endPosY = score > 0 ? self.frame.size.height * 0.80 : self.frame.size.height * -0.04
@@ -549,7 +549,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber)
         createHeader()
         buttonHeight = self.frame.width * 0.08
-//        createUndo(enabled: true)
+        createUndo(enabled: false)
         createGoBackButton()
 //        wtGameFinishedSprite.setDelegate(delegate: self)
         WTGameWordList.shared.clear()
@@ -992,12 +992,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.view?.addSubview(doneButton!)
         let xPos2 = showFoundedWordsTableView!.frame.minX + radius + buttonCenterDistance
         let center2 = CGPoint(x: xPos2, y:yPos)
-        questionMarkButton = createButton(imageName: "", title: "?", frame: buttonFrame, center: center2, cornerRadius: radius, enabled: enabled)
+        questionMarkButton = createButton(imageName: "", title: questionMark, frame: buttonFrame, center: center2, cornerRadius: radius, enabled: enabled)
         questionMarkButton?.addTarget(self, action: #selector(self.questionMarkTapped), for: .touchUpInside)
         self.view?.addSubview(questionMarkButton!)
         let xPos3 = showFoundedWordsTableView!.frame.minX + radius + buttonCenterDistance * 2
         let center3 = CGPoint(x: xPos3, y:yPos)
-        starButton = createButton(imageName: "", title: "*", frame: buttonFrame, center: center3, cornerRadius: radius, enabled: enabled)
+        starButton = createButton(imageName: "", title: star, frame: buttonFrame, center: center3, cornerRadius: radius, enabled: enabled)
         starButton?.addTarget(self, action: #selector(self.starButtonTapped), for: .touchUpInside)
         self.view?.addSubview(starButton!)
         let xPos4 = showFoundedWordsTableView!.frame.minX + radius + buttonCenterDistance * 3
@@ -1022,13 +1022,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     @objc func questionMarkTapped() {
         sortUp = true
         setSortButtonImage()
-        addLetterToSearchingWord(letter: "?")
+        addLetterToSearchingWord(letter: questionMark)
     }
     
     @objc func starButtonTapped() {
         sortUp = true
         setSortButtonImage()
-        addLetterToSearchingWord(letter: "*")
+        addLetterToSearchingWord(letter: star)
     }
     
     @objc func retypeButtonTapped() {
@@ -1082,14 +1082,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         goToPreviousGameButton!.isHidden = hide
         goToNextGameButton!.isHidden = hide
         wordListButton!.isHidden = hide
-        undoButton!.isHidden = hide
         allWordsButton!.isHidden = hide
         goBackButton!.isHidden = hide
         wordListButton!.isHidden = hide
-    }
+        if undoButton != nil {
+            undoButton!.isHidden = hide
+        }
+   }
     
     private func addLetterToSearchingWord(letter: String) {
-        searchingWord += letter.lowercased()
+        searchingWord += letter
         showFoundedWordsTableView?.removeFromSuperview()
         showFoundedWordsTableView = nil
         showSearchResults()
@@ -1105,84 +1107,147 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     var sortUp = true
+    let star = "*"
+    let questionMark = "?"
+    var searchingParts = [String]()
+    var beginswith = ""
+    var endswith = ""
+    var containsParts = [String]()
     
-    func showSearchResults() {
-        func wordFilter(_ word: WordListModel)->Bool {
+    private func filterWordList()->Results<WordListModel>? {
 
-//            if word.word.subString(startPos: 0, length: 2) != language {
-//                return false
-//            }
-            let actWord = word.word.subString(startPos: 2, length: word.word.length - 2)
-//            if actWord == "морская камбала" {
-//                print(actWord)
-//            }
-            if actWord.length < searchingWord.length || (actWord.length > searchingWord.length && !searchingWord.ends(with: "*")) {
-                return false
-            }
-
-            for pos in 0..<searchingWord.length {
-                let actSearchingChar = searchingWord.char(from: pos)
-                let actChar = actWord.char(from: pos)
-                if !(actSearchingChar == "?" || actSearchingChar == "*" || actSearchingChar == actChar) {
-                    return false
-                }
-            }
-            if let _: Range<String.Index> = actWord.range(of: " ") {
-                return false
-            }
-            
-            let element = LineOfFoundedWords(actWord)
-            listOfFoundedWords.append(element)
-            return true
+//        var containsIndex = 0
+        searchingParts = [String]()
+        beginswith = GV.actLanguage
+        endswith = ""
+        containsParts = [String]()
+        var actString = ""
+        if searchingWord.begins(with: star) {
+            searchingWord.removeFirst()
+            return nil
         }
-        var beginswith = GV.actLanguage
-        var endswith = ""
-        var contains = ""
-        var containsIndex = 0
-        listOfFoundedWords = [LineOfFoundedWords]()
         for pos in 0..<searchingWord.length {
-            let actSearchingChar = searchingWord.char(from: pos)
-            if actSearchingChar == "?" || actSearchingChar == "*" {
-                containsIndex = pos
-                break
-            }
-            beginswith += actSearchingChar
-        }
-        repeat {
-            containsIndex += 1
-            if containsIndex >= searchingWord.length {
-                break
-            }
-        } while (searchingWord.char(from: containsIndex) == "?" || searchingWord.char(from: containsIndex) == "*")
-        
-        if containsIndex < searchingWord.length {
-            var lastIndex = 0
-            for pos in containsIndex..<searchingWord.length {
-                let actSearchingChar = searchingWord.char(from: pos)
-                if actSearchingChar == "?" || actSearchingChar == "*" {
-                    break
+            let actSearchingChar = searchingWord.lowercased().char(from: pos)
+            if actSearchingChar == questionMark {
+                if actString.count > 0 && actString.char(from: 0) != questionMark {
+                    searchingParts.append(actString)
+                    actString = ""
                 }
-                contains += actSearchingChar
-                lastIndex = pos
+                actString += questionMark
+                continue
             }
-            if lastIndex + 1 == searchingWord.length {
-                endswith = contains
-                contains = ""
+            if actSearchingChar == star {
+                if actString.count > 0 && actString.char(from: 0) != star {
+                    searchingParts.append(actString)
+                    actString = star
+                }
+                continue
+            }
+            if actSearchingChar != star && actSearchingChar != questionMark {
+                if actString.count > 0 && (actString.char(from:0) == star || actString.char(from:0) == questionMark) {
+                    searchingParts.append(actString)
+                    actString = ""
+                }
+                actString += actSearchingChar
+                continue
             }
         }
-        var allWordsForLanguage: Results<WordListModel>?
-        if searchingWord.length > 1 {
-            if beginswith.length > 2 {
-                allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", beginswith)
-            } else if contains.length > 0 {
-                allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word CONTAINS %@", beginswith, contains)
-            } else if endswith.length > 0 {
-                allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word ENDSWITH %@", beginswith, endswith)
-            } else {
-                allWordsForLanguage = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", beginswith)
+        if actString != "" {
+            searchingParts.append(actString)
+        }
+        print("searchingParts:")
+        if searchingParts.count == 0 {
+            return nil
+        }
+        var index = 0
+        for part in searchingParts {
+            print("index: \(index):\(part)")
+            index += 1
+        }
+        if searchingParts.first!.firstChar() != star && searchingParts.first!.firstChar() != questionMark {
+            beginswith += searchingParts.first!
+        }
+        if searchingParts.count > 1 && searchingParts.last!.firstChar() != star && searchingParts.last!.firstChar() != questionMark {
+            endswith += searchingParts.last!
+        }
+        for (ind, part) in searchingParts.enumerated() {
+            if ind > 0 && ind < searchingParts.count - 1 && part.char(from: 0) != star && part.char(from: 0) != questionMark {
+                containsParts.append(part)
             }
-            
-            let _ = allWordsForLanguage!.filter(wordFilter).count
+        }
+        print("beginswith:\(beginswith)")
+        print("endswith:\(endswith)")
+        var results: Results<WordListModel>?
+        if searchingWord.length > 1 {
+            if containsParts.count > 0 {
+                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word CONTAINS %@", beginswith, containsParts[0])
+            } else if endswith.length > 0 {
+                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word ENDSWITH %@", beginswith, endswith)
+            } else {
+                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", beginswith)
+            }
+        }
+        
+        return results
+    }
+    
+    private func wordFilter(word: String)->LineOfFoundedWords? {
+        if word.length > 18 {
+            return nil
+        }
+        if /*word == "молоко" || word == "молочко" */ word == "kutyaharapás" {
+            print(word)
+        }
+        var starSearchingActiv = false
+//        var lastStarPosition = 0
+//        let beginswith = searchingParts[0]
+        var wordIndex = 0
+        for part in searchingParts {
+            if word.length < wordIndex {
+                return nil
+            }
+            if wordIndex + part.length > word.length {
+                return nil
+            }
+            if part.firstChar() == star {
+                wordIndex += 1
+                starSearchingActiv = true
+            } else if part.firstChar() == questionMark {
+                wordIndex += part.length
+            } else {
+                if starSearchingActiv {
+                    if let index = word.index(from: wordIndex, of: part) {
+                        wordIndex = index + part.length
+                        starSearchingActiv = false
+                        continue
+                    } else {
+                        return nil
+                    }
+                }
+                if word.subString(at: wordIndex, length: part.length) == part {
+                    wordIndex += part.length
+                    continue
+                } else {
+                    return nil
+                }
+            }
+        }
+        if !starSearchingActiv && wordIndex != word.length {
+            return nil
+        }
+        let returnValue = LineOfFoundedWords(word)
+        return returnValue
+    }
+
+    private func showSearchResults() {
+        listOfFoundedWords = [LineOfFoundedWords]()
+        let filteredWordList = filterWordList()
+        if filteredWordList != nil {
+            for word in filteredWordList! {
+                if let OKWord = wordFilter(word: word.word.subString(at: 2, length: word.word.length - 2)) {
+                    listOfFoundedWords.append(OKWord)
+                }
+            }
         }
         if sortUp {
             listOfFoundedWords = listOfFoundedWords.sorted(by: {$0.length < $1.length || ($0.length == $1.length && $0.word < $1.word)})
@@ -1371,6 +1436,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if undoButton != nil {
             undoButton?.removeFromSuperview()
             undoButton = nil
+        }
+        if activityRoundItem.count == 0 {
+            activityRoundItem.append(ActivityRound())
+            activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
         }
         let enabled = activityRoundItem[0].activityItems.count > 0
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
@@ -1729,7 +1798,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 firstTouchedCol = touchedNodes.col
                 firstTouchedRow = touchedNodes.GRow
                 var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.GRow].letter
-                choosedLetter = choosedLetter == " " ? "?" : choosedLetter
+                choosedLetter = choosedLetter == " " ? questionMark : choosedLetter
                 addLetterToSearchingWord(letter: choosedLetter)           }
         } else if touchedNodes.shapeIndex > NoValue {
             startShapeIndex = touchedNodes.shapeIndex
@@ -1767,7 +1836,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if (touchedNodes.col >= 0 && touchedNodes.col < 10) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < 10) {
                 if firstTouchedCol != touchedNodes.col || firstTouchedRow != touchedNodes.GRow {
                     var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.GRow].letter
-                    choosedLetter = choosedLetter == " " ? "?" : choosedLetter
+                    choosedLetter = choosedLetter == " " ? questionMark : choosedLetter
                     addLetterToSearchingWord(letter: choosedLetter)
                     firstTouchedCol = touchedNodes.col
                     firstTouchedRow = touchedNodes.GRow
@@ -1844,11 +1913,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 if name == ownWordsButtonName {
                     touchedNodes.showOwnWordsButton = true
                 } else if name.begins(with: "GBD") {
-                    touchedNodes.GCol = Int(name.subString(startPos: 4, length:1))!
-                    touchedNodes.GRow = Int(name.subString(startPos: 6, length:1))!
-                } else if let number = Int(name.subString(startPos: 3, length: name.count - 3)) {
+                    touchedNodes.GCol = Int(name.subString(at: 4, length:1))!
+                    touchedNodes.GRow = Int(name.subString(at: 6, length:1))!
+                } else if let number = Int(name.subString(at: 3, length: name.count - 3)) {
                     if enabled {
-                        let nameStartedWith = name.subString(startPos: 0, length: 3)
+                        let nameStartedWith = name.subString(at: 0, length: 3)
                         if startShapeIndex >= 0 {
                             touchedNodes.shapeIndex = startShapeIndex
                         }
@@ -1862,24 +1931,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     }
                 }
             }
-//            if name == answer1Name {
-//               touchedNodes.answer1 = true
-//            } else if name == answer2Name {
-//                touchedNodes.answer2 = true
-////            } else if name == ownWordsBackgroundName {
-////                touchedNodes.ownWordsBackground = true
-//            }
         }
-//        if touchedNodes.GRow == -1 {
-//            for node in nodes1 {
-//                guard let name = node.name else {
-//                    continue
-//                }
-//                if name.begins(with: "GBD") {
-//                    touchedNodes.GRow = Int(name.subString(startPos: 6, length:1))!
-//                }
-//            }
-//        }
         return touchedNodes
     }
     let answer1Name = "Answer1"
@@ -1905,7 +1957,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if (touchedNodes.col >= 0 && touchedNodes.col < 10) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < 10) {
                 if firstTouchedCol != touchedNodes.col || firstTouchedRow != touchedNodes.GRow {
                     var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.GRow].letter
-                    choosedLetter = choosedLetter == " " ? "?" : choosedLetter
+                    choosedLetter = choosedLetter == " " ? questionMark : choosedLetter
                     addLetterToSearchingWord(letter: choosedLetter)
                 }
             }
@@ -2425,146 +2477,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        wtGameboard!.checkWholeWords()
     }
     
-    private func generateArrayOfWordPiecesOld()->String {
-        let gameNumber =  GV.playingRecord.gameNumber
-        let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
-        let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
-        let random = MyRandom(gameNumber: gameNumber)
-        func getLetters( from: inout [String], archiv: inout [String])->[String] {
-            
-            if from.count == 0 {
-                repeat {
-                    let archivIndex = random.getRandomInt(0, max: archiv.count - 1)
-                    let item = archiv[archivIndex]
-                    archiv.remove(at: archivIndex)
-                    from.append(item)
-                } while archiv.count > 0
-                //                for item in archiv {
-                //                    from.append(item)
-                //                }
-                //                archiv.removeAll()
-            }
-            let index = random.getRandomInt(0, max: from.count - 1)
-            let temp = from[index]
-            var piece = [String]()
-            piece.append(temp.subString(startPos:0, length: 1))
-            if temp.count == 2 {
-                piece.append(temp.subString(startPos:1, length: 1))
-            }
-            archiv.append(temp)
-            from.remove(at: index)
-            return piece
-        }
-        tilesForGame.removeAll()
-        var oneLetterPieces = [String]()
-        var oneLetterPiecesArchiv = [String]()
-        var twoLetterPieces = [String]()
-        var twoLetterPiecesArchiv = [String]()
-        var letterFrequencyTable = [String:Int]()
-        var mandatoryLetterFrequencyTable = [String:Int]()
-        var countMandatoryLetters = 0
-        let letterFrequencyRecords = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", GV.language.getText(.tcAktLanguage) + GV.frequencyString)
-        // calculating letterFrequency
-        for record in letterFrequencyRecords {
-            let separatedValues = record.word.components(separatedBy: itemSeparator)
-            letterFrequencyTable[separatedValues[1].uppercased()] = Int(Double(separatedValues[2])!)
-        }
-        // fill mandatoryLetterFrequencyTable with 0 for all letters
-        for (letter, _) in letterFrequencyTable {
-            mandatoryLetterFrequencyTable[letter] = 0
-        }
-        for word in words {
-            countMandatoryLetters += word.length
-            for letter in word.uppercased() {
-                mandatoryLetterFrequencyTable[String(letter)]! += 1
-            }
-        }
-        var allProcent = 0
-        for (letter, origValue) in mandatoryLetterFrequencyTable {
-            let absValue = Double(origValue) //Double(mandatoryLetterFrequencyTable[letter]!)
-            let procentValue = Int(round(100.0 * absValue / Double(countMandatoryLetters)))
-            let newValue = procentValue > letterFrequencyTable[letter]! ?
-                (procentValue > 25 ? 25 : procentValue) :
-                letterFrequencyTable[letter]! * (procentValue == 0 ? 2 : 1)
-            mandatoryLetterFrequencyTable[letter] = newValue
-            allProcent += newValue
-        }
-        
-        for word in words {
-            for index in 0..<word.count / 2 {
-                if !twoLetterPieces.contains(where: {$0 == word.subString(startPos: index * 2, length: 2).uppercased()}) {
-                    twoLetterPieces.append(word.subString(startPos: index * 2, length: 2).uppercased())
-                    for letter in twoLetterPieces.last! {
-                        if mandatoryLetterFrequencyTable[String(letter)]! > 0 {
-                            mandatoryLetterFrequencyTable[String(letter)]! -= 1
-                        }
-                    }
-                }
-            }
-        }
-        for (letter, counter) in mandatoryLetterFrequencyTable {
-            for _ in 0..<counter {
-                oneLetterPieces.append(String(letter))
-            }
-        }
-        var typesWithLen1 = [MyShapes]()
-        var typesWithLen2 = [MyShapes]()
-        var typesWithLen3 = [MyShapes]()
-        var typesWithLen4 = [MyShapes]()
-        
-        for index in 0..<MyShapes.count - 1 {
-            guard let type = MyShapes(rawValue: index) else {
-                return ""
-            }
-            let length = myForms[type]![0].count
-            switch length {
-            case 1: typesWithLen1.append(type)
-            case 2: typesWithLen2.append(type)
-            case 3: typesWithLen3.append(type)
-            case 4: typesWithLen4.append(type)
-            default: break
-            }
-        }
-        var lengths = [Int]()
-        for index in 1...100 {
-            switch index {
-            case 1...45: lengths.append(1)
-            case 46...96: lengths.append(2)
-            case 97...99: lengths.append(3)
-            default:      lengths.append(4)
-            }
-        }
-        var generateLength = 0
-        repeat {
-            let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
-            var tileType = MyShapes.NotUsed
-            var letters = [String]()
-            switch tileLength {
-            case 1: tileType = typesWithLen1[0]
-            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
-            case 2: tileType = typesWithLen2[0]
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)
-            case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            letters += getLetters(from: &twoLetterPieces, archiv: &twoLetterPiecesArchiv)
-            default: break
-            }
-            let rotateIndex = random.getRandomInt(0, max: 3)
-            
-            //            let tileForGameItem = TilesForGame(type: tileType, rotateIndex: rotateIndex, letters: letters)
-            let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
-            tilesForGame.append(tileForGameItem)
-            generateLength += tileLength
-        } while generateLength < 1000
-        var generatedArrayInStringForm = ""
-        for tile in tilesForGame {
-            generatedArrayInStringForm += tile.toString() + "°"
-        }
-        return generatedArrayInStringForm
-    }
 
     private func generateArrayOfWordPieces()->String {
         var allLettersTable = [String]()
@@ -2577,12 +2489,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         func getLetters(length: Int)->[String] {
             var piece = [String]()
             for _ in 0..<length {
-//                if allLettersTable.count == 0 {
-//                    allLettersTable = origAllLettersTable
-//                }
+                if allLettersTable.count == 0 {
+                    allLettersTable = origAllLettersTable
+                }
                 let index = random.getRandomInt(0, max: allLettersTable.count - 1)
                 let letter = allLettersTable[index]
-//                allLettersTable.remove(at: index)
+                allLettersTable.remove(at: index)
                 piece.append(letter)
             }
             return piece
@@ -2651,8 +2563,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var count = 1
         for word in words {
             for index in 0..<word.count / 2 {
-                if !twoLetterPieces.contains(where: {$0 == word.subString(startPos: index * 2, length: 2).uppercased()}) {
-                    twoLetterPieces.append(word.subString(startPos: index * 2, length: 2).uppercased())
+                if !twoLetterPieces.contains(where: {$0 == word.subString(at: index * 2, length: 2).uppercased()}) {
+                    twoLetterPieces.append(word.subString(at: index * 2, length: 2).uppercased())
 //                    for letter in twoLetterPieces.last! {
 //                        if mandatoryLetterFrequencyTable[String(letter)]! > 0 {
 //                            mandatoryLetterFrequencyTable[String(letter)]! -= 1
@@ -2709,20 +2621,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             var letters = [String]()
             switch tileLength {
             case 1: tileType = typesWithLen1[0]
-            letters += getLetters(length: 1)
+                letters += getLetters(length: 1)
             case 2: tileType = typesWithLen2[0]
                 if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
                     let index = random.getRandomInt(0, max: twoLetterPieces.count - 1)
-                    letters.append(twoLetterPieces[index].subString(startPos: 0, length: 1))
-                    letters.append(twoLetterPieces[index].subString(startPos: 1, length: 1))
+                    letters.append(twoLetterPieces[index].firstChar())
+                    letters.append(twoLetterPieces[index].char(from: 1))
                 } else {
                     letters = getLetters(length: 2)
                 }
             case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
                 if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
                     let index = random.getRandomInt(0, max: twoLetterPieces.count - 1)
-                    letters.append(twoLetterPieces[index].subString(startPos: 0, length: 1))
-                    letters.append(twoLetterPieces[index].subString(startPos: 1, length: 1))
+                    letters.append(twoLetterPieces[index].firstChar())
+                    letters.append(twoLetterPieces[index].char(from: 1))
                     letters += getLetters(length: 1)
                 } else {
                     letters = getLetters(length:3)
@@ -2730,11 +2642,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
                 if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
                 let index1 = random.getRandomInt(0, max: twoLetterPieces.count - 1)
-                letters.append(twoLetterPieces[index1].subString(startPos: 0, length: 1))
-                letters.append(twoLetterPieces[index1].subString(startPos: 1, length: 1))
+                letters.append(twoLetterPieces[index1].firstChar())
+                letters.append(twoLetterPieces[index1].char(from: 1))
                 let index2 = random.getRandomInt(0, max: twoLetterPieces.count - 1)
-                letters.append(twoLetterPieces[index2].subString(startPos: 0, length: 1))
-                letters.append(twoLetterPieces[index2].subString(startPos: 1, length: 1))
+                letters.append(twoLetterPieces[index2].firstChar())
+                letters.append(twoLetterPieces[index2].char(from: 1))
             } else {
                 letters = getLetters(length:4)
             }
@@ -2873,11 +2785,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         
     }
 
-    
-
-    
-
-    
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
     }

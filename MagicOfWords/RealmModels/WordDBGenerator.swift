@@ -88,7 +88,7 @@ class WordDBGenerator {
         for word in wordList {
             let charset = CharacterSet(charactersIn: "-!") // words with "-", "!" are not computed
             if word.rangeOfCharacter(from: charset) == nil {
-                if notDELanguage || word.subString(startPos: 0, length: 1).uppercased() == word.subString(startPos: 0, length: 1) {
+                if notDELanguage || word.firstChar().uppercased() == word.firstChar() {
                     generateLetterFrequency(language: language, word: word.lowercased())
                     let wordModel = WordListModel()
                     wordModel.word = (language + word).lowercased()
@@ -164,31 +164,45 @@ class WordDBGenerator {
     
     func generatingMandatoryWords(language: String) {
         let words = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
-        let sortedWords =  Array(words).sorted(by: {$0.word.length < $1.word.length})
-        var minIndex = 0
-        var maxIndex = 0
+        let sortedWords =  Array(words).sorted(by: {$0.word.length < $1.word.length || ($0.word.length == $1.word.length && $0.word < $1.word)})
+        var indexTab = [0,0,0,0,0,0,0,0,0,0,0,0]
+        var searching = true
         repeat {
             for index in 0..<sortedWords.count {
-                if minIndex == 0 && sortedWords[index].word.length == 7 {
-                    minIndex = index
+                let length = sortedWords[index].word.length - 2
+                if length < 5 {
+                    continue
                 }
-                if minIndex != 0 && sortedWords[index].word.length < 14 {
-                    maxIndex = index
+
+                if indexTab[length] == 0 {
+                    indexTab[length] = index
                 }
-            }
-        } while maxIndex == 0
+                if length > 10 {
+                    searching = false
+                    break
+                }
+           }
+        } while searching
         var wordTable = [String]()
         var wordsToPrint = [String]()
+        let wordLengths = [5,6,6,7,7,7,7,8,8,8,8,9,9,10,11]
         let random = MyRandom(gameNumber: 0)
         repeat {
+            let wLenIndex = random.getRandomInt(0, max: wordLengths.count - 2)
+            let minIndex = indexTab[wordLengths[wLenIndex]]
+            let maxIndex = indexTab[wordLengths[wLenIndex + 1]] - 1
             let wordIndex = random.getRandomInt(minIndex, max: maxIndex)
             let word = sortedWords[wordIndex]
             let wLength = word.word.length
-            let search = word.word.subString(startPos: 2, length: wLength - 2)
+            let search = word.word.subString(at: 2, length: wLength - 2)
             if let _ = wordTable.index(where: { $0 == search }) {
                 
+            } else if let _ = wordTable.index(where: { $0.subString(at: 0, length: $0.length - 1) == search}) {
+                    
+            } else if let _ = wordTable.index(where: { $0 == search.subString(at: 0, length: search.length - 1)}) {
+            
             } else {
-                wordTable.append(word.word.subString(startPos: 2, length: wLength - 2))
+                wordTable.append(word.word.subString(at: 2, length: wLength - 2))
             }
         } while wordTable.count < 10000
         var index = 0
@@ -211,12 +225,11 @@ class WordDBGenerator {
             wordsToPrint.append(text)
         }
         
-        print(wordsToPrint)
+//        print(wordsToPrint)
     }
     func generatingWordList(language: String) {
         let words = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
         let sortedWords =  Array(words).sorted(by: {$0.word < $1.word})
-        var wordsToPrint = [String]()
         for word in sortedWords {
             try! realm.write() {
                 let wordListRecord = WordListModel()

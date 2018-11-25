@@ -48,9 +48,9 @@ public struct MovingItem {
             var letters = [UsedLetter]()
             var index = 0
             repeat {
-                let col = Int(inputString.subString(startPos: index, length: 1))
-                let row = Int(inputString.subString(startPos: index + 1, length: 1))
-                let letter = inputString.subString(startPos: index + 1, length: 1)
+                let col = Int(inputString.subString(at: index, length: 1))
+                let row = Int(inputString.subString(at: index + 1, length: 1))
+                let letter = inputString.subString(at: index + 1, length: 1)
                 letters.append(UsedLetter(col: col!, row: row!, letter: letter))
                 index += 3
             } while index >= inputString.count
@@ -670,7 +670,7 @@ class WTGameboard: SKShapeNode {
         for index in 0..<size * size {
             let col = index / size
             let row = index % size
-            GV.gameArray[col][row].restore(from: string.subString(startPos: 2 * index, length: 2))
+            GV.gameArray[col][row].restore(from: string.subString(at: 2 * index, length: 2))
         }
     }
     
@@ -734,8 +734,8 @@ class WTGameboard: SKShapeNode {
     public func removeFromGameboard(sprite: WTPiece) {
         let gameboardIndexes = sprite.gameArrayPositions
         for gbIndex in gameboardIndexes {
-            if let col = Int(gbIndex.subString(startPos: 0, length: 1)) {
-                if let row = Int(gbIndex.subString(startPos: 1, length: 1)) {
+            if let col = Int(gbIndex.subString(at: 0, length: 1)) {
+                if let row = Int(gbIndex.subString(at: 1, length: 1)) {
                     GV.gameArray[col][row].remove()
                 }
             }
