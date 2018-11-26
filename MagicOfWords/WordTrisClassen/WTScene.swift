@@ -1122,10 +1122,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         endswith = ""
         containsParts = [String]()
         var actString = ""
-        if searchingWord.begins(with: star) {
-            searchingWord.removeFirst()
-            return nil
-        }
+//        if searchingWord.begins(with: star) {
+//            searchingWord.removeFirst()
+//            return nil
+//        }
         for pos in 0..<searchingWord.length {
             let actSearchingChar = searchingWord.lowercased().char(from: pos)
             if actSearchingChar == questionMark {
@@ -1137,8 +1137,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 continue
             }
             if actSearchingChar == star {
-                if actString.count > 0 && actString.char(from: 0) != star {
+                if actString.count > 0 && actString.firstChar() != star {
                     searchingParts.append(actString)
+                    actString = star
+                }
+                if actString.count == 0 {
                     actString = star
                 }
                 continue
@@ -1155,15 +1158,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if actString != "" {
             searchingParts.append(actString)
         }
-        print("searchingParts:")
+//        print("searchingParts:")
         if searchingParts.count == 0 {
             return nil
         }
-        var index = 0
-        for part in searchingParts {
-            print("index: \(index):\(part)")
-            index += 1
-        }
+//        var index = 0
+//        for part in searchingParts {
+//            print("index: \(index):\(part)")
+//            index += 1
+//        }
         if searchingParts.first!.firstChar() != star && searchingParts.first!.firstChar() != questionMark {
             beginswith += searchingParts.first!
         }
@@ -1175,8 +1178,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 containsParts.append(part)
             }
         }
-        print("beginswith:\(beginswith)")
-        print("endswith:\(endswith)")
+//        print("beginswith:\(beginswith)")
+//        print("endswith:\(endswith)")
         var results: Results<WordListModel>?
         if searchingWord.length > 1 {
             if containsParts.count > 0 {
@@ -2486,24 +2489,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
         let random = MyRandom(gameNumber: gameNumber)
 //        random.generateRandomInts()
-        func getLetters(length: Int)->[String] {
-            var piece = [String]()
-            for _ in 0..<length {
-                if allLettersTable.count == 0 {
-                    allLettersTable = origAllLettersTable
-                }
-                let index = random.getRandomInt(0, max: allLettersTable.count - 1)
-                let letter = allLettersTable[index]
-                allLettersTable.remove(at: index)
-                piece.append(letter)
-            }
-            return piece
-        }
         tilesForGame.removeAll()
         var oneLetterPieces = [String]()
 //        var oneLetterPiecesArchiv = [String]()
         var twoLetterPieces = [String]()
-//        var twoLetterPiecesArchiv = [String]()
+        var twoLetterPiecesArchiv = [String]()
         var letterFrequencyTable = [String:Int]()
         var mandatoryLetterFrequencyTable = [String:Int]()
         var countMandatoryLetters = 0
@@ -2563,13 +2553,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var count = 1
         for word in words {
             for index in 0..<word.count / 2 {
-                if !twoLetterPieces.contains(where: {$0 == word.subString(at: index * 2, length: 2).uppercased()}) {
-                    twoLetterPieces.append(word.subString(at: index * 2, length: 2).uppercased())
-//                    for letter in twoLetterPieces.last! {
-//                        if mandatoryLetterFrequencyTable[String(letter)]! > 0 {
-//                            mandatoryLetterFrequencyTable[String(letter)]! -= 1
-//                        }
-//                    }
+                let twoLetterPiece = word.subString(at: index * 2, length: 2).uppercased()
+                if !twoLetterPieces.contains(where: {$0 == twoLetterPiece}) {
+                    twoLetterPieces.append(twoLetterPiece)
+                    for letter in twoLetterPiece {
+                        if mandatoryLetterFrequencyTable[String(letter)]! > 1 {
+                            mandatoryLetterFrequencyTable[String(letter)]! -= 1
+                        }
+                    }
                 }
             }
             count += 1
@@ -2577,6 +2568,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 break
             }
         }
+        twoLetterPiecesArchiv = twoLetterPieces
         for (letter, counter) in mandatoryLetterFrequencyTable {
             for _ in 0..<counter {
                 oneLetterPieces.append(String(letter))
@@ -2612,6 +2604,31 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             default:      lengths.append(4)
             }
         }
+        
+        func getTwoLetterPieces()->[String] {
+            var letters = [String]()
+            if twoLetterPieces.count == 0 {
+                twoLetterPieces = twoLetterPiecesArchiv
+            }
+            let index = random.getRandomInt(0, max: twoLetterPieces.count - 1)
+            letters.append(twoLetterPieces[index].firstChar())
+            letters.append(twoLetterPieces[index].char(from: 1))
+            twoLetterPieces.remove(at: index)
+            return letters
+        }
+        func getLetters(length: Int)->[String] {
+            var piece = [String]()
+            for _ in 0..<length {
+                if allLettersTable.count == 0 {
+                    allLettersTable = origAllLettersTable
+                }
+                let index = random.getRandomInt(0, max: allLettersTable.count - 1)
+                let letter = allLettersTable[index]
+                allLettersTable.remove(at: index)
+                piece.append(letter)
+            }
+            return piece
+        }
 
         var generateLength = 0
         repeat {
@@ -2624,32 +2641,25 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 letters += getLetters(length: 1)
             case 2: tileType = typesWithLen2[0]
                 if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
-                    let index = random.getRandomInt(0, max: twoLetterPieces.count - 1)
-                    letters.append(twoLetterPieces[index].firstChar())
-                    letters.append(twoLetterPieces[index].char(from: 1))
-                } else {
+                    letters += getTwoLetterPieces()
+
+               } else {
                     letters = getLetters(length: 2)
                 }
             case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
                 if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
-                    let index = random.getRandomInt(0, max: twoLetterPieces.count - 1)
-                    letters.append(twoLetterPieces[index].firstChar())
-                    letters.append(twoLetterPieces[index].char(from: 1))
+                    letters = getTwoLetterPieces()
                     letters += getLetters(length: 1)
                 } else {
                     letters = getLetters(length:3)
                 }
             case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
                 if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
-                let index1 = random.getRandomInt(0, max: twoLetterPieces.count - 1)
-                letters.append(twoLetterPieces[index1].firstChar())
-                letters.append(twoLetterPieces[index1].char(from: 1))
-                let index2 = random.getRandomInt(0, max: twoLetterPieces.count - 1)
-                letters.append(twoLetterPieces[index2].firstChar())
-                letters.append(twoLetterPieces[index2].char(from: 1))
-            } else {
-                letters = getLetters(length:4)
-            }
+                    letters = getTwoLetterPieces()
+                    letters += getTwoLetterPieces()
+                } else {
+                    letters = getLetters(length:4)
+                }
             default: break
             }
 
