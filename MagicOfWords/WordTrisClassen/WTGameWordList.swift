@@ -12,11 +12,9 @@ import GameplayKit
 let maxScore = 2000
 let pointsForLetter = 10
 let maxUsedLength = 25
-let pointsForWord: [Int:Int] = [0: 0, 1: 0, 2: 0, 3: 10, 4: 50, 5:100, 6: 150, 7: 200, 8: 250, 9: 300, 10: 350, 11: 410, 12: 470, 13: 530, 14: 600,
-                                15: 670, 16: 740, 17: 820, 18:900, 19: 1000, 20:1100, 21: 1200, 22: 1300, 23: 1400, 24: 1500, 25: 2000]
-let minutesForWord: [Int: Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 5, 8: 5, 9:10, 10: 10, 11: 15, 12: 15, 13: 15, 14: 15,
-                                  15: 20, 16: 20, 17: 20, 18:20, 19: 25, 20:25, 21: 25, 22: 30, 23: 30, 24: 30, 25: 60]
-
+let pointsForWord: [Int:Int] = [0: 0, 1: 0, 2: 0, 3: 10, 4: 50, 5:100, 6: 150, 7: 200, 8: 250, 9: 300, 10: 350, 11: 410, 12: 470, 13: 530, 14: 600, 15: 670, 16: 740, 17: 820, 18:900, 19: 1000, 20:1100, 21: 1200, 22: 1300, 23: 1400, 24: 1500, 25: 2000]
+let minutesForWord: [Int: Int] = [0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 5, 8: 5, 9:10, 10: 10, 11: 15, 12: 15, 13: 15, 14: 15, 15: 20, 16: 20, 17: 20, 18:20, 19: 25, 20:25, 21: 25, 22: 30, 23: 30, 24: 30, 25: 60]
+let pointsForLettersInPosition: [Int:Int] = [0: 0, 1: 0, 2: 10, 3: 20, 4: 30, 5:50, 6: 60, 7: 70, 8: 90, 9: 100, 10: 110, 11: 130, 12: 140, 13: 150, 14: 170, 15: 180, 16: 190, 17: 210, 18: 220, 19: 230, 20:250, 21: 260, 22: 270, 23: 280, 24: 300, 25: 310]
 public struct ConnectionType {
     var left = false
     var top = false
@@ -260,13 +258,22 @@ public class WTGameWordList {
     public func restoreFromPlayingRecord() {
         clearWordsInGame()
         for round in GV.playingRecord.rounds {
-            cleanGameArrayConnections()
+            cleanGameArray()
+            resetOccurencesInWords()
             wordsInRound.append(WordInRound())
             initFromString(from: round.infos)
         }
     }
     
-    private func cleanGameArrayConnections() {
+    private func resetOccurencesInWords() {
+        for col in 0..<GV.size {
+            for row in 0..<GV.size {
+                GV.gameArray[col][row].resetCountOccurencesInWords()
+            }
+        }
+    }
+    
+    private func cleanGameArray() {
         for col in 0..<GV.size {
             for row in 0..<GV.size {
                 GV.gameArray[col][row].clearConnectionType()
@@ -342,20 +349,26 @@ public class WTGameWordList {
             }
         }
         if noCommonLetter && noDiagonal {
-//            var isSaved = false
-            let oldScore = getActualScore()
+            var oldScore = 0
+            var newScore = 0
+            if doAnimate {
+                oldScore = getActualScore()
+            }
             wordsInRound[wordsInRound.count - 1].wordsInGame.append(selectedWord)
             for index in 0..<selectedWord.usedLetters.count {
 //            for letter in selectedWord.usedLetters {
                 let letter = selectedWord.usedLetters[index]
                 let connectionType = selectedWord.connectionTypes[index]
-                GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType)
+                GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType, incrWords: true)
             }
             addWordToAllWords(word: selectedWord.word)
-            let newScore = getActualScore()
+            if doAnimate {
+                newScore = getActualScore()
+            }
             let changeTime = minutesForWord[selectedWord.word.length]
             if doAnimate { // only when new word added, not in init
                 delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: doAnimate, changeTime: changeTime!)
+                
             }
         }
         return noCommonLetter && noDiagonal
@@ -389,9 +402,12 @@ public class WTGameWordList {
                     break
                 }
             }
-            for letter in selectedWord.usedLetters {
+            for (index, letter) in selectedWord.usedLetters.enumerated() {
                 if isThisPositionFree(letter: letter) {
-                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myUsedColor, toStatus: .used)
+                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myUsedColor, toStatus: .used, decrWords: true)
+                } else {
+                    let connectionType = selectedWord.connectionTypes[index]
+                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType, decrWords: true)
                 }
             }
             let newScore = getActualScore()
@@ -399,7 +415,7 @@ public class WTGameWordList {
             delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: -changeTime!)
         }
         
-        cleanGameArrayConnections()
+        cleanGameArray()
         for word in wordsInRound.last!.wordsInGame
  {
             for index in 0..<word.usedLetters.count {
@@ -454,6 +470,10 @@ public class WTGameWordList {
                 score += word.score
             }
         }
+        if forAll {
+            let letterScore = getPointsForLetters()
+            score += letterScore
+        }
         return score
     }
     
@@ -464,7 +484,25 @@ public class WTGameWordList {
                 score += selectedWord.score
             }
         }
+        let letterScore = getPointsForLetters()
+        score += letterScore
         return score
+    }
+    
+    public func getPointsForLetters()->Int {
+        var letterScore = 0
+        for round in GV.playingRecord.rounds {
+            letterScore += round.roundScore
+        }
+        for col in 0..<GV.sizeOfGrid {
+            for row in 0..<GV.sizeOfGrid {
+                var count = GV.gameArray[col][row].getCountOccurencesInWords()
+                count = count > 25 ? 25 : count
+                letterScore += pointsForLettersInPosition[count]!
+//                print("col: \(col), row: \(row), count: \(count), score: \(letterScore)")
+            }
+        }
+        return letterScore
     }
     
     public func toStringLastRound()->String {

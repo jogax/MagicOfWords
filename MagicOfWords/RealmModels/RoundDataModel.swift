@@ -15,4 +15,5 @@ class RoundDataModel: Object {
     @objc dynamic var infos = ""
     @objc dynamic var activityItems = ""
     @objc dynamic var gameArray = ""
+    @objc dynamic var roundScore = 0
 }

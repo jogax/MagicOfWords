@@ -726,6 +726,7 @@ class WTGameboard: SKShapeNode {
         for col in 0..<size {
             for row in 0..<size {
                 GV.gameArray[col][row].clearIfUsed()
+                GV.gameArray[col][row].resetCountOccurencesInWords()
             }
         }
         roundInfos.append(RoundInfos())

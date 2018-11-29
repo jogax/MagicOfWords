@@ -55,23 +55,36 @@ class WTGameboardItem: SKSpriteNode {
     public var doubleUsed = false
     private var blockSize:CGFloat = 0
     private var label: SKLabelNode
+    private var countWordsLabel: SKLabelNode
     private var connectionType = ConnectionType()
-//    private var countOccurencesInWords = 0
+    private var countOccurencesInWords = 0
     public var letter = emptyLetter
+    private var fontSize: CGFloat = 0
     init(blockSize: CGFloat, fontSize: CGFloat) {
         label = SKLabelNode()
+        countWordsLabel = SKLabelNode()
+        self.fontSize = fontSize
         let texture = SKTexture(imageNamed: "whiteSprite0000.png")
         super.init(texture: texture, color: .white, size: CGSize(width: blockSize, height: blockSize))
-        label.fontName = "KohinoorTelugu-Regular"
-        label.fontName = "Baskerville"
-        label.fontName = "ChalkboardSE-Light"
-        label.fontName = "PingFangTC-Semibold"
+//        label.fontName = "KohinoorTelugu-Regular"
+//        label.fontName = "Baskerville"
+//        label.fontName = "ChalkboardSE-Light"
+//        label.fontName = "PingFangTC-Semibold"
         label.fontName = "KohinoorBangla-Regular"
         label.fontColor = .black
         label.verticalAlignmentMode = .center
-        label.fontSize = fontSize
+        label.fontSize = self.fontSize
         label.zPosition = self.zPosition + 1
         addChild(label)
+
+        countWordsLabel.position = CGPoint(x: blockSize * 0.28, y: -blockSize * 0.35)
+        countWordsLabel.fontName = "KohinoorBangla-Regular"
+        countWordsLabel.fontColor = .black
+//        countWordsLabel.verticalAlignmentMode = .center
+        countWordsLabel.fontSize = fontSize * 0.7
+//        countWordsLabel.text = String(countOccurencesInWords)
+        countWordsLabel.zPosition = self.zPosition + 2
+        addChild(countWordsLabel)
     }
     
     public func setLetter(letter: String, status: ItemStatus, toColor: MyColor, forcedChange: Bool = false)->Bool {
@@ -94,8 +107,16 @@ class WTGameboardItem: SKSpriteNode {
         }
     }
     
+    public func resetCountOccurencesInWords() {
+        countOccurencesInWords = 0
+    }
+    
     public func getColor()->MyColor {
         return myColor
+    }
+    
+    public func getCountOccurencesInWords()->Int {
+        return countOccurencesInWords
     }
     public func setColorByState() {
         switch status {
@@ -197,13 +218,26 @@ class WTGameboardItem: SKSpriteNode {
         setTexture()
     }
     
-    public func setColors(toColor: MyColor, toStatus: ItemStatus, connectionType: ConnectionType = ConnectionType()) {
+    public func setColors(toColor: MyColor, toStatus: ItemStatus, connectionType: ConnectionType = ConnectionType(), incrWords: Bool = false, decrWords: Bool = false) {
         let color = letter == emptyLetter ? .myWhiteColor : toColor
         self.myColor = color
         self.color = convertMyColorToSKColor(color: color)
         self.status = toStatus == .noChange ? self.status : toStatus
         self.status = letter == emptyLetter ? .empty : self.status
         setConnectionType(connectionType: connectionType)
+//        if toStatus == .empty || toStatus == .used {
+//           countOccurencesInWords = 0
+//        }
+        self.countOccurencesInWords += incrWords ? 1 : 0
+        if self.countOccurencesInWords > 0 && decrWords {
+            self.countOccurencesInWords -= 1
+        }
+        if toColor == .myGreenColor {
+            self.countWordsLabel.text = String(countOccurencesInWords)
+            self.countWordsLabel.fontSize = self.fontSize * (countOccurencesInWords < 10 ? 0.7 : 0.6)
+        } else {
+            self.countWordsLabel.text = ""
+        }
     }
     
     private func setTexture() {

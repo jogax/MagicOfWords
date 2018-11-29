@@ -503,7 +503,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var countShowingRows = 0
     var startShapeIndex = 0
     let shapeMultiplicator = [CGFloat(0.20), CGFloat(0.50), CGFloat(0.80)]
-    let sizeOfGrid = 10
     var undoSprite = SKSpriteNode()
     let letterCounts: [Int:[Int]] = [
         1: [1],
@@ -863,7 +862,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let gameNumber = GV.playingRecord.gameNumber
         let headerText = GV.language.getText(.tcHeader, values: String(gameNumber + 1), String(GV.playingRecord.rounds.count))
         headerLabel.text = headerText
-        let score = WTGameWordList.shared.getScore(forAll: true)
+        let letterScore = 0 //WTGameWordList.shared.getPointsForLetters()
+        let normalScore = WTGameWordList.shared.getScore(forAll: true)
+        let score = letterScore + normalScore
         var place = 0
         if bestPlayersReady {
             place = self.bestPlayers!.filter("score > %@", score).count + 1
@@ -1501,10 +1502,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         createLabel(word: GV.language.getText(.tcWordsToCollect, values: String(WTGameWordList.shared.getCountWords(mandatory: true)), "0","0", "0"), first: true, name: mandatoryWordsHeaderName)
         createLabel(word: GV.language.getText(.tcOwnWords, values:
-                    String(WTGameWordList.shared.getCountWords(mandatory: false)),
-                    String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
-                    String(WTGameWordList.shared.getScore(mandatory: false))), first: false, name: ownWordsHeaderName)
-
+            String(WTGameWordList.shared.getCountWords(mandatory: false)),
+            String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
+//                    String(WTGameWordList.shared.getScore(mandatory: false))), first: false, name: ownWordsHeaderName)
+            String(0)),
+            first: false, name: ownWordsHeaderName)
     }
     
     private func createWordLabel(wordToShow: WordWithCounter, counter: Int) {
@@ -1564,7 +1566,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        createHeader()
         myTimer = MyTimer(time: timeForGame)
         addChild(myTimer!)
-        wtGameboard = WTGameboard(size: sizeOfGrid, parentScene: self, delegate: self)
+        wtGameboard = WTGameboard(size: GV.sizeOfGrid, parentScene: self, delegate: self)
 
         generateArrayOfWordPieces(new: new)
         indexOfTilesForGame = 0
@@ -1801,13 +1803,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 firstTouchedCol = touchedNodes.col
                 firstTouchedRow = touchedNodes.GRow
                 var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.GRow].letter
-                choosedLetter = choosedLetter == " " ? questionMark : choosedLetter
+                choosedLetter = choosedLetter == " " ? "" : choosedLetter
                 addLetterToSearchingWord(letter: choosedLetter)           }
         } else if touchedNodes.shapeIndex > NoValue {
             startShapeIndex = touchedNodes.shapeIndex
             pieceArray[touchedNodes.shapeIndex].zPosition = 10
             wtGameboard!.clear()
-        } else if touchedNodes.GCol.between(min: 0, max: sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: sizeOfGrid - 1){
+        } else if touchedNodes.GCol.between(min: 0, max: GV.sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: GV.sizeOfGrid - 1){
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
 //        } else if touchedNodes.ownWordsBackground {
@@ -1839,7 +1841,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if (touchedNodes.col >= 0 && touchedNodes.col < 10) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < 10) {
                 if firstTouchedCol != touchedNodes.col || firstTouchedRow != touchedNodes.GRow {
                     var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.GRow].letter
-                    choosedLetter = choosedLetter == " " ? questionMark : choosedLetter
+                    choosedLetter = choosedLetter == " " ? "" : choosedLetter
                     addLetterToSearchingWord(letter: choosedLetter)
                     firstTouchedCol = touchedNodes.col
                     firstTouchedRow = touchedNodes.GRow
@@ -1850,7 +1852,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * WSGameboardSizeMultiplier)
             sprite.alpha = 0.0
             if wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow) {  // true says moving finished
-                if touchedNodes.row == sizeOfGrid { // when at bottom
+                if touchedNodes.row == GV.sizeOfGrid { // when at bottom
                     sprite.alpha = 1.0
                 }
             }
@@ -1860,7 +1862,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                if wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 2, GRow: touchedNodes.GRow) {
 //                    _ = wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 1, GRow: touchedNodes.GRow)
 //                }
-            } else if touchedNodes.GCol >= 0 && touchedNodes.GCol < sizeOfGrid && touchedNodes.GRow >= 0 && touchedNodes.GRow < sizeOfGrid {
+            } else if touchedNodes.GCol >= 0 && touchedNodes.GCol < GV.sizeOfGrid && touchedNodes.GRow >= 0 && touchedNodes.GRow < GV.sizeOfGrid {
                 movingSprite = (wtGameboard?.moveChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow))!
             }
             if movingSprite {
@@ -1873,7 +1875,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 pieceArray[touchedNodes.shapeIndex].position = touchLocation
             }
             let yDistance = (touchLocation - firstTouchLocation).y
-            if yDistance > blockSize / 2 && touchedNodes.row >= 0 && touchedNodes.row < sizeOfGrid {
+            if yDistance > blockSize / 2 && touchedNodes.row >= 0 && touchedNodes.row < GV.sizeOfGrid {
                 if touchedNodes.shapeIndex >= 0 {
                     moved = wtGameboard!.startShowingSpriteOnGameboard(shape: pieceArray[touchedNodes.shapeIndex], col: touchedNodes.col, row: touchedNodes.row) //, shapePos: touchedNodes.shapeIndex)
                     movedIndex = touchedNodes.shapeIndex
@@ -1960,7 +1962,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if (touchedNodes.col >= 0 && touchedNodes.col < 10) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < 10) {
                 if firstTouchedCol != touchedNodes.col || firstTouchedRow != touchedNodes.GRow {
                     var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.GRow].letter
-                    choosedLetter = choosedLetter == " " ? questionMark : choosedLetter
+                    choosedLetter = choosedLetter == " " ? "" : choosedLetter
                     addLetterToSearchingWord(letter: choosedLetter)
                 }
             }
@@ -2015,33 +2017,34 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 pieceArray[lastPosition].name = "Pos\(lastPosition)"
                 pieceArray[lastPosition].setPieceFromPosition(index: lastPosition)
                 self.addChild(pieceArray[lastPosition])
-                let freePlaceFound = checkFreePlace()
-
-//                checkIfGameFinished()
-                let answer1Action =  UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer1), style: .default, handler: {alert -> Void in
-                    self.gameboardEnabled = true
-                    let title = GV.language.getText(.tcNoMoreStepsAnswer2)
-                    let wordLength = title.width(font: self.myTitleFont!)
-                    let wordHeight = title.height(font: self.myTitleFont!)
-                    let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
-                    let answer1ButtonPos = self.frame.height * 0.05
-                    let center = CGPoint(x:self.frame.width * 0.5, y: answer1ButtonPos) //self.frame.height * 0.20)
-                    let radius = frame.height * 0.5
-                    self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .green)
-                    self.answer1Button!.addTarget(self, action: #selector(self.startNextRound), for: .touchUpInside)
-                    self.view?.addSubview(self.answer1Button!)
-                })
-                let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
-                    self.startNextRound()
-                })
-               if !freePlaceFound {
-                    let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
-                                                            message: GV.language.getText(.tcNoMoreStepsQuestion2),
-                                                            preferredStyle: .alert)
-                    alertController.addAction(answer1Action)
-                    alertController.addAction(answer2Action)
-                    self.parentViewController!.present(alertController, animated: true, completion: nil)
-                }
+                
+//                let freePlaceFound = checkFreePlace()
+//
+////                checkIfGameFinished()
+//                let answer1Action =  UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer1), style: .default, handler: {alert -> Void in
+//                    self.gameboardEnabled = true
+//                    let title = GV.language.getText(.tcNoMoreStepsAnswer2)
+//                    let wordLength = title.width(font: self.myTitleFont!)
+//                    let wordHeight = title.height(font: self.myTitleFont!)
+//                    let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
+//                    let answer1ButtonPos = self.frame.height * 0.05
+//                    let center = CGPoint(x:self.frame.width * 0.5, y: answer1ButtonPos) //self.frame.height * 0.20)
+//                    let radius = frame.height * 0.5
+//                    self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .green)
+//                    self.answer1Button!.addTarget(self, action: #selector(self.startNextRound), for: .touchUpInside)
+//                    self.view?.addSubview(self.answer1Button!)
+//                })
+//                let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
+//                    self.startNextRound()
+//                })
+//               if !freePlaceFound {
+//                    let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
+//                                                            message: GV.language.getText(.tcNoMoreStepsQuestion2),
+//                                                            preferredStyle: .alert)
+//                    alertController.addAction(answer1Action)
+//                    alertController.addAction(answer2Action)
+//                    self.parentViewController!.present(alertController, animated: true, completion: nil)
+//                }
                saveActualState()
             } else {
                 pieceArray[movedIndex].position = origPosition[movedIndex]
@@ -2055,6 +2058,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     pieceArray[touchedNodes.shapeIndex].position = origPosition[touchedNodes.shapeIndex]
             }
         }
+        let freePlaceFound = checkFreePlace(showAlert: true)
+        
+        //                checkIfGameFinished()
+
         startShapeIndex = -1
         _ = checkIfGameFinished()
     }
@@ -2080,23 +2087,25 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             answer1Button = nil
         }
         removeNodesWith(name: answer1ButtonName)
+        self.modifyHeader()
+        let roundScore = WTGameWordList.shared.getPointsForLetters()
         self.wtGameboard!.clearGreenFieldsForNextRound()
-        if !self.checkFreePlace() {
+        if !self.checkFreePlace(showAlert: false) {
             self.showGameFinished(status: .NoMoreSteps)
         } else {
             //                roundIndexes.append(activityItems.count - 1)
-            realm.beginWrite()
-            let newRound = RoundDataModel()
-            //                newRound.index = activityItems.count - 1
-            newRound.gameArray = self.wtGameboard!.gameArrayToString()
-            GV.playingRecord.rounds.append(newRound)
-            self.timeForGame.incrementMaxTime(value: iHalfHour)
-            WTGameWordList.shared.addNewRound()
-            self.activityRoundItem.append(ActivityRound())
-            self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
-            try! realm.commitWrite()
-            self.modifyHeader()
-        }
+            try! realm.write() {
+                GV.playingRecord.rounds.last!.roundScore = roundScore
+                let newRound = RoundDataModel()
+                //                newRound.index = activityItems.count - 1
+                newRound.gameArray = self.wtGameboard!.gameArrayToString()
+                GV.playingRecord.rounds.append(newRound)
+                self.timeForGame.incrementMaxTime(value: iHalfHour)
+                WTGameWordList.shared.addNewRound()
+                self.activityRoundItem.append(ActivityRound())
+                self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
+            }
+         }
         self.enabled = true
         self.gameboardEnabled = false
         self.removeNodesWith(name: self.MyQuestionName)
@@ -2317,7 +2326,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    private func checkFreePlace()->Bool {
+    private func checkFreePlace(showAlert: Bool)->Bool {
         var placeFound = true
         for piece in pieceArray {
             for rotateIndex in 0..<4 {
@@ -2325,6 +2334,30 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 if placeFound {break}
             }
             if placeFound {break}
+        }
+        if !placeFound {
+            let answer1Action =  UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer1), style: .default, handler: {alert -> Void in
+                self.gameboardEnabled = true
+                let title = GV.language.getText(.tcNoMoreStepsAnswer2)
+                let wordLength = title.width(font: self.myTitleFont!)
+                let wordHeight = title.height(font: self.myTitleFont!)
+                let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
+                let answer1ButtonPos = self.frame.height * 0.05
+                let center = CGPoint(x:self.frame.width * 0.5, y: answer1ButtonPos) //self.frame.height * 0.20)
+                let radius = frame.height * 0.5
+                self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .green)
+                self.answer1Button!.addTarget(self, action: #selector(self.startNextRound), for: .touchUpInside)
+                self.view?.addSubview(self.answer1Button!)
+            })
+            let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
+                self.startNextRound()
+            })
+            let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
+                                                    message: GV.language.getText(.tcNoMoreStepsQuestion2),
+                                                    preferredStyle: .alert)
+            alertController.addAction(answer1Action)
+            alertController.addAction(answer2Action)
+            self.parentViewController!.present(alertController, animated: true, completion: nil)
         }
         return placeFound
     }
@@ -2554,7 +2587,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for word in words {
             for index in 0..<word.count / 2 {
                 let twoLetterPiece = word.subString(at: index * 2, length: 2).uppercased()
-                if !twoLetterPieces.contains(where: {$0 == twoLetterPiece}) {
+                let reversedTwoLetterPiece = twoLetterPiece.char(from: 1) + twoLetterPiece.firstChar()
+                if !twoLetterPieces.contains(where: {$0 == twoLetterPiece}) &&
+                   !twoLetterPieces.contains(where: {$0 == reversedTwoLetterPiece}) {
                     twoLetterPieces.append(twoLetterPiece)
                     for letter in twoLetterPiece {
                         if mandatoryLetterFrequencyTable[String(letter)]! > 1 {
@@ -2798,5 +2833,25 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
     }
+    private func printGameArray() {
+        let line = "____________________________________________"
+        for row in 0..<10 {
+            var infoLine = "|"
+            for col in 0..<10 {
+                let char = GV.gameArray[col][row].letter
+                var greenMark = emptyLetter
+                if GV.gameArray[col][row].status == .wholeWord {
+                    greenMark = "*"
+                }
+                if GV.gameArray[col][row].doubleUsed {
+                    greenMark = "!"
+                }
+                infoLine += greenMark + (char == "" ? "!" : char) + greenMark + "|"
+            }
+            print(infoLine)
+        }
+        print(line)
+    }
+
 }
 
