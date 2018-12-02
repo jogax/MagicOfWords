@@ -215,12 +215,14 @@ class WTGameboard: SKShapeNode {
     private var roundInfos = [RoundInfos]()
     private var foundedWordsWithCount = [FoundedWordWithCounter]()
     private let scoreProLetter = 10
+    private var yCenter: CGFloat = 0
 
-    init(size: Int, parentScene: SKScene, delegate: WTGameboardDelegate) {
+    init(size: Int, parentScene: SKScene, delegate: WTGameboardDelegate, yCenter: CGFloat) {
         self.size = size
         self.parentScene = parentScene
         self.blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(size)
         self.delegate = delegate
+        self.yCenter = yCenter
         super.init()
         createBackgroundShape(size: size)
         GV.gameArray = createNewGameArray(size: size)
@@ -288,7 +290,7 @@ class WTGameboard: SKShapeNode {
         //        let myShape =
 
         grid = Grid(blockSize: blockSize!, rows:size, cols:size)
-        grid!.position = CGPoint (x:parentScene.frame.midX, y:parentScene.frame.maxY * 0.45)
+        grid!.position = CGPoint (x:parentScene.frame.midX, y:parentScene.frame.maxY * yCenter)
         grid!.name = gridName
         self.addChild(grid!)
     }

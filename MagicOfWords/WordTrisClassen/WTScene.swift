@@ -362,9 +362,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var parentViewController: UIViewController?
     
 
-    func showScore(newWord: SelectedWord, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int) {
+    func showScore(newWord: SelectedWord, totalScore: Int, doAnimate: Bool, changeTime: Int) {
         if doAnimate {
-            showWordAndScore(word: newWord, score: newScore)
+            showWordAndScore(word: newWord, score: totalScore)
         }
         if changeTime != 0 {
             timeForGame.incrementMaxTime(value: changeTime * 60)
@@ -372,7 +372,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        if changeTime < 0 {
 //            timeForGame.decrementMaxTime(value: changeTime * 60)
 //        }
-        self.totalScore = totalScore
+//        self.totalScore = totalScore
         showFoundedWords()
         return
     }
@@ -514,6 +514,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
     let mandatoryWordsHeaderName = "°°°mandatoryWords°°°"
     let ownWordsHeaderName = "°°°ownWords°°°"
+    let bonusHeaderName = "°°°bonusHeader°°°"
     let undoName = "°°°undo°°°"
     let goBackName = "°°°goBack°°°"
     let headerName = "°°°header°°°"
@@ -541,6 +542,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.view!.isMultipleTouchEnabled = false
         self.view!.subviews.forEach { $0.removeFromSuperview() }
         self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+        GV.totalScore = 0
+        GV.mandatoryScore = 0
+        GV.ownScore = 0
+        GV.bonusScore = 0
 //        self.wtGameFinishedSprite = WTGameFinished()
 //        self.addChild(wtGameFinishedSprite)
         self.backgroundColor = bgColor
@@ -756,18 +761,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.newGameNumber = gameNumber
     }
     
-    let firstLinePosition:CGFloat = 0.93
-    let secondLinePosition:CGFloat = 0.91
-    let thirdLinePosition:CGFloat = 0.89
-    let fourthLinePosition:CGFloat = 0.87
-    let fifthLinePosition:CGFloat = 0.84
-    let sixthLinePosition:CGFloat = 0.82
+    let gameNumberLinePosition:CGFloat = 0.93
+    let bestScoreLinePosition:CGFloat = 0.91
+    let myScoreLinePosition:CGFloat = 0.89
+    let bonusPointsLinePosition:CGFloat = 0.86
+    let ownWordsLinePosition:CGFloat = 0.84
+    let mandatoryWordsLinePosition:CGFloat = 0.82
+    let showAllWordsButtonCenterY:CGFloat = 0.265
+    let gameboardCenterY: CGFloat = 0.42
+    let pieceArrayCenterY: CGFloat = 0.10
     
     private func createHeader() {
         let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
         if self.childNode(withName: timeName) == nil {
             timeLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
-            let YPosition: CGFloat = self.frame.height * firstLinePosition
+            let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let xPosition = self.frame.size.width * 0.85
             timeLabel.position = CGPoint(x: xPosition, y: YPosition)
             timeLabel.fontSize = fontSize
@@ -779,7 +787,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 
         if self.childNode(withName: headerName) == nil {
-            let YPosition: CGFloat = self.frame.height * firstLinePosition
+            let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let gameNumber = GV.playingRecord.gameNumber
             let text = GV.language.getText(.tcHeader, values: String(gameNumber), String(0))
             headerLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
@@ -799,7 +807,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let bestScore = 0
         
         if self.childNode(withName: bestScoreName) == nil {
-            let YPosition: CGFloat = self.frame.height * secondLinePosition
+            let YPosition: CGFloat = self.frame.height * bestScoreLinePosition
             //            let text = GV.language.getText(.tcBestScoreHeader, values: bestOnlineRecord!.player, bestOnlineRecord!.score)
             let text = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:15), bestName)
             bestScoreHeaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
@@ -813,7 +821,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         
         if self.childNode(withName: myScoreName) == nil {
-            let YPosition: CGFloat = self.frame.height * thirdLinePosition
+            let YPosition: CGFloat = self.frame.height * myScoreLinePosition
             let text = GV.language.getText(.tcMyScoreHeader, values: String(GV.playingRecord.score).fixLength(length:15), myName)
             myScoreheaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
             myScoreheaderLabel.text = text
@@ -909,15 +917,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 label!.text = actWord.word + " (\(actWord.counter)) "
             }
         }
+        
+        if let label = self.childNode(withName: bonusHeaderName)! as? SKLabelNode {
+            label.text = GV.language.getText(.tcBonusHeader, values: String(GV.bonusScore))
+        }
 
         if let label = self.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
             label.text = GV.language.getText(.tcWordsToCollect, values: String(WTGameWordList.shared.getCountWords(mandatory: true)), String(WTGameWordList.shared.getCountFoundedWords(mandatory: true, countFoundedMandatory: true)),
                 String(WTGameWordList.shared.getCountFoundedWords(mandatory: true, countAll: true)),
-                String(WTGameWordList.shared.getScore(mandatory: true)))
+                String(GV.mandatoryScore))
         }
         if let label = self.childNode(withName: ownWordsHeaderName)! as? SKLabelNode {
                 label.text = GV.language.getText(.tcOwnWords, values: String(WTGameWordList.shared.getCountWords(mandatory: false)), String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
-                    String(WTGameWordList.shared.getScore(mandatory: false)))
+                    String(GV.ownScore))
         }
         modifyHeader()
 
@@ -932,7 +944,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 //        else {
 //            blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
-//        }
+//        }f
         if !returnBool {
             blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
         }
@@ -1391,12 +1403,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             allWordsButton = nil
         }
         var ownHeaderYPos = CGFloat(0)
-        let ownHeader: SKNode = (self.childNode(withName: ownWordsHeaderName) as! SKLabelNode)
+//        let ownHeader: SKNode = (self.childNode(withName: ownWordsHeaderName) as! SKLabelNode)
         let title = GV.language.getText(.tcShowAllWords)
         let wordLength = title.width(font: myTitleFont!)
         let wordHeight = title.height(font: myTitleFont!)
         let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
-        ownHeaderYPos = self.frame.height - ownHeader.frame.maxY + frame.height
+        ownHeaderYPos = self.frame.height * showAllWordsButtonCenterY// - ownHeader.frame.maxY + frame.height
         allWordsButtonCenter = CGPoint(x:self.frame.width * 0.5, y: ownHeaderYPos) //self.frame.height * 0.20)
         let radius = frame.height * 0.5
         allWordsButton = createButton(imageName: "", title: title, frame: frame, center: allWordsButtonCenter, cornerRadius: radius, enabled: true )
@@ -1489,35 +1501,42 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func showWordsToCollect() {
-        var counter = 1
+//        var counter = 1
 //        let wordList = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: "°")
-        let wordList = WTGameWordList.shared.getMandatoryWords()
-        for word in wordList {
-//            GV.allWords.append(WordToCheck(word: word, mandatory: true, creationIndex: NoValue, countFounded: 0))
-//            var wordToShow = AllWordsToShow(word: word)
-//            allWordsToShow.append(wordToShow)
-//            let wordToShow = WordToCheck(word: word.word, countFounded: 0, mandatory: true, creationIndex: 0, score: 0)
-            createWordLabel(wordToShow: word, counter: counter)
-            counter += 1
-        }
-        createLabel(word: GV.language.getText(.tcWordsToCollect, values: String(WTGameWordList.shared.getCountWords(mandatory: true)), "0","0", "0"), first: true, name: mandatoryWordsHeaderName)
+        
+        createLabel(word: GV.language.getText(.tcBonusHeader, values:
+            String(WTGameWordList.shared.getCountWords(mandatory: false)),
+                                              String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
+                                              //                    String(WTGameWordList.shared.getScore(mandatory: false))), first: false, name: ownWordsHeaderName)
+            String(0)),
+                    linePosition: bonusPointsLinePosition, name: bonusHeaderName)
         createLabel(word: GV.language.getText(.tcOwnWords, values:
             String(WTGameWordList.shared.getCountWords(mandatory: false)),
             String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
 //                    String(WTGameWordList.shared.getScore(mandatory: false))), first: false, name: ownWordsHeaderName)
             String(0)),
-            first: false, name: ownWordsHeaderName)
-    }
+                    linePosition: ownWordsLinePosition, name: ownWordsHeaderName)
+        createLabel(word: GV.language.getText(.tcWordsToCollect, values: String(WTGameWordList.shared.getCountWords(mandatory: true)), "0","0", "0"), linePosition: mandatoryWordsLinePosition, name: mandatoryWordsHeaderName)
+        let wordList = WTGameWordList.shared.getMandatoryWords()
+        for (counter, word) in wordList.enumerated() {
+            //            GV.allWords.append(WordToCheck(word: word, mandatory: true, creationIndex: NoValue, countFounded: 0))
+            //            var wordToShow = AllWordsToShow(word: word)
+            //            allWordsToShow.append(wordToShow)
+            //            let wordToShow = WordToCheck(word: word.word, countFounded: 0, mandatory: true, creationIndex: 0, score: 0)
+            createWordLabel(wordToShow: word, counter: counter)
+            //            counter += 1
+        }
+   }
     
     private func createWordLabel(wordToShow: WordWithCounter, counter: Int) {
         let xPositionMultiplier = [0.2, 0.5, 0.8]
-        let mandatoryYPositionMultiplier:CGFloat = sixthLinePosition
+        let mandatoryYPositionMultiplier = mandatoryWordsLinePosition
 //        let ownYPositionMultiplier:CGFloat = 0.80 // orig
         let distance: CGFloat = 0.02
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
-        let wordRow = CGFloat((counter - 1) / countWordsInRow)
-        let wordColumn = (counter - 1) % countWordsInRow
-        let value = wordRow * distance
+        let wordRow = CGFloat(counter / countWordsInRow)
+        let wordColumn = counter % countWordsInRow
+        let value = (wordRow + 1) * distance
         var yPosition: CGFloat = 0
 
         yPosition = self.frame.height * (mandatoryYPositionMultiplier - value)
@@ -1544,11 +1563,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
 //    }
 //    
-    private func createLabel(word: String, first: Bool, name: String) {
+    private func createLabel(word: String, linePosition: CGFloat, name: String) {
 //        let ownYPosition: [CGFloat] = [0.02, 0.04, 0.06]
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
 //        let yIndex = (WTGameWordList.shared.getCountWords(mandatory: true) / countWordsInRow) - 2
-        let yPosition = self.frame.height * (fifthLinePosition - (first ? 0 : 0.06))
+        let yPosition = self.frame.height * linePosition //(first ? 0 : 0.06))
         let xPosition = self.frame.size.width * 0.5
         label.position = CGPoint(x: xPosition, y: yPosition)
         label.fontSize = self.frame.size.height * 0.018
@@ -1566,14 +1585,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        createHeader()
         myTimer = MyTimer(time: timeForGame)
         addChild(myTimer!)
-        wtGameboard = WTGameboard(size: GV.sizeOfGrid, parentScene: self, delegate: self)
+        wtGameboard = WTGameboard(size: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
 
         generateArrayOfWordPieces(new: new)
         indexOfTilesForGame = 0
 //        getOnlineRecords()
         pieceArray = Array(repeating: WTPiece(), count: 3)
         for index in 0..<3 {
-            origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * heightMultiplicator)
+            origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * pieceArrayCenterY)
         }
         if !new {
             wtGameboard!.setRoundInfos()
@@ -2058,7 +2077,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     pieceArray[touchedNodes.shapeIndex].position = origPosition[touchedNodes.shapeIndex]
             }
         }
-        let freePlaceFound = checkFreePlace(showAlert: true)
+//        let freePlaceFound = checkFreePlace(showAlert: true)
         
         //                checkIfGameFinished()
 

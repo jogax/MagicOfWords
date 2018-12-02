@@ -35,6 +35,7 @@ let huDictionary: [TextConstants: String] = [
     .tcMyScoreHeader:     "%. Hely (Én): % (%)",
     .tcBestScoreHeader:   "1. Hely     : % (%)",
 //    .tcActScoreHeader:"Most játszik: %: %",
+    .tcBonusHeader:       "Bónusz pontok: %",
     .tcWordsToCollect:    "Kirakandó szavak: (% / % / % / %)",
     .tcOwnWords:          "Saját szavaim (% / % / %)",
     .tcGameFinished:       "Gratulálok, befejezted a játékot!",

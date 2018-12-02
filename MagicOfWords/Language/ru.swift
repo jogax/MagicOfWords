@@ -35,6 +35,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcMyScoreHeader:     "%. Место (Я): % (%)",
     .tcBestScoreHeader:   "1. Место    : % (%)",
 //    .tcActScoreHeader:    "Сейчас играет: %: %",
+    .tcBonusHeader:       "Бонусные очки: %",
     .tcWordsToCollect:    "Слова для сбора: (% / % / % / %)",
     .tcOwnWords:          "Мои слова (% / % / %)",
     .tcGameFinished:       "Поздравляю, ты закончил игру!",

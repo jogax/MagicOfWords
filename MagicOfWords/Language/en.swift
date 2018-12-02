@@ -35,6 +35,7 @@ let enDictionary: [TextConstants: String] = [
     .tcMyScoreHeader:     "%. Place (Me): % (%)",
     .tcBestScoreHeader:   "1. Place     : % (%)",
 //    .tcActScoreHeader:    "Best plyaing: %: %",
+    .tcBonusHeader:       "Bonus Points: %",
     .tcWordsToCollect:    "Words to collect: (% / % / % / %)",
     .tcOwnWords:          "My own words (% / % / %)",
     .tcGameFinished:       "Congratulations, you've finished the game!",
@@ -88,4 +89,5 @@ let enDictionary: [TextConstants: String] = [
     .tcRestartGame:         "Restart",
     .tcShowWordlistHeader:  " List of found words (%)",
     .tcSearchingWord:       " Searching word: %",
+
 ]

@@ -79,6 +79,33 @@ public struct SelectedWord {
         }
         self.connectionTypes = setConnectionTypes()
     }
+ 
+    public func totalScore(plus: Bool)->Int {
+        return self.score + self.bonus(plus: plus)
+    }
+
+    public func bonus(plus: Bool)->Int {
+        var returnValue = 0
+        for letter in usedLetters {
+            var actCount = 0
+            actCount = GV.gameArray[letter.col][letter.row].getCountOccurencesInWords()
+            let change = actCount < 1 ? 0 : plus ? 1 : -1
+            actCount = actCount > 25 ? 25 : actCount
+            let actBonus = pointsForLettersInPosition[actCount]!
+            let oldBonus = pointsForLettersInPosition[actCount - change]!
+            returnValue += actBonus - oldBonus
+        }
+        return returnValue
+    }
+    
+    public func isMandatory()->Bool {
+        for word in GV.mandatoryWords {
+            if word == self.word {
+                return true
+            }
+        }
+        return false
+    }
     
     private func setConnectionTypes()->[ConnectionType] {
         var connectionTypes = Array(repeating: ConnectionType(), count: usedLetters.count)
@@ -158,7 +185,7 @@ public struct WordWithCounter {
 public protocol WTGameWordListDelegate: class {
     
     /// Method called when a new Word is saved
-    func showScore(newWord: SelectedWord, newScore: Int, totalScore: Int, doAnimate: Bool, changeTime: Int)
+    func showScore(newWord: SelectedWord, totalScore: Int, doAnimate: Bool, changeTime: Int)
     func startShowingWordsOverPosition(wordList: [SelectedWord])
 //    func stopShowingWordsOverPosition()
     func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord)
@@ -175,17 +202,18 @@ public class WTGameWordList {
     private var wordsInRound: [WordInRound]
     private var delegate: WTGameWordListDelegate?
     public var allWords = [WordWithCounter]()
+    private var mandatoryWords = [String]()
     static let shared = WTGameWordList()
     init() {
         wordsInRound = [WordInRound]()
+        mandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
     }
     public func setDelegate(delegate: WTGameWordListDelegate) {
         self.delegate = delegate
     }
     
     public func setMandatoryWords() {
-        let myMandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
-        for word in myMandatoryWords {
+        for word in mandatoryWords {
             allWords.append(WordWithCounter(word: word, counter: 0, mandatory: true))
         }
     }
@@ -349,11 +377,11 @@ public class WTGameWordList {
             }
         }
         if noCommonLetter && noDiagonal {
-            var oldScore = 0
-            var newScore = 0
-            if doAnimate {
-                oldScore = getActualScore()
-            }
+//            var oldScore = 0
+//            var newScore = 0
+//            if doAnimate {
+//                oldScore = getActualScore()
+//            }
             wordsInRound[wordsInRound.count - 1].wordsInGame.append(selectedWord)
             for index in 0..<selectedWord.usedLetters.count {
 //            for letter in selectedWord.usedLetters {
@@ -362,16 +390,39 @@ public class WTGameWordList {
                 GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType, incrWords: true)
             }
             addWordToAllWords(word: selectedWord.word)
-            if doAnimate {
-                newScore = getActualScore()
-            }
+            var scoreOfWord = modifyScores(selectedWord: selectedWord, plus: true)
+            scoreOfWord += modifyBonus(selectedWord: selectedWord, plus: true)
+//            if doAnimate {
+//                newScore = getActualScore()
+//            }
             let changeTime = minutesForWord[selectedWord.word.length]
             if doAnimate { // only when new word added, not in init
-                delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: doAnimate, changeTime: changeTime!)
+                delegate!.showScore(newWord: selectedWord, totalScore: scoreOfWord, doAnimate: doAnimate, changeTime: changeTime!)
                 
             }
         }
         return noCommonLetter && noDiagonal
+    }
+    
+    private func modifyScores(selectedWord: SelectedWord, plus: Bool)->Int {
+        var score = selectedWord.score
+        if !plus {
+            score = -score
+        }
+        if selectedWord.isMandatory() {
+            GV.mandatoryScore += score
+        } else {
+            GV.ownScore += score
+        }
+        GV.totalScore += score
+        return score
+    }
+    
+    private func modifyBonus(selectedWord: SelectedWord, plus: Bool)->Int {
+        let bonus = selectedWord.bonus(plus: plus)
+        GV.bonusScore += bonus
+        GV.totalScore += bonus
+        return bonus
     }
     
     private func addWordToAllWords(word: String) {
@@ -394,7 +445,7 @@ public class WTGameWordList {
     public func removeLastWord(selectedWord: SelectedWord) {
         let wordsInGame = wordsInRound.last!.wordsInGame
         if wordsInGame.count > 0 {
-            let oldScore = getActualScore()
+//            let oldScore = getActualScore()
             removeWordFromAllWords(word: selectedWord.word)
             for index in 0..<wordsInGame.count {
                 if selectedWord == wordsInGame[index] {
@@ -410,9 +461,11 @@ public class WTGameWordList {
                     GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType, decrWords: true)
                 }
             }
-            let newScore = getActualScore()
+            var scoreOfWord = modifyBonus(selectedWord: selectedWord, plus: false)
+            scoreOfWord += modifyScores(selectedWord: selectedWord, plus: false)
+//            let newScore = getActualScore()
             let changeTime = selectedWord.word.length > maxUsedLength ? minutesForWord[maxUsedLength] : minutesForWord[selectedWord.word.length]
-            delegate!.showScore(newWord: selectedWord, newScore: newScore - oldScore, totalScore: newScore, doAnimate: true, changeTime: -changeTime!)
+            delegate!.showScore(newWord: selectedWord, totalScore: scoreOfWord, doAnimate: true, changeTime: -changeTime!)
         }
         
         cleanGameArray()
@@ -477,17 +530,17 @@ public class WTGameWordList {
         return score
     }
     
-    private func getActualScore()->Int {
-        var score = 0
-        for item in wordsInRound {
-            for selectedWord in item.wordsInGame {
-                score += selectedWord.score
-            }
-        }
-        let letterScore = getPointsForLetters()
-        score += letterScore
-        return score
-    }
+//    private func getActualScore()->Int {
+//        var score = 0
+//        for item in wordsInRound {
+//            for selectedWord in item.wordsInGame {
+//                score += selectedWord.score
+//            }
+//        }
+//        let letterScore = getPointsForLetters()
+//        score += letterScore
+//        return score
+//    }
     
     public func getPointsForLetters()->Int {
         var letterScore = 0

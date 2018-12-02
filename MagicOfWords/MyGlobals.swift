@@ -59,6 +59,11 @@ struct GV {
     static var gameArray: [[WTGameboardItem]] = [[WTGameboardItem]]()
     static var notificationToken: NotificationToken?
     static let sizeOfGrid = 10
+    static var mandatoryScore = 0
+    static var ownScore = 0
+    static var bonusScore = 0
+    static var totalScore = 0
+    static var mandatoryWords = [String]()
     static var myUser: SyncUser? = nil {
         willSet(newValue) {
             for callBack in callBackMyUser {

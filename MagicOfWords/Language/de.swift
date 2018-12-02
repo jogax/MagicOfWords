@@ -35,6 +35,7 @@ let deDictionary: [TextConstants: String] = [
     .tcMyScoreHeader:     "%. Platz (Ich): % (%)",
     .tcBestScoreHeader:   "1. Platz      : % (%)",
 //    .tcActScoreHeader:"Jetzt spielt: %: %",
+    .tcBonusHeader:       "Bonuspunkte: %",
     .tcWordsToCollect:    "Zu sammelnde Wörter: (% / % / % / %)",
     .tcOwnWords:          "Eigene Wörter (% / % / %)",
     .tcGameFinished:       "Herzlichen Glückwunsch, du hast das Spiel beendet!",
