@@ -213,8 +213,11 @@ public class WTGameWordList {
     }
     
     public func setMandatoryWords() {
+        mandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
+        GV.mandatoryWords.removeAll()
         for word in mandatoryWords {
             allWords.append(WordWithCounter(word: word, counter: 0, mandatory: true))
+            GV.mandatoryWords.append(word)
         }
     }
     
@@ -516,19 +519,19 @@ public class WTGameWordList {
         return score
     }
     
-    public func getScore(forAll: Bool = false, mandatory: Bool = false)->Int {
-        var score = 0
-        for word in allWords {
-            if forAll || word.mandatory == mandatory {
-                score += word.score
-            }
-        }
-        if forAll {
-            let letterScore = getPointsForLetters()
-            score += letterScore
-        }
-        return score
-    }
+//    public func getScore(forAll: Bool = false, mandatory: Bool = false)->Int {
+//        var score = 0
+//        for word in allWords {
+//            if forAll || word.mandatory == mandatory {
+//                score += word.score
+//            }
+//        }
+//        if forAll {
+//            let letterScore = getPointsForLetters()
+//            score += letterScore
+//        }
+//        return score
+//    }
     
 //    private func getActualScore()->Int {
 //        var score = 0

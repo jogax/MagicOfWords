@@ -870,9 +870,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let gameNumber = GV.playingRecord.gameNumber
         let headerText = GV.language.getText(.tcHeader, values: String(gameNumber + 1), String(GV.playingRecord.rounds.count))
         headerLabel.text = headerText
-        let letterScore = 0 //WTGameWordList.shared.getPointsForLetters()
-        let normalScore = WTGameWordList.shared.getScore(forAll: true)
-        let score = letterScore + normalScore
+//        let letterScore = GV.bonusScore
+//        let normalScore = GV.mandatoryScore + GV.//WTGameWordList.shared.getScore(forAll: true)
+        let score = GV.totalScore
         var place = 0
         if bestPlayersReady {
             place = self.bestPlayers!.filter("score > %@", score).count + 1
@@ -2222,10 +2222,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.connectedToInternet {
             if self.syncedRecordsOK {
                 try! realmSync!.write {
-                    self.bestScoreSync![0].score = WTGameWordList.shared.getScore(forAll:true)
+                    self.bestScoreSync![0].score = GV.totalScore
                     self.bestScoreSync![0].usedTime = self.timeForGame.time
-                    if WTGameWordList.shared.getScore(forAll:true) > self.bestScoreForGame![0].bestScore {
-                        self.bestScoreForGame![0].bestScore = WTGameWordList.shared.getScore(forAll:true)
+                    if GV.totalScore > self.bestScoreForGame![0].bestScore {
+                        self.bestScoreForGame![0].bestScore = GV.totalScore
                         self.bestScoreForGame![0].timeStamp = Date()
                         self.bestScoreForGame![0].owner = playerActivity?[0]
                     }
@@ -2244,7 +2244,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        if GV.allMandatoryWordsFounded() {
         if WTGameWordList.shared.gameFinished() {
             try! realm.write() {
-                GV.playingRecord.score = WTGameWordList.shared.getScore(forAll: true)
+                GV.playingRecord.score = GV.totalScore
                 GV.playingRecord.gameStatus = GV.GameStatusFinished
                 GV.playingRecord.nowPlaying = false
                 GV.playingRecord.pieces = ""
@@ -2307,7 +2307,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
         try! realm.write {
 //            GV.playingRecord.ownWords = tempOwnWords
-            GV.playingRecord.score = WTGameWordList.shared.getScore(forAll: true)
+            GV.playingRecord.score = GV.totalScore
             GV.playingRecord.pieces = pieces
             GV.playingRecord.gameStatus = GV.GameStatusPlaying
             var rounds: RoundDataModel
