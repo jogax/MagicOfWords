@@ -174,7 +174,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     private func calculateColumnWidths(showCount: Bool = true) {
         title = ""
-        let fixlength = 15
+        let fixlength = GV.onIpad ? 15 : 10
         lengthOfWord = maxLength < fixlength ? fixlength : maxLength
         let text1 = " \(GV.language.getText(.tcWord).fixLength(length: lengthOfWord, center: true))     "
         let text2 = showCount ? "\(GV.language.getText(.tcCount)) " : ""
@@ -1068,7 +1068,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //  hide the bottom buttons
         timerIsCounting = !hide
         inDefiningSearchingWord = hide
-        wtGameboardMovedBy = self.frame.height * 0.18
+//        let gridSize = wtGameboard!.getGridSize()
+//        let gridPosition = wtGameboard!.getGridPosition()
+        wtGameboardMovedBy = self.frame.height * 0.15
+//        print(origMovedBy)
+//        wtGameboardMovedBy = self.frame.height - (gridPosition.y + gridSize.height / 2)
         for row in 0...10 {
             if let child = self.childNode(withName: "Row\(row)") {
                 child.position.y -= hide ? wtGameboardMovedBy : -wtGameboardMovedBy
@@ -1315,7 +1319,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         (width, _) = calculateTableViewWidth(header0: header0, header1: header1, header2: title)
 //        width = width < optimalWidth ? optimalWidth : width
         let size = CGSize(width: width, height: maxHeight)//showingWordsHeight + headerframeHeight)
-        let origin = CGPoint(x: 0.5 * (self.frame.width - width), y: self.frame.height * 0.03)
+        let origin = CGPoint(x: 0.5 * (self.frame.width - width), y: self.frame.height * 0.035)
         showFoundedWordsTableView?.frame=CGRect(origin: origin, size: size)
         self.showFoundedWordsTableView?.reloadData()
         
@@ -1585,7 +1589,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        createHeader()
         myTimer = MyTimer(time: timeForGame)
         addChild(myTimer!)
-        wtGameboard = WTGameboard(size: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
+        wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
 
         generateArrayOfWordPieces(new: new)
         indexOfTilesForGame = 0
@@ -2082,6 +2086,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         //                checkIfGameFinished()
 
         startShapeIndex = -1
+        _ = checkFreePlace(showAlert: true)
         _ = checkIfGameFinished()
     }
     var bestScoreSync: Results<BestScoreSync>?
@@ -2355,24 +2360,25 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if placeFound {break}
         }
         if !placeFound {
-            let answer1Action =  UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer1), style: .default, handler: {alert -> Void in
-                self.gameboardEnabled = true
-                let title = GV.language.getText(.tcNoMoreStepsAnswer2)
-                let wordLength = title.width(font: self.myTitleFont!)
-                let wordHeight = title.height(font: self.myTitleFont!)
-                let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
-                let answer1ButtonPos = self.frame.height * 0.05
-                let center = CGPoint(x:self.frame.width * 0.5, y: answer1ButtonPos) //self.frame.height * 0.20)
-                let radius = frame.height * 0.5
-                self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .green)
-                self.answer1Button!.addTarget(self, action: #selector(self.startNextRound), for: .touchUpInside)
-                self.view?.addSubview(self.answer1Button!)
+            let answer1Action =  UIAlertAction(title: GV.language.getText(.tcBack), style: .default, handler: {alert -> Void in
+//                self.gameboardEnabled = true
+//                let title = GV.language.getText(.tcNoMoreStepsAnswer2)
+//                let wordLength = title.width(font: self.myTitleFont!)
+//                let wordHeight = title.height(font: self.myTitleFont!)
+//                let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
+//                let answer1ButtonPos = self.frame.height * 0.05
+//                let center = CGPoint(x:self.frame.width * 0.5, y: answer1ButtonPos) //self.frame.height * 0.20)
+//                let radius = frame.height * 0.5
+//                self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .green)
+//                self.answer1Button!.addTarget(self, action: #selector(self.startUndo), for: .touchUpInside)
+//                self.view?.addSubview(self.answer1Button!)
+                self.startUndo()
             })
             let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
                 self.startNextRound()
             })
             let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
-                                                    message: GV.language.getText(.tcNoMoreStepsQuestion2),
+                                                    message: "", //GV.language.getText(.tcNoMoreStepsQuestion2),
                                                     preferredStyle: .alert)
             alertController.addAction(answer1Action)
             alertController.addAction(answer2Action)

@@ -198,7 +198,7 @@ class WTGameboard: SKShapeNode {
     var delegate: WTGameboardDelegate
     var parentScene: SKScene
     var myPiece = WTPiece()
-    var size: Int
+    var countCols: Int
     var grid: Grid?
     let blockSize: CGFloat?
     var shape: WTPiece = WTPiece()
@@ -217,17 +217,17 @@ class WTGameboard: SKShapeNode {
     private let scoreProLetter = 10
     private var yCenter: CGFloat = 0
 
-    init(size: Int, parentScene: SKScene, delegate: WTGameboardDelegate, yCenter: CGFloat) {
-        self.size = size
+    init(countCols: Int, parentScene: SKScene, delegate: WTGameboardDelegate, yCenter: CGFloat) {
+        self.countCols = countCols
         self.parentScene = parentScene
-        self.blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(size)
+        self.blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(countCols)
         self.delegate = delegate
         self.yCenter = yCenter
         super.init()
-        createBackgroundShape(size: size)
-        GV.gameArray = createNewGameArray(size: size)
-        for col in 0..<size {
-            for row in 0..<size {
+        createBackgroundShape(countCols: countCols)
+        GV.gameArray = createNewGameArray(countCols: countCols)
+        for col in 0..<countCols {
+            for row in 0..<countCols {
                 GV.gameArray[col][row].position = grid!.gridPosition(col: col, row: row) //+
                 GV.gameArray[col][row].name = "GBD/\(col)/\(row)"
                 grid!.addChild(GV.gameArray[col][row])
@@ -239,7 +239,7 @@ class WTGameboard: SKShapeNode {
     }
     
     private func generateNetOfColsAndRows() {
-        for col in 0..<size {
+        for col in 0..<countCols {
             let colSprite = SKSpriteNode()
             colSprite.position = grid!.gridPosition(col: col, row: 0) + CGPoint(x: grid!.frame.midX, y: grid!.frame.minY)
             colSprite.size = CGSize(width: blockSize!, height: parentScene.frame.height)
@@ -250,7 +250,7 @@ class WTGameboard: SKShapeNode {
         let col10Width = parentScene.frame.maxX - grid!.frame.maxX
         colSprite.position = CGPoint(x: grid!.frame.maxX + col10Width / 2, y: grid!.frame.midY)
         colSprite.size = CGSize(width: col10Width, height: parentScene.frame.height)
-        colSprite.name = "Col\(size)"
+        colSprite.name = "Col\(countCols)"
         parentScene.addChild(colSprite)
         
         let rowSprite = SKSpriteNode()
@@ -258,9 +258,9 @@ class WTGameboard: SKShapeNode {
         rowSprite.position = CGPoint(x: parentScene.frame.midX, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * blockSize!)
         rowSprite.size = CGSize(width: parentScene.frame.width, height: row10Height)
 //        rowSprite.color = .blue
-        rowSprite.name = "Row\(size)"
+        rowSprite.name = "Row\(countCols)"
         parentScene.addChild(rowSprite)
-        for row in 0..<size {
+        for row in 0..<countCols {
             let rowSprite = SKSpriteNode()
             rowSprite.position = CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * blockSize!)
             rowSprite.size = CGSize(width: parentScene.frame.width * 1.1, height: blockSize!)
@@ -268,17 +268,17 @@ class WTGameboard: SKShapeNode {
 //                rowSprite.alpha = 1
 //                rowSprite.color = .green
 //            }
-            rowSprite.name = "Row\(size - 1 - row)"
+            rowSprite.name = "Row\(countCols - 1 - row)"
             parentScene.addChild(rowSprite)
         }
     }
-    private func createNewGameArray(size: Int) -> [[WTGameboardItem]] {
+    private func createNewGameArray(countCols: Int) -> [[WTGameboardItem]] {
         var gameArray: [[WTGameboardItem]] = []
         
-        for i in 0..<size {
+        for i in 0..<countCols {
             gameArray.append( [WTGameboardItem]() )
             
-            for j in 0..<size {
+            for j in 0..<countCols {
                 gameArray[i].append( WTGameboardItem(blockSize: blockSize!, fontSize: parentScene.frame.width * 0.040) )
                 gameArray[i][j].letter = emptyLetter
             }
@@ -286,14 +286,23 @@ class WTGameboard: SKShapeNode {
         return gameArray
     }
 
-    private func createBackgroundShape(size: Int) {
+    private func createBackgroundShape(countCols: Int) {
         //        let myShape =
 
-        grid = Grid(blockSize: blockSize!, rows:size, cols:size)
+        grid = Grid(blockSize: blockSize!, rows:countCols, cols:countCols)
         grid!.position = CGPoint (x:parentScene.frame.midX, y:parentScene.frame.maxY * yCenter)
         grid!.name = gridName
         self.addChild(grid!)
     }
+    
+    public func getGridSize()->CGSize {
+        return grid!.size
+    }
+    
+    public func getGridPosition()->CGPoint {
+        return grid!.position
+    }
+    
     
     public func clear() {
         for index in 0..<usedItems.count {
@@ -311,7 +320,7 @@ class WTGameboard: SKShapeNode {
         self.shape = shape
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
         let (myCol, myRow) = analyseColAndRow(col: col, row: row, GRow: row - 2, formOfShape: formOfShape)
-        if myRow == size {
+        if myRow == countCols {
             clear()
             return true
         }
@@ -338,10 +347,10 @@ class WTGameboard: SKShapeNode {
         let formOfShape = myForms[shape.myType]![shape.rotateIndex]
         let (myCol, myRow) = analyseColAndRow(col: col, row: row, GRow: GRow, formOfShape: formOfShape)
         if moveModusStarted {
-            if (shape.rotateIndex == leftDir && col + shape.letters.count - 1 < size && col >= 0) || // OK
-               (shape.rotateIndex == rightDir && col < size && col - shape.letters.count + 1 >= 0) || // OK
-               (shape.rotateIndex == upDir && row + shape.letters.count - 1 < size && row >= 0) ||
-               (shape.rotateIndex == downDir && row < size && row - shape.letters.count + 1 >= 0) {
+            if (shape.rotateIndex == leftDir && col + shape.letters.count - 1 < countCols && col >= 0) || // OK
+               (shape.rotateIndex == rightDir && col < countCols && col - shape.letters.count + 1 >= 0) || // OK
+               (shape.rotateIndex == upDir && row + shape.letters.count - 1 < countCols && row >= 0) ||
+               (shape.rotateIndex == downDir && row < countCols && row - shape.letters.count + 1 >= 0) {
                 clear()
                 for index in 0..<shape.children.count {
                     let letter = shape.letters[index]
@@ -362,11 +371,11 @@ class WTGameboard: SKShapeNode {
                          calculatedRow = rowX - itemRow + shape.letters.count - 1
                     case downDir:
                         calculatedCol = myCol
-                        calculatedRow = row - itemRow < 0 ? 0 : row - itemRow > size - 1 ? size - 1 : row - itemRow
+                        calculatedRow = row - itemRow < 0 ? 0 : row - itemRow > countCols - 1 ? countCols - 1 : row - itemRow
                     default: break
                     }
-                    if calculatedRow > size - 1 {
-                        calculatedRow = size - 1
+                    if calculatedRow > countCols - 1 {
+                        calculatedRow = countCols - 1
                     }
                   _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
                     let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
@@ -376,7 +385,7 @@ class WTGameboard: SKShapeNode {
 
         } else {
             clear()
-            if myRow == size {
+            if myRow == countCols {
                 return true
             }
             for index in 0..<shape.children.count {
@@ -384,7 +393,7 @@ class WTGameboard: SKShapeNode {
                 let itemCol = formOfShape[index] % 10
                 let itemRow = formOfShape[index] / 10
                 let calculatedCol = myCol + itemCol // - adder
-                let calculatedRow = myRow - itemRow < 0 ? 0 : myRow - itemRow > size - 1 ? size - 1 : myRow - itemRow
+                let calculatedRow = myRow - itemRow < 0 ? 0 : myRow - itemRow > countCols - 1 ? countCols - 1 : myRow - itemRow
                 _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
                 let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
                 usedItems.append(usedItem)
@@ -412,8 +421,8 @@ class WTGameboard: SKShapeNode {
             myRow = 0
         }
         
-        if myCol + maxCol > size - 1 {
-            myCol = size - maxCol - 1
+        if myCol + maxCol > countCols - 1 {
+            myCol = countCols - maxCol - 1
         }
         
         if myCol < 0 {
@@ -587,8 +596,8 @@ class WTGameboard: SKShapeNode {
     
     
     public func endChooseOwnWord(col: Int, row: Int)->FoundedWord? {
-        for col in 0..<size {
-            for row in 0..<size {
+        for col in 0..<countCols {
+            for row in 0..<countCols {
                 if GV.gameArray[col][row].myColor == .myBlueColor {
                     GV.gameArray[col][row].changeColor(toColor: .myNoColor)
                 }
@@ -597,7 +606,7 @@ class WTGameboard: SKShapeNode {
         if moveModusStarted {
             return nil
         } else {
-            if col < 0 || col >= size || row < 0 || row >= size {
+            if col < 0 || col >= countCols || row < 0 || row >= countCols {
                 return nil
             }
             //        let actLetter = UsedLetters(col: col, row: row, letter: gameArray![col][row].letter)
@@ -669,9 +678,9 @@ class WTGameboard: SKShapeNode {
     }
     
     public func stringToGameArray(string: String) {
-        for index in 0..<size * size {
-            let col = index / size
-            let row = index % size
+        for index in 0..<countCols * countCols {
+            let col = index / countCols
+            let row = index % countCols
             GV.gameArray[col][row].restore(from: string.subString(at: 2 * index, length: 2))
         }
     }
@@ -702,13 +711,13 @@ class WTGameboard: SKShapeNode {
 
     public func checkFreePlaceForPiece(piece: WTPiece, rotateIndex: Int)->Bool {
         let form = myForms[piece.myType]![rotateIndex]
-        for col in 0..<size {
-            for row in 0..<size {
+        for col in 0..<countCols {
+            for row in 0..<countCols {
                 var pieceOK = true
                 for formItem in form {
                     let summarizedCol = col + formItem / 10
                     let summarizedRow = row - formItem % 10
-                    if summarizedCol >= size || summarizedRow < 0 {
+                    if summarizedCol >= countCols || summarizedRow < 0 {
                         pieceOK = false
                         break
                     } else if GV.gameArray[summarizedCol][summarizedRow].status != .empty {
@@ -725,8 +734,8 @@ class WTGameboard: SKShapeNode {
     }
     
     public func clearGreenFieldsForNextRound() {
-        for col in 0..<size {
-            for row in 0..<size {
+        for col in 0..<countCols {
+            for row in 0..<countCols {
                 GV.gameArray[col][row].clearIfUsed()
                 GV.gameArray[col][row].resetCountOccurencesInWords()
             }
@@ -746,8 +755,8 @@ class WTGameboard: SKShapeNode {
     }
     
 //    public func clearGameArray() {
-//        for row in 0..<size {
-//            for col in 0..<size {
+//        for row in 0..<countCols {
+//            for col in 0..<countCols {
 //                GV.gameArray[col][row].remove()
 //            }
 //        }
