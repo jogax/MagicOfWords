@@ -163,7 +163,12 @@ class WordDBGenerator {
     }
     
     func generatingMandatoryWords(language: String) {
-        let words = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
+        var words: Results<WordListModel>
+        if language == "en" {
+            words = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and not word ENDSWITH %@", language, "s")
+        } else {
+            words = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
+        }
         let sortedWords =  Array(words).sorted(by: {$0.word.length < $1.word.length || ($0.word.length == $1.word.length && $0.word < $1.word)})
         var indexTab = [0,0,0,0,0,0,0,0,0,0,0,0]
         var searching = true
@@ -185,7 +190,7 @@ class WordDBGenerator {
         } while searching
         var wordTable = [String]()
         var wordsToPrint = [String]()
-        let wordLengths = [5,6,6,7,7,7,7,8,8,8,8,9,9,10,11]
+        let wordLengths = [5,5,5,5,6,6,6,6,7,7,7,7,7,7,7,7,8,8,9,10,11]
         let random = MyRandom(gameNumber: 0)
         repeat {
             let wLenIndex = random.getRandomInt(0, max: wordLengths.count - 2)
@@ -208,7 +213,7 @@ class WordDBGenerator {
         var index = 0
         for gameNumber in 0...999 {
             var text = ""
-            for _ in 0...7 {
+            for _ in 0...5 {
                 text += wordTable[index] + "°"
                 index += 1
             }

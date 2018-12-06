@@ -493,6 +493,7 @@ class WTGameboard: SKShapeNode {
     public func startChooseOwnWord(col: Int, row: Int) {
         moveModusStarted = false
         noMoreMove = false
+        stopChoosing = false
         if showingWords {
 //            WTGameWordList.shared.stopShowingWords()
             showingWords = false
@@ -503,6 +504,7 @@ class WTGameboard: SKShapeNode {
     }
     
     var origChoosedWord = FoundedWord()
+    var stopChoosing = false
 
     public func moveChooseOwnWord(col: Int, row: Int)->Bool {
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
@@ -524,14 +526,19 @@ class WTGameboard: SKShapeNode {
                     choosedWord.removeLast()
                 } else {
                     if choosedWord.usedLetters.count > 0 {
-                        if abs(choosedWord.usedLetters.last!.col - col) == 1 && abs(choosedWord.usedLetters.last!.row - row) == 1 {
+                        if abs(choosedWord.usedLetters.last!.col - col) == 1 && abs(choosedWord.usedLetters.last!.row - row) == 1 || !(choosedWord.usedLetters.last!.col == col || choosedWord.usedLetters.last!.row == row)
+                        {
                             if setMoveModusIfPossible(col: col, row: row) {
                                 return true
+                            } else {
+                                stopChoosing = true
                             }
                         }
                     }
-                    GV.gameArray[col][row].changeColor(toColor: .myBlueColor)
-                    choosedWord.addLetter(letter: actLetter)
+                    if !stopChoosing {
+                        GV.gameArray[col][row].changeColor(toColor: .myBlueColor)
+                        choosedWord.addLetter(letter: actLetter)
+                    }
                 }
         }
         return false
