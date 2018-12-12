@@ -231,6 +231,7 @@
 				20F176042162688300AF37D7 /* Realm.framework */,
 				20F176062162688E00AF37D7 /* RealmSwift.framework */,
 				201FB1B020288C2B00EC9F36 /* MagicOfWords */,
+				206B38C221BC102E008CDE1D /* RealmCloudModels */,
 				201FB1AF20288C2B00EC9F36 /* Products */,
 				2057BA262029F57B000DF337 /* Frameworks */,
 			);
@@ -303,9 +304,6 @@
 				2081931F202B472900406D9A /* GameDataModel.swift */,
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
-				205627EC214AA716006B9357 /* BestScoreSync.swift */,
-				2081441F2167B65500496AFC /* BestScoreForGame.swift */,
-				205627EE214AA9E9006B9357 /* PlayerActivity.swift */,
 				20A6913C203088FF00AB47C0 /* enWords.txt */,
 				20B28ADF20330C64001682B2 /* deWordsOld.txt */,
 				205234E22187902900B9935F /* deWords.txt */,
@@ -368,6 +366,16 @@
 				204BB45C2063E9E000CDF085 /* undo.png */,
 			);
 			path = Pictures;
+			sourceTree = "<group>";
+		};
+		206B38C221BC102E008CDE1D /* RealmCloudModels */ = {
+			isa = PBXGroup;
+			children = (
+				205627EC214AA716006B9357 /* BestScoreSync.swift */,
+				2081441F2167B65500496AFC /* BestScoreForGame.swift */,
+				205627EE214AA9E9006B9357 /* PlayerActivity.swift */,
+			);
+			path = RealmCloudModels;
 			sourceTree = "<group>";
 		};
 		2074A64120C051780075432A /* ReadOnlyDB */ = {

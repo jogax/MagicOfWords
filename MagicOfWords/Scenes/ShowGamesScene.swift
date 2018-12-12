@@ -21,6 +21,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         var bestScore = ""
         var score = ""
         var finished = false
+        var place = 0
     }
 
     let xMultiplierTab: [CGFloat] = [0.3, 0.5, 0.8]
@@ -33,7 +34,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     var notificationToken: NotificationToken?
     var subscriptionToken: NotificationToken?
     var subscription: SyncSubscription<BestScoreForGame>!
-    var showAll = true
+//    var showAll = true
     var parentViewController: UIViewController?
 
 //    override func didMoveToView(view: SKView) {
@@ -59,10 +60,10 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         parentViewController = controller
     }
     
-    public func setSelect(all: Bool) {
-        self.showAll = all
-    }
-    
+//    public func setSelect(all: Bool) {
+//        self.showAll = all
+//    }
+//    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         goBack(gameNumberSelected: false, gameNumber: 0)
     }
@@ -99,7 +100,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
             repeat {
                 counter -= 1
                 showingWordsHeight = lineHeight * counter
-            } while showingWordsHeight + headerframeHeight > self.frame.height * 0.9
+            } while showingWordsHeight + headerframeHeight > self.frame.height * 0.6
         }
         let width = title.width(font: myFont!)
         let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
@@ -118,7 +119,9 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 let origin = CGPoint(x: 0, y: 0)
                 //        let origin = CGPoint(x: 0.5 * (self.view.frame.width - (headerLine.width(font: myFont!))), y: 200)
 //                let heightOfLine =  self!.title.height(font: self!.myFont!) * 1.12
-            let size = CGSize(width: self!.title.width(font: self!.myFont!) * 1, height: self!.lineHeight * CGFloat(self!.gamesForShow.count + 2))
+            var height = self!.lineHeight * CGFloat(self!.gamesForShow.count + 2)
+            height = height > self!.frame.height * 0.8 ? self!.frame.height * 0.8 : height
+            let size = CGSize(width: self!.title.width(font: self!.myFont!) * 1, height: height)
                 self!.showGamesInTableView!.frame=CGRect(origin: origin, size: size)
 
                 //        showPlayerActivityView!.frame = self.view.frame
@@ -146,7 +149,9 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                     //                 if self!.initialLoadDone {
                     // Query results have changed, so apply them to the UITableView
                     if insertions.count > 0 {
-                        showGamesInTableView.frame.size.height += CGFloat(insertions.count) * self!.lineHeight //self!.title.height(font: self!.myFont!)
+                        if self!.frame.height * 0.8 > showGamesInTableView.frame.size.height + CGFloat(insertions.count) * self!.lineHeight {
+                            showGamesInTableView.frame.size.height += CGFloat(insertions.count) * self!.lineHeight
+                        }
                     }
                     if deletions.count > 0 {
                         showGamesInTableView.frame.size.height -= CGFloat(deletions.count) * self!.lineHeight //self!.title.height(font: self!.myFont!)
@@ -175,21 +180,19 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         let notExists:String = "---"
         var returnArray = [FinishedGameData]()
         var games: Results<GameDataModel>
-        if showAll {
-            games = realm.objects(GameDataModel.self).filter("language = %@", GV.language.getText(.tcAktLanguage))
-        } else {
-            games = realm.objects(GameDataModel.self).filter("language = %@ and gameStatus = %d", GV.language.getText(.tcAktLanguage), GV.GameStatusPlaying)
-        }
+        games = realm.objects(GameDataModel.self).filter("language = %@", GV.language.getText(.tcAktLanguage))
         for game in games {
             if game.gameStatus == GV.GameStatusNew {
                 continue
             }
             var item = FinishedGameData()
             item.gameNumber = String((game.gameNumber % 1000) + 1)
+            let combinedKey = item.gameNumber + game.language
             item.score = String(game.score)
             item.bestPlayer = notExists
             item.bestScore = notExists
             item.finished = game.gameStatus == GV.GameStatusFinished
+            item.place = RealmService.objects(BestScoreSync.self).filter("combinedPrimary beginswith %@ and score > %d", combinedKey, game.score).count + 1
             returnArray.append(item)
         }
         for bestGame in allResultsItems! {
@@ -204,7 +207,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                     returnArray[index].bestPlayer = bestGame.owner!.nickName!
                     returnArray[index].bestScore = String(bestGame.bestScore)
                 }
-            } else if showAll {
+            } else {
                 var item = FinishedGameData()
                 item.gameNumber = String(bestGame.gameNumber)
                 item.score = notExists
@@ -244,7 +247,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
             //            view.frame = CGRect(x: 50, y: 0, width: width, height: 2 * lineHeight)
             let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
             label1.font = myFont!
-            label1.text = GV.language.getText(showAll ? .tcTableOfBestscores : .tcGamesToContinue).fixLength(length: title.length, center: true)
+            label1.text = GV.language.getText(.tcTableOfBestscores).fixLength(length: title.length, center: true)
             view.addSubview(label1)
             let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight, width: width, height: lineHeight))
             label2.font = myFont!
@@ -298,6 +301,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         cell.addColumn(text: String(gamesForShow[indexPath.row].bestPlayer).fixLength(length: 12)/*, color: color*/) // Best Player
         cell.addColumn(text: String(gamesForShow[indexPath.row].bestScore).fixLength(length: 7)) // Best Score
         cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: 8)/*, color: color*/) // My Score
+        cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: 4) )
         if gamesForShow[indexPath.row].finished {
             let image = UIImage(named: "hook.png")
             cell.addButton(image: image!)

@@ -18,7 +18,9 @@ class PlayerActivity: Object {
     @objc dynamic var isOnline: Bool = false
     @objc dynamic var onlineSince: Date?
     @objc dynamic var onlineTime: Int = 0
- 
+    @objc dynamic var countOnlines: Int = 0
+    @objc dynamic var creationTime: Date?
+
 
     override static func primaryKey() -> String? {
         return "name"

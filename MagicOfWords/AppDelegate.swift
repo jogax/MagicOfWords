@@ -76,7 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 9,
+            schemaVersion: 10,
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
@@ -85,9 +85,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
-                default: migration.enumerateObjects(ofType: GameDataModel.className()) { oldObject, newObject in
-                    newObject!["combinedKey"] = oldObject!["language"] as! String + String((oldObject!["gameNumber"] as! Int) % 1000)
-                    newObject!["gameNumber"] = Int(oldObject!["gameNumber"] as! Int % 1000)
+                default: migration.enumerateObjects(ofType: GameDataModel.className())
+                    { oldObject, newObject in
+                        if oldObject!["combinedKey"] == nil {
+                            newObject!["combinedKey"] = oldObject!["language"] as! String + String((oldObject!["gameNumber"] as! Int) % 1000)
+                            newObject!["gameNumber"] = Int(oldObject!["gameNumber"] as! Int % 1000)
+                        }
                     }
 
                 }
@@ -170,7 +173,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             try! realmSync?.write {
                 if playerActivity?.count == 0 {
                 } else {
-                    //                    let timeInterval = getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!)
+                    if playerActivity![0].creationTime == nil {
+                        playerActivity![0].creationTime = Date()
+                    }
+                    playerActivity![0].countOnlines += 1
                     playerActivity![0].isOnline = false
                     playerActivity![0].onlineTime += Int(getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!))
                     playerActivity![0].onlineSince = nil
@@ -201,6 +207,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     if playerActivity?.count == 0 {
                         try! realmSync?.write {
                             let playerActivityItem = PlayerActivity()
+                            playerActivityItem.creationTime = Date()
                             playerActivityItem.name = GV.basicDataRecord.myName
                             playerActivityItem.nickName = GV.basicDataRecord.myNickname
                             playerActivityItem.isOnline = true
@@ -260,7 +267,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //  ==================================
         if realmSync != nil {
             let myGameRecords = realm.objects(GameDataModel.self).filter("language = %@ and synced = false", language).sorted(byKeyPath: "gameNumber", ascending: true)
-            if myGameRecords.count > 0 {
+            if myGameRecords.count > 0 && bestScoreSync == nil {
                 bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary ENDSWITH %@", combinedPrimarySync)
                 bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "AllMyScoreRecords:\(combinedPrimarySync)")
                 bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
@@ -293,6 +300,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 }
                             }
                         }
+                    } else if state == .invalidated {
+                        self!.bestScoreSubscriptionToken = nil
+                        print ("state: \(state)")
                     } else {
                         print("state: \(state)")
                     }

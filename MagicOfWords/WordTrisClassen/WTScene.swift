@@ -883,9 +883,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             myScorelabel!.text = scoreText
         }
  
-        if bestScoreForGame != nil && bestScoreForGame!.count > 0 {            
-            let bestName = bestScoreForGame![0].owner!.nickName
-            let bestScore = bestScoreForGame![0].bestScore
+        if bestScoreForActualGame != nil && bestScoreForActualGame!.count > 0 {
+            let bestName = bestScoreForActualGame![0].owner != nil ? bestScoreForActualGame![0].owner!.nickName : ""
+            let bestScore = bestScoreForActualGame![0].bestScore
             let bestScoretext = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:6), bestName!)
             let bestScorelabel = self.childNode(withName: bestScoreName) as? SKLabelNode
             bestScorelabel!.text = bestScoretext
@@ -2094,9 +2094,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var bestScoreSubscriptionToken: NotificationToken?
     var forGameSubscriptionToken: NotificationToken?
     var bestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
-    var bestScoreForGame: Results<BestScoreForGame>?
-    var bestScoreForGameToken: NotificationToken?
-    var bestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
+    var bestScoreForActualGame: Results<BestScoreForGame>?
+    var bestScoreForActualGameToken: NotificationToken?
+    var bestScoreForActualGameSubscription: SyncSubscription<BestScoreForGame>?
     var syncedRecordsOK = false
     var waitingForSynceRecords = false
     var answer1Button: UIButton?
@@ -2172,6 +2172,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                             bestScoreSyncRecord.score = 0
                             bestScoreSyncRecord.usedTime = 0
                             bestScoreSyncRecord.owner = playerActivity?[0]
+                            bestScoreSyncRecord.timeStamp = Date()
+                            bestScoreSyncRecord.creationTime = Date()
                             realmSync!.add(bestScoreSyncRecord)
                         }
                     }
@@ -2180,25 +2182,32 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 
             }
-            bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
-            bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "ForGameRecord:\(combinedPrimaryForGame)")
-            forGameSubscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
+            bestScoreForActualGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary = %@", combinedPrimaryForGame)
+            bestScoreForActualGameSubscription = bestScoreForActualGame!.subscribe(named: "ForGameRecord:\(combinedPrimaryForGame)")
+            forGameSubscriptionToken = bestScoreForActualGameSubscription!.observe(\.state) { [weak self]  state in
                 //                print("in Subscription!")
                 if state == .complete {
-                    if self!.bestScoreForGame!.count == 0 {
+                    if self!.bestScoreForActualGame!.count == 0 {
                         try! realmSync!.write {
-                            let bestScoreForGameRecord = BestScoreForGame()
-                            bestScoreForGameRecord.gameNumber = gameNumber
-                            bestScoreForGameRecord.language = language
-                            bestScoreForGameRecord.combinedPrimary = combinedPrimaryForGame
-                            bestScoreForGameRecord.bestScore = 0
-                            bestScoreForGameRecord.owner = playerActivity?[0]
-                            realmSync!.add(bestScoreForGameRecord)
+                            let bestScoreForActualGameRecord = BestScoreForGame()
+                            bestScoreForActualGameRecord.gameNumber = gameNumber
+                            bestScoreForActualGameRecord.language = language
+                            bestScoreForActualGameRecord.combinedPrimary = combinedPrimaryForGame
+                            bestScoreForActualGameRecord.bestScore = 0
+                            bestScoreForActualGameRecord.owner = playerActivity?[0]
+                            realmSync!.add(bestScoreForActualGameRecord)
                         }
+                    } else {
+                        if self!.bestScoreForActualGame![0].owner == nil {
+                            try! realmSync!.write {
+                                self!.bestScoreForActualGame![0].owner = playerActivity![0]
+                            }
+                        }
+
                     }
-                    self!.syncedRecordsOK = self!.bestScoreForGame!.count > 0
+                    self!.syncedRecordsOK = self!.bestScoreForActualGame!.count > 0
                     self!.waitingForSynceRecords = !self!.syncedRecordsOK
-                    self!.bestScoreForGameToken = self!.bestScoreForGame!.observe { [weak self] (changes) in
+                    self!.bestScoreForActualGameToken = self!.bestScoreForActualGame!.observe { [weak self] (changes) in
                         switch changes {
                         case .initial:
                             // Results are now populated and can be accessed without blocking the UI
@@ -2207,7 +2216,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                            print("Initial Data displayed")
                         case .update(_, _, _, let modifications):
                             if modifications.count > 0 {
-//                                print("modified: \(self!.bestScoreForGame![0].bestScore)")
+//                                print("modified: \(self!.bestScoreForActualGame![0].bestScore)")
                                 self!.modifyHeader()
                             }
                         case .error(let error):
@@ -2229,10 +2238,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 try! realmSync!.write {
                     self.bestScoreSync![0].score = GV.totalScore
                     self.bestScoreSync![0].usedTime = self.timeForGame.time
-                    if GV.totalScore > self.bestScoreForGame![0].bestScore {
-                        self.bestScoreForGame![0].bestScore = GV.totalScore
-                        self.bestScoreForGame![0].timeStamp = Date()
-                        self.bestScoreForGame![0].owner = playerActivity?[0]
+                    self.bestScoreSync![0].timeStamp = Date()
+                    if GV.totalScore > self.bestScoreForActualGame![0].bestScore {
+                        self.bestScoreForActualGame![0].bestScore = GV.totalScore
+                        self.bestScoreForActualGame![0].timeStamp = Date()
+                        self.bestScoreForActualGame![0].owner = playerActivity?[0]
                     }
                 }
                 try! realm.write() {
@@ -2267,9 +2277,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func showGameFinished(status: GameFinishedStatus) {
 
-        if bestScoreForGame != nil && bestScoreForGame!.count > 0 && bestPlayersReady {
-            let bestName = bestScoreForGame![0].owner!.nickName
-            let bestScore = bestScoreForGame![0].bestScore
+        if bestScoreForActualGame != nil && bestScoreForActualGame!.count > 0 && bestPlayersReady {
+            let bestName = bestScoreForActualGame![0].owner!.nickName
+            let bestScore = bestScoreForActualGame![0].bestScore
             let bestScoretext = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:6), bestName!)
             let bestScorelabel = self.childNode(withName: bestScoreName) as? SKLabelNode
             bestScorelabel!.text = bestScoretext

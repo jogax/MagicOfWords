@@ -78,7 +78,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     func showGames(all: Bool) {
         showGamesScene = ShowGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         showGamesScene!.setDelegate(delegate: self, controller: self)
-        showGamesScene!.setSelect(all: all)
+//        showGamesScene!.setSelect(all: all)
         if let view = self.view as! SKView? {
             view.presentScene(showGamesScene!)
         }
@@ -384,6 +384,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                 GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
                 GV.basicDataRecord.myName = myName
                 GV.basicDataRecord.myNickname = generateMyNickname()
+                GV.basicDataRecord.creationTime = Date()
                 realm.add(GV.basicDataRecord)
             } else {
                 GV.basicDataRecord = realm.objects(BasicDataModel.self).first!

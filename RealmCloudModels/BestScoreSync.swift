@@ -20,6 +20,9 @@ class BestScoreSync: Object {
     @objc dynamic var finished: Bool = false
     @objc dynamic var usedTime: Int = 0
     @objc dynamic var owner: PlayerActivity? // to-one relationships must be optional
+    @objc dynamic var creationTime = Date()
+    @objc dynamic var timeStamp = Date()
+
 
     override static func primaryKey() -> String? {
         return "combinedPrimary"

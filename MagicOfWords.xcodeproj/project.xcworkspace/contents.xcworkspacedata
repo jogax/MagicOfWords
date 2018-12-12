@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:/Users/JozsefRomhanyi/Documents/GitHub/MagicOfWords/Cartfile">
+   </FileRef>
+   <FileRef
       location = "self:MagicOfWords.xcodeproj">
    </FileRef>
 </Workspace>

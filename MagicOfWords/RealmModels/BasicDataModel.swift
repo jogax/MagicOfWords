@@ -16,6 +16,7 @@ class BasicDataModel: Object {
     @objc dynamic var myNickname = ""
     @objc dynamic var keyWord = ""
     @objc dynamic var difficulty = 0
+    @objc dynamic var creationTime = Date()
     override  class func primaryKey() -> String {
         return "ID"
     }
