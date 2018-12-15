@@ -44,7 +44,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         self.present(alertController, animated: true, completion: nil)
         
     }
-    
+    #if DEBUG
     func displayCloudRecordsViewController() {
         if GV.myUser != nil
         {
@@ -52,6 +52,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             self.present(cloudRecordsViewController, animated: true, completion: nil)
         }
     }
+    #endif
     
     var showGamesScene: ShowGamesScene?
     func backFromSettingsScene() {
