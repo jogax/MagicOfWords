@@ -32,6 +32,8 @@ let enDictionary: [TextConstants: String] = [
     .tcHeader:            "Game: %, Round: %,",
     .tcTime:              "Time: %",
     .tcScore:             "Score:",
+    .tcPlace:             "Place:",
+    .tcKeywordHeader:     "Keyword:",
     .tcMyScoreHeader:     "%. Place (Me): % (%)",
     .tcBestScoreHeader:   "1. Place     : % (%)",
 //    .tcActScoreHeader:    "Best plyaing: %: %",

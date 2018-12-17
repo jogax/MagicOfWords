@@ -32,6 +32,8 @@ let huDictionary: [TextConstants: String] = [
     .tcHeader:            "Játék: %, Kör: %,",
     .tcTime:              "Idő: %",
     .tcScore:             "Pontok:",
+    .tcPlace:             "Hely:",
+    .tcKeywordHeader:     "Kulcs:",
     .tcMyScoreHeader:     "%. Hely (Én): % (%)",
     .tcBestScoreHeader:   "1. Hely     : % (%)",
 //    .tcActScoreHeader:"Most játszik: %: %",

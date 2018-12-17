@@ -32,6 +32,8 @@ let deDictionary: [TextConstants: String] = [
     .tcHeader:             "Spiel: %, Runde: %,",
     .tcTime:               "Zeit: %",
     .tcScore:             "Punkte:",
+    .tcPlace:             "Platz:",
+    .tcKeywordHeader:     "Schlüssel:",
     .tcMyScoreHeader:     "%. Platz (Ich): % (%)",
     .tcBestScoreHeader:   "1. Platz      : % (%)",
 //    .tcActScoreHeader:"Jetzt spielt: %: %",

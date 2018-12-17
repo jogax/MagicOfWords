@@ -32,6 +32,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcHeader:            "Игра: %, Круг: %,",
     .tcTime:              "Время: %",
     .tcScore:             "Очки:",
+    .tcPlace:             "Место:",
+    .tcKeywordHeader:     "Ключ:",
     .tcMyScoreHeader:     "%. Место (Я): % (%)",
     .tcBestScoreHeader:   "1. Место    : % (%)",
 //    .tcActScoreHeader:    "Сейчас играет: %: %",

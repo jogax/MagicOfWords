@@ -34,6 +34,8 @@ enum TextConstants: Int {
     tcHeader,
     tcTime,
     tcScore,
+    tcPlace,
+    tcKeywordHeader,
     tcMyScoreHeader,
     tcBestScoreHeader,
     tcBonusHeader,
