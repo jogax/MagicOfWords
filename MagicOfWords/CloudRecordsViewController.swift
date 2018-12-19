@@ -64,12 +64,16 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
         switch tableType {
         case .Players:
-            cell.addColumn(text: "  " + (playerTable[indexPath.row].nickName.fixLength(length: lengthOfNickName - 4, leadingBlanks: false)), color: actColor) // WordColumn
+            cell.addColumn(text: "  ")
+            let image = UIImage(named: playerTable[indexPath.row].isOnline ? "online.png" : "offline.png")
+            cell.addButton(image: image!)
+            cell.addColumn(text: " " + (playerTable[indexPath.row].nickName.fixLength(length: lengthOfNickName - 4, leadingBlanks: false)), color: actColor) // WordColumn
             cell.addColumn(text: (playerTable[indexPath.row].keyWord.fixLength(length: lengthOfKeyWord, leadingBlanks: false)), color: actColor)
-            cell.addColumn(text: String(playerTable[indexPath.row].isOnline).fixLength(length: lengthOfIsOnline, leadingBlanks: false), color: actColor)
+//            cell.addColumn(text: String(playerTable[indexPath.row].isOnline).fixLength(length: lengthOfIsOnline, leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(playerTable[indexPath.row].onlineTime.HourMinSec).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
         case .BestScoreSync:
-            cell.addColumn(text: "  " + String(bestScoreTable[indexPath.row].gameNumber).fixLength(length: lengthOfGameNumber, leadingBlanks: false), color: actColor)
+            let actColor = (bestScoreTable[indexPath.row].gameNumber % 2 == 0 ? UIColor.white : color)
+           cell.addColumn(text: "  " + String(bestScoreTable[indexPath.row].gameNumber).fixLength(length: lengthOfGameNumber, leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(bestScoreTable[indexPath.row].place).fixLength(length: lengthOfPlace, leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(bestScoreTable[indexPath.row].score).fixLength(length: lengthOfScore, leadingBlanks: false), color: actColor)
             cell.addColumn(text: (bestScoreTable[indexPath.row].nickName.fixLength(length: lengthOfNickName, leadingBlanks: false)), color: actColor) // WordColumn
@@ -116,7 +120,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         case .Players:
             text1 = "\(GV.language.getText(.tcNickName)) ".fixLength(length: lengthOfNickName, center: true)
             text2 = "\(GV.language.getText(.tcKeywordHeader)) ".fixLength(length: lengthOfKeyWord, center: true)
-            text3 = "\(GV.language.getText(.tcIsOnline)) ".fixLength(length: lengthOfIsOnline, center: true)
+//            text3 = "\(GV.language.getText(.tcIsOnline)) ".fixLength(length: lengthOfIsOnline, center: true)
             text4 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengthOfOnlineTime, center: true)
         case .BestScoreSync:
             text1 = "\(GV.language.getText(.tcGameNumber))".fixLength(length: lengthOfGameNumber, center: true)
@@ -237,7 +241,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         let yPos = showPlayerActivityView!.frame.maxY + buttonRadius * 1.2
         let xPos1 = showPlayerActivityView!.frame.minX + buttonRadius
         let center1 = CGPoint(x: xPos1, y:yPos)
-        doneButton = createButton(imageName: "hook.png", imageSize: 0.5, title: "", frame: buttonFrame, center: center1, enabled: enabled)
+        doneButton = createButton(imageName: "hook.png", imageSize: 0.3, title: "", frame: buttonFrame, center: center1, enabled: enabled)
         doneButton?.addTarget(self, action: #selector(self.stopShowingTable), for: .touchUpInside)
         self.view?.addSubview(doneButton!)
         let xPos2 = showPlayerActivityView!.frame.minX + buttonRadius + buttonCenterDistance
@@ -297,6 +301,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     
     private func setNewTableView(tableType: TableType) {
+        initialLoadDone = false
         self.tableType = tableType
         showPlayerActivityView!.removeFromSuperview()
         showPlayerActivityView = nil
@@ -345,16 +350,19 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     
     private func showPlayerActivity() {
-        if playerSubscription != nil {
-            playerSubscriptionToken!.invalidate()
-            playerSubscription!.unsubscribe()
-            playerSubscription = nil
-            playerSubscriptionToken = nil
-        }
+//        if playerSubscription != nil {
+//            playerSubscriptionToken!.invalidate()
+//            playerSubscription!.unsubscribe()
+//            playerSubscription = nil
+//            playerSubscriptionToken = nil
+//        }
         self.playerActivityItems = RealmService.objects(PlayerActivity.self).sorted(byKeyPath: "nickName", ascending: true)
         playerSubscription = playerActivityItems!.subscribe(named: "playerActivityQuery")
+        if playerSubscriptionToken != nil {
+            playerSubscriptionToken!.invalidate()
+        }
         playerSubscriptionToken = playerSubscription!.observe(\.state) { [weak self]  state in
-            print("in Subscription!")
+//                print("in Subscription!")
             switch state {
             case .creating:
                 print("creating")
@@ -389,7 +397,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                     switch changes {
                     case .initial:
                         // Results are now populated and can be accessed without blocking the UI
-                        //                showPlayerActivityView.reloadData()
+                        showPlayerActivityView.reloadData()
                         self!.initialLoadDone = true
                     //                print("Initial Data displayed")
                     case .update(_, let deletions, let insertions, let modifications):
@@ -428,7 +436,6 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // An error occurred while processing the subscription
             }
         }
-        
     }
     struct PlayerData {
         var nickName = ""

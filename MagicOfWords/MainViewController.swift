@@ -364,11 +364,13 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         alertController.addAction(nickNameAction!)
         #if DEBUG
         //--------------------- showRealmCloudAction ---------------------
-        let showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.displayCloudRecordsViewController()
-        })
-        alertController.addAction(showRealmCloudAction)
+        if GV.connectedToInternet {
+            let showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.displayCloudRecordsViewController()
+            })
+            alertController.addAction(showRealmCloudAction)
+        }
         #endif
         //--------------------- Present alert ---------------------
         present(alertController, animated: true, completion: nil)

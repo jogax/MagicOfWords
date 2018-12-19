@@ -23,6 +23,8 @@
 		201FB1DE20288CEA00EC9F36 /* en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D220288CEA00EC9F36 /* en.swift */; };
 		201FB1DF20288CEA00EC9F36 /* de.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D320288CEA00EC9F36 /* de.swift */; };
 		201FB1E020288CEA00EC9F36 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D420288CEA00EC9F36 /* Language.swift */; };
+		202EF6C621CA9DAD000E4DA4 /* online.png in Resources */ = {isa = PBXBuildFile; fileRef = 202EF6C521CA9DAD000E4DA4 /* online.png */; };
+		202EF6C821CAA21A000E4DA4 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = 202EF6C721CAA21A000E4DA4 /* offline.png */; };
 		20395F5D21A2FE4E00947D7F /* retype.png in Resources */ = {isa = PBXBuildFile; fileRef = 20395F5C21A2FE4E00947D7F /* retype.png */; };
 		20395F5F21A31D4300947D7F /* search.png in Resources */ = {isa = PBXBuildFile; fileRef = 20395F5E21A31D4300947D7F /* search.png */; };
 		20437F9A217B793100F16F99 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20437F99217B793100F16F99 /* Reachability.framework */; };
@@ -132,6 +134,8 @@
 		201FB1D220288CEA00EC9F36 /* en.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = en.swift; sourceTree = "<group>"; };
 		201FB1D320288CEA00EC9F36 /* de.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = de.swift; sourceTree = "<group>"; };
 		201FB1D420288CEA00EC9F36 /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
+		202EF6C521CA9DAD000E4DA4 /* online.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = online.png; sourceTree = "<group>"; };
+		202EF6C721CAA21A000E4DA4 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = offline.png; sourceTree = "<group>"; };
 		20395F5C21A2FE4E00947D7F /* retype.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = retype.png; sourceTree = "<group>"; };
 		20395F5E21A31D4300947D7F /* search.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = search.png; sourceTree = "<group>"; };
 		20437F99217B793100F16F99 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
@@ -334,6 +338,8 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				202EF6C721CAA21A000E4DA4 /* offline.png */,
+				202EF6C521CA9DAD000E4DA4 /* online.png */,
 				20469BCE21A43F4E00743EB1 /* sortdown.png */,
 				20469BCF21A43F4E00743EB1 /* sortup.png */,
 				20395F5E21A31D4300947D7F /* search.png */,
@@ -476,6 +482,7 @@
 			files = (
 				20552DC6211F1EFA00C54538 /* whiteSprite1101.png in Resources */,
 				208D085620C42F4000954E63 /* Mandatory.realm in Resources */,
+				202EF6C621CA9DAD000E4DA4 /* online.png in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				20552DBF211F1EFA00C54538 /* whiteSprite1010.png in Resources */,
 				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
@@ -503,6 +510,7 @@
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
 				205CF7F02129BF4B00C1B89D /* previousGame.png in Resources */,
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
+				202EF6C821CAA21A000E4DA4 /* offline.png in Resources */,
 				2051A54E2191E376001AD00B /* hook.png in Resources */,
 				20552DBE211F1EFA00C54538 /* whiteSprite0110.png in Resources */,
 				205E8E2820948E2E00314646 /* button.png in Resources */,
