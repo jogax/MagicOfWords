@@ -290,20 +290,38 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             if nickNameAction != nil {
                 nickNameAction!.isEnabled = true
             }
+            #if DEBUG
+            if showRealmCloudAction != nil {
+                showRealmCloudAction!.isEnabled = true
+            }
+            #endif
         case .cellular:
             GV.connectedToInternet = true
             if nickNameAction != nil {
                 nickNameAction!.isEnabled = true
             }
+            #if DEBUG
+            if showRealmCloudAction != nil {
+                showRealmCloudAction!.isEnabled = true
+            }
+            #endif
         case .none:
             GV.connectedToInternet = false
             if nickNameAction != nil {
                 nickNameAction!.isEnabled = false
             }
+            #if DEBUG
+            if showRealmCloudAction != nil {
+                showRealmCloudAction!.isEnabled = false
+            }
+            #endif
         }
     }
 
     var nickNameAction: UIAlertAction?
+    #if DEBUG
+    var showRealmCloudAction: UIAlertAction?
+    #endif
     
 
     func showMenu() {
@@ -364,13 +382,12 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         alertController.addAction(nickNameAction!)
         #if DEBUG
         //--------------------- showRealmCloudAction ---------------------
-        if GV.connectedToInternet {
-            let showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
+            showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
                 alert -> Void in
                 self.displayCloudRecordsViewController()
             })
-            alertController.addAction(showRealmCloudAction)
-        }
+            showRealmCloudAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+            alertController.addAction(showRealmCloudAction!)
         #endif
         //--------------------- Present alert ---------------------
         present(alertController, animated: true, completion: nil)

@@ -52,7 +52,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         case .BestScoreSync:
             return bestScoreItems!.count
         case .BestScoreForGame:
-            return 0
+            return forGameItems!.count
         }
     }
     
@@ -77,7 +77,11 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             cell.addColumn(text: String(bestScoreTable[indexPath.row].place).fixLength(length: lengthOfPlace, leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(bestScoreTable[indexPath.row].score).fixLength(length: lengthOfScore, leadingBlanks: false), color: actColor)
             cell.addColumn(text: (bestScoreTable[indexPath.row].nickName.fixLength(length: lengthOfNickName, leadingBlanks: false)), color: actColor) // WordColumn
-        default: break
+        case .BestScoreForGame:
+            let actColor = (bestScoreTable[indexPath.row].gameNumber % 2 == 0 ? UIColor.white : color)
+            cell.addColumn(text: "  " + String(bestScoreTable[indexPath.row].gameNumber).fixLength(length: lengthOfGameNumber - 2, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: String(bestScoreTable[indexPath.row].score).fixLength(length: lengthOfScore + 4, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: (bestScoreTable[indexPath.row].nickName.fixLength(length: lengthOfNickName, leadingBlanks: false)), color: actColor) // WordColumn
         }
         return cell
     }
@@ -128,7 +132,10 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             text3 = "\(GV.language.getText(.tcScore)) ".fixLength(length: lengthOfScore, center: true)
             text4 = "\(GV.language.getText(.tcNickName)) ".fixLength(length: lengthOfNickName, center: true)
         case .BestScoreForGame:
-            break
+            text1 = "\(GV.language.getText(.tcGameNumber))".fixLength(length: lengthOfGameNumber, center: true)
+//            text2 = "\(GV.language.getText(.tcPlace)) ".fixLength(length: lengthOfPlace, center: true)
+            text3 = "\(GV.language.getText(.tcScore)) ".fixLength(length: lengthOfScore, center: true)
+            text4 = "\(GV.language.getText(.tcNickName)) ".fixLength(length: lengthOfNickName, center: true)
         }
         headerLine += text1
         headerLine += text2
@@ -193,29 +200,6 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         })
     }
     
-    private func createButton(imageName: String, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool)->UIButton {
-        let button = UIButton()
-        if imageName.length > 0 {
-            let image = UIImage(named: imageName)
-            button.setImage(image, for: UIControl.State.normal)
-        }
-        if title.length > 0 {
-            button.setTitle(title, for: .normal)
-            button.setTitleColor(UIColor.black, for: .normal)
-            button.titleLabel?.font = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
-            
-        }
-        button.backgroundColor = bgColor
-        button.layer.cornerRadius = cornerRadius
-        button.alpha = enabled ? 1.0 : 0.2
-        button.isEnabled = enabled
-        button.layer.borderWidth = GV.onIpad ? 5 : 3
-        button.layer.borderColor = UIColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1.0).cgColor
-        button.frame = frame
-        button.center = center
-        return button
-    }
-    
     var enabled = true
     var doneButton: UIButton?
     var playersButton: UIButton?
@@ -241,22 +225,22 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         let yPos = showPlayerActivityView!.frame.maxY + buttonRadius * 1.2
         let xPos1 = showPlayerActivityView!.frame.minX + buttonRadius
         let center1 = CGPoint(x: xPos1, y:yPos)
-        doneButton = createButton(imageName: "hook.png", imageSize: 0.3, title: "", frame: buttonFrame, center: center1, enabled: enabled)
+        doneButton = createButton(imageName: "hook.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center1, enabled: enabled)
         doneButton?.addTarget(self, action: #selector(self.stopShowingTable), for: .touchUpInside)
         self.view?.addSubview(doneButton!)
         let xPos2 = showPlayerActivityView!.frame.minX + buttonRadius + buttonCenterDistance
         let center2 = CGPoint(x: xPos2, y:yPos)
-        playersButton = createButton(imageName: "", title: playersTitle, frame: buttonFrame, center: center2, cornerRadius: buttonRadius, enabled: enabled)
+        playersButton = createButton(imageName: "players.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center2, enabled: enabled)
         playersButton?.addTarget(self, action: #selector(self.playersButtonTapped), for: .touchUpInside)
         self.view?.addSubview(playersButton!)
         let xPos3 = showPlayerActivityView!.frame.minX + buttonRadius + buttonCenterDistance * 2
         let center3 = CGPoint(x: xPos3, y:yPos)
-        scoreButton = createButton(imageName: "", title: allTitle, frame: buttonFrame, center: center3, cornerRadius: buttonRadius, enabled: enabled)
+        scoreButton = createButton(imageName: "bestScores.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center3, enabled: enabled)
         scoreButton?.addTarget(self, action: #selector(self.scoreButtonTapped), for: .touchUpInside)
         self.view?.addSubview(scoreButton!)
         let xPos4 = showPlayerActivityView!.frame.minX + buttonRadius + buttonCenterDistance * 3
         let center4 = CGPoint(x: xPos4, y:yPos)
-        bestButton = createButton(imageName: "", imageSize: 0.6, title: bestTitle, frame: buttonFrame, center: center4, enabled: enabled)
+        bestButton = createButton(imageName: "firstplaces.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center4, enabled: enabled)
         bestButton?.addTarget(self, action: #selector(self.bestButtonTapped), for: .touchUpInside)
         self.view?.addSubview(bestButton!)
         let xPos5 = showPlayerActivityView!.frame.minX + buttonRadius + buttonCenterDistance * 4
@@ -277,6 +261,31 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         bestButton!.center = CGPoint(x: bestButton!.center.x, y: calculatedYPos)
         sortButton!.center = CGPoint(x: sortButton!.center.x, y: calculatedYPos)
     }
+    
+    private func createButton(imageName: String, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool)->UIButton {
+        let button = UIButton()
+        if imageName.length > 0 {
+            let image = UIImage(named: imageName)
+            button.setImage(image, for: UIControl.State.normal)
+        }
+        if title.length > 0 {
+            button.setTitle(title, for: .normal)
+            button.setTitleColor(UIColor.black, for: .normal)
+            button.titleLabel?.font = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
+            
+        }
+        button.backgroundColor = bgColor
+        button.layer.cornerRadius = cornerRadius
+        button.alpha = enabled ? 1.0 : 0.2
+        button.isEnabled = enabled
+        button.layer.borderWidth = GV.onIpad ? 5 : 3
+        button.layer.borderColor = UIColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1.0).cgColor
+        button.frame = frame
+        button.center = center
+        return button
+    }
+    
+
 
     private func createButton(imageName: String, imageSize: CGFloat = 1.0, title: String, frame: CGRect, center: CGPoint, enabled: Bool, color: UIColor? = nil)->UIButton {
         let button = UIButton()
@@ -301,6 +310,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     
     private func setNewTableView(tableType: TableType) {
+        sortUp = true
         initialLoadDone = false
         self.tableType = tableType
         showPlayerActivityView!.removeFromSuperview()
@@ -310,23 +320,18 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     
     @objc func playersButtonTapped() {
-        sortUp = true
         setNewTableView(tableType: .Players)
         showPlayerActivity()
-//        setSortButtonImage()
-//        addLetterToSearchingWord(letter: questionMark)
     }
     
     @objc func scoreButtonTapped() {
         setNewTableView(tableType: .BestScoreSync)
-        sortUp = true
-        showScores()
+        showBestScoreSync()
     }
     
     @objc func bestButtonTapped() {
-        sortUp = true
-//        setSortButtonImage()
-//        removeLastLetterFromSearchingWord()
+        setNewTableView(tableType: .BestScoreForGame)
+        showBestScoreForGame()
     }
     
     @objc func sortButtonTapped() {
@@ -350,17 +355,9 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     
     private func showPlayerActivity() {
-//        if playerSubscription != nil {
-//            playerSubscriptionToken!.invalidate()
-//            playerSubscription!.unsubscribe()
-//            playerSubscription = nil
-//            playerSubscriptionToken = nil
-//        }
+        deactivateSubscriptions()
         self.playerActivityItems = RealmService.objects(PlayerActivity.self).sorted(byKeyPath: "nickName", ascending: true)
         playerSubscription = playerActivityItems!.subscribe(named: "playerActivityQuery")
-        if playerSubscriptionToken != nil {
-            playerSubscriptionToken!.invalidate()
-        }
         playerSubscriptionToken = playerSubscription!.observe(\.state) { [weak self]  state in
 //                print("in Subscription!")
             switch state {
@@ -463,15 +460,8 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         addUsers(isOnline: false)
     }
     
-    private func showScores() {
-        if playerSubscription != nil {
-            playerSubscriptionToken!.invalidate()
-            playerSubscription!.unsubscribe()
-        }
-        if bestScoreSubscription != nil {
-            bestScoreSubscriptionToken!.invalidate()
-            bestScoreSubscription!.unsubscribe()
-        }
+    private func showBestScoreSync() {
+        deactivateSubscriptions()
         bestScoreItems = RealmService.objects(BestScoreSync.self).filter("language = %@ AND score > 0", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
         bestScoreSubscription = bestScoreItems!.subscribe(named: "bestScoreQuery")
         bestScoreSubscriptionToken = bestScoreSubscription.observe(\.state) { [weak self]  state in
@@ -553,18 +543,116 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     
     private func generateTableData() {
         bestScoreTable.removeAll()
-        let maxGameNumber = bestScoreItems!.last!.gameNumber
-        for actGameNumber in 1...maxGameNumber {
-            let scoreItems = bestScoreItems!.filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false)
-            for (place, item) in scoreItems.enumerated() {
+        switch tableType {
+        case .BestScoreSync:
+            let maxGameNumber = bestScoreItems!.last!.gameNumber
+            for actGameNumber in 1...maxGameNumber {
+                let scoreItems = bestScoreItems!.filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false)
+                for (place, item) in scoreItems.enumerated() {
+                    var bestScoreData = BestScoreData()
+                    bestScoreData.gameNumber = actGameNumber
+                    bestScoreData.place = place + 1
+                    bestScoreData.score = item.score
+                    bestScoreData.nickName = item.owner!.nickName!
+                    bestScoreTable.append(bestScoreData)
+                }
+            }
+        case .BestScoreForGame:
+            let maxGameNumber = forGameItems!.last!.gameNumber
+            for actGameNumber in 1...maxGameNumber {
+                let item = forGameItems!.filter("gameNumber = %d", actGameNumber).first!
                 var bestScoreData = BestScoreData()
                 bestScoreData.gameNumber = actGameNumber
-                bestScoreData.place = place + 1
-                bestScoreData.score = item.score
+                bestScoreData.score = item.bestScore
                 bestScoreData.nickName = item.owner!.nickName!
                 bestScoreTable.append(bestScoreData)
             }
+        default:
+            break
         }
+    }
+    
+    private func deactivateSubscriptions() {
+        if playerSubscription != nil {
+            playerSubscriptionToken!.invalidate()
+            playerSubscription!.unsubscribe()
+        }
+        if bestScoreSubscription != nil {
+            bestScoreSubscriptionToken!.invalidate()
+            bestScoreSubscription!.unsubscribe()
+        }
+    }
+    
+    private func showBestScoreForGame() {
+        deactivateSubscriptions()
+        forGameItems = RealmService.objects(BestScoreForGame.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+        forGameSubscription = forGameItems!.subscribe(named: "bestForGameQuery")
+        forGameSubscriptionToken = forGameSubscription.observe(\.state) { [weak self]  state in
+            switch state {
+            case .creating:
+                print("creating")
+            // The subscription has not yet been written to the Realm
+            case .pending:
+                print("pending")
+                // The subscription has been written to the Realm and is waiting
+            // to be processed by the server
+            case .complete:
+                self!.view.addSubview(self!.showPlayerActivityView!)
+                self!.calculateColumnWidths()
+                let origin = CGPoint(x: 0, y: 0)
+                let maxHeight = self!.view.frame.height * 0.8
+                let calculatedHeight = self!.headerLine.height(font: self!.myFont!) * (CGFloat(self!.forGameItems!.count + 1))
+                let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
+                let size = CGSize(width: self!.headerLine.width(font: self!.myFont!) * 1, height: height)
+                let center = CGPoint(x: 0.5 * self!.view.frame.width, y: 0.5 * self!.view.frame.height)
+                self!.showPlayerActivityView!.frame=CGRect(origin: origin, size: size)
+                self!.showPlayerActivityView!.center=center
+                self!.modifyButtonsPosition()
+                self!.generateTableData()
+                self!.showPlayerActivityView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
+                self!.showPlayerActivityView!.reloadData()
+                print("complete: count records: \(String(describing: self!.forGameItems!.count))")
+                self!.bestScoreNotificationToken = self!.forGameItems!.observe { [weak self] (changes) in
+                    guard let showPlayerActivityView = self?.showPlayerActivityView else { return }
+                    
+                    switch changes {
+                    case .initial:
+                        self!.initialLoadDone = true
+                    case .update(_, let deletions, let insertions, let modifications):
+                        if self!.initialLoadDone && self!.tableType == .BestScoreSync {
+                            // Query results have changed, so apply them to the UITableView
+                            if insertions.count > 0 {
+                                showPlayerActivityView.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
+                            }
+                            if deletions.count > 0 {
+                                showPlayerActivityView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
+                            }
+                            showPlayerActivityView.beginUpdates()
+                            showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+                                                              with: .automatic)
+                            showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+                                                              with: .automatic)
+                            showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+                                                              with: .automatic)
+                            showPlayerActivityView.endUpdates()
+                        }
+                    case .error(let error):
+                        // An error occurred while opening the Realm file on the background worker thread
+                        fatalError("\(error)")
+                    }
+                }
+                
+                // The subscription has been processed by the server and all objects
+            // matching the query are in the local Realm
+            case .invalidated:
+                print("invalitdated")
+            // The subscription has been removed
+            case .error(let error):
+                print("error: \(error)")
+                // An error occurred while processing the subscription
+            }        }
+        
+        
     }
     
 

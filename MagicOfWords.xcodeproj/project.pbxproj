@@ -34,6 +34,9 @@
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
 		204A8ADA2029EE6000E9C11F /* WTScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WTScene.swift */; };
 		204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204AEB38205D1F47004D2ECD /* WTGameFinished.swift */; };
+		204B6FD021CD3ADD00893D58 /* players.png in Resources */ = {isa = PBXBuildFile; fileRef = 204B6FCF21CD3ADD00893D58 /* players.png */; };
+		204B6FD321CD418D00893D58 /* firstplaces.png in Resources */ = {isa = PBXBuildFile; fileRef = 204B6FD121CD418D00893D58 /* firstplaces.png */; };
+		204B6FD421CD418D00893D58 /* bestScores.png in Resources */ = {isa = PBXBuildFile; fileRef = 204B6FD221CD418D00893D58 /* bestScores.png */; };
 		204BB45D2063E9E000CDF085 /* undo.png in Resources */ = {isa = PBXBuildFile; fileRef = 204BB45C2063E9E000CDF085 /* undo.png */; };
 		205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F4206150AC00E7FAF4 /* ruGameData.txt */; };
 		205184F72061525C00E7FAF4 /* huGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F62061525C00E7FAF4 /* huGameData.txt */; };
@@ -145,6 +148,9 @@
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
 		204A8AD92029EE6000E9C11F /* WTScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTScene.swift; sourceTree = "<group>"; };
 		204AEB38205D1F47004D2ECD /* WTGameFinished.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameFinished.swift; sourceTree = "<group>"; };
+		204B6FCF21CD3ADD00893D58 /* players.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = players.png; sourceTree = "<group>"; };
+		204B6FD121CD418D00893D58 /* firstplaces.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firstplaces.png; sourceTree = "<group>"; };
+		204B6FD221CD418D00893D58 /* bestScores.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bestScores.png; sourceTree = "<group>"; };
 		204BB45C2063E9E000CDF085 /* undo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = undo.png; path = MagicOfWords/Pictures/undo.png; sourceTree = SOURCE_ROOT; };
 		205184F4206150AC00E7FAF4 /* ruGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruGameData.txt; sourceTree = "<group>"; };
 		205184F62061525C00E7FAF4 /* huGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huGameData.txt; sourceTree = "<group>"; };
@@ -338,8 +344,11 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				204B6FD221CD418D00893D58 /* bestScores.png */,
+				204B6FD121CD418D00893D58 /* firstplaces.png */,
 				202EF6C721CAA21A000E4DA4 /* offline.png */,
 				202EF6C521CA9DAD000E4DA4 /* online.png */,
+				204B6FCF21CD3ADD00893D58 /* players.png */,
 				20469BCE21A43F4E00743EB1 /* sortdown.png */,
 				20469BCF21A43F4E00743EB1 /* sortup.png */,
 				20395F5E21A31D4300947D7F /* search.png */,
@@ -507,11 +516,13 @@
 				20552DCA211F1EFA00C54538 /* whiteSprite0000.png in Resources */,
 				205234E32187902900B9935F /* deWords.txt in Resources */,
 				20552DC5211F1EFA00C54538 /* whiteSprite0010.png in Resources */,
+				204B6FD321CD418D00893D58 /* firstplaces.png in Resources */,
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
 				205CF7F02129BF4B00C1B89D /* previousGame.png in Resources */,
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
 				202EF6C821CAA21A000E4DA4 /* offline.png in Resources */,
 				2051A54E2191E376001AD00B /* hook.png in Resources */,
+				204B6FD021CD3ADD00893D58 /* players.png in Resources */,
 				20552DBE211F1EFA00C54538 /* whiteSprite0110.png in Resources */,
 				205E8E2820948E2E00314646 /* button.png in Resources */,
 				205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */,
@@ -524,6 +535,7 @@
 				20395F5D21A2FE4E00947D7F /* retype.png in Resources */,
 				20469BD021A43F4E00743EB1 /* sortdown.png in Resources */,
 				20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */,
+				204B6FD421CD418D00893D58 /* bestScores.png in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
 				20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
