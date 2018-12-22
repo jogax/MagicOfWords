@@ -30,8 +30,39 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     //    var lengthOfOnlineSince = 0
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
     var tableType: TableType = .Players
+    
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
-        
+        let nickName = bestScoreTable[indexPath.row].nickName
+        if nickName == "JogaxPad129" {
+            let playerActivityWithNickName = RealmService.objects(PlayerActivity.self).filter("nickName = %@", nickName).first!
+            let name = playerActivityWithNickName.name
+            let bestScoreItems = RealmService.objects(BestScoreForGame.self)
+            try! RealmService.write() {
+                for item in bestScoreItems {
+                    let actName = item.owner!.name
+                    if actName == name {
+                        RealmService.delete(item)
+                    }
+                }
+                let scoreItems = RealmService.objects(BestScoreSync.self).filter("playerName = %@", name)
+                for item in scoreItems {
+                    RealmService.delete(item)
+                }
+                RealmService.delete(playerActivityWithNickName)
+            }
+            print("name: \(name), count: \(bestScoreItems.count)")
+            
+        } else {
+            let oldBestScoreTable = bestScoreTable
+            bestScoreTable.removeAll()
+            for item in oldBestScoreTable {
+                if item.nickName == nickName {
+                    bestScoreTable.append(item)
+                }
+            }
+            setTableviewSize()
+            showPlayerActivityView!.reloadData()
+        }
     }
 
     func getNumberOfSections() -> Int {
@@ -50,9 +81,9 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         case .Players:
             return playerActivityItems!.count
         case .BestScoreSync:
-            return bestScoreItems!.count
+            return bestScoreTable.count
         case .BestScoreForGame:
-            return forGameItems!.count
+            return bestScoreTable.count
         }
     }
     
@@ -553,19 +584,46 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                     bestScoreData.gameNumber = actGameNumber
                     bestScoreData.place = place + 1
                     bestScoreData.score = item.score
-                    bestScoreData.nickName = item.owner!.nickName!
+                    if item.owner != nil {
+                        bestScoreData.nickName = item.owner!.nickName!
+                    }
                     bestScoreTable.append(bestScoreData)
                 }
             }
         case .BestScoreForGame:
             let maxGameNumber = forGameItems!.last!.gameNumber
+            var generateRecord = false
             for actGameNumber in 1...maxGameNumber {
-                let item = forGameItems!.filter("gameNumber = %d", actGameNumber).first!
-                var bestScoreData = BestScoreData()
-                bestScoreData.gameNumber = actGameNumber
-                bestScoreData.score = item.bestScore
-                bestScoreData.nickName = item.owner!.nickName!
-                bestScoreTable.append(bestScoreData)
+                if forGameItems!.filter("gameNumber = %d", actGameNumber).count > 0 {
+                    let item = forGameItems!.filter("gameNumber = %d", actGameNumber).first!
+                    var bestScoreData = BestScoreData()
+                    bestScoreData.gameNumber = actGameNumber
+                    bestScoreData.score = item.bestScore
+                    if item.owner == nil {
+                        generateRecord = true
+                        try! RealmService.write() {
+                            RealmService.delete(item)
+                        }
+                    } else {
+                        bestScoreData.nickName = item.owner!.nickName!
+                        bestScoreTable.append(bestScoreData)
+                    }
+                } else {
+                    generateRecord = true
+                }
+                if generateRecord {
+                    let item = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false).first!
+                    let bestScoreForGameItem = BestScoreForGame()
+                    bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
+                    bestScoreForGameItem.gameNumber = actGameNumber
+                    bestScoreForGameItem.language = item.language
+                    bestScoreForGameItem.bestScore = item.score
+                    bestScoreForGameItem.timeStamp = item.timeStamp
+                    bestScoreForGameItem.owner = item.owner!
+                    try! RealmService.write() {
+                        RealmService.add(bestScoreForGameItem)
+                    }
+                }
             }
         default:
             break
@@ -581,6 +639,18 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             bestScoreSubscriptionToken!.invalidate()
             bestScoreSubscription!.unsubscribe()
         }
+    }
+    
+    private func setTableviewSize() {
+        let origin = CGPoint(x: 0, y: 0)
+        let maxHeight = view.frame.height * 0.8
+        let calculatedHeight = headerLine.height(font: myFont!) * (CGFloat(bestScoreTable.count + 1))
+        let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
+        let size = CGSize(width: headerLine.width(font: myFont!) * 1, height: height)
+        let center = CGPoint(x: 0.5 * view.frame.width, y: 0.5 * view.frame.height)
+        showPlayerActivityView!.frame=CGRect(origin: origin, size: size)
+        showPlayerActivityView!.center=center
+        modifyButtonsPosition()
     }
     
     private func showBestScoreForGame() {
@@ -599,16 +669,17 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             case .complete:
                 self!.view.addSubview(self!.showPlayerActivityView!)
                 self!.calculateColumnWidths()
-                let origin = CGPoint(x: 0, y: 0)
-                let maxHeight = self!.view.frame.height * 0.8
-                let calculatedHeight = self!.headerLine.height(font: self!.myFont!) * (CGFloat(self!.forGameItems!.count + 1))
-                let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
-                let size = CGSize(width: self!.headerLine.width(font: self!.myFont!) * 1, height: height)
-                let center = CGPoint(x: 0.5 * self!.view.frame.width, y: 0.5 * self!.view.frame.height)
-                self!.showPlayerActivityView!.frame=CGRect(origin: origin, size: size)
-                self!.showPlayerActivityView!.center=center
-                self!.modifyButtonsPosition()
                 self!.generateTableData()
+                self!.setTableviewSize()
+//                let origin = CGPoint(x: 0, y: 0)
+//                let maxHeight = self!.view.frame.height * 0.8
+//                let calculatedHeight = self!.headerLine.height(font: self!.myFont!) * (CGFloat(self!.bestScoreTable.count + 1))
+//                let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
+//                let size = CGSize(width: self!.headerLine.width(font: self!.myFont!) * 1, height: height)
+//                let center = CGPoint(x: 0.5 * self!.view.frame.width, y: 0.5 * self!.view.frame.height)
+//                self!.showPlayerActivityView!.frame=CGRect(origin: origin, size: size)
+//                self!.showPlayerActivityView!.center=center
+//                self!.modifyButtonsPosition()
                 self!.showPlayerActivityView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
                 self!.showPlayerActivityView!.reloadData()
                 print("complete: count records: \(String(describing: self!.forGameItems!.count))")
@@ -654,9 +725,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         
         
     }
-    
-
-
+        
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

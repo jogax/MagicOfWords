@@ -16,6 +16,10 @@ public extension UIDevice {
         case noDevice = 0, iPodTouch5, iPodTouch6, iPhone4, iPhone4s, iPhone5, iPhone5c, iPhone5s, iPhone6, iPhone6Plus, iPhone6s, iPhone6sPlus, iPad2,
         iPad3, iPad4, iPadAir, iPadAir2, iPadMini, iPadMini2, iPadMini3, iPadMini4, iPadPro, appleTV, simulator}
     
+    var deviceID: String {
+        return (UIDevice.current.identifierForVendor?.uuidString)!
+    }
+    
     var modelName: String {
         let bounds = UIScreen.main.bounds
         let width = bounds.width
@@ -79,7 +83,6 @@ public extension UIDevice {
         }
         
     }
-    
 }
 
 extension Double {

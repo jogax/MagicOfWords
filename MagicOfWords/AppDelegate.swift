@@ -176,6 +176,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     if playerActivity![0].creationTime == nil {
                         playerActivity![0].creationTime = Date()
                     }
+                    if playerActivity![0].territory == nil {
+                        playerActivity![0].territory = GV.language.getPreferredLanguage()
+                        playerActivity![0].deviceType = UIDevice().modelName
+                    }
                     playerActivity![0].countOnlines += 1
                     playerActivity![0].isOnline = false
                     playerActivity![0].onlineTime += Int(getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!))
@@ -213,6 +217,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             playerActivityItem.isOnline = true
                             playerActivityItem.onlineSince = getLocalDate()
                             playerActivityItem.onlineTime = 0
+                            playerActivityItem.territory = GV.language.getPreferredLanguage()
+                            playerActivityItem.deviceType = UIDevice().modelName
                             realmSync?.add(playerActivityItem)
                         }
                     }

@@ -20,7 +20,8 @@ class PlayerActivity: Object {
     @objc dynamic var onlineTime: Int = 0
     @objc dynamic var countOnlines: Int = 0
     @objc dynamic var creationTime: Date?
-
+    @objc dynamic var territory: String?
+    @objc dynamic var deviceType: String?
 
     override static func primaryKey() -> String? {
         return "name"
