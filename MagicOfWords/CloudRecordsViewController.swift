@@ -33,25 +33,26 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
         let nickName = bestScoreTable[indexPath.row].nickName
-        if nickName == "JogaxPad129" {
-            let playerActivityWithNickName = RealmService.objects(PlayerActivity.self).filter("nickName = %@", nickName).first!
-            let name = playerActivityWithNickName.name
-            let bestScoreItems = RealmService.objects(BestScoreForGame.self)
-            try! RealmService.write() {
-                for item in bestScoreItems {
-                    let actName = item.owner!.name
-                    if actName == name {
-                        RealmService.delete(item)
-                    }
-                }
-                let scoreItems = RealmService.objects(BestScoreSync.self).filter("playerName = %@", name)
-                for item in scoreItems {
-                    RealmService.delete(item)
-                }
-                RealmService.delete(playerActivityWithNickName)
-            }
-            print("name: \(name), count: \(bestScoreItems.count)")
-            
+//        for deleting a complete user from Realm Cloud
+        if nickName == "xxx" {
+//            let playerActivityWithNickName = RealmService.objects(PlayerActivity.self).filter("nickName = %@", nickName).first!
+//            let name = playerActivityWithNickName.name
+//            let bestScoreItems = RealmService.objects(BestScoreForGame.self)
+//            try! RealmService.write() {
+//                for item in bestScoreItems {
+//                    let actName = item.owner!.name
+//                    if actName == name {
+//                        RealmService.delete(item)
+//                    }
+//                }
+//                let scoreItems = RealmService.objects(BestScoreSync.self).filter("playerName = %@", name)
+//                for item in scoreItems {
+//                    RealmService.delete(item)
+//                }
+//                RealmService.delete(playerActivityWithNickName)
+//            }
+//            print("name: \(name), count: \(bestScoreItems.count)")
+//
         } else {
             let oldBestScoreTable = bestScoreTable
             bestScoreTable.removeAll()
@@ -602,7 +603,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                     if item.owner == nil {
                         generateRecord = true
                         try! RealmService.write() {
-                            RealmService.delete(item)
+//                            RealmService.delete(item)
                         }
                     } else {
                         bestScoreData.nickName = item.owner!.nickName!
@@ -612,17 +613,17 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                     generateRecord = true
                 }
                 if generateRecord {
-                    let item = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false).first!
-                    let bestScoreForGameItem = BestScoreForGame()
-                    bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
-                    bestScoreForGameItem.gameNumber = actGameNumber
-                    bestScoreForGameItem.language = item.language
-                    bestScoreForGameItem.bestScore = item.score
-                    bestScoreForGameItem.timeStamp = item.timeStamp
-                    bestScoreForGameItem.owner = item.owner!
-                    try! RealmService.write() {
-                        RealmService.add(bestScoreForGameItem)
-                    }
+//                    let item = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false).first!
+//                    let bestScoreForGameItem = BestScoreForGame()
+//                    bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
+//                    bestScoreForGameItem.gameNumber = actGameNumber
+//                    bestScoreForGameItem.language = item.language
+//                    bestScoreForGameItem.bestScore = item.score
+//                    bestScoreForGameItem.timeStamp = item.timeStamp
+//                    bestScoreForGameItem.owner = item.owner!
+//                    try! RealmService.write() {
+//                        RealmService.add(bestScoreForGameItem)
+//                    }
                 }
             }
         default:
