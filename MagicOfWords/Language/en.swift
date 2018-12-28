@@ -91,5 +91,5 @@ let enDictionary: [TextConstants: String] = [
     .tcRestartGame:         "Restart",
     .tcShowWordlistHeader:  " List of found words (%)",
     .tcSearchingWord:       " Searching word: %",
-
+    .tcCollectMandatory:    "Search mandatory words",
 ]

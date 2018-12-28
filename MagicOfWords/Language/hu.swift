@@ -91,4 +91,5 @@ let huDictionary: [TextConstants: String] = [
     .tcRestartGame:         "Újraindítás",
     .tcShowWordlistHeader:  " A talált szavak listája (%)",
     .tcSearchingWord:       " Kereső szó: %",
+    .tcCollectMandatory:    "Kötelező szavak keresése",
 ]

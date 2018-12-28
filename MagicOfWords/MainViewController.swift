@@ -52,6 +52,13 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             self.present(cloudRecordsViewController, animated: true, completion: nil)
         }
     }
+    
+    func displayCollectMandatoryViewController() {
+        if GV.myUser != nil {
+            let collectMandatoryViewController = CollectMandatoryWordsViewController()
+            self.present(collectMandatoryViewController, animated: true, completion: nil)
+        }
+    }
     #endif
     
     var showGamesScene: ShowGamesScene?
@@ -294,6 +301,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             if showRealmCloudAction != nil {
                 showRealmCloudAction!.isEnabled = true
             }
+            if collectMandatoryAction != nil {
+                collectMandatoryAction!.isEnabled = true
+            }
             #endif
         case .cellular:
             GV.connectedToInternet = true
@@ -303,6 +313,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             #if DEBUG
             if showRealmCloudAction != nil {
                 showRealmCloudAction!.isEnabled = true
+            }
+            if collectMandatoryAction != nil {
+                collectMandatoryAction!.isEnabled = true
             }
             #endif
         case .none:
@@ -314,6 +327,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             if showRealmCloudAction != nil {
                 showRealmCloudAction!.isEnabled = false
             }
+            if collectMandatoryAction != nil {
+                collectMandatoryAction!.isEnabled = false
+            }
             #endif
         }
     }
@@ -321,6 +337,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     var nickNameAction: UIAlertAction?
     #if DEBUG
     var showRealmCloudAction: UIAlertAction?
+    var collectMandatoryAction: UIAlertAction?
     #endif
     
 
@@ -388,6 +405,12 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             })
             showRealmCloudAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
             alertController.addAction(showRealmCloudAction!)
+            collectMandatoryAction = UIAlertAction(title: GV.language.getText(.tcCollectMandatory), style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.displayCollectMandatoryViewController()
+            })
+            collectMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+            alertController.addAction(collectMandatoryAction!)
         #endif
         //--------------------- Present alert ---------------------
         present(alertController, animated: true, completion: nil)

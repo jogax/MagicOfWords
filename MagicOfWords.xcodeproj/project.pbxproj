@@ -31,6 +31,9 @@
 		20439FEF20BC40DB00D44286 /* Versions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20439FEE20BC40DB00D44286 /* Versions.txt */; };
 		20469BD021A43F4E00743EB1 /* sortdown.png in Resources */ = {isa = PBXBuildFile; fileRef = 20469BCE21A43F4E00743EB1 /* sortdown.png */; };
 		20469BD121A43F4E00743EB1 /* sortup.png in Resources */ = {isa = PBXBuildFile; fileRef = 20469BCF21A43F4E00743EB1 /* sortup.png */; };
+		20491F4921CFC88B0060C675 /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20491F4821CFC88B0060C675 /* CommonString.swift */; };
+		20491F4B21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20491F4A21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift */; };
+		20491F4D21CFCEB20060C675 /* ruMandatory.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20491F4C21CFCEB20060C675 /* ruMandatory.txt */; };
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
 		204A8ADA2029EE6000E9C11F /* WTScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WTScene.swift */; };
 		204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204AEB38205D1F47004D2ECD /* WTGameFinished.swift */; };
@@ -145,6 +148,9 @@
 		20439FEE20BC40DB00D44286 /* Versions.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Versions.txt; sourceTree = "<group>"; };
 		20469BCE21A43F4E00743EB1 /* sortdown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sortdown.png; sourceTree = "<group>"; };
 		20469BCF21A43F4E00743EB1 /* sortup.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sortup.png; sourceTree = "<group>"; };
+		20491F4821CFC88B0060C675 /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
+		20491F4A21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectMandatoryWordsViewController.swift; sourceTree = "<group>"; };
+		20491F4C21CFCEB20060C675 /* ruMandatory.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruMandatory.txt; sourceTree = "<group>"; };
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
 		204A8AD92029EE6000E9C11F /* WTScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTScene.swift; sourceTree = "<group>"; };
 		204AEB38205D1F47004D2ECD /* WTGameFinished.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameFinished.swift; sourceTree = "<group>"; };
@@ -263,6 +269,7 @@
 				20943C8D2092129000B34A07 /* MyQuestions.swift */,
 				201FB1CA20288CE900EC9F36 /* MainViewController.swift */,
 				20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */,
+				20491F4A21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift */,
 				201FB1CC20288CEA00EC9F36 /* MyFunctions.swift */,
 				201FB1C920288CE900EC9F36 /* MyGlobals.swift */,
 				20A604B22035D93A00DC48F0 /* MyRandom.swift */,
@@ -327,6 +334,7 @@
 				205184F4206150AC00E7FAF4 /* ruGameData.txt */,
 				20F17608216269DB00AF37D7 /* StateOfWordChanging.txt */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
+				20491F4C21CFCEB20060C675 /* ruMandatory.txt */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -389,6 +397,7 @@
 				205627EC214AA716006B9357 /* BestScoreSync.swift */,
 				2081441F2167B65500496AFC /* BestScoreForGame.swift */,
 				205627EE214AA9E9006B9357 /* PlayerActivity.swift */,
+				20491F4821CFC88B0060C675 /* CommonString.swift */,
 			);
 			path = RealmCloudModels;
 			sourceTree = "<group>";
@@ -532,6 +541,7 @@
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
 				204BB45D2063E9E000CDF085 /* undo.png in Resources */,
 				205234E5218796C200B9935F /* WordList.realm in Resources */,
+				20491F4D21CFCEB20060C675 /* ruMandatory.txt in Resources */,
 				20395F5D21A2FE4E00947D7F /* retype.png in Resources */,
 				20469BD021A43F4E00743EB1 /* sortdown.png in Resources */,
 				20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */,
@@ -587,6 +597,7 @@
 				2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */,
 				20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */,
 				201FB1DE20288CEA00EC9F36 /* en.swift in Sources */,
+				20491F4921CFC88B0060C675 /* CommonString.swift in Sources */,
 				201FB1DA20288CEA00EC9F36 /* hu.swift in Sources */,
 				2065252620FD212C00F0BC46 /* WTGameWordList.swift in Sources */,
 				205627ED214AA716006B9357 /* BestScoreSync.swift in Sources */,
@@ -597,6 +608,7 @@
 				201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */,
 				201FB1D720288CEA00EC9F36 /* ru.swift in Sources */,
 				201435D920C2FE24002D1C04 /* SettingsScene.swift in Sources */,
+				20491F4B21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift in Sources */,
 				20531C6820B6EA5400E060E2 /* ShowGamesScene.swift in Sources */,
 				204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */,
 				20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */,

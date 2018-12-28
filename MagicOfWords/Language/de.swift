@@ -91,6 +91,7 @@ let deDictionary: [TextConstants: String] = [
     .tcRestartGame:         "Neustart",
     .tcShowWordlistHeader:  " Liste der gefundenen Wörter (%)",
     .tcSearchingWord:       " Suchwort: %",
+    .tcCollectMandatory:    "Pflichtwörter suchen",
 ]
 
 

@@ -57,7 +57,6 @@ class CustomTableViewCell: UITableViewCell {
         label.textColor = UIColor.black
         label.text = text
         label.backgroundColor = color
-//        label.addBorder(toSide: .Left, withColor: UIColor.black, andThickness: 0.5)
         boxView.addSubview(label)
     }
     

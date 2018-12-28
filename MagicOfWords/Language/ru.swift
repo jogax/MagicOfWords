@@ -91,4 +91,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcRestartGame:         "Запуск",
     .tcShowWordlistHeader:  " Список найденных слов (%)",
     .tcSearchingWord:       " Поисковое слово: %",
+    .tcCollectMandatory:    "Поиск обязательных слов",
 ]

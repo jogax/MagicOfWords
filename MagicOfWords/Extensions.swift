@@ -375,9 +375,10 @@ extension String {
         return String(repeating: character, count: padCount) + self
     }
     
-    func endingSubString(at: Int) -> String.SubSequence {
+    func endingSubString(at: Int) -> String {
         let indexStartOfText = self.index(self.startIndex, offsetBy: at)
-        return self[indexStartOfText...]
+        let returnValue = String(self[indexStartOfText...])
+        return returnValue
     }
 
     mutating func subString(at: Int, length: Int, remove: Bool) -> String.SubSequence {
