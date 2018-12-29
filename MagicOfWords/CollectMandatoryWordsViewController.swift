@@ -23,10 +23,6 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var lengthOfGameNumber = 6
     var lengthOfScore = 5
     var lengthOfPlace = 5
-    
-    
-    
-    
     //    var lengthOfOnlineSince = 0
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
     
@@ -37,16 +33,26 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
             wordModel.word = (GV.actLanguage + word).lowercased()
             RealmService.add(wordModel)
             savedMandatoryWords.append(word)
+            wordLengths[word.length - 4] += 1
+            wordLengths[0] += 1
         }
+        print("wordLengths: \(wordLengths)")
         showMandatoryWords()
     }
     
     func getNumberOfSections() -> Int {
-        return 1
+        return 2
     }
     
     func getNumberOfRowsInSections(section: Int) -> Int {
-        return mandatoryWordsTable.count
+        switch section {
+        case 0:
+            return 0 //return wordLengths.count
+        case 1:
+            return mandatoryWordsTable.count
+        default:
+            return 0
+        }
     }
     
     var mandatoryWordsTable = [String]()
@@ -58,7 +64,12 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: width, height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.010)))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
-        cell.addColumn(text: " " + (mandatoryWordsTable[indexPath.row].fixLength(length: 100, leadingBlanks: false)), color: actColor)
+        switch indexPath.row {
+        case 0:
+            cell.addColumn(text: " " + (String(wordLengths[indexPath.row]).fixLength(length: 100, leadingBlanks: false)), color: actColor)
+        default:
+            cell.addColumn(text: " " + (mandatoryWordsTable[indexPath.row].fixLength(length: 100, leadingBlanks: false)), color: actColor)
+        }
         return cell
     }
     
@@ -135,8 +146,32 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var tableviewAdded = false
     
     @objc func inputFieldDidChange(_ textField: UITextField) {
-        searchPhrase = textField.text!
+        if searchPhrase.length > 2 && String(textField.text!.lowercased().last!) == "/" {
+            let actPhrase = textField.text!.startingSubString(length: 3)
+            textField.text = incrementString(string: actPhrase)
+        }
+        searchPhrase = textField.text!.lowercased()
         showMandatoryWords()
+    }
+    
+    private func incrementString(string: String)->String {
+        var returnValue:String = ""
+        var incrementLetter = true
+        let alphabet = GV.language.getText(.tcAlphabet).lowercased()
+        for index in 0..<string.length {
+            let char = string.char(from:string.length - 1 - index).lowercased()
+            var charIndex = alphabet.index(from:0, of: char)
+            if incrementLetter {
+                charIndex! += 1
+                incrementLetter = false
+            }
+            if charIndex == alphabet.length {
+                charIndex = 0
+                incrementLetter = true
+            }
+            returnValue.insert(Character(alphabet.char(from:charIndex!)), at: returnValue.startIndex)
+        }
+        return returnValue
     }
 
     private func getStartingPhrase() {
@@ -350,13 +385,13 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         if !tableviewAdded {
             let origin = CGPoint(x: 0, y: 0)
             let height = view.frame.height * 0.6
-            let width = view.frame.width * 0.5
+            let width = view.frame.width * 0.3
             let size = CGSize(width: width, height: height)
             let center = CGPoint(x: 0.5 * view.frame.width, y: 0.35 * view.frame.height)
             showMandatoryWordsView!.frame=CGRect(origin: origin, size: size)
             showMandatoryWordsView!.center=center
-            createButtons()
-            modifyButtonsPosition()
+//            createButtons()
+//            modifyButtonsPosition()
             showMandatoryWordsView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
             view.addSubview(showMandatoryWordsView!)
             tableviewAdded = true
@@ -365,20 +400,37 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     private func showMandatoryWords() {
         mandatoryWordsTable = [String]()
+        var continueCycle = true
         let language = GV.actLanguage
-        if searchPhrase.length > 0 {
-            allWordsItems = realmWordList.objects(WordListModel.self).filter("word beginsWith %@", language + searchPhrase.lowercased())
-            for item in allWordsItems! {
-                let word = String(item.word.endingSubString(at:2))
-                if word.length > 4 && word.length < 11 {
-                    if !savedMandatoryWords.contains(word) {
-                        mandatoryWordsTable.append(String(word))
+        repeat {
+            if searchPhrase.length > 2 {
+                allWordsItems = realmWordList.objects(WordListModel.self).filter("word beginsWith %@", language + searchPhrase.lowercased())
+                for item in allWordsItems! {
+                    let word = String(item.word.endingSubString(at:2))
+                    if word.length > 4 && word.length < 11 {
+                        if !savedMandatoryWords.contains(word) {
+                            mandatoryWordsTable.append(String(word))
+                        }
                     }
                 }
+                if mandatoryWordsTable.count > 0 {
+                    continueCycle = false
+                } else {
+                    let actPhrase = inputField!.text!.startingSubString(length: 3).lowercased()
+                    inputField!.text = incrementString(string: actPhrase)
+                    searchPhrase = inputField!.text!
+                    if searchPhrase == "яяя" {
+                        continueCycle = false
+                    }
+                }
+            } else {
+                continueCycle = false
             }
-        }
+        } while continueCycle
         showMandatoryWordsView!.reloadData()
+
     }
+    
     struct PlayerData {
         var nickName = ""
         var keyWord = ""
@@ -395,20 +447,6 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         var nickName = ""
     }
     var bestScoreTable = [BestScoreData]()
-    
-    
-    private func setTableviewSize() {
-        let origin = CGPoint(x: 0, y: 0)
-        let maxHeight = view.frame.height * 0.8
-        let calculatedHeight = headerLine.height(font: myFont!) * (CGFloat(bestScoreTable.count + 1))
-        let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
-        let size = CGSize(width: headerLine.width(font: myFont!) * 1, height: height)
-        let center = CGPoint(x: 0.5 * view.frame.width, y: 0.5 * view.frame.height)
-        showMandatoryWordsView!.frame=CGRect(origin: origin, size: size)
-        showMandatoryWordsView!.center=center
-        modifyButtonsPosition()
-    }
-    
     
     private func readTextFile() {
         let language = GV.actLanguage
@@ -451,6 +489,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var mandatoryItems: Results<CommonString>?
     var mandatorySubscription: SyncSubscription<CommonString>?
     var mandatorySubscriptionToken: NotificationToken?
+    var wordLengths = [0,0,0,0,0,0,0]
     
     private func getSavedMandatoryWords() {
         mandatoryItems = RealmService.objects(CommonString.self).filter("word BEGINSWITH %@", GV.actLanguage).sorted(byKeyPath: "word", ascending: true)
@@ -469,9 +508,18 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                 for item in self!.mandatoryItems! {
                     let word = item.word.endingSubString(at:2)
                     if word.length > 4 {
-                        self!.savedMandatoryWords.append(item.word.endingSubString(at:2))
+                        if word == "температура" {
+                            try! RealmService.write {
+                                RealmService.delete(item)
+                            }
+                        } else {
+                            self!.savedMandatoryWords.append(item.word.endingSubString(at:2))
+                            self!.wordLengths[word.length - 4] += 1
+                            self!.wordLengths[0] += 1
+                        }
                     }
                 }
+                print("wordLengths: \(self!.wordLengths)")
                 self!.readTextFile()
             default:
                 print("state: \(state)")
@@ -487,4 +535,6 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     
 }
+
+
 #endif

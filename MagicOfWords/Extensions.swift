@@ -381,6 +381,10 @@ extension String {
         return returnValue
     }
 
+    func startingSubString(length: Int) -> String {
+        return subString(at: 0, length: length)
+    }
+    
     mutating func subString(at: Int, length: Int, remove: Bool) -> String.SubSequence {
         let indexStartOfText = self.index(self.startIndex, offsetBy: at)
         let indexEndOfText = self.index(self.startIndex, offsetBy: at + length)
