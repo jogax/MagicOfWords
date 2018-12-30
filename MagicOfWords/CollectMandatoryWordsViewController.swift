@@ -41,18 +41,11 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     
     func getNumberOfSections() -> Int {
-        return 2
+        return 1
     }
     
     func getNumberOfRowsInSections(section: Int) -> Int {
-        switch section {
-        case 0:
-            return 0 //return wordLengths.count
-        case 1:
-            return mandatoryWordsTable.count
-        default:
-            return 0
-        }
+        return mandatoryWordsTable.count
     }
     
     var mandatoryWordsTable = [String]()
@@ -64,12 +57,12 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: width, height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.010)))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
-        switch indexPath.row {
-        case 0:
-            cell.addColumn(text: " " + (String(wordLengths[indexPath.row]).fixLength(length: 100, leadingBlanks: false)), color: actColor)
-        default:
+//        switch indexPath.row {
+//        case 0:
+//            cell.addColumn(text: " " + (String(wordLengths[indexPath.row]).fixLength(length: 100, leadingBlanks: false)), color: actColor)
+//        default:
             cell.addColumn(text: " " + (mandatoryWordsTable[indexPath.row].fixLength(length: 100, leadingBlanks: false)), color: actColor)
-        }
+//        }
         return cell
     }
     
@@ -82,13 +75,17 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
         let lineHeight = headerLine.height(font: myFont!)
-        let width = headerLine.width(withConstrainedHeight: 0, font: myFont!)
+        var title = ""
+        if wordLengths.count > 0 {
+            title = " all: \(wordLengths[0]), 5: \(wordLengths[1]), 6: \(wordLengths[2]), 7: \(wordLengths[3]), 8: \(wordLengths[4]), 9: \(wordLengths[5]), 10: \(wordLengths[6])"
+        }
+        let width = title.width(withConstrainedHeight: 0, font: myFont!)
         let view = UIView()
-        let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
-        label1.font = myFont!
-        label1.text = headerLine
-        view.addSubview(label1)
-        let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight, width: width, height: lineHeight))
+//        let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
+//        label1.font = myFont!
+//        label1.text = headerLine
+//        view.addSubview(label1)
+        let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight * 0.5, width: width, height: lineHeight))
         label2.font = myFont!
         label2.text = title
         view.addSubview(label2)
@@ -97,7 +94,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     
     func getHeightForHeaderInSection(tableView: UITableView, section: Int) -> CGFloat {
-        return headerLine.height(font: myFont!)
+        return headerLine.height(font: myFont!) * 2
     }
     
     //    let realm: Realm
@@ -146,20 +143,16 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var tableviewAdded = false
     
     @objc func inputFieldDidChange(_ textField: UITextField) {
-        if searchPhrase.length > 2 && String(textField.text!.lowercased().last!) == "/" {
-            let actPhrase = textField.text!.startingSubString(length: 3)
-            textField.text = incrementString(string: actPhrase)
-        }
-        searchPhrase = textField.text!.lowercased()
         showMandatoryWords()
     }
     
     private func incrementString(string: String)->String {
         var returnValue:String = ""
         var incrementLetter = true
+        let startValue = string.startingSubString(length: 3)
         let alphabet = GV.language.getText(.tcAlphabet).lowercased()
-        for index in 0..<string.length {
-            let char = string.char(from:string.length - 1 - index).lowercased()
+        for index in 0..<startValue.length {
+            let char = startValue.char(from:startValue.length - 1 - index).lowercased()
             var charIndex = alphabet.index(from:0, of: char)
             if incrementLetter {
                 charIndex! += 1
@@ -169,7 +162,9 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                 charIndex = 0
                 incrementLetter = true
             }
-            returnValue.insert(Character(alphabet.char(from:charIndex!)), at: returnValue.startIndex)
+            if charIndex != nil {
+                returnValue.insert(Character(alphabet.char(from:charIndex!)), at: returnValue.startIndex)
+            }
         }
         return returnValue
     }
@@ -385,7 +380,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         if !tableviewAdded {
             let origin = CGPoint(x: 0, y: 0)
             let height = view.frame.height * 0.6
-            let width = view.frame.width * 0.3
+            let width = view.frame.width * 0.7
             let size = CGSize(width: width, height: height)
             let center = CGPoint(x: 0.5 * view.frame.width, y: 0.35 * view.frame.height)
             showMandatoryWordsView!.frame=CGRect(origin: origin, size: size)
@@ -399,15 +394,45 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     
     private func showMandatoryWords() {
+        if inputField!.text!.length < 3 {
+            return
+        }
         mandatoryWordsTable = [String]()
         var continueCycle = true
         let language = GV.actLanguage
+        var searchLength = 0
+        var searchPhrase = ""
+        var inc = false
+        var lastCh = String(inputField!.text!.last!)
+        if lastCh == "/" {
+            inc = true
+            lastCh = inputField!.text!.subString(at: inputField!.text!.length - 2, length: 1)
+        }
+        if lastCh.isMemberOf("5", "6", "7", "8", "9", "0") {
+            searchLength = Int(lastCh)!
+            searchLength = searchLength == 0 ? 10 : searchLength
+            searchPhrase = inputField!.text!.startingSubString(length: inputField!.text!.length - 1)
+//        }
+//        if inputField!.text!.startingSubString(length: 1).isNumeric() {
+//            searchLength = Int(inputField!.text!.startingSubString(length: 1))!
+//            if searchLength == 0 {
+//                searchLength = 10
+//            }
+//            if searchLength < 5 || searchLength > 10 {
+//                searchLength = 0
+//            }
+//            searchPhrase = inputField!.text!.subString(at: 1, length: inputField!.text!.length - 1)
+        } else {
+            searchPhrase = inputField!.text!
+        }
+
+        
         repeat {
             if searchPhrase.length > 2 {
                 allWordsItems = realmWordList.objects(WordListModel.self).filter("word beginsWith %@", language + searchPhrase.lowercased())
                 for item in allWordsItems! {
                     let word = String(item.word.endingSubString(at:2))
-                    if word.length > 4 && word.length < 11 {
+                    if word.length > 4 && word.length < 11 && (searchLength == 0 || word.length == searchLength) {
                         if !savedMandatoryWords.contains(word) {
                             mandatoryWordsTable.append(String(word))
                         }
@@ -415,13 +440,16 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                 }
                 if mandatoryWordsTable.count > 0 {
                     continueCycle = false
-                } else {
-                    let actPhrase = inputField!.text!.startingSubString(length: 3).lowercased()
-                    inputField!.text = incrementString(string: actPhrase)
-                    searchPhrase = inputField!.text!
-                    if searchPhrase == "яяя" {
+                } else if inc {
+                    let newPhrase = incrementString(string: searchPhrase)
+                    if newPhrase == "яяя" {
                         continueCycle = false
+                    } else {
+                        inputField!.text = searchLength == 0 ? newPhrase : newPhrase + String(searchLength)
+                        searchPhrase = newPhrase
                     }
+                } else {
+                    continueCycle = false
                 }
             } else {
                 continueCycle = false
