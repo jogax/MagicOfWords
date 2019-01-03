@@ -23,18 +23,30 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var lengthOfGameNumber = 6
     var lengthOfScore = 5
     var lengthOfPlace = 5
+    let savePhrase = " saved"
     //    var lengthOfOnlineSince = 0
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 20 : 15)
     
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
-        let word = mandatoryWordsTable[indexPath.row]
+        var word = mandatoryWordsTable[indexPath.row]
         try! RealmService.write {
             let wordModel = CommonString()
-            wordModel.word = (GV.actLanguage + word).lowercased()
-            RealmService.add(wordModel)
-            savedMandatoryWords.append(word)
-            wordLengths[word.length - 4] += 1
-            wordLengths[0] += 1
+            if word.length > savePhrase.length && word.ends(with: savePhrase) {
+                word = word.startingSubString(length: word.length - savePhrase.length).lowercased()
+
+                let toDelete = RealmService.objects(CommonString.self).filter("word = %@", GV.actLanguage + word).first!
+                savedMandatoryWords.removeAll { $0 == toDelete.word.endingSubString(at:2) }
+                RealmService.delete(toDelete)
+                mandatoryWordsTable[indexPath.row] = word.endingSubString(at: 2)
+                wordLengths[word.length - 4] -= 1
+                wordLengths[0] -= 1
+            } else {
+                wordModel.word = (GV.actLanguage + word).lowercased()
+                RealmService.add(wordModel)
+                savedMandatoryWords.append(word)
+                wordLengths[word.length - 4] += 1
+                wordLengths[0] += 1
+            }
         }
         print("wordLengths: \(wordLengths)")
         showMandatoryWords()
@@ -137,7 +149,6 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         getStartingPhrase()
         buttonsCreated = false
         buttonRadius = self.view.frame.width / 25
-        
     }
     var inputField: UITextField?
     var tableviewAdded = false
@@ -179,12 +190,12 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         inputField!.borderStyle = UITextField.BorderStyle.line
         inputField!.addTarget(self, action: #selector(inputFieldDidChange(_:)), for: .editingChanged)
         
-        // Set UITextField background colour
+        inputField!.text = GV.basicDataRecord.searchPhrase// Set UITextField background colour
         inputField!.backgroundColor = UIColor.white
         
         // Set UITextField text color
         inputField!.textColor = UIColor.black
-        inputField!.placeholder = "search..."
+//        inputField!.placeholder = "search..."
         self.view?.addSubview(inputField!)
     }
     
@@ -393,11 +404,9 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         }
     }
     
-    enum SearchType: Int {
-        case All = 0, No5, No6, No7, No8, No9, No10
-    }
-    
-    var searchType: SearchType = .All
+    var searchLength = 0
+    var showAll = true
+
     private func showMandatoryWords() {
         if inputField!.text!.length < 3 {
             return
@@ -405,32 +414,29 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         mandatoryWordsTable = [String]()
         var continueCycle = true
         let language = GV.actLanguage
-        var searchLength = 0
         var searchPhrase = ""
-        var inc = false
-        var lastCh = String(inputField!.text!.last!)
+        let lastCh = String(inputField!.text!.last!)
         if lastCh == "/" {
-            inc = true
-            lastCh = inputField!.text!.subString(at: inputField!.text!.length - 2, length: 1)
-        }
-        if lastCh.isMemberOf("5", "6", "7", "8", "9", "0") {
-            searchLength = Int(lastCh)!
-            searchLength = searchLength == 0 ? 10 : searchLength
-            searchPhrase = inputField!.text!.startingSubString(length: inputField!.text!.length - 1)
-//        }
-//        if inputField!.text!.startingSubString(length: 1).isNumeric() {
-//            searchLength = Int(inputField!.text!.startingSubString(length: 1))!
-//            if searchLength == 0 {
-//                searchLength = 10
-//            }
-//            if searchLength < 5 || searchLength > 10 {
-//                searchLength = 0
-//            }
-//            searchPhrase = inputField!.text!.subString(at: 1, length: inputField!.text!.length - 1)
-        } else {
             searchPhrase = inputField!.text!
+            let newPhrase = incrementString(string: searchPhrase)
+            if newPhrase == "яяя" {
+                continueCycle = false
+            } else {
+                inputField!.text = newPhrase
+                searchPhrase = newPhrase
+            }
         }
-
+        var newLength = 0
+        if lastCh.isMemberOf("5", "6", "7", "8", "9", "0") {
+            newLength = Int(lastCh)! == 0 ? 10 : Int(lastCh)!
+            inputField!.text!.removeLast()
+            searchLength = searchLength == newLength ? 0 : newLength
+        }
+        if lastCh.isMemberOf("[", "]") {
+            showAll = !showAll
+            inputField!.text!.removeLast()
+        }
+        searchPhrase = inputField!.text!
         
         repeat {
             if searchPhrase.length > 2 {
@@ -440,17 +446,18 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                     if word.length > 4 && word.length < 11 && (searchLength == 0 || word.length == searchLength) {
                         if !savedMandatoryWords.contains(word) {
                             mandatoryWordsTable.append(String(word))
+                        } else if showAll {
+                            mandatoryWordsTable.append("\(String(word))\(savePhrase)")
                         }
                     }
                 }
-                if mandatoryWordsTable.count > 0 {
-                    continueCycle = false
-                } else if inc {
+                if mandatoryWordsTable.count == 0 {
+                    searchPhrase = inputField!.text!
                     let newPhrase = incrementString(string: searchPhrase)
                     if newPhrase == "яяя" {
                         continueCycle = false
                     } else {
-                        inputField!.text = searchLength == 0 ? newPhrase : newPhrase + String(searchLength)
+                        inputField!.text = newPhrase
                         searchPhrase = newPhrase
                     }
                 } else {
@@ -460,6 +467,9 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                 continueCycle = false
             }
         } while continueCycle
+        try! realm.write() {
+            GV.basicDataRecord.searchPhrase = searchPhrase
+        }
         showMandatoryWordsView!.reloadData()
 
     }
