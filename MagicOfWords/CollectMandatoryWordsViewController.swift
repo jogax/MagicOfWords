@@ -24,7 +24,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var lengthOfScore = 5
     var lengthOfPlace = 5
     //    var lengthOfOnlineSince = 0
-    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
+    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 20 : 15)
     
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
         let word = mandatoryWordsTable[indexPath.row]
@@ -379,8 +379,8 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     private func showViewTable() {
         if !tableviewAdded {
             let origin = CGPoint(x: 0, y: 0)
-            let height = view.frame.height * 0.6
-            let width = view.frame.width * 0.7
+            let height = view.frame.height * (GV.onIpad ? 0.6 : 0.3)
+            let width = view.frame.width * (GV.onIpad ? 0.8 : 0.9)
             let size = CGSize(width: width, height: height)
             let center = CGPoint(x: 0.5 * view.frame.width, y: 0.35 * view.frame.height)
             showMandatoryWordsView!.frame=CGRect(origin: origin, size: size)
@@ -393,6 +393,11 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         }
     }
     
+    enum SearchType: Int {
+        case All = 0, No5, No6, No7, No8, No9, No10
+    }
+    
+    var searchType: SearchType = .All
     private func showMandatoryWords() {
         if inputField!.text!.length < 3 {
             return
