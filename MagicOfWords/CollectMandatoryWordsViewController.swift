@@ -506,21 +506,22 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         if wordList.last! == finished || wordList[wordList.count - 2] == finished {
             print("done")
         } else {
-            for word in wordList {
+            for word1 in wordList {
+                let word = word1.lowercased()
                 if word.length < 5 {
-                    print("word is too short: \(word)")
+//                    print("word is too short: \(word)")
                 } else if word.length > 10 {
-                    print("word is too long: \(word)")
-                } else if realmWordList.objects(WordListModel.self).filter("word = %@", language + word.lowercased()).count == 1 {
+//                    print("word is too long: \(word)")
+                } else if realmWordList.objects(WordListModel.self).filter("word = %@", language + word).count == 1 {
                     let wordModel = CommonString()
-                    wordModel.word = (language + word).lowercased()
+                    wordModel.word = language + word
                     if !savedMandatoryWords.contains(where: {$0 == word}) {
                         try! RealmService.write {
                             RealmService.add(wordModel)
                             savedMandatoryWords.append(word)
                         }
                     } else {
-                        print("word is in RealmCloud: \(word)")
+//                        print("word is in RealmCloud: \(word)")
                     }
                 } else {
                     print("word not exists: \(word)")
@@ -536,7 +537,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     private func getSavedMandatoryWords() {
         mandatoryItems = RealmService.objects(CommonString.self).filter("word BEGINSWITH %@", GV.actLanguage).sorted(byKeyPath: "word", ascending: true)
-        mandatorySubscription = mandatoryItems!.subscribe(named: "mandatoryQuery")
+        mandatorySubscription = mandatoryItems!.subscribe(named: "\(GV.actLanguage)mandatoryQuery")
         mandatorySubscriptionToken = mandatorySubscription!.observe(\.state) { [weak self]  state in
             switch state {
             case .creating:
@@ -551,14 +552,15 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                 for item in self!.mandatoryItems! {
                     let word = item.word.endingSubString(at:2)
                     if word.length > 4 {
-                        if word == "температура" {
+                        if word == "" {
                             try! RealmService.write {
                                 RealmService.delete(item)
                             }
                         } else {
-                            self!.savedMandatoryWords.append(item.word.endingSubString(at:2))
+                            self!.savedMandatoryWords.append(word)
                             self!.wordLengths[word.length - 4] += 1
                             self!.wordLengths[0] += 1
+                            print("\(word)")
                         }
                     }
                 }
