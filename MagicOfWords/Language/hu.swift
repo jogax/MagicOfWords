@@ -92,4 +92,5 @@ let huDictionary: [TextConstants: String] = [
     .tcShowWordlistHeader:  " A talált szavak listája (%)",
     .tcSearchingWord:       " Kereső szó: %",
     .tcCollectMandatory:    "Kötelező szavak keresése",
+    .tcCreateMandatory:     "Kötelező szavak generálása",
 ]

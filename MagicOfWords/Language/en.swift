@@ -92,4 +92,5 @@ let enDictionary: [TextConstants: String] = [
     .tcShowWordlistHeader:  " List of found words (%)",
     .tcSearchingWord:       " Searching word: %",
     .tcCollectMandatory:    "Search mandatory words",
+    .tcCreateMandatory:     "Create mandatory words",
 ]

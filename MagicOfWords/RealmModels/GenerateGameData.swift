@@ -226,7 +226,7 @@
 ////        repeat {
 ////            let tileLength = lengths[random.getRandomInt(0, max: lengths.count - 1)]
 ////            var tileType = MyShapes.NotUsed
-////            var letters = [String]()
+//            var letters = [String]()
 ////            switch tileLength {
 ////            case 1: tileType = typesWithLen1[0]
 ////            letters += getLetters(from: &oneLetterPieces, archiv: &oneLetterPiecesArchiv)

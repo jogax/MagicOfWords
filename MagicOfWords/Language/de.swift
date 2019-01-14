@@ -92,6 +92,7 @@ let deDictionary: [TextConstants: String] = [
     .tcShowWordlistHeader:  " Liste der gefundenen Wörter (%)",
     .tcSearchingWord:       " Suchwort: %",
     .tcCollectMandatory:    "Pflichtwörter suchen",
+    .tcCreateMandatory:     "Pflichtwörter erstellen",
 ]
 
 

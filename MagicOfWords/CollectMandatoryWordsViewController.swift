@@ -517,6 +517,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                     wordModel.word = language + word
                     if !savedMandatoryWords.contains(where: {$0 == word}) {
                         try! RealmService.write {
+                            print("new word founded: \(word)")
                             RealmService.add(wordModel)
                             savedMandatoryWords.append(word)
                         }
@@ -524,7 +525,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //                        print("word is in RealmCloud: \(word)")
                     }
                 } else {
-                    print("word not exists: \(word)")
+//                    print("word not exists: \(word)")
                 }
             }
         }

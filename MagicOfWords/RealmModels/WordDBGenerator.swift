@@ -59,12 +59,12 @@ class WordDBGenerator {
             print("Start")
             generateWordList(language: "de")
             print("DE ready")
-            generateWordList(language: "en")
-            print("EN ready")
-            generateWordList(language: "hu")
-            print("HU ready")
-            generateWordList(language: "ru")
-            print("RU ready")
+//            generateWordList(language: "en")
+//            print("EN ready")
+//            generateWordList(language: "hu")
+//            print("HU ready")
+//            generateWordList(language: "ru")
+//            print("RU ready")
         }
     }
 
@@ -84,12 +84,16 @@ class WordDBGenerator {
         } catch let error as NSError {
             print("Failed reading from URL: \(String(describing: wordFileURL)), Error: " + error.localizedDescription)
         }
+        let deWordsToDelete = realm.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
+        try! realm.write() {
+            realm.delete(deWordsToDelete)
+        }
         let wordList = wordsFile.components(separatedBy: .newlines)
         for word in wordList {
-            let charset = CharacterSet(charactersIn: "-!") // words with "-", "!" are not computed
-            if word.rangeOfCharacter(from: charset) == nil {
+            let charset = CharacterSet(charactersIn: "-! /.èêûé") // words with "-", "!" are not computed
+            if word.rangeOfCharacter(from: charset) == nil || word.length > 20 || word.length < 2 {
                 if notDELanguage || word.firstChar().uppercased() == word.firstChar() {
-                    generateLetterFrequency(language: language, word: word.lowercased())
+//                    generateLetterFrequency(language: language, word: word.lowercased())
                     let wordModel = WordListModel()
                     wordModel.word = (language + word).lowercased()
                     if realm.objects(WordListModel.self).filter("word = %d", wordModel.word).count == 0 {
@@ -98,9 +102,11 @@ class WordDBGenerator {
                         }
                     }
                 }
+            } else {
+                print("\(word)")
             }
         }
-        saveLetterFrequency(language: language)
+//        saveLetterFrequency(language: language)
         
     }
     
