@@ -31,6 +31,7 @@
 		20439FEF20BC40DB00D44286 /* Versions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20439FEE20BC40DB00D44286 /* Versions.txt */; };
 		20469BD021A43F4E00743EB1 /* sortdown.png in Resources */ = {isa = PBXBuildFile; fileRef = 20469BCE21A43F4E00743EB1 /* sortdown.png */; };
 		20469BD121A43F4E00743EB1 /* sortup.png in Resources */ = {isa = PBXBuildFile; fileRef = 20469BCF21A43F4E00743EB1 /* sortup.png */; };
+		2047EAC121EE286C00ECE383 /* Mandatory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2047EAC021EE286C00ECE383 /* Mandatory.swift */; };
 		2048259921E8CC59000933B3 /* deWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2048259821E8CC59000933B3 /* deWords.txt */; };
 		20491F4921CFC88B0060C675 /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20491F4821CFC88B0060C675 /* CommonString.swift */; };
 		20491F4B21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20491F4A21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift */; };
@@ -68,8 +69,6 @@
 		20552DCA211F1EFA00C54538 /* whiteSprite0000.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBA211F1EFA00C54538 /* whiteSprite0000.png */; };
 		20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBB211F1EFA00C54538 /* whiteSprite0111.png */; };
 		20552DCC211F1EFA00C54538 /* whiteSprite0100.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBC211F1EFA00C54538 /* whiteSprite0100.png */; };
-		2055A0BE21ECC3FB00967079 /* enMandatory1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2055A0BD21ECC3FB00967079 /* enMandatory1.txt */; };
-		2055A0C021ECD19600967079 /* huOutput.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2055A0BF21ECD19600967079 /* huOutput.txt */; };
 		2055B489211C74A9000FD7A9 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */; };
 		205627ED214AA716006B9357 /* BestScoreSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205627EC214AA716006B9357 /* BestScoreSync.swift */; };
 		205627EF214AA9E9006B9357 /* PlayerActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205627EE214AA9E9006B9357 /* PlayerActivity.swift */; };
@@ -77,7 +76,6 @@
 		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		2057BA2C202A0006000DF337 /* ChoosePackageScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */; };
 		205850F42170D2C900D89B9A /* RealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205850F32170D2C900D89B9A /* RealmManager.swift */; };
-		205BF79821E4D3A6006633C6 /* huMandatory1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205BF79721E4D3A6006633C6 /* huMandatory1.txt */; };
 		205BF79A21E4D952006633C6 /* huMandatory.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205BF79921E4D952006633C6 /* huMandatory.txt */; };
 		205CF7EB2129A21000C1B89D /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EA2129A21000C1B89D /* finger.png */; };
 		205CF7ED2129BC9300C1B89D /* back.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EC2129BC9300C1B89D /* back.png */; };
@@ -87,10 +85,8 @@
 		205E8E2820948E2E00314646 /* button.png in Resources */ = {isa = PBXBuildFile; fileRef = 205E8E2720948E2D00314646 /* button.png */; };
 		2060036E20347FF400023E10 /* WTGameboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036D20347FF400023E10 /* WTGameboardItem.swift */; };
 		2060037020348A8800023E10 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036F20348A8800023E10 /* Grid.swift */; };
-		2064CF4F21E68D1A006D280B /* deMandatory1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2064CF4E21E68D1A006D280B /* deMandatory1.txt */; };
 		2065252620FD212C00F0BC46 /* WTGameWordList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2065252520FD212C00F0BC46 /* WTGameWordList.swift */; };
 		206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206664A720A45A3000C6C5E4 /* RoundDataModel.swift */; };
-		206F12F721E793620097C298 /* deMandatory2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 206F12F621E793620097C298 /* deMandatory2.txt */; };
 		208144202167B65500496AFC /* BestScoreForGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081441F2167B65500496AFC /* BestScoreForGame.swift */; };
 		208173E12103577900960800 /* balloon.png in Resources */ = {isa = PBXBuildFile; fileRef = 208173E02103577800960800 /* balloon.png */; };
 		20819320202B472900406D9A /* GameDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081931F202B472900406D9A /* GameDataModel.swift */; };
@@ -158,6 +154,7 @@
 		20439FEE20BC40DB00D44286 /* Versions.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Versions.txt; sourceTree = "<group>"; };
 		20469BCE21A43F4E00743EB1 /* sortdown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sortdown.png; sourceTree = "<group>"; };
 		20469BCF21A43F4E00743EB1 /* sortup.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sortup.png; sourceTree = "<group>"; };
+		2047EAC021EE286C00ECE383 /* Mandatory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mandatory.swift; sourceTree = "<group>"; };
 		2048259821E8CC59000933B3 /* deWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deWords.txt; sourceTree = "<group>"; };
 		20491F4821CFC88B0060C675 /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
 		20491F4A21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectMandatoryWordsViewController.swift; sourceTree = "<group>"; };
@@ -195,8 +192,6 @@
 		20552DBA211F1EFA00C54538 /* whiteSprite0000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0000.png; sourceTree = "<group>"; };
 		20552DBB211F1EFA00C54538 /* whiteSprite0111.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0111.png; sourceTree = "<group>"; };
 		20552DBC211F1EFA00C54538 /* whiteSprite0100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0100.png; sourceTree = "<group>"; };
-		2055A0BD21ECC3FB00967079 /* enMandatory1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enMandatory1.txt; sourceTree = "<group>"; };
-		2055A0BF21ECD19600967079 /* huOutput.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huOutput.txt; sourceTree = "<group>"; };
 		2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		205627EC214AA716006B9357 /* BestScoreSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestScoreSync.swift; sourceTree = "<group>"; };
 		205627EE214AA9E9006B9357 /* PlayerActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerActivity.swift; sourceTree = "<group>"; };
@@ -204,7 +199,6 @@
 		2057BA292029F591000DF337 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2057BA2B202A0006000DF337 /* ChoosePackageScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePackageScene.swift; sourceTree = "<group>"; };
 		205850F32170D2C900D89B9A /* RealmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmManager.swift; sourceTree = "<group>"; };
-		205BF79721E4D3A6006633C6 /* huMandatory1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huMandatory1.txt; sourceTree = "<group>"; };
 		205BF79921E4D952006633C6 /* huMandatory.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huMandatory.txt; sourceTree = "<group>"; };
 		205CF7EA2129A21000C1B89D /* finger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = finger.png; path = MagicOfWords/Pictures/finger.png; sourceTree = SOURCE_ROOT; };
 		205CF7EC2129BC9300C1B89D /* back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = back.png; path = MagicOfWords/Pictures/back.png; sourceTree = SOURCE_ROOT; };
@@ -214,10 +208,8 @@
 		205E8E2720948E2D00314646 /* button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = button.png; sourceTree = "<group>"; };
 		2060036D20347FF400023E10 /* WTGameboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameboardItem.swift; sourceTree = "<group>"; };
 		2060036F20348A8800023E10 /* Grid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
-		2064CF4E21E68D1A006D280B /* deMandatory1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deMandatory1.txt; sourceTree = "<group>"; };
 		2065252520FD212C00F0BC46 /* WTGameWordList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameWordList.swift; sourceTree = "<group>"; };
 		206664A720A45A3000C6C5E4 /* RoundDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundDataModel.swift; sourceTree = "<group>"; };
-		206F12F621E793620097C298 /* deMandatory2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deMandatory2.txt; sourceTree = "<group>"; };
 		2081441F2167B65500496AFC /* BestScoreForGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestScoreForGame.swift; sourceTree = "<group>"; };
 		208173E02103577800960800 /* balloon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = balloon.png; sourceTree = "<group>"; };
 		2081931F202B472900406D9A /* GameDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDataModel.swift; sourceTree = "<group>"; };
@@ -357,14 +349,9 @@
 				20F17608216269DB00AF37D7 /* StateOfWordChanging.txt */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
 				20491F4C21CFCEB20060C675 /* ruMandatory.txt */,
-				205BF79721E4D3A6006633C6 /* huMandatory1.txt */,
 				205BF79921E4D952006633C6 /* huMandatory.txt */,
-				2055A0BF21ECD19600967079 /* huOutput.txt */,
 				2049314921E6494D00BE66EA /* deMandatory.txt */,
-				2064CF4E21E68D1A006D280B /* deMandatory1.txt */,
-				206F12F621E793620097C298 /* deMandatory2.txt */,
 				2049314B21E6496100BE66EA /* enMandatory.txt */,
-				2055A0BD21ECC3FB00967079 /* enMandatory1.txt */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -428,6 +415,7 @@
 				2081441F2167B65500496AFC /* BestScoreForGame.swift */,
 				205627EE214AA9E9006B9357 /* PlayerActivity.swift */,
 				20491F4821CFC88B0060C675 /* CommonString.swift */,
+				2047EAC021EE286C00ECE383 /* Mandatory.swift */,
 			);
 			path = RealmCloudModels;
 			sourceTree = "<group>";
@@ -532,7 +520,6 @@
 				208D085620C42F4000954E63 /* Mandatory.realm in Resources */,
 				202EF6C621CA9DAD000E4DA4 /* online.png in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
-				2055A0BE21ECC3FB00967079 /* enMandatory1.txt in Resources */,
 				20552DBF211F1EFA00C54538 /* whiteSprite1010.png in Resources */,
 				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
@@ -548,18 +535,15 @@
 				20552DC4211F1EFA00C54538 /* whiteSprite1011.png in Resources */,
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
 				205184F72061525C00E7FAF4 /* huGameData.txt in Resources */,
-				2055A0C021ECD19600967079 /* huOutput.txt in Resources */,
 				20552DC8211F1EFA00C54538 /* whiteSprite1100.png in Resources */,
 				205CF7F12129BF4B00C1B89D /* nextGame.png in Resources */,
 				208173E12103577900960800 /* balloon.png in Resources */,
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
-				2064CF4F21E68D1A006D280B /* deMandatory1.txt in Resources */,
 				20552DC7211F1EFA00C54538 /* whiteSprite1110.png in Resources */,
 				20552DCA211F1EFA00C54538 /* whiteSprite0000.png in Resources */,
 				205234E32187902900B9935F /* deWordsOld1.txt in Resources */,
 				205BF79A21E4D952006633C6 /* huMandatory.txt in Resources */,
 				20552DC5211F1EFA00C54538 /* whiteSprite0010.png in Resources */,
-				206F12F721E793620097C298 /* deMandatory2.txt in Resources */,
 				204B6FD321CD418D00893D58 /* firstplaces.png in Resources */,
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
 				205CF7F02129BF4B00C1B89D /* previousGame.png in Resources */,
@@ -570,7 +554,6 @@
 				20552DBE211F1EFA00C54538 /* whiteSprite0110.png in Resources */,
 				205E8E2820948E2E00314646 /* button.png in Resources */,
 				205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */,
-				205BF79821E4D3A6006633C6 /* huMandatory1.txt in Resources */,
 				20552DC9211F1EFA00C54538 /* whiteSprite0001.png in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
 				205CF7ED2129BC9300C1B89D /* back.png in Resources */,
@@ -658,6 +641,7 @@
 				2060037020348A8800023E10 /* Grid.swift in Sources */,
 				20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */,
 				205E601A20C02BB800A5AB39 /* WordDBGenerator.swift in Sources */,
+				2047EAC121EE286C00ECE383 /* Mandatory.swift in Sources */,
 				201FB1D620288CEA00EC9F36 /* MainViewController.swift in Sources */,
 				201FB1DD20288CEA00EC9F36 /* MenuScene.swift in Sources */,
 				201FB1D820288CEA00EC9F36 /* MyFunctions.swift in Sources */,
