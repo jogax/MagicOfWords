@@ -83,20 +83,57 @@ class CreateMandatoryWordsViewController: UIViewController {
         }
     }
     
-    var wordLengthsProGame: [WordLengthsProGame] =
-        [WordLengthsProGame(first: 0, counts: [3, 3, 0, 0, 0, 0]),
-         WordLengthsProGame(first: 15, counts: [3, 2, 1, 0, 0, 0]),
-        WordLengthsProGame(first: 30, counts: [2, 2, 1, 1, 0, 0]),
-        WordLengthsProGame(first: 60, counts: [2, 1, 1, 1, 1, 0]),
-        WordLengthsProGame(first: 100, counts: [1, 1, 1, 1, 1, 1]),
-        WordLengthsProGame(first: 500, counts: [0, 2, 1, 1, 1, 1]),
-        WordLengthsProGame(first: 750, counts: [0, 0, 2, 2, 1, 1]),
-        WordLengthsProGame(first: 1000, counts: [1, 1, 1, 1, 1, 1])]
+    var wordLengthsProGame: [WordLengthsProGame]?
 
+    var mandatoryWordsTable = [String]()
     private func generateMandatoryWords() {
+        switch GV.actLanguage {
+            case "en": // OK
+                wordLengthsProGame =
+                [WordLengthsProGame(first: 0, counts: [2, 2, 1, 1, 0, 0]),
+                WordLengthsProGame(first: 400, counts: [1, 1, 2, 1, 1, 0]),
+                WordLengthsProGame(first: 600, counts: [0, 1, 1, 2, 1, 1]),
+                WordLengthsProGame(first: 700, counts: [0, 0, 2, 2, 1, 1]),
+                WordLengthsProGame(first: 800, counts: [0, 1, 1, 0, 2, 2]),
+                WordLengthsProGame(first: 850, counts: [0, 0, 1, 0, 3, 2]),
+                WordLengthsProGame(first: 880, counts: [0, 0, 0, 0, 3, 3]),
+                WordLengthsProGame(first: 1000, counts: [1, 1, 1, 1, 1, 1])]
+        case "de":  // OK
+            wordLengthsProGame =
+                [WordLengthsProGame(first: 0, counts: [1, 2, 1, 1, 1, 0]),
+                 WordLengthsProGame(first: 100, counts: [1, 1, 1, 1, 1, 1]),
+                 WordLengthsProGame(first: 920, counts: [0, 0, 1, 2, 2, 1]),
+                 WordLengthsProGame(first: 970, counts: [1, 1, 1, 0, 1, 2]),
+                 WordLengthsProGame(first: 990, counts: [0, 0, 0, 1, 2, 3]),
+                 WordLengthsProGame(first: 1000, counts: [1, 1, 1, 1, 1, 1])]
+        case "hu": // OK
+            wordLengthsProGame =
+                [WordLengthsProGame(first: 0, counts: [3, 3, 0, 0, 0, 0]),
+                 WordLengthsProGame(first: 25, counts: [3, 2, 1, 0, 0, 0]),
+                 WordLengthsProGame(first: 50, counts: [2, 2, 1, 1, 0, 0]),
+                 WordLengthsProGame(first: 150, counts: [2, 1, 1, 1, 1, 0]),
+                 WordLengthsProGame(first: 300, counts: [1, 1, 1, 1, 1, 1]),
+                 WordLengthsProGame(first: 700, counts: [0, 2, 1, 1, 1, 1]),
+                 WordLengthsProGame(first: 900, counts: [0, 0, 2, 2, 1, 1]),
+                 WordLengthsProGame(first: 1000, counts: [1, 1, 1, 1, 1, 1])]
+        case "ru": // OK
+            wordLengthsProGame =
+                [WordLengthsProGame(first: 0, counts: [3, 3, 0, 0, 0, 0]),
+                 WordLengthsProGame(first: 25, counts: [3, 2, 1, 0, 0, 0]),
+                 WordLengthsProGame(first: 50, counts: [2, 2, 1, 1, 0, 0]),
+                 WordLengthsProGame(first: 150, counts: [2, 1, 1, 1, 1, 0]),
+                 WordLengthsProGame(first: 450, counts: [1, 1, 1, 1, 1, 1]),
+                 WordLengthsProGame(first: 700, counts: [0, 2, 1, 1, 1, 1]),
+                 WordLengthsProGame(first: 900, counts: [0, 0, 2, 2, 1, 1]),
+                 WordLengthsProGame(first: 1000, counts: [1, 1, 1, 1, 1, 1])]
+        default:
+            break
+        }
         savedMandatoryWordsArchiv = savedMandatoryWords
-        generatedItems = RealmService.objects(Mandatory.self).filter("combinedKey BEGINSWITH %@", GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: true)
-        generatedSubscription = generatedItems!.subscribe(named: "\(GV.actLanguage)generatedQuery")
+        generatedItems = RealmService.objects(Mandatory.self).filter("combinedKey BEGINSWITH %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+        generatedSubscription = generatedItems!.subscribe(named: "\(GV.actLanguage)generatedQuery1")
+//        generatedSubscription!.unsubscribe()
+//        generatedItems = RealmService.objects(Mandatory.self).filter("combinedKey BEGINSWITH %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
         generatedSubscriptionToken = generatedSubscription!.observe(\.state) { [weak self]  state in
             switch state {
             case .creating:
@@ -108,6 +145,9 @@ class CreateMandatoryWordsViewController: UIViewController {
             // to be processed by the server
             case .complete:
                 if self!.generatedItems!.count == 1000 {
+                    for item in self!.generatedItems! {
+                        self!.mandatoryWordsTable.append(item.mandatoryWords)
+                    }
                     return
                 }
                 try! RealmService.write() {
@@ -127,8 +167,8 @@ class CreateMandatoryWordsViewController: UIViewController {
         print("wordLengths: \(wordLengths)")
         
         for gameNumber in 0..<1000 {
-            if wordLengthsProGame[index].first == gameNumber {
-                actWordLength = wordLengthsProGame[index]
+            if wordLengthsProGame![index].first == gameNumber {
+                actWordLength = wordLengthsProGame![index]
                 index += 1
             }
             var words = ""
