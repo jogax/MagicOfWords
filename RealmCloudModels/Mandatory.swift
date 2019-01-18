@@ -17,6 +17,7 @@ class Mandatory: Object {
     @objc dynamic var gameNumber = 0
     @objc dynamic var language = ""
     @objc dynamic var mandatoryWords = ""
+    @objc dynamic var change = false
     override  class func primaryKey() -> String {
         return "combinedKey"
     }

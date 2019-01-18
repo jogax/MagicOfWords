@@ -12,7 +12,9 @@ import GameplayKit
 
 #if DEBUG
 
-class CreateMandatoryWordsViewController: UIViewController {
+class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate {
+    var showMandatoryWordsView: WTTableView? = WTTableView()
+    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 15)
 
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nil, bundle: nil)
@@ -59,6 +61,12 @@ class CreateMandatoryWordsViewController: UIViewController {
                             self!.wordLengths[self!.wordLengths.count - 1] += 1
                         }
                     } else {
+//                        try! RealmService.write() {
+//                            let recordToDelete = RealmService.objects(CommonString.self).filter("word BEGINSWITH %@", GV.actLanguage + word)
+//                            if recordToDelete.count > 0 {
+//                                RealmService.delete(recordToDelete)
+//                            }
+//                        }
                         print("word not in wordList: \(word)")
                     }
                 }
@@ -103,8 +111,8 @@ class CreateMandatoryWordsViewController: UIViewController {
                 [WordLengthsProGame(first: 0, counts: [1, 2, 1, 1, 1, 0]),
                  WordLengthsProGame(first: 100, counts: [1, 1, 1, 1, 1, 1]),
                  WordLengthsProGame(first: 920, counts: [0, 0, 1, 2, 2, 1]),
-                 WordLengthsProGame(first: 970, counts: [1, 1, 1, 0, 1, 2]),
-                 WordLengthsProGame(first: 990, counts: [0, 0, 0, 1, 2, 3]),
+                 WordLengthsProGame(first: 980, counts: [2, 0, 1, 0, 1, 2]),
+                 WordLengthsProGame(first: 990, counts: [2, 1, 1, 0, 0, 2]),
                  WordLengthsProGame(first: 1000, counts: [1, 1, 1, 1, 1, 1])]
         case "hu": // OK
             wordLengthsProGame =
@@ -148,11 +156,12 @@ class CreateMandatoryWordsViewController: UIViewController {
                     for item in self!.generatedItems! {
                         self!.mandatoryWordsTable.append(item.mandatoryWords)
                     }
+                    self!.showMandatoryTable()
                     return
                 }
-                try! RealmService.write() {
-                    RealmService.delete(self!.generatedItems!)
-                }
+//                try! RealmService.write() {
+//                    RealmService.delete(self!.generatedItems!)
+//                }
                 self!.generateNewItems()
             default:
                 print("state: \(state)")
@@ -160,15 +169,68 @@ class CreateMandatoryWordsViewController: UIViewController {
         }
     }
     
+    var tableviewAdded = false
+    var timer: Timer?
+    
+    private func showMandatoryTable() {
+        if !tableviewAdded {
+            let origin = CGPoint(x: 0, y: 0)
+            let height = view.frame.height * (GV.onIpad ? 0.6 : 0.3)
+            let width = view.frame.width * (GV.onIpad ? 0.99 : 0.9)
+            let size = CGSize(width: width, height: height)
+            let center = CGPoint(x: 0.5 * view.frame.width, y: 0.35 * view.frame.height)
+            showMandatoryWordsView!.frame=CGRect(origin: origin, size: size)
+            showMandatoryWordsView!.center=center
+            showMandatoryWordsView!.setDelegate(delegate: self)
+            //            createButtons()
+            //            modifyButtonsPosition()
+            showMandatoryWordsView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
+            view.addSubview(showMandatoryWordsView!)
+            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(checkTable(timerX: )), userInfo: nil, repeats: true)
+            let indexPath = IndexPath(row: GV.basicDataRecord.showingRow, section: 0)
+            showMandatoryWordsView!.scrollToRow(at: indexPath, at: .top, animated: true)
+            tableviewAdded = true
+        }
+    }
+    
+    var lastHighestRow = 0
+    
+    @objc private func checkTable(timerX: Timer) {
+        let indexPaths = showMandatoryWordsView!.indexPathsForVisibleRows
+        let actHighestRow = indexPaths![0].row + 2
+        if lastHighestRow != actHighestRow {
+            lastHighestRow = actHighestRow
+            try! realm.write() {
+                GV.basicDataRecord.showingRow = actHighestRow
+            }
+        }
+    }
+
+    
     private func generateNewItems() {
         var actWordLength: WordLengthsProGame = WordLengthsProGame()
         var index = 0
         var random: MyRandom?
+//        var cs: [Int] = [1, 1, 1, 1, 1, 0]
+        var actWordLengths = wordLengths
+//        var actWordLengthsArchiv = [Int]()
+//        var first = 0
         print("wordLengths: \(wordLengths)")
         
         for gameNumber in 0..<1000 {
             if wordLengthsProGame![index].first == gameNumber {
                 actWordLength = wordLengthsProGame![index]
+                if gameNumber > 0 {
+                    let substracter = wordLengthsProGame![index].first - wordLengthsProGame![index - 1].first
+                    actWordLengths[6] = 0
+                    for ind in 0..<actWordLengths.count - 1 {
+                        let multiplier = wordLengthsProGame![index - 1].counts[ind]
+                        actWordLengths[ind] -= substracter * multiplier
+                        actWordLengths[6] += actWordLengths[ind]
+                    }
+                    
+                    print("actWordLengths: \(actWordLengths)")
+                }
                 index += 1
             }
             var words = ""
@@ -197,9 +259,30 @@ class CreateMandatoryWordsViewController: UIViewController {
                     RealmService.add(wordsInCloud)
                 }
             }
-            print("generating: \(actWordLength), gameNumber: \(gameNumber), words: \(words)")
+//            print("generating: \(actWordLength), gameNumber: \(gameNumber), words: \(words)")
             
         }
+        
+        var printString = ""
+        var allCounts = 0
+        for index in 0..<savedMandatoryWords.count {
+            printString += "\(index + 5): \(savedMandatoryWords[index].count), "
+            allCounts += savedMandatoryWords[index].count
+        }
+        printString += " AllCounts: \(allCounts)"
+        print("actWordLengths: \(actWordLengths)")
+        print(printString)
+        
+        
+//        let substracter = wordLengthsProGame![index].first - wordLengthsProGame![index - 1].first
+//        actWordLengths[6] = 0
+//        for ind in 0..<actWordLengths.count - 1 {
+//            let multiplier = wordLengthsProGame![index - 1].counts[ind]
+//            actWordLengths[ind] -= substracter * multiplier
+//            actWordLengths[6] += actWordLengths[ind]
+//        }
+        
+
 
     }
     
@@ -211,6 +294,75 @@ class CreateMandatoryWordsViewController: UIViewController {
         }
         return stringArray
     }
+    
+    func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
+//        let mandatoryRecord = generatedItems![indexPath.row]
+        try! RealmService.write() {
+            generatedItems![indexPath.row].change = !generatedItems![indexPath.row].change
+        }
+        showMandatoryWordsView!.reloadData()
+    }
+    
+    func getNumberOfSections() -> Int {
+        return 1
+    }
+    
+    func getNumberOfRowsInSections(section: Int) -> Int {
+        return mandatoryWordsTable.count
+    }
+    
+    func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
+        let actColor = UIColor.white
+        let width = tableView.frame.width
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
+        cell.setFont(font: myFont!)
+        cell.setCellSize(size: CGSize(width: width, height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.010)))
+        cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
+        //        switch indexPath.row {
+        //        case 0:
+        //            cell.addColumn(text: " " + (String(wordLengths[indexPath.row]).fixLength(length: 100, leadingBlanks: false)), color: actColor)
+        //        default:
+        cell.addColumn(text: " " + String(indexPath.row) + ":" )
+        var text = " " + (mandatoryWordsTable[indexPath.row].fixLength(length: 40, leadingBlanks: false))
+        if generatedItems![indexPath.row].change {
+            text += GV.language.getText(.tcChangeWord)
+        }
+        cell.addColumn(text: text, color: actColor)
+        //        }
+        return cell
+    }
+    
+    func getHeightForRow(tableView: UITableView, indexPath: IndexPath) -> CGFloat {
+        return "A".height(font: myFont!) * 2
+    }
+    
+    func setHeaderView(tableView: UITableView, headerView: UIView, section: Int) {
+    }
+    
+    func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
+        let lineHeight = "A".height(font: myFont!)
+        let title = "   Mandatorywords"
+//        if wordLengths.count > 0 {
+//            title = " all: \(wordLengths[0]), 5: \(wordLengths[1]), 6: \(wordLengths[2]), 7: \(wordLengths[3]), 8: \(wordLengths[4]), 9: \(wordLengths[5]), 10: \(wordLengths[6])"
+//        }
+        let width = title.width(withConstrainedHeight: 0, font: myFont!)
+        let view = UIView()
+        //        let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
+        //        label1.font = myFont!
+        //        label1.text = headerLine
+        //        view.addSubview(label1)
+        let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight * 0.5, width: width, height: lineHeight))
+        label2.font = myFont!
+        label2.text = title
+        view.addSubview(label2)
+        view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
+        return view
+    }
+    
+    func getHeightForHeaderInSection(tableView: UITableView, section: Int) -> CGFloat {
+        return "A".height(font: myFont!) * 2
+    }
+
     var mandatoryItems: Results<CommonString>?
     var mandatorySubscription: SyncSubscription<CommonString>?
     var mandatorySubscriptionToken: NotificationToken?

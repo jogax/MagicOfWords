@@ -93,6 +93,7 @@ let deDictionary: [TextConstants: String] = [
     .tcSearchingWord:       " Suchwort: %",
     .tcCollectMandatory:    "Pflichtwörter suchen",
     .tcCreateMandatory:     "Pflichtwörter erstellen",
+    .tcChangeWord:          " ändern"
 ]
 
 

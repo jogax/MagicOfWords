@@ -91,7 +91,8 @@ enum TextConstants: Int {
     tcShowWordlistHeader,
     tcSearchingWord,
     tcCollectMandatory,
-    tcCreateMandatory
+    tcCreateMandatory,
+    tcChangeWord
 }
 
     let LanguageEN = "en" // index 0
