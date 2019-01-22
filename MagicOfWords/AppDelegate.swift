@@ -76,7 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 12,
+            schemaVersion: 13,
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
@@ -95,7 +95,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                 }
         },
-            objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self]
+            objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self, WordListTemp.self]
 //            objectTypes: [WordListModel.self]
         )
         

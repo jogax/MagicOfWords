@@ -11,8 +11,73 @@ import RealmSwift
 
 #if GENERATEWORDLIST
 // for Generating WordList DB
-    let defaultConfig = Realm.Configuration(
-        objectTypes: [WordListModel.self])
+//        Compressing Realm DB if neaded
+//        let config1 = Realm.Configuration(shouldCompactOnLaunch: { totalBytes, usedBytes in
+//            // totalBytes refers to the size of the file on disk in bytes (data + free space)
+//            // usedBytes refers to the number of bytes used by data in the file
+//
+//            // Compact if the file is over 100MB in size and less than 50% 'used'
+//            let tenMB = 10 * 1024 * 1024
+//            return (totalBytes > tenMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+//        })
+//        do {
+//            // Realm is compacted on the first open if the configuration block conditions were met.
+//            _ = try Realm(configuration: config1)
+//        } catch {
+//            print("error")
+//            // handle error compacting or opening Realm
+//        }
+
+let wordListConf = Realm.Configuration(
+    fileURL: URL(string: Bundle.main.path(forResource: "WordListTemp", ofType: "realm")!),
+    readOnly: true,
+    schemaVersion: 13,
+    // Set the block which will be called automatically when opening a Realm with
+    // a schema version lower than the one set above
+    migrationBlock: { migration, oldSchemaVersion in
+        switch oldSchemaVersion {
+//        case 0...3:
+//            migration.deleteData(forType: GameDataModel.className())
+//            migration.deleteData(forType: RoundDataModel.className())
+//            migration.deleteData(forType: BasicDataModel.className())
+        default: migration.enumerateObjects(ofType: GameDataModel.className())
+        { oldObject, newObject in
+//            if oldObject!["combinedKey"] == nil {
+//                newObject!["combinedKey"] = oldObject!["language"] as! String + String((oldObject!["gameNumber"] as! Int) % 1000)
+//                newObject!["gameNumber"] = Int(oldObject!["gameNumber"] as! Int % 1000)
+//            }
+            }
+            
+        }
+},
+    objectTypes: [WordListTemp.self])
+
+let defaultConfig = Realm.Configuration(
+schemaVersion: 13,
+// Set the block which will be called automatically when opening a Realm with
+// a schema version lower than the one set above
+migrationBlock: { migration, oldSchemaVersion in
+    switch oldSchemaVersion {
+    case 0...3:
+        migration.deleteData(forType: GameDataModel.className())
+        migration.deleteData(forType: RoundDataModel.className())
+        migration.deleteData(forType: BasicDataModel.className())
+    default: migration.enumerateObjects(ofType: GameDataModel.className())
+    { oldObject, newObject in
+        if oldObject!["combinedKey"] == nil {
+            newObject!["combinedKey"] = oldObject!["language"] as! String + String((oldObject!["gameNumber"] as! Int) % 1000)
+            newObject!["gameNumber"] = Int(oldObject!["gameNumber"] as! Int % 1000)
+        }
+        }
+        
+    }
+},
+objectTypes: [WordListModel.self]
+//            objectTypes: [WordListModel.self]
+)
+
+//    let defaultConfig = Realm.Configuration(
+//        objectTypes: [WordListModel.self, WordListTemp.self])
 #endif
 #if GENERATEMANDATORY
 // for generating Mandatory Words
@@ -29,7 +94,7 @@ let defaultConfig = Realm.Configuration(
 #if CREATEWORDLIST
 // for generating Mandatory Words
 let defaultConfig = Realm.Configuration(
-    objectTypes: [WordListModel.self])
+    objectTypes: [WordListModel.self, WordListTemp.self])
 #endif
 
 
@@ -57,10 +122,12 @@ class WordDBGenerator {
             generateMandatoryWords(language: "ru")
         } else {
             print("Start")
-            generateWordList(language: "de")
-            print("DE ready")
-//            generateWordList(language: "en")
-//            print("EN ready")
+//            generateWordList(language: "de")
+//            print("DE ready")
+//            _ = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(getSavedMandatoryWords), userInfo: nil, repeats: true)
+//            getSavedMandatoryWords()
+            generateWordList(language: "en")
+            print("EN ready")
 //            generateWordList(language: "hu")
 //            print("HU ready")
 //            generateWordList(language: "ru")
@@ -71,41 +138,111 @@ class WordDBGenerator {
     var letters = [String: Int]()
     var countLetters = 0
     var primaryKey = -1
+    var wordList = [String]()
+    
+//    var mandatoryItems: Results<CommonString>?
+//    var mandatorySubscription: SyncSubscription<CommonString>?
+//    var mandatorySubscriptionToken: NotificationToken?
+//
+//    private func getSavedMandatoryWords() {
+//        mandatoryItems = RealmService.objects(CommonString.self).filter("word BEGINSWITH %@", "myWordListen").sorted(byKeyPath: "word", ascending: true)
+//        mandatorySubscription = mandatoryItems!.subscribe(named: "myWordListen")
+//        mandatorySubscriptionToken = mandatorySubscription!.observe(\.state) { [weak self]  state in
+//            switch state {
+//            case .creating:
+//                print("creating")
+//            // The subscription has not yet been written to the Realm
+//            case .pending:
+//                print("pending")
+//                // The subscription has been written to the Realm and is waiting
+//            // to be processed by the server
+//            case .complete:
+//                for item in self!.mandatoryItems! {
+//                    self!.wordList.append(item.word.endingSubString(at:9))
+//                }
+//                self!.generateWordList(language: "en")
+//            default:
+//                print("state: \(state)")
+//            }
+//        }
+//    }
+//
 
     private func generateWordList(language: String) {
-        let notDELanguage = language != GV.language.getText(.tcGermanShort)
+        let realmWordListTemp:Realm = try! Realm(configuration: wordListConf)
+
+//        let notDELanguage = language != GV.language.getText(.tcGermanShort)
         countLetters = 0
         letters = [String: Int]()
-        let wordFileURL = Bundle.main.path(forResource: "\(language)Words", ofType: "txt")
-        // Read from the file Words
-        var wordsFile = ""
-        do {
-            wordsFile = try String(contentsOfFile: wordFileURL!, encoding: String.Encoding.utf8)
-        } catch let error as NSError {
-            print("Failed reading from URL: \(String(describing: wordFileURL)), Error: " + error.localizedDescription)
-        }
-        let deWordsToDelete = realm.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
-        try! realm.write() {
-            realm.delete(deWordsToDelete)
-        }
-        let wordList = wordsFile.components(separatedBy: .newlines)
-        for word in wordList {
-            let charset = CharacterSet(charactersIn: "-! /.èêûé") // words with "-", "!" are not computed
-            if word.rangeOfCharacter(from: charset) == nil || word.length > 20 || word.length < 2 {
-                if notDELanguage || word.firstChar().uppercased() == word.firstChar() {
-//                    generateLetterFrequency(language: language, word: word.lowercased())
-                    let wordModel = WordListModel()
-                    wordModel.word = (language + word).lowercased()
-                    if realm.objects(WordListModel.self).filter("word = %d", wordModel.word).count == 0 {
-                        try! realm.write {
-                            realm.add(wordModel)
-                        }
+//        let wordFileURL = Bundle.main.path(forResource: "\(language)Words", ofType: "txt")
+//        // Read from the file Words
+//        var wordsFile = ""
+//        do {
+//            wordsFile = try String(contentsOfFile: wordFileURL!, encoding: String.Encoding.utf8)
+//        } catch let error as NSError {
+//            print("Failed reading from URL: \(String(describing: wordFileURL)), Error: " + error.localizedDescription)
+//        }
+        let wordListItems = realmWordListTemp.objects(WordListTemp.self)
+        
+//        for item in wordListItems {
+//            wordList.append(item.word.endingSubString(at:2))
+//        }
+//        let wordsToCopy = realm.objects(WordListModel.self)//.filter("word BEGINSWITH %@", language)
+        var countRu = 0
+        var countHu = 0
+        var countDe = 0
+        var countEn = 0
+        let all = wordListItems.count
+        var countSavedWords = 0
+        
+        for word in wordListItems {
+            let language = word.word.subString(at: 0, length: 2)
+            if language == "en" {
+                if word.word.ends(with: "s") {
+                    let searchWord = word.word.subString(at:0, length: word.word.length - 1)
+                    if wordListItems.filter("word = %@", searchWord).count == 1 {
+                        continue
                     }
                 }
-            } else {
-                print("\(word)")
+            }
+            countSavedWords += 1
+            switch language {
+            case "en": countEn += 1
+            case "de": countDe += 1
+            case "hu": countHu += 1
+            case "ru": countRu += 1
+            default: continue
+            }
+            let wordList = WordListModel()
+            wordList.word = word.word
+            try! realm.write() {
+                realm.add(wordList)
+                if countSavedWords % 1000 == 0 {
+                    print("all: \(all), count: \(countSavedWords), en: \(countEn), de: \(countDe), hu: \(countHu), ru: \(countRu)")
+                }
             }
         }
+//        try! realm.write() {
+//            realm.delete(wordsToDelete)
+//        }
+//        let wordList = wordsFile.components(separatedBy: .newlines)
+//        for word in wordsToCopy {
+//            let charset = CharacterSet(charactersIn: "-! /.èêûé") // words with "-", "!" are not computed
+//            if word.rangeOfCharacter(from: charset) == nil || word.length > 20 || word.length < 2 {
+//                if notDELanguage || word.firstChar().uppercased() == word.firstChar() {
+////                    generateLetterFrequency(language: language, word: word.lowercased())
+//                    let wordModel = WordListModel()
+//                    wordModel.word = (language + word).lowercased()
+//                    if realm.objects(WordListModel.self).filter("word = %d", wordModel.word).count == 0 {
+//                        try! realm.write {
+//                            realm.add(wordModel)
+//                        }
+//                    }
+//                }
+//            } else {
+//                print("\(word)")
+//            }
+//        }
 //        saveLetterFrequency(language: language)
         
     }

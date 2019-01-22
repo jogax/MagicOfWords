@@ -261,16 +261,14 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         #endif
 //        readNewTextFile()
         // Get the SKScene from the loaded GKScene
+        //-------------------------
         generateBasicDataRecordIfNeeded()
-//        generatingMandatoryWords(language: "hu")
-//        generatingMandatoryWords(language: "ru")
-//        checkMandatoryWords()
-//        getRecordCounts()
        if countContinueGames > 0 {
             startWTScene(new: false, next: .NoMore, gameNumber: 0)
         } else {
             showMenu()
         }
+        //------------------------
 //        startMenuScene()
     }
     

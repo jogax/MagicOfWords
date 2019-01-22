@@ -374,5 +374,33 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
     var savedMandatoryWords: [[String]] = []
     var savedMandatoryWordsArchiv: [[String]] = []
     var wordLengths = [0,0,0,0,0,0,0]
+
+
+
+    private func deletePlurals() {
+        let enWordsToDelete = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", "en")
+        var deletedPlurals = 0
+        var savedWords = 0
+        for enWord in enWordsToDelete {
+            let commonString = WordListTemp()
+            commonString.word = enWord.word
+            if enWord.word.ends(with: "s") {
+                let wordToCheck = enWord.word.startingSubString(length: enWord.word.length - 1)
+                if enWordsToDelete.filter("word == %@",wordToCheck).count == 1 {
+                    deletedPlurals += 1
+                    continue
+                }
+            }
+            savedWords += 1
+            try! realm.write() {
+                realm.add(commonString)
+                if savedWords % 1000 == 0 {
+                    print("saved \(savedWords) words")
+                }
+            }
+        }
+        print("allWords: \(enWordsToDelete.count), deleted: \(deletedPlurals)")
+    }
+
 }
 #endif
