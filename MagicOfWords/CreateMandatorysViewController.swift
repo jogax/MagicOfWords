@@ -61,12 +61,12 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
                             self!.wordLengths[self!.wordLengths.count - 1] += 1
                         }
                     } else {
-//                        try! RealmService.write() {
-//                            let recordToDelete = RealmService.objects(CommonString.self).filter("word BEGINSWITH %@", GV.actLanguage + word)
-//                            if recordToDelete.count > 0 {
-//                                RealmService.delete(recordToDelete)
-//                            }
-//                        }
+                        try! RealmService.write() {
+                            let recordToDelete = self!.mandatoryItems!.filter("word BEGINSWITH %@", GV.actLanguage + word)
+                            if recordToDelete.count > 0 {
+                                RealmService.delete(recordToDelete)
+                            }
+                        }
                         print("word not in wordList: \(word)")
                     }
                 }
@@ -99,12 +99,12 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
             case "en": // OK
                 wordLengthsProGame =
                 [WordLengthsProGame(first: 0, counts: [2, 2, 1, 1, 0, 0]),
-                WordLengthsProGame(first: 400, counts: [1, 1, 2, 1, 1, 0]),
-                WordLengthsProGame(first: 600, counts: [0, 1, 1, 2, 1, 1]),
-                WordLengthsProGame(first: 700, counts: [0, 0, 2, 2, 1, 1]),
-                WordLengthsProGame(first: 800, counts: [0, 1, 1, 0, 2, 2]),
-                WordLengthsProGame(first: 850, counts: [0, 0, 1, 0, 3, 2]),
-                WordLengthsProGame(first: 880, counts: [0, 0, 0, 0, 3, 3]),
+                WordLengthsProGame(first: 200, counts: [1, 1, 2, 1, 1, 0]),
+                WordLengthsProGame(first: 400, counts: [1, 1, 1, 1, 1, 1]),
+                WordLengthsProGame(first: 790, counts: [0, 0, 2, 2, 1, 1]),
+                WordLengthsProGame(first: 850, counts: [0, 2, 1, 1, 1, 1]),
+                WordLengthsProGame(first: 880, counts: [0, 2, 0, 1, 3, 0]),
+                WordLengthsProGame(first: 900, counts: [1, 1, 1, 1, 1, 1]),
                 WordLengthsProGame(first: 1000, counts: [1, 1, 1, 1, 1, 1])]
         case "de":  // OK
             wordLengthsProGame =
@@ -152,11 +152,16 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
+                var gameNumber = 1
+                var printTable = [String]()
                 if self!.generatedItems!.count == 1000 {
                     for item in self!.generatedItems! {
                         self!.mandatoryWordsTable.append(item.mandatoryWords)
+                        printTable.append("\(item.mandatoryWords)")
+                        gameNumber += 1
                     }
-                    self!.showMandatoryTable()
+//                    self!.saveToLocalRealm()
+//                    self!.showMandatoryTable()
                     return
                 }
 //                try! RealmService.write() {
@@ -171,7 +176,51 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
     
     var tableviewAdded = false
     var timer: Timer?
+    var newMandatoryURL: URL?
+
     
+//    private func saveToLocalRealm() {
+//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//        newMandatoryURL = documentsURL.appendingPathComponent("NewMandatory.realm")
+//        let config1 = Realm.Configuration(
+//            fileURL: newMandatoryURL!,
+//            shouldCompactOnLaunch: { totalBytes, usedBytes in
+//                // totalBytes refers to the size of the file on disk in bytes (data + free space)
+//                // usedBytes refers to the number of bytes used by data in the file
+//                
+//                // Compact if the file is over 100MB in size and less than 50% 'used'
+//                let oneMB = 10 * 1024 * 1024
+//                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+//        },
+//            objectTypes: [MandatoryModel.self])
+//        do {
+//            // Realm is compacted on the first open if the configuration block conditions were met.
+//            _ = try Realm(configuration: config1)
+//        } catch {
+//            print("error")
+//            // handle error compacting or opening Realm
+//        }
+//
+//        let mandatoryConfig = Realm.Configuration(
+//            //        fileURL: URL(string: Bundle.main.path(forResource: "NewMandatory", ofType: "realm")!),
+//            fileURL: newMandatoryURL!,
+//            objectTypes: [MandatoryModel.self])
+//        let newMandatory:Realm = try! Realm(configuration: mandatoryConfig)
+//        for item in generatedItems! {
+//            if newMandatory.objects(MandatoryModel.self).filter("combinedKey == %@", item.combinedKey).count == 0 {
+//                let newItem = MandatoryModel()
+//                newItem.combinedKey = item.combinedKey
+//                newItem.gameNumber = item.gameNumber
+//                newItem.language = item.language
+//                newItem.mandatoryWords = item.mandatoryWords
+//                try! newMandatory.write() {
+//                    newMandatory.add(newItem)
+//                }
+//            }
+//        }
+//       print("hier")
+//    }
+//    
     private func showMandatoryTable() {
         if !tableviewAdded {
             let origin = CGPoint(x: 0, y: 0)
@@ -376,31 +425,6 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
     var wordLengths = [0,0,0,0,0,0,0]
 
 
-
-    private func deletePlurals() {
-        let enWordsToDelete = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", "en")
-        var deletedPlurals = 0
-        var savedWords = 0
-        for enWord in enWordsToDelete {
-            let commonString = WordListTemp()
-            commonString.word = enWord.word
-            if enWord.word.ends(with: "s") {
-                let wordToCheck = enWord.word.startingSubString(length: enWord.word.length - 1)
-                if enWordsToDelete.filter("word == %@",wordToCheck).count == 1 {
-                    deletedPlurals += 1
-                    continue
-                }
-            }
-            savedWords += 1
-            try! realm.write() {
-                realm.add(commonString)
-                if savedWords % 1000 == 0 {
-                    print("saved \(savedWords) words")
-                }
-            }
-        }
-        print("allWords: \(enWordsToDelete.count), deleted: \(deletedPlurals)")
-    }
 
 }
 #endif

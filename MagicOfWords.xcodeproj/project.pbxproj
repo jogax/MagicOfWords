@@ -96,7 +96,11 @@
 		20819322202B484D00406D9A /* gameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20819321202B484D00406D9A /* gameData.txt */; };
 		20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20819323202B4A7100406D9A /* GenerateGameData.swift */; };
 		20842DE62031EA910078FFDA /* ruWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20842DE52031EA910078FFDA /* ruWords.txt */; };
+		2087444321FA1C74006C00C6 /* deRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2087444221FA1C74006C00C6 /* deRestWords.txt */; };
 		2087AC0E202C86FF008DEF26 /* LoadingScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087AC0D202C86FF008DEF26 /* LoadingScene.swift */; };
+		20895DFB21FA152100E54BF3 /* enMandatoryInput.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */; };
+		208B278F21FB382C007259B6 /* enRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B278E21FB382C007259B6 /* enRestWords.txt */; };
+		208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B279021FB8ED1007259B6 /* ruRestWords.txt */; };
 		208D085620C42F4000954E63 /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 208D085520C42F3400954E63 /* Mandatory.realm */; };
 		20943C8E2092129000B34A07 /* MyQuestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20943C8D2092129000B34A07 /* MyQuestions.swift */; };
 		2098BB8E20601B0B00C3641B /* magier.png in Resources */ = {isa = PBXBuildFile; fileRef = 2098BB8D20601B0B00C3641B /* magier.png */; };
@@ -110,7 +114,8 @@
 		20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE120330E73001682B2 /* BasicDataModel.swift */; };
 		20B28AE620333273001682B2 /* WTTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTTableView.swift */; };
 		20CDA669214FFEBF00160DC6 /* CloudRecordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */; };
-		20F17609216269DB00AF37D7 /* StateOfWordChanging.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F17608216269DB00AF37D7 /* StateOfWordChanging.txt */; };
+		20F3102E2201DD6C007EE1D0 /* compare1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* compare1.txt */; };
+		20F310302201DEBB007EE1D0 /* compare2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102F2201DEBB007EE1D0 /* compare2.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -221,7 +226,11 @@
 		20819321202B484D00406D9A /* gameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = gameData.txt; sourceTree = "<group>"; };
 		20819323202B4A7100406D9A /* GenerateGameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateGameData.swift; sourceTree = "<group>"; };
 		20842DE52031EA910078FFDA /* ruWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruWords.txt; sourceTree = "<group>"; };
+		2087444221FA1C74006C00C6 /* deRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deRestWords.txt; sourceTree = "<group>"; };
 		2087AC0D202C86FF008DEF26 /* LoadingScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScene.swift; sourceTree = "<group>"; };
+		20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enMandatoryInput.txt; sourceTree = "<group>"; };
+		208B278E21FB382C007259B6 /* enRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enRestWords.txt; sourceTree = "<group>"; };
+		208B279021FB8ED1007259B6 /* ruRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruRestWords.txt; sourceTree = "<group>"; };
 		208D085520C42F3400954E63 /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
 		20943C8D2092129000B34A07 /* MyQuestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyQuestions.swift; sourceTree = "<group>"; };
 		2098BB8D20601B0B00C3641B /* magier.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = magier.png; path = MagicOfWords/Pictures/magier.png; sourceTree = SOURCE_ROOT; };
@@ -232,11 +241,11 @@
 		20A6914120309CC500AB47C0 /* WTGamebord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGamebord.swift; sourceTree = "<group>"; };
 		20A6E83420AEDB4B000F5950 /* MyTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTimer.swift; sourceTree = "<group>"; };
 		20B04BB120935CC2008F99A2 /* menuBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menuBackground.png; sourceTree = "<group>"; };
-		20B28ADF20330C64001682B2 /* deWordsOld.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deWordsOld.txt; sourceTree = "<group>"; };
 		20B28AE120330E73001682B2 /* BasicDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicDataModel.swift; sourceTree = "<group>"; };
 		20B28AE520333273001682B2 /* WTTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTTableView.swift; sourceTree = "<group>"; };
 		20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudRecordsViewController.swift; sourceTree = "<group>"; };
-		20F17608216269DB00AF37D7 /* StateOfWordChanging.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = StateOfWordChanging.txt; sourceTree = "<group>"; };
+		20F3102D2201DD6C007EE1D0 /* compare1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = compare1.txt; sourceTree = "<group>"; };
+		20F3102F2201DEBB007EE1D0 /* compare2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = compare2.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -298,6 +307,7 @@
 				201FB1E92028940D00EC9F36 /* Scenes */,
 				20587FAF205A6D9F008C018A /* Pictures */,
 				201FB1E8202893E500EC9F36 /* Language */,
+				20895DF921FA143900E54BF3 /* WordFiles */,
 				201FB1EA20289CEC00EC9F36 /* RealmModels */,
 			);
 			path = MagicOfWords;
@@ -336,26 +346,8 @@
 				2081931F202B472900406D9A /* GameDataModel.swift */,
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
-				20A6913C203088FF00AB47C0 /* enWords.txt */,
-				20B28ADF20330C64001682B2 /* deWordsOld.txt */,
-				205234E22187902900B9935F /* deWordsOld1.txt */,
-				203D83FA21F6580000A2873C /* deWordsOld.txt */,
-				2048259821E8CC59000933B3 /* deWords.txt */,
-				204A8AD72029DDFF00E9C11F /* huWords.txt */,
-				20842DE52031EA910078FFDA /* ruWords.txt */,
 				205E601920C02BB800A5AB39 /* WordDBGenerator.swift */,
-				20819321202B484D00406D9A /* gameData.txt */,
-				205184F820615B3100E7FAF4 /* deGameData.txt */,
-				205184FA20615B5C00E7FAF4 /* enGameData.txt */,
-				205184F62061525C00E7FAF4 /* huGameData.txt */,
-				205184F4206150AC00E7FAF4 /* ruGameData.txt */,
-				20F17608216269DB00AF37D7 /* StateOfWordChanging.txt */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
-				20491F4C21CFCEB20060C675 /* ruMandatory.txt */,
-				204C30B221EF789A008B1CB3 /* ruMandatory6.txt */,
-				205BF79921E4D952006633C6 /* huMandatory.txt */,
-				2049314921E6494D00BE66EA /* deMandatory.txt */,
-				2049314B21E6496100BE66EA /* enMandatory.txt */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -433,6 +425,35 @@
 				205234E4218796C100B9935F /* WordList.realm */,
 			);
 			path = ReadOnlyDB;
+			sourceTree = "<group>";
+		};
+		20895DF921FA143900E54BF3 /* WordFiles */ = {
+			isa = PBXGroup;
+			children = (
+				204C30B221EF789A008B1CB3 /* ruMandatory6.txt */,
+				205BF79921E4D952006633C6 /* huMandatory.txt */,
+				2049314921E6494D00BE66EA /* deMandatory.txt */,
+				2049314B21E6496100BE66EA /* enMandatory.txt */,
+				20491F4C21CFCEB20060C675 /* ruMandatory.txt */,
+				20A6913C203088FF00AB47C0 /* enWords.txt */,
+				205234E22187902900B9935F /* deWordsOld1.txt */,
+				20819321202B484D00406D9A /* gameData.txt */,
+				205184F820615B3100E7FAF4 /* deGameData.txt */,
+				205184FA20615B5C00E7FAF4 /* enGameData.txt */,
+				205184F62061525C00E7FAF4 /* huGameData.txt */,
+				205184F4206150AC00E7FAF4 /* ruGameData.txt */,
+				2048259821E8CC59000933B3 /* deWords.txt */,
+				204A8AD72029DDFF00E9C11F /* huWords.txt */,
+				20842DE52031EA910078FFDA /* ruWords.txt */,
+				203D83FA21F6580000A2873C /* deWordsOld.txt */,
+				20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */,
+				20F3102D2201DD6C007EE1D0 /* compare1.txt */,
+				20F3102F2201DEBB007EE1D0 /* compare2.txt */,
+				2087444221FA1C74006C00C6 /* deRestWords.txt */,
+				208B278E21FB382C007259B6 /* enRestWords.txt */,
+				208B279021FB8ED1007259B6 /* ruRestWords.txt */,
+			);
+			path = WordFiles;
 			sourceTree = "<group>";
 		};
 		20A6913E20309B2200AB47C0 /* WordTrisClassen */ = {
@@ -530,6 +551,7 @@
 				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
 				20552DC3211F1EFA00C54538 /* whiteSprite0011.png in Resources */,
+				2087444321FA1C74006C00C6 /* deRestWords.txt in Resources */,
 				20552DC2211F1EFA00C54538 /* whiteSprite1111.png in Resources */,
 				20552DCC211F1EFA00C54538 /* whiteSprite0100.png in Resources */,
 				20552DC0211F1EFA00C54538 /* whiteSprite0101.png in Resources */,
@@ -538,11 +560,14 @@
 				20552DBD211F1EFA00C54538 /* whiteSprite1001.png in Resources */,
 				20842DE62031EA910078FFDA /* ruWords.txt in Resources */,
 				20552DC4211F1EFA00C54538 /* whiteSprite1011.png in Resources */,
+				20F310302201DEBB007EE1D0 /* compare2.txt in Resources */,
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
 				205184F72061525C00E7FAF4 /* huGameData.txt in Resources */,
 				20552DC8211F1EFA00C54538 /* whiteSprite1100.png in Resources */,
 				205CF7F12129BF4B00C1B89D /* nextGame.png in Resources */,
+				20895DFB21FA152100E54BF3 /* enMandatoryInput.txt in Resources */,
 				208173E12103577900960800 /* balloon.png in Resources */,
+				208B278F21FB382C007259B6 /* enRestWords.txt in Resources */,
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
 				20552DC7211F1EFA00C54538 /* whiteSprite1110.png in Resources */,
 				20552DCA211F1EFA00C54538 /* whiteSprite0000.png in Resources */,
@@ -561,6 +586,7 @@
 				20552DC9211F1EFA00C54538 /* whiteSprite0001.png in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
 				205CF7ED2129BC9300C1B89D /* back.png in Resources */,
+				20F3102E2201DD6C007EE1D0 /* compare1.txt in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
 				204C30B321EF789A008B1CB3 /* ruMandatory6.txt in Resources */,
 				204BB45D2063E9E000CDF085 /* undo.png in Resources */,
@@ -576,7 +602,7 @@
 				20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
 				2049314C21E6496100BE66EA /* enMandatory.txt in Resources */,
-				20F17609216269DB00AF37D7 /* StateOfWordChanging.txt in Resources */,
+				208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */,
 				20395F5F21A31D4300947D7F /* search.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

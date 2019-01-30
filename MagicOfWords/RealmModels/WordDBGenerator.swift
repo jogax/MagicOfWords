@@ -169,7 +169,7 @@ class WordDBGenerator {
 //
 
     private func generateWordList(language: String) {
-        let realmWordListTemp:Realm = try! Realm(configuration: wordListConf)
+        let realmWordListTemp:Realm = try! Realm(configuration: wordListConfig)
 
 //        let notDELanguage = language != GV.language.getText(.tcGermanShort)
         countLetters = 0

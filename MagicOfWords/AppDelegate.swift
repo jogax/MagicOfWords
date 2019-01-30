@@ -34,6 +34,15 @@ var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncCon
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,
+    schemaVersion: 13,
+    // Set the block which will be called automatically when opening a Realm with
+    // a schema version lower than the one set above
+//    migrationBlock: {
+//        migration, oldSchemaVersion in
+//    },
+            
+//        }
+//},
     objectTypes: [WordListModel.self])
 let reachability = Reachability()!
 // Open the Realm with the configuration
@@ -57,26 +66,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 //        Compressing Realm DB if neaded
-//        let config1 = Realm.Configuration(shouldCompactOnLaunch: { totalBytes, usedBytes in
-//            // totalBytes refers to the size of the file on disk in bytes (data + free space)
-//            // usedBytes refers to the number of bytes used by data in the file
-//
-//            // Compact if the file is over 100MB in size and less than 50% 'used'
-//            let tenMB = 10 * 1024 * 1024
-//            return (totalBytes > tenMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
-//        })
-//        do {
-//            // Realm is compacted on the first open if the configuration block conditions were met.
-//            _ = try Realm(configuration: config1)
-//        } catch {
-//            print("error")
-//            // handle error compacting or opening Realm
-//        }
+        let config1 = Realm.Configuration(shouldCompactOnLaunch: { totalBytes, usedBytes in
+            // totalBytes refers to the size of the file on disk in bytes (data + free space)
+            // usedBytes refers to the number of bytes used by data in the file
+
+            // Compact if the file is over 100MB in size and less than 50% 'used'
+            let tenMB = 10 * 1024 * 1024
+            return (totalBytes > tenMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+        })
+        do {
+            // Realm is compacted on the first open if the configuration block conditions were met.
+            _ = try Realm(configuration: config1)
+        } catch {
+            print("error")
+            // handle error compacting or opening Realm
+        }
         let config = Realm.Configuration(
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 13,
+            schemaVersion: 14,
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
@@ -85,6 +94,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
+                case 4...13:
+                    migration.deleteData(forType: GameDataModel.className())
+                    migration.deleteData(forType: RoundDataModel.className())
+
                 default: migration.enumerateObjects(ofType: GameDataModel.className())
                     { oldObject, newObject in
                         if oldObject!["combinedKey"] == nil {
