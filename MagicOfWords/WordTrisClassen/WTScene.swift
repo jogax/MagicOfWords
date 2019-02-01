@@ -453,7 +453,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var timerIsCounting = false
     let heightMultiplicator = CGFloat((GV.onIpad ? 0.10 : 0.15))
     var blockSize: CGFloat = 0
-    var random: MyRandom?
 //    var allWordsToShow = [AllWordsToShow]()
     var timer: Timer? = Timer()
     var timeLabel = SKLabelNode()
@@ -549,7 +548,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        self.wtGameFinishedSprite = WTGameFinished()
 //        self.addChild(wtGameFinishedSprite)
         self.backgroundColor = bgColor
-//        GV.allWords = [WordToCheck]()
+//        generateReadOnly()
+//        exit(0)
         getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber)
         createHeader()
         buttonHeight = self.frame.width * 0.08
@@ -575,6 +575,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     func startNewGame() {
         wtSceneDelegate!.gameFinished(start: .NewGame)
     }
+    
+//    func generateReadOnly() {
+//        let real
+//        for gameNumber in 0...999 {
+//            getPlayingRecord(new: new, next: nextGame, gameNumber: gameNumber)
+//        }
+//    }
     
     let timeInitValue = "0°origMaxTime"
     func restartThisGame() {
@@ -1581,6 +1588,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.addChild(label)
     }
     
+    var random: MyRandom?
+
     private func play() {
         timerIsCounting = true
         headerCreated = false
@@ -1590,8 +1599,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         myTimer = MyTimer(time: timeForGame)
         addChild(myTimer!)
         wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
+        try! realm.write() {
+            GV.playingRecord.randomCounts = 0
+        }
+        random = MyRandom()
+        
+        
 
         generateArrayOfWordPieces(new: new)
+        
         indexOfTilesForGame = 0
 //        getOnlineRecords()
         pieceArray = Array(repeating: WTPiece(), count: 3)
@@ -1749,12 +1765,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 let tile = WTPiece(from: piece, parent: self, blockSize: blockSize, arrayIndex: index)
                 tilesForGame.append(tile)
                 tilesForGame.last!.addArrayIndex(index: index)
-//                if new {
-//                    tilesForGame.last!.reset()
-//                }
             }
         }
-//        let playingWords = playingRecord.pieces.components(separatedBy: "°")
     }
     
     private func getNextPiece(horizontalPosition: Int)->WTPiece {
@@ -2548,14 +2560,92 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        wtGameboard!.checkWholeWords()
     }
     
-
     private func generateArrayOfWordPieces()->String {
+        var myWords = [String]()
+        var tileType = MyShapes.NotUsed
+        var letters = [String]()
+        var generateLength = 0
+        var typesWithLen1 = [MyShapes]()
+        var typesWithLen2 = [MyShapes]()
+        var typesWithLen3 = [MyShapes]()
+        var typesWithLen4 = [MyShapes]()
+        
+        for index in 0..<MyShapes.count - 1 {
+            guard let type = MyShapes(rawValue: index) else {
+                return ""
+            }
+            if type == .NotUsed {
+                break
+            }
+            let length = myForms[type]![0].count
+            switch length {
+            case 1: typesWithLen1.append(type)
+            case 2: typesWithLen2.append(type)
+            case 3: typesWithLen3.append(type)
+            case 4: typesWithLen4.append(type)
+            default: break
+            }
+        }
+
+        func splittingWord(word: String) {
+            var inputWord = word
+            repeat {
+                var letters = [String]()
+                let randomLength = inputWord.length > 3 ? 3 : inputWord.length
+                let tileLength = random!.getRandomInt(1, max: randomLength)
+                for _ in 0..<tileLength {
+                    letters.append(inputWord.firstChar())
+                    inputWord = inputWord.endingSubString(at: 1)
+                }
+
+                switch tileLength {
+                case 1: tileType = typesWithLen1[random!.getRandomInt(0, max: typesWithLen1.count - 1)]
+                case 2: tileType = typesWithLen2[random!.getRandomInt(0, max: typesWithLen2.count - 1)]
+                case 3: tileType = typesWithLen3[random!.getRandomInt(0, max: typesWithLen3.count - 1)]
+                default: continue
+                }
+                let rotateIndex = random!.getRandomInt(0, max: 3)
+                
+                let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
+                tilesForGame.append(tileForGameItem)
+                generateLength += tileLength
+
+
+            } while inputWord.length > 0
+        }
+        let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(GV.playingRecord.gameNumber))[0]
+        let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
+        for word in words {
+            myWords.append(word)
+            splittingWord(word: word)
+        }
+        
+
+        repeat {
+            let number = GV.playingRecord.gameNumber + 50
+            let searchGameNumber = random!.getRandomInt(number, max: number + 1000) % 1000
+            let wordPosition = random!.getRandomInt(0, max: 5)
+            let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(searchGameNumber))[0]
+            let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
+            let word = words[wordPosition]
+            splittingWord(word: word)
+
+        } while generateLength < 1500
+        var generatedArrayInStringForm = ""
+        for tile in tilesForGame {
+            generatedArrayInStringForm += tile.toString() + "°"
+        }
+        return generatedArrayInStringForm
+
+    }
+    
+    private func oldGenerateArrayOfWordPieces()->String {
         var allLettersTable = [String]()
         var origAllLettersTable = [String]()
         let gameNumber =  GV.playingRecord.gameNumber
         let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
         let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
-        let random = MyRandom(gameNumber: gameNumber)
+        let random = MyRandom()
 //        random.generateRandomInts()
         tilesForGame.removeAll()
         var oneLetterPieces = [String]()

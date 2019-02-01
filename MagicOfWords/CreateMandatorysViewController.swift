@@ -284,7 +284,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
             }
             var words = ""
             
-            random = MyRandom(gameNumber: gameNumber)
+            random = MyRandom()
             for (index, count) in actWordLength.counts.enumerated() {
                 for _ in 0..<count {
                     let max = savedMandatoryWords[index].count - 1

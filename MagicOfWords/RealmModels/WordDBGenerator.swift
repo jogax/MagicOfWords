@@ -94,7 +94,7 @@ let defaultConfig = Realm.Configuration(
 #if CREATEWORDLIST
 // for generating Mandatory Words
 let defaultConfig = Realm.Configuration(
-    objectTypes: [WordListModel.self, WordListTemp.self])
+    objectTypes: [WordListModel.self])
 #endif
 
 
@@ -182,7 +182,7 @@ class WordDBGenerator {
 //        } catch let error as NSError {
 //            print("Failed reading from URL: \(String(describing: wordFileURL)), Error: " + error.localizedDescription)
 //        }
-        let wordListItems = realmWordListTemp.objects(WordListTemp.self)
+        let wordListItems = realmWordListTemp.objects(WordList.self)
         
 //        for item in wordListItems {
 //            wordList.append(item.word.endingSubString(at:2))

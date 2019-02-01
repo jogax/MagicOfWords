@@ -11,48 +11,60 @@ import GameplayKit
 
 class MyRandom {
 //    private var index = 0
-    var random: GKARC4RandomSource
+    var random: GKARC4RandomSource?
+    var counts = 0
+//    var gameNumber = 0
 //    var gameNumber = 0
 //    var stringTable = [String]()
     
-    init(gameNumber: Int) {
-        
+    init() {
+        counts = GV.playingRecord.randomCounts
+        prepareRandom()
+    }
+    
+    private func prepareRandom() {
         let gameData = levelData.dataFromHexadecimalString()!
         random = GKARC4RandomSource(seed: gameData)
-        random.dropValues(2048 + 1111 * gameNumber)
-//        self.gameNumber = gameNumber % 10000
-//        index = 7 * self.gameNumber
+        let startValue = 1111 * (GV.playingRecord.gameNumber + 555)
+        random!.dropValues(startValue)
+        dropCounts()
     }
     
-    func getRandomInt(_ min: Int, max: Int) -> Int {
-        let returnValue = min + random.nextInt(upperBound: (max + 1 - min))
-//        let returnValue = min + intValue[index] % (max + 1 - min)
-//        index += 11 * gameNumber
-//        if index >= intValue.count {
-//            index = index % intValue.count
-//        }
-//        print("returnValue: \(returnValue)")
-        return returnValue
+    private func dropCounts() {
+        for _ in 0..<counts {
+            _ = random!.nextInt()
+        }
     }
     
-//    func generateRandomInts() {
-//        var stringValue = ""
-//        
-//        for index in 0..<25000 {
-//            if index % 25 == 0 {
-//                if stringValue != "" {
-//                    stringTable.append(stringValue)
-//                    stringValue = ""
-//                }
-//            }
-//            let intValue = random.nextInt(upperBound: 1000)
-//            stringValue += ("\(intValue),")
-//        }
-//        print(stringTable)
-//        print("\(value)")
-//    }
+    
+    public func dropValues(value: Int) {
+        for _ in 0..<value {
+            _ = getRandomInt(0, max: 1)
+        }
+    }
+    
+    public func decrementCounts(value: Int) {
+        let adder = value + 0
+        counts -= (counts > adder ? adder : counts)
+        try! realm.write() {
+            GV.playingRecord.randomCounts = counts
+        }
+        prepareRandom()
+    }
+    
+    public func getRandomInt(_ min: Int, max: Int) -> Int {
+        counts += 1
+        try! realm.write() {
+            GV.playingRecord.randomCounts = counts
+        }
+//        let returnValue = min + random.nextInt(upperBound: (max + 1 - min))
+        let returnValue = min + abs(random!.nextInt()) % (max + 1 - min)
+       return returnValue
+    }
+    
     
     private var levelData = "5ff5310cc41380bf720ce9238f984730"
+    
 //        1:"c43d64fe101c1051f58927cd68717bf9",
 //        2:"119db944bcf1fd22d64e5758fb1d70b3",
 //        3:"61d4430034ac9a4aee4c4d7630736664",
