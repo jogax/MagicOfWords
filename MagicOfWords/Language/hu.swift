@@ -53,6 +53,7 @@ let huDictionary: [TextConstants: String] = [
 //    .tcNoMoreStepsQuestion2: "Szeretnél saját szavakat kijelölni?",
 //    .tcNoMoreStepsAnswer1: "Igen",
     .tcNoMoreStepsAnswer2: "Következő kör",
+    .tcNoMoreStepsAnswer3: "Saját szavak kijelölése",
     .tcAlphabet:           "AÁBCDEÉFGHIÍJKLMNOÓÖŐPRSTUÚÜŰVZY",
     .tcFrequency:           "A°8/Á°5/B°2/C°2/D°2/E°7/É°3/F°1/G°3/H°1/I°4/Í°1/J°1/K°4/L°6/M°3/N°4/O°4/Ó°2/Ö°1/Ő°1/P°2/R°6/S°8/T°6/U°2/Ú°0/Ü°1/Ű°0/V°2/Z°4/Y°2",
     .tcNickNameLetters:    "ABCDEFGHIJKLMNOPRSTUVZY",

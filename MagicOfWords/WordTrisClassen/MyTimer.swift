@@ -118,6 +118,36 @@ class MyTimer: SKSpriteNode {
         }
     }
     
+    private var startTime: Double = 0
+    private var lastTime: Double = 0
+    
+    public func startTimeMessing() {
+        startTime = CACurrentMediaTime()
+        lastTime = startTime
+    }
+    
+    private func myPrint(head: String, time: Double) {
+        if time > 1 {
+            print("\(head) \(time) sec ***")
+        } else {
+            print("\(head) used time: \(time * 1000) mSec")
+        }
+
+    }
+    public func showWholeTime(text: String = "") {
+        let head = text == "" ? text : text + ":"
+        let actTime = CACurrentMediaTime()
+        myPrint(head: head, time: lastTime - startTime)
+        lastTime = actTime
+  }
+
+    public func showLastTime(text: String = "") {
+        let head = text == "" ? text : text + ":"
+        let actTime = CACurrentMediaTime()
+        myPrint(head: head, time: actTime - lastTime)
+        lastTime = actTime
+    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
             return
     }

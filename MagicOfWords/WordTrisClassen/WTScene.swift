@@ -1599,9 +1599,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         myTimer = MyTimer(time: timeForGame)
         addChild(myTimer!)
         wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
-        try! realm.write() {
-            GV.playingRecord.randomCounts = 0
-        }
+//        try! realm.write() {
+//            GV.playingRecord.randomCounts = 0
+//        }
         random = MyRandom()
         
         
@@ -1750,13 +1750,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    private func generateArrayOfWordPieces(new: Bool) {
-        if new || GV.playingRecord.pieces.count == 0 {
-            let pieces = generateArrayOfWordPieces()
-            try! realm.write {
-                GV.playingRecord.pieces = pieces
-            }
-       }
+    private func saveArrayOfPieces() {
         tilesForGame.removeAll()
         let piecesToPlay = GV.playingRecord.pieces.components(separatedBy: "°")
         for index in 0..<piecesToPlay.count {
@@ -1767,16 +1761,33 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 tilesForGame.last!.addArrayIndex(index: index)
             }
         }
+   }
+    
+    private func generateArrayOfWordPieces(new: Bool) {
+        if new || GV.playingRecord.pieces.count == 0 {
+            let pieces = generateArrayOfWordPieces(first: true)
+             try! realm.write {
+                GV.playingRecord.pieces = pieces
+            }
+       }
+       saveArrayOfPieces()
     }
     
     private func getNextPiece(horizontalPosition: Int)->WTPiece {
 //        blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
         var tileForGame: WTPiece
         repeat {
+            if indexOfTilesForGame == tilesForGame.count {
+                let pieces = generateArrayOfWordPieces(first:false)
+                 try! realm.write {
+                    GV.playingRecord.pieces = pieces
+                }
+                saveArrayOfPieces()
+            }
             tileForGame = tilesForGame[indexOfTilesForGame]
             indexOfTilesForGame += 1
         } while tileForGame.isOnGameboard
-        indexOfTilesForGame = indexOfTilesForGame >= tilesForGame.count ? 0 : indexOfTilesForGame
+//        indexOfTilesForGame = indexOfTilesForGame >= tilesForGame.count ? 0 : indexOfTilesForGame
         return tileForGame
 
     }
@@ -2053,33 +2064,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 pieceArray[lastPosition].setPieceFromPosition(index: lastPosition)
                 self.addChild(pieceArray[lastPosition])
                 
-//                let freePlaceFound = checkFreePlace()
-//
-////                checkIfGameFinished()
-//                let answer1Action =  UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer1), style: .default, handler: {alert -> Void in
-//                    self.gameboardEnabled = true
-//                    let title = GV.language.getText(.tcNoMoreStepsAnswer2)
-//                    let wordLength = title.width(font: self.myTitleFont!)
-//                    let wordHeight = title.height(font: self.myTitleFont!)
-//                    let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
-//                    let answer1ButtonPos = self.frame.height * 0.05
-//                    let center = CGPoint(x:self.frame.width * 0.5, y: answer1ButtonPos) //self.frame.height * 0.20)
-//                    let radius = frame.height * 0.5
-//                    self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .green)
-//                    self.answer1Button!.addTarget(self, action: #selector(self.startNextRound), for: .touchUpInside)
-//                    self.view?.addSubview(self.answer1Button!)
-//                })
-//                let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
-//                    self.startNextRound()
-//                })
-//               if !freePlaceFound {
-//                    let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
-//                                                            message: GV.language.getText(.tcNoMoreStepsQuestion2),
-//                                                            preferredStyle: .alert)
-//                    alertController.addAction(answer1Action)
-//                    alertController.addAction(answer2Action)
-//                    self.parentViewController!.present(alertController, animated: true, completion: nil)
-//                }
                saveActualState()
             } else {
                 pieceArray[movedIndex].position = origPosition[movedIndex]
@@ -2383,6 +2367,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if !placeFound {
             let answer1Action =  UIAlertAction(title: GV.language.getText(.tcBack), style: .default, handler: {alert -> Void in
+                self.startUndo()
+            })
+            let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
+                self.startNextRound()
+            })
+            let answer3Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer3), style: .default, handler: {alert -> Void in
 //                self.gameboardEnabled = true
 //                let title = GV.language.getText(.tcNoMoreStepsAnswer2)
 //                let wordLength = title.width(font: self.myTitleFont!)
@@ -2391,19 +2381,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                let answer1ButtonPos = self.frame.height * 0.05
 //                let center = CGPoint(x:self.frame.width * 0.5, y: answer1ButtonPos) //self.frame.height * 0.20)
 //                let radius = frame.height * 0.5
-//                self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .green)
-//                self.answer1Button!.addTarget(self, action: #selector(self.startUndo), for: .touchUpInside)
+//                self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .white)
+////                self.answer1Button!.addTarget(self, action: #selector(self.startUndo), for: .touchUpInside)
 //                self.view?.addSubview(self.answer1Button!)
-                self.startUndo()
-            })
-            let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
-                self.startNextRound()
             })
             let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
                                                     message: "", //GV.language.getText(.tcNoMoreStepsQuestion2),
                                                     preferredStyle: .alert)
             alertController.addAction(answer1Action)
             alertController.addAction(answer2Action)
+            alertController.addAction(answer3Action)
             self.parentViewController!.present(alertController, animated: true, completion: nil)
         }
         return placeFound
@@ -2560,8 +2547,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        wtGameboard!.checkWholeWords()
     }
     
-    private func generateArrayOfWordPieces()->String {
-        var myWords = [String]()
+    private func generateArrayOfWordPieces(first: Bool)->String {
         var tileType = MyShapes.NotUsed
         var letters = [String]()
         var generateLength = 0
@@ -2588,7 +2574,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 
         func splittingWord(word: String) {
-            var inputWord = word
+            var inputWord = word.uppercased()
             repeat {
                 var letters = [String]()
                 let randomLength = inputWord.length > 3 ? 3 : inputWord.length
@@ -2605,32 +2591,35 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 default: continue
                 }
                 let rotateIndex = random!.getRandomInt(0, max: 3)
-                
+
                 let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
                 tilesForGame.append(tileForGameItem)
-                generateLength += tileLength
-
 
             } while inputWord.length > 0
         }
-        let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(GV.playingRecord.gameNumber))[0]
-        let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
-        for word in words {
-            myWords.append(word)
-            splittingWord(word: word)
+         if first {
+            let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(GV.playingRecord.gameNumber))[0]
+            let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
+            for word in words {
+                print(word)
+                splittingWord(word: word)
+            }
         }
-        
-
-        repeat {
-            let number = GV.playingRecord.gameNumber + 50
+        let number = GV.playingRecord.gameNumber + 50
+        let records = realmMandatory.objects(MandatoryModel.self).filter("combinedKey BEGINSWITH %d", GV.actLanguage)
+//        myTimer!.startTimeMessing()
+        for _ in 1...(first ? 4 : 10) {
             let searchGameNumber = random!.getRandomInt(number, max: number + 1000) % 1000
             let wordPosition = random!.getRandomInt(0, max: 5)
-            let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(searchGameNumber))[0]
+            let actRecord = records[searchGameNumber]
             let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
             let word = words[wordPosition]
+            print(word)
+//            myTimer!.showLastTime(text: "before splitting")
             splittingWord(word: word)
-
-        } while generateLength < 1500
+//            myTimer!.showLastTime(text: "after splitting")
+         }
+//        myTimer!.showWholeTime(text: "after generating")
         var generatedArrayInStringForm = ""
         for tile in tilesForGame {
             generatedArrayInStringForm += tile.toString() + "°"
@@ -2638,6 +2627,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         return generatedArrayInStringForm
 
     }
+    
+    
     
     private func oldGenerateArrayOfWordPieces()->String {
         var allLettersTable = [String]()

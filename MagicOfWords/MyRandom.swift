@@ -57,8 +57,8 @@ class MyRandom {
         try! realm.write() {
             GV.playingRecord.randomCounts = counts
         }
-//        let returnValue = min + random.nextInt(upperBound: (max + 1 - min))
-        let returnValue = min + abs(random!.nextInt()) % (max + 1 - min)
+        let returnValue = min + random!.nextInt(upperBound: (max + 1 - min))
+//        let returnValue = min + abs(random!.nextInt()) % (max + 1 - min)
        return returnValue
     }
     

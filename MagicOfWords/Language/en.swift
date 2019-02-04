@@ -53,6 +53,7 @@ let enDictionary: [TextConstants: String] = [
 //    .tcNoMoreStepsQuestion2: "Would yue like to choose own words?",
 //    .tcNoMoreStepsAnswer1: "Yes",
     .tcNoMoreStepsAnswer2: "Next round",
+    .tcNoMoreStepsAnswer3: "Choose own words",
     .tcAlphabet:           "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     .tcFrequency:           "A°8/B°2/C°4/D°3/E°11/F°1/G°2/H°3/I°8/J°1/K°1/L°5/M°3/N°7/O°7/P°3/Q°0/R°7/S°10/T°7/U°3/V°1/W°1/X°0/Y°1/Z°0",
     .tcNickNameLetters:    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
