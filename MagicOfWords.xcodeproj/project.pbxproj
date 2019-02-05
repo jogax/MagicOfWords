@@ -97,7 +97,6 @@
 		20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20819323202B4A7100406D9A /* GenerateGameData.swift */; };
 		20842DE62031EA910078FFDA /* ruWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20842DE52031EA910078FFDA /* ruWords.txt */; };
 		2084C0D62209BF73002B8F2E /* compare2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2084C0D52209BF73002B8F2E /* compare2.txt */; };
-		2084C0D82209BF8B002B8F2E /* deRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2084C0D72209BF8B002B8F2E /* deRestWords.txt */; };
 		2087444321FA1C74006C00C6 /* deRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2087444221FA1C74006C00C6 /* deRestWords.txt */; };
 		2087AC0E202C86FF008DEF26 /* LoadingScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087AC0D202C86FF008DEF26 /* LoadingScene.swift */; };
 		20895DFB21FA152100E54BF3 /* enMandatoryInput.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */; };
@@ -603,7 +602,6 @@
 				2048259921E8CC59000933B3 /* deWords.txt in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
 				20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */,
-				2084C0D82209BF8B002B8F2E /* deRestWords.txt in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
 				2049314C21E6496100BE66EA /* enMandatory.txt in Resources */,
 				208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */,

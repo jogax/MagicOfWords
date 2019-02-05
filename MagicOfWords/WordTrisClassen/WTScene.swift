@@ -839,20 +839,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             myScoreheaderLabel.fontColor = SKColor.black
             self.addChild(myScoreheaderLabel)
         }
-//        if self.childNode(withName: actScoreName) == nil {
-//            let YPosition: CGFloat = self.frame.height * fourthLinePosition
-////            let text = GV.language.getText(.tcActScoreHeader, values: String(actOnlinePlayer), String(actOnlineScore))
-//            let text = GV.language.getText(.tcActScoreHeader, values: "actPlayer", "500")
-//            actScoreHeaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
-//            actScoreHeaderLabel.text = text
-//            actScoreHeaderLabel.name = String(headerName)
-//            actScoreHeaderLabel.fontSize = fontSize
-//            actScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * xPosMultiplierForScore, y: YPosition)
-//            actScoreHeaderLabel.horizontalAlignmentMode = .left
-//            actScoreHeaderLabel.fontColor = SKColor.black
-//            self.addChild(actScoreHeaderLabel)
-//        }
-
    }
     
     var headerCreated = false

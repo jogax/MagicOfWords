@@ -428,27 +428,63 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     private func generateBasicDataRecordIfNeeded() {
-        try! realm.write {
-            let myName = String(UInt64(Date().timeIntervalSince1970 * 111111))
-            //            let toDelete = realm.objects(BasicDataModel.self)
+//            let myName = String(UInt64(Date().timeIntervalSince1970 * 111111))
+             //            let toDelete = realm.objects(BasicDataModel.self)
             //            realm.delete(toDelete)
             if realm.objects(BasicDataModel.self).count == 0 {
+                let myName = generateRandomNameFromDeviceID()
                 GV.basicDataRecord = BasicDataModel()
                 GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
                 GV.basicDataRecord.myName = myName
                 GV.basicDataRecord.myNickname = generateMyNickname()
                 GV.basicDataRecord.creationTime = Date()
-                realm.add(GV.basicDataRecord)
+                try! realm.write {
+                    realm.add(GV.basicDataRecord)
+                }
             } else {
                 GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
-                if GV.basicDataRecord.myName == "" {
-                    GV.basicDataRecord.myName = myName
-                    GV.basicDataRecord.myNickname = generateMyNickname()
-                }
+//                if GV.basicDataRecord.myName == "" {
+//                    GV.basicDataRecord.myName = myName
+//                    GV.basicDataRecord.myNickname = generateMyNickname()
+//                }
                 GV.language.setLanguage(GV.basicDataRecord.actLanguage)
             }
             //            loginToRealmSync()
+    }
+    
+    
+    private func generateRandomNameFromDeviceID()->String {
+        let deviceName = UIDevice().deviceID
+        let random = MyRandom(forName: true)
+        var modifiedID = ""
+        for char in deviceName {
+            if String(char) != "-" {
+                modifiedID += String(char)
+            }
         }
+        var index = 0
+        var randomizedID = ""
+        var counter = 0
+        repeat {
+            let input = modifiedID.subString(at: index, length: 2)
+            let scanner = Scanner(string: input)
+            var value: UInt64 = 0
+            
+            if scanner.scanHexInt64(&value) {
+                let adder = random.getRandomInt(1, max: 255)
+                let newValue = (Int(value) + adder) % 256
+                randomizedID += String(format:"%02X", newValue)
+                counter += 1
+                if counter % 2 == 0 {
+                    randomizedID += "-"
+                }
+           }
+           index += 2
+        } while index < modifiedID.length
+        
+        
+        randomizedID.removeLast()
+        return randomizedID
     }
     
     func generateMyNickname()->String {
