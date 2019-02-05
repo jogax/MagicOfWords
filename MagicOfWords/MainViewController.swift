@@ -354,7 +354,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         let newOK = countMandatory - countExistingGames > 0
         let continueOK = countContinueGames > 0
         //--------------------- newGameAction ---------------------
-        let newGameAction = UIAlertAction(title: "\(GV.language.getText(.tcNewGame)) (\(countMandatory - countExistingGames)) ", style: .default, handler: { [unowned self]
+        let newGameAction = UIAlertAction(title: "\(GV.language.getText(.tcNewGame)) ", style: .default, handler: { [unowned self]
             alert -> Void in
             if newOK {
                 self.startNewGame()
@@ -428,9 +428,6 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     private func generateBasicDataRecordIfNeeded() {
-//            let myName = String(UInt64(Date().timeIntervalSince1970 * 111111))
-             //            let toDelete = realm.objects(BasicDataModel.self)
-            //            realm.delete(toDelete)
             if realm.objects(BasicDataModel.self).count == 0 {
                 let myName = generateRandomNameFromDeviceID()
                 GV.basicDataRecord = BasicDataModel()
@@ -443,13 +440,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                 }
             } else {
                 GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
-//                if GV.basicDataRecord.myName == "" {
-//                    GV.basicDataRecord.myName = myName
-//                    GV.basicDataRecord.myNickname = generateMyNickname()
-//                }
                 GV.language.setLanguage(GV.basicDataRecord.actLanguage)
             }
-            //            loginToRealmSync()
+
     }
     
     

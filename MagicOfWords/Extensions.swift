@@ -64,9 +64,13 @@ public extension UIDevice {
         case "iPad4,7", "iPad4,8", "iPad4,9":           return "iPad Mini 3"
         case "iPad5,1", "iPad5,2":                      return "iPad Mini 4"
         case "iPad6,3", "iPad6,4":                      return "iPad Pro 9.7 Inch"
+        case "iPad6,11", "iPad6,12":                    return "iPad 9.7 5th Gen"
+        case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5 Inch"
+        case "iPad7,5", "iPad7,6":                      return "iPad 9.7 6th Gen"
+        case "iPad8,1", "iPad8,2", "iPad8,3", "iPad8,4":return "iPad Pro 11 Inch"
         case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9 Inch"
         case "iPad7,1", "iPad7,2":                      return "iPad Pro 12.9 Inch 2. Generation"
-        case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5 Inch"
+        case "iPad8,5", "iPad8,6", "iPad8,7", "iPad8,8":return "iPad Pro 12.9 Inch 3. Generation"
         case "AppleTV5,3":                              return "Apple TV"
         case "i386", "x86_64":
             switch (width, height) {

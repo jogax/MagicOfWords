@@ -34,15 +34,6 @@ var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncCon
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,
-    schemaVersion: 13,
-    // Set the block which will be called automatically when opening a Realm with
-    // a schema version lower than the one set above
-//    migrationBlock: {
-//        migration, oldSchemaVersion in
-//    },
-            
-//        }
-//},
     objectTypes: [WordListModel.self])
 let reachability = Reachability()!
 // Open the Realm with the configuration
