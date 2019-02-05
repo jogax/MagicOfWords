@@ -96,6 +96,8 @@
 		20819322202B484D00406D9A /* gameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20819321202B484D00406D9A /* gameData.txt */; };
 		20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20819323202B4A7100406D9A /* GenerateGameData.swift */; };
 		20842DE62031EA910078FFDA /* ruWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20842DE52031EA910078FFDA /* ruWords.txt */; };
+		2084C0D62209BF73002B8F2E /* compare2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2084C0D52209BF73002B8F2E /* compare2.txt */; };
+		2084C0D82209BF8B002B8F2E /* deRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2084C0D72209BF8B002B8F2E /* deRestWords.txt */; };
 		2087444321FA1C74006C00C6 /* deRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2087444221FA1C74006C00C6 /* deRestWords.txt */; };
 		2087AC0E202C86FF008DEF26 /* LoadingScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087AC0D202C86FF008DEF26 /* LoadingScene.swift */; };
 		20895DFB21FA152100E54BF3 /* enMandatoryInput.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */; };
@@ -115,7 +117,6 @@
 		20B28AE620333273001682B2 /* WTTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTTableView.swift */; };
 		20CDA669214FFEBF00160DC6 /* CloudRecordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */; };
 		20F3102E2201DD6C007EE1D0 /* compare1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* compare1.txt */; };
-		20F310302201DEBB007EE1D0 /* compare2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102F2201DEBB007EE1D0 /* compare2.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -226,6 +227,8 @@
 		20819321202B484D00406D9A /* gameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = gameData.txt; sourceTree = "<group>"; };
 		20819323202B4A7100406D9A /* GenerateGameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateGameData.swift; sourceTree = "<group>"; };
 		20842DE52031EA910078FFDA /* ruWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruWords.txt; sourceTree = "<group>"; };
+		2084C0D52209BF73002B8F2E /* compare2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = compare2.txt; sourceTree = "<group>"; };
+		2084C0D72209BF8B002B8F2E /* deRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deRestWords.txt; sourceTree = "<group>"; };
 		2087444221FA1C74006C00C6 /* deRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deRestWords.txt; sourceTree = "<group>"; };
 		2087AC0D202C86FF008DEF26 /* LoadingScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScene.swift; sourceTree = "<group>"; };
 		20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enMandatoryInput.txt; sourceTree = "<group>"; };
@@ -245,7 +248,6 @@
 		20B28AE520333273001682B2 /* WTTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTTableView.swift; sourceTree = "<group>"; };
 		20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudRecordsViewController.swift; sourceTree = "<group>"; };
 		20F3102D2201DD6C007EE1D0 /* compare1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = compare1.txt; sourceTree = "<group>"; };
-		20F3102F2201DEBB007EE1D0 /* compare2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = compare2.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -448,7 +450,8 @@
 				203D83FA21F6580000A2873C /* deWordsOld.txt */,
 				20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */,
 				20F3102D2201DD6C007EE1D0 /* compare1.txt */,
-				20F3102F2201DEBB007EE1D0 /* compare2.txt */,
+				2084C0D52209BF73002B8F2E /* compare2.txt */,
+				2084C0D72209BF8B002B8F2E /* deRestWords.txt */,
 				2087444221FA1C74006C00C6 /* deRestWords.txt */,
 				208B278E21FB382C007259B6 /* enRestWords.txt */,
 				208B279021FB8ED1007259B6 /* ruRestWords.txt */,
@@ -560,7 +563,7 @@
 				20552DBD211F1EFA00C54538 /* whiteSprite1001.png in Resources */,
 				20842DE62031EA910078FFDA /* ruWords.txt in Resources */,
 				20552DC4211F1EFA00C54538 /* whiteSprite1011.png in Resources */,
-				20F310302201DEBB007EE1D0 /* compare2.txt in Resources */,
+				2084C0D62209BF73002B8F2E /* compare2.txt in Resources */,
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
 				205184F72061525C00E7FAF4 /* huGameData.txt in Resources */,
 				20552DC8211F1EFA00C54538 /* whiteSprite1100.png in Resources */,
@@ -600,6 +603,7 @@
 				2048259921E8CC59000933B3 /* deWords.txt in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
 				20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */,
+				2084C0D82209BF8B002B8F2E /* deRestWords.txt in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
 				2049314C21E6496100BE66EA /* enMandatory.txt in Resources */,
 				208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */,

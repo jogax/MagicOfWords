@@ -1784,6 +1784,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 saveArrayOfPieces()
             }
+            
             tileForGame = tilesForGame[indexOfTilesForGame]
             indexOfTilesForGame += 1
         } while tileForGame.isOnGameboard

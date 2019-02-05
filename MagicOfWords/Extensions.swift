@@ -70,13 +70,13 @@ public extension UIDevice {
         case "AppleTV5,3":                              return "Apple TV"
         case "i386", "x86_64":
             switch (width, height) {
-            case (320, 480):                            return "iPhone 4s"
-            case (320, 568):                            return "iPhone 5s"
-            case (375, 667):                            return "iPhone 6"
-            case (414, 736):                            return "iPhone 6 Plus"
-            case (768, 1024):                           return "iPad Air"
-            case (1024, 1366):                          return "iPad Pro"
-            case (375, 812):                            return "iPhone_X"
+            case (320, 480):                            return "iPhone 4s Simulator"
+            case (320, 568):                            return "iPhone 5s Simulator"
+            case (375, 667):                            return "iPhone 6  Simulator"
+            case (414, 736):                            return "iPhone 6 Plus Simulator"
+            case (768, 1024):                           return "iPad Air Simulator"
+            case (1024, 1366):                          return "iPad Pro Simulator"
+            case (375, 812):                            return "iPhone_X Simulator"
             default:                                    return identifier
             }
         default:                                        return identifier
