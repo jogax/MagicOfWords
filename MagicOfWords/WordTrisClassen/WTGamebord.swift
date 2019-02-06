@@ -99,8 +99,59 @@ public struct FoundedWord {
         self.usedLetters = usedLetters
     }
     public mutating func addLetter(letter: UsedLetter) {
+        if usedLetters.count > 0 {
+            checkContinuity(letter: letter)
+        }
         word.append(letter.letter)
         usedLetters.append(letter)
+    }
+    
+    private mutating func checkContinuity(letter:UsedLetter) {
+        let actLetter = letter
+        let lastLetter = usedLetters.last!
+        if actLetter.col == lastLetter.col {
+                if actLetter.row - 1 > lastLetter.row {
+                    let col = actLetter.col
+                    for row in lastLetter.row + 1...actLetter.row - 1 {
+                        GV.gameArray[col][row].changeColor(toColor: .myBlueColor)
+                        let actLetter = GV.gameArray[col][row].letter
+                        let newLetter = UsedLetter(col: col, row: row, letter: actLetter)
+                        word.append(newLetter.letter)
+                        usedLetters.append(newLetter)
+                    }
+                } else if lastLetter.row - 1 > actLetter.row {
+                    let col = actLetter.col
+                    for row in actLetter.row + 1...lastLetter.row - 1 {
+                        GV.gameArray[col][row].changeColor(toColor: .myBlueColor)
+                        let actLetter = GV.gameArray[col][row].letter
+                        let newLetter = UsedLetter(col: col, row: row, letter: actLetter)
+                        word.append(newLetter.letter)
+                        usedLetters.append(newLetter)
+                    }
+            }
+        }
+        if actLetter.row == lastLetter.row {
+            if actLetter.col - 1 > lastLetter.col {
+                let row = actLetter.row
+                for col in lastLetter.col + 1...actLetter.col - 1 {
+                    GV.gameArray[col][row].changeColor(toColor: .myBlueColor)
+                    let actLetter = GV.gameArray[col][row].letter
+                    let newLetter = UsedLetter(col: col, row: row, letter: actLetter)
+                    word.append(newLetter.letter)
+                    usedLetters.append(newLetter)
+                }
+            } else if lastLetter.col - 1 > actLetter.col {
+                let row = actLetter.row
+                for col in actLetter.col + 1...lastLetter.col - 1 {
+                    GV.gameArray[col][row].changeColor(toColor: .myBlueColor)
+                    let actLetter = GV.gameArray[col][row].letter
+                    let newLetter = UsedLetter(col: col, row: row, letter: actLetter)
+                    word.append(newLetter.letter)
+                    usedLetters.append(newLetter)
+                }
+            }
+        }
+
     }
     
     public mutating func removeFirstLetter() {
