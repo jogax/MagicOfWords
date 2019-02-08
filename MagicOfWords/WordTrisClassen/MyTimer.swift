@@ -27,11 +27,11 @@ class TimeForGame {
     }
     init() {
         time = 0
-        maxTime = iHour
+        maxTime = iHour * 10
     }
     init(from: String) {
         time = 0
-        maxTime = iHour
+        maxTime = iHour * 10
         let components = from.components(separatedBy: itemSeparator)
         if components.count == 2 {
             if let myTime = Int(components[0]) {

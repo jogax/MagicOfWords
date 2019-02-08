@@ -49,6 +49,16 @@ let mandatoryConfig = Realm.Configuration(
 // Open the Realm with the configuration
 let realmMandatory: Realm = try! Realm(configuration: mandatoryConfig)
 
+let mandatoryListConfig  = Realm.Configuration(
+    // Get the path to the bundled file
+    fileURL: URL(string: Bundle.main.path(forResource: "MandatoryList", ofType:"realm")!),
+    // Open the file in read-only mode as application bundles are not writeable
+    readOnly: true,
+    objectTypes: [MandatoryListModel.self])
+
+// Open the Realm with the configuration
+let realmMandatoryList: Realm = try! Realm(configuration: mandatoryListConfig)
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -76,7 +86,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 15,
+            schemaVersion: 16, // new item words
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in

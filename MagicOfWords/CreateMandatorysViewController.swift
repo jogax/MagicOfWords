@@ -34,7 +34,11 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
     }
     
     func creating() {
-        getSavedMandatoryWords()
+        generateMandatoryList(language: "en")
+        generateMandatoryList(language: "de")
+        generateMandatoryList(language: "hu")
+        generateMandatoryList(language: "ru")
+//        getSavedMandatoryWords()
     }
     
     private func getSavedMandatoryWords() {
@@ -221,6 +225,35 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
 //       print("hier")
 //    }
 //    
+
+    private func generateMandatoryList(language: String) {
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            newMandatoryURL = documentsURL.appendingPathComponent("MandatoryList.realm")
+//            let url = NSURL(string: (NSBundle.mainBundle().resourceURL?.absoluteString)! +  named + ".realm")
+            let mandatoryConfig = Realm.Configuration(
+                //        fileURL: URL(string: Bundle.main.path(forResource: "NewMandatory", ofType: "realm")!),
+                fileURL: newMandatoryURL!,
+                objectTypes: [MandatoryListModel.self])
+            let newMandatoryList:Realm = try! Realm(configuration: mandatoryConfig)
+            let mandatoryItems = realmMandatory.objects(MandatoryModel.self).filter("language = %@", language )
+            for item in mandatoryItems {
+                let words = item.mandatoryWords
+                let wordArray = words.components(separatedBy: itemSeparator)
+                for word in wordArray {
+                    if newMandatoryList.objects(MandatoryListModel.self).filter("word = %@", word).count == 0 {
+                        let newItem = MandatoryListModel()
+                        newItem.word = word
+                        newItem.language = language
+                        try! newMandatoryList.write() {
+                            newMandatoryList.add(newItem)
+                        }
+                    }
+                }
+            }
+            print("hier")
+        }
+    
+
     private func showMandatoryTable() {
         if !tableviewAdded {
             let origin = CGPoint(x: 0, y: 0)

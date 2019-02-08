@@ -1726,9 +1726,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             timeForGame.incrementTime()
         }
         timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.remainingTime.HourMinSec)
-        realm.beginWrite()
-        GV.playingRecord.time = timeForGame.toString()
-        try! realm.commitWrite()
+        try! realm.write() {
+            GV.playingRecord.time = timeForGame.toString()
+        }
         if myTimer!.update(time: timeForGame) {
             timer!.invalidate()
             timer = nil
@@ -2359,20 +2359,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 self.startUndo()
             })
             let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
+                self.stopShowingTableIfNeeded()
                 self.startNextRound()
             })
             let answer3Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer3), style: .default, handler: {alert -> Void in
-//                self.gameboardEnabled = true
-//                let title = GV.language.getText(.tcNoMoreStepsAnswer2)
-//                let wordLength = title.width(font: self.myTitleFont!)
-//                let wordHeight = title.height(font: self.myTitleFont!)
-//                let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
-//                let answer1ButtonPos = self.frame.height * 0.05
-//                let center = CGPoint(x:self.frame.width * 0.5, y: answer1ButtonPos) //self.frame.height * 0.20)
-//                let radius = frame.height * 0.5
-//                self.answer1Button = self.createButton(imageName: "", title: GV.language.getText(.tcNoMoreStepsAnswer2), frame: frame, center: center, cornerRadius: radius, enabled: true, color: .white)
-////                self.answer1Button!.addTarget(self, action: #selector(self.startUndo), for: .touchUpInside)
-//                self.view?.addSubview(self.answer1Button!)
             })
             let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
                                                     message: "", //GV.language.getText(.tcNoMoreStepsQuestion2),
@@ -2407,10 +2397,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             try! realm.write() {
                 if activityRoundItem.count > 0 {
                     GV.playingRecord.rounds.removeLast()
-                    timeForGame.decrementMaxTime(value: iHalfHour)
-                    wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
-                    WTGameWordList.shared.getPreviousRound()
                     activityRoundItem.removeLast()
+                    timeForGame.decrementMaxTime(value: iHalfHour)
+                    
+                    wtGameboard!.setRoundInfos()
+                    WTGameWordList.shared.restoreFromPlayingRecord()
+                    restoreGameArray()
+                    showFoundedWords()
                     modifyHeader()
                 } else {
                     createUndo(enabled: false)
@@ -2544,7 +2537,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var typesWithLen2 = [MyShapes]()
         var typesWithLen3 = [MyShapes]()
         var typesWithLen4 = [MyShapes]()
-        
+        var usedWords = [String]()
+        var wordsString = ""
+        var letterCounters = [String: Int]()
+
         for index in 0..<MyShapes.count - 1 {
             guard let type = MyShapes(rawValue: index) else {
                 return ""
@@ -2561,9 +2557,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             default: break
             }
         }
+        
+        wordsString = GV.playingRecord.words
+        if wordsString.length > 0 {
+            usedWords = wordsString.components(separatedBy: itemSeparator)
+        }
+        let myLetters = GV.language.getText(.tcAlphabet)
+        for letter in myLetters {
+            letterCounters[String(letter)] = 0
+        }
 
         func splittingWord(word: String) {
             var inputWord = word.uppercased()
+            for letter in inputWord {
+                letterCounters[String(letter)]! += 1
+            }
+            usedWords.append(inputWord)
+            wordsString += inputWord + "°"
             repeat {
                 var letters = [String]()
                 let randomLength = inputWord.length > 3 ? 3 : inputWord.length
@@ -2586,32 +2596,57 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
             } while inputWord.length > 0
         }
-         if first {
+        if first {
             let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(GV.playingRecord.gameNumber))[0]
             let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
             for word in words {
                 print(word)
                 splittingWord(word: word)
             }
+        } else {
+            for word in usedWords {
+                for letter in word.uppercased() {
+                    letterCounters[String(letter)]! += 1
+                }
+            }
         }
-        let number = GV.playingRecord.gameNumber + 50
-        let records = realmMandatory.objects(MandatoryModel.self).filter("combinedKey BEGINSWITH %d", GV.actLanguage)
+//        let number = GV.playingRecord.gameNumber + 50
+//        var allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("word BEGINSWITH %d", GV.actLanguage)
 //        myTimer!.startTimeMessing()
         for _ in 1...(first ? 4 : 10) {
-            let searchGameNumber = random!.getRandomInt(number, max: number + 1000) % 1000
-            let wordPosition = random!.getRandomInt(0, max: 5)
-            let actRecord = records[searchGameNumber]
-            let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
-            let word = words[wordPosition]
-            print(word)
-//            myTimer!.showLastTime(text: "before splitting")
-            splittingWord(word: word)
-//            myTimer!.showLastTime(text: "after splitting")
+            var letters = [String]()
+            var minValue = 1000
+            for item in letterCounters {
+                if item.value < minValue {
+                    minValue = item.value
+                }
+            }
+
+            
+            for item in letterCounters {
+                if item.value == minValue {
+                    letters.append(item.key)
+                }
+            }
+            let allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[0].lowercased())
+
+            let counter = allRecords.count
+            let wordIndex = random!.getRandomInt(0, max: counter - 1)
+            let word = allRecords[wordIndex].word
+            
+             splittingWord(word: word)
+            
+//            print("letters: \(letters), word: \(word)")
+            
          }
 //        myTimer!.showWholeTime(text: "after generating")
         var generatedArrayInStringForm = ""
         for tile in tilesForGame {
             generatedArrayInStringForm += tile.toString() + "°"
+        }
+        wordsString.removeLast()
+        try! realm.write() {
+            GV.playingRecord.words = wordsString
         }
         return generatedArrayInStringForm
 
