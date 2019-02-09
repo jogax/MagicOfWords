@@ -2399,7 +2399,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     GV.playingRecord.rounds.removeLast()
                     activityRoundItem.removeLast()
                     timeForGame.decrementMaxTime(value: iHalfHour)
-                    
+                    GV.totalScore = 0
+                    GV.mandatoryScore = 0
+                    GV.ownScore = 0
+                    GV.bonusScore = 0
                     wtGameboard!.setRoundInfos()
                     WTGameWordList.shared.restoreFromPlayingRecord()
                     restoreGameArray()

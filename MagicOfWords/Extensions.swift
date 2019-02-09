@@ -316,6 +316,15 @@ public extension Float {
 
 extension String {
     
+    func contains(strings: [String])->Bool {
+        for string in strings {
+            if self.range(of:string) != nil {
+                return true
+            }
+        }
+        return false
+    }
+    
     func index(from: Int, of: String)->Int? {
         let length = of.length
         for ind in from..<self.length - length + 1 {

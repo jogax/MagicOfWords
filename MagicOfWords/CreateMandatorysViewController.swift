@@ -34,10 +34,19 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
     }
     
     func creating() {
-        generateMandatoryList(language: "en")
-        generateMandatoryList(language: "de")
-        generateMandatoryList(language: "hu")
-        generateMandatoryList(language: "ru")
+//        generateWordList(language: "en")
+//        generateWordList(language: "de")
+//        generateWordList(language: "hu")
+//        generateWordList(language: "ru")
+//        generateWordList(language: "stop")
+        checkMandatoryInWordList(language: "en")
+        checkMandatoryInWordList(language: "de")
+        checkMandatoryInWordList(language: "hu")
+        checkMandatoryInWordList(language: "ru")
+//        generateMandatoryList(language: "en")
+//        generateMandatoryList(language: "de")
+//        generateMandatoryList(language: "hu")
+//        generateMandatoryList(language: "ru")
 //        getSavedMandatoryWords()
     }
     
@@ -180,51 +189,66 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
     
     var tableviewAdded = false
     var timer: Timer?
+    var newWordListURL: URL?
     var newMandatoryURL: URL?
 
+
     
-//    private func saveToLocalRealm() {
-//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-//        newMandatoryURL = documentsURL.appendingPathComponent("NewMandatory.realm")
-//        let config1 = Realm.Configuration(
-//            fileURL: newMandatoryURL!,
-//            shouldCompactOnLaunch: { totalBytes, usedBytes in
-//                // totalBytes refers to the size of the file on disk in bytes (data + free space)
-//                // usedBytes refers to the number of bytes used by data in the file
-//                
-//                // Compact if the file is over 100MB in size and less than 50% 'used'
-//                let oneMB = 10 * 1024 * 1024
-//                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
-//        },
-//            objectTypes: [MandatoryModel.self])
-//        do {
-//            // Realm is compacted on the first open if the configuration block conditions were met.
-//            _ = try Realm(configuration: config1)
-//        } catch {
-//            print("error")
-//            // handle error compacting or opening Realm
-//        }
-//
-//        let mandatoryConfig = Realm.Configuration(
-//            //        fileURL: URL(string: Bundle.main.path(forResource: "NewMandatory", ofType: "realm")!),
-//            fileURL: newMandatoryURL!,
-//            objectTypes: [MandatoryModel.self])
-//        let newMandatory:Realm = try! Realm(configuration: mandatoryConfig)
-//        for item in generatedItems! {
-//            if newMandatory.objects(MandatoryModel.self).filter("combinedKey == %@", item.combinedKey).count == 0 {
-//                let newItem = MandatoryModel()
-//                newItem.combinedKey = item.combinedKey
-//                newItem.gameNumber = item.gameNumber
-//                newItem.language = item.language
-//                newItem.mandatoryWords = item.mandatoryWords
-//                try! newMandatory.write() {
-//                    newMandatory.add(newItem)
-//                }
-//            }
-//        }
-//       print("hier")
-//    }
-//    
+    private func saveToLocalRealm() {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        newWordListURL = documentsURL.appendingPathComponent("NewWordList")
+        let config1 = Realm.Configuration(
+            fileURL: newWordListURL!,
+            shouldCompactOnLaunch: { totalBytes, usedBytes in
+                // totalBytes refers to the size of the file on disk in bytes (data + free space)
+                // usedBytes refers to the number of bytes used by data in the file
+                
+                // Compact if the file is over 100MB in size and less than 50% 'used'
+                let oneMB = 10 * 1024 * 1024
+                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+        },
+            objectTypes: [MandatoryModel.self])
+        do {
+            // Realm is compacted on the first open if the configuration block conditions were met.
+            _ = try Realm(configuration: config1)
+        } catch {
+            print("error")
+            // handle error compacting or opening Realm
+        }
+
+        
+        let newWordListConfig = Realm.Configuration(
+            fileURL: newWordListURL!,
+            objectTypes: [MandatoryModel.self])
+        let newWordList:Realm = try! Realm(configuration: newWordListConfig)
+        for item in generatedItems! {
+            if newWordList.objects(MandatoryModel.self).filter("combinedKey == %@", item.combinedKey).count == 0 {
+                let newItem = MandatoryModel()
+                newItem.combinedKey = item.combinedKey
+                newItem.gameNumber = item.gameNumber
+                newItem.language = item.language
+                newItem.mandatoryWords = item.mandatoryWords
+                try! newWordList.write() {
+                    newWordList.add(newItem)
+                }
+            }
+        }
+       print("hier")
+    }
+
+    private func checkMandatoryInWordList(language: String) {
+        var count = 0
+        print("check \(language)")
+        let allMandatory = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %@", language)
+        for mandatoryWord in allMandatory {
+            let word = mandatoryWord.word
+            if realmWordList.objects(WordListModel.self).filter("word = %@", language + word).count == 0{
+                print("word not in wordlist: \(word)")
+                count += 1
+            }
+        }
+        print("\(count) words not in wordlist")
+    }
 
     private func generateMandatoryList(language: String) {
             let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -460,4 +484,116 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
 
 
 }
+
+private func generateWordList(language: String) {
+    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    let newWordListURL = documentsURL.appendingPathComponent("NewWordList")
+    let config1 = Realm.Configuration(
+        fileURL: newWordListURL,
+        shouldCompactOnLaunch: { totalBytes, usedBytes in
+            // totalBytes refers to the size of the file on disk in bytes (data + free space)
+            // usedBytes refers to the number of bytes used by data in the file
+            
+            // Compact if the file is over 100MB in size and less than 50% 'used'
+            let oneMB = 10 * 1024 * 1024
+            return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+    },
+        objectTypes: [WordListModel.self])
+    do {
+        // Realm is compacted on the first open if the configuration block conditions were met.
+        _ = try Realm(configuration: config1)
+    } catch {
+        print("error")
+        // handle error compacting or opening Realm
+    }
+    let newWordListConfig = Realm.Configuration(
+        fileURL: newWordListURL,
+        objectTypes: [WordListModel.self])
+    
+    let newWordList:Realm = try! Realm(configuration: newWordListConfig)
+
+    if language == "stop"
+    {
+        exit(0)
+    }
+    var count = 0
+    if language != "de" {
+        let wordList = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@",language)
+        for item in wordList {
+            let newWord = WordListModel()
+            newWord.word = item.word
+            if item.word.contains(strings: [":freq:"]) {
+                continue
+            }
+            if newWordList.objects(WordListModel.self).filter("word = %@",item.word).count > 0 {
+                print("word \(item.word) is soon in DB")
+                continue
+            }
+            try! newWordList.write() {
+                newWordList.add(newWord)
+            }
+            count += 1
+            if count % 1000 == 0 {
+                print("language: \(language), count: \(count)")
+            }
+        }
+    } else {
+        let wordFileURL = Bundle.main.path(forResource: "\(language)Words", ofType: "txt")
+    // Read from the file Words
+        var wordsFile = ""
+        do {
+            wordsFile = try String(contentsOfFile: wordFileURL!, encoding: String.Encoding.utf8)
+        } catch let error as NSError {
+            print("Failed reading from URL: \(String(describing: wordFileURL)), Error: " + error.localizedDescription)
+        }
+        
+        let myWords = wordsFile.components(separatedBy: .newlines)
+        
+        for item in myWords {
+            if !item.contains(strings: ["-", " "]) {
+                let newWord = WordListModel()
+                newWord.word = language + item.lowercased()
+                if newWordList.objects(WordListModel.self).filter("word = %@", newWord.word).count > 0 {
+                    print("word \(item.lowercased()) is soon in DB")
+                 } else {
+                    try! newWordList.write() {
+                        newWordList.add(newWord)
+                    }
+                }
+                count += 1
+                if count % 1000 == 0 {
+                    print("language: \(language), count: \(count)")
+                }
+
+            } else {
+                print("word not appended: \(item)")
+            }
+        }
+        
+    }
+    //        try! realm.write() {
+    //            realm.delete(wordsToDelete)
+    //        }
+    //        let wordList = wordsFile.components(separatedBy: .newlines)
+    //        for word in wordsToCopy {
+    //            let charset = CharacterSet(charactersIn: "-! /.èêûé") // words with "-", "!" are not computed
+    //            if word.rangeOfCharacter(from: charset) == nil || word.length > 20 || word.length < 2 {
+    //                if notDELanguage || word.firstChar().uppercased() == word.firstChar() {
+    ////                    generateLetterFrequency(language: language, word: word.lowercased())
+    //                    let wordModel = WordListModel()
+    //                    wordModel.word = (language + word).lowercased()
+    //                    if realm.objects(WordListModel.self).filter("word = %d", wordModel.word).count == 0 {
+    //                        try! realm.write {
+    //                            realm.add(wordModel)
+    //                        }
+    //                    }
+    //                }
+    //            } else {
+    //                print("\(word)")
+    //            }
+    //        }
+    //        saveLetterFrequency(language: language)
+    
+}
+
 #endif

@@ -116,7 +116,7 @@
 		20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE120330E73001682B2 /* BasicDataModel.swift */; };
 		20B28AE620333273001682B2 /* WTTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B28AE520333273001682B2 /* WTTableView.swift */; };
 		20CDA669214FFEBF00160DC6 /* CloudRecordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */; };
-		20F3102E2201DD6C007EE1D0 /* compare1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* compare1.txt */; };
+		20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -248,7 +248,7 @@
 		20B28AE120330E73001682B2 /* BasicDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicDataModel.swift; sourceTree = "<group>"; };
 		20B28AE520333273001682B2 /* WTTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTTableView.swift; sourceTree = "<group>"; };
 		20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudRecordsViewController.swift; sourceTree = "<group>"; };
-		20F3102D2201DD6C007EE1D0 /* compare1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = compare1.txt; sourceTree = "<group>"; };
+		20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruMandatoryIgor.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -451,7 +451,7 @@
 				20842DE52031EA910078FFDA /* ruWords.txt */,
 				203D83FA21F6580000A2873C /* deWordsOld.txt */,
 				20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */,
-				20F3102D2201DD6C007EE1D0 /* compare1.txt */,
+				20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */,
 				2084C0D52209BF73002B8F2E /* compare2.txt */,
 				2084C0D72209BF8B002B8F2E /* deRestWords.txt */,
 				2087444221FA1C74006C00C6 /* deRestWords.txt */,
@@ -592,7 +592,7 @@
 				20552DC9211F1EFA00C54538 /* whiteSprite0001.png in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
 				205CF7ED2129BC9300C1B89D /* back.png in Resources */,
-				20F3102E2201DD6C007EE1D0 /* compare1.txt in Resources */,
+				20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
 				204C30B321EF789A008B1CB3 /* ruMandatory6.txt in Resources */,
 				204BB45D2063E9E000CDF085 /* undo.png in Resources */,
