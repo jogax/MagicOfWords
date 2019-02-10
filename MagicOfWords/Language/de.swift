@@ -94,7 +94,11 @@ let deDictionary: [TextConstants: String] = [
     .tcSearchingWord:       " Suchwort: %",
     .tcCollectMandatory:    "Pflichtwörter suchen",
     .tcCreateMandatory:     "Pflichtwörter erstellen",
-    .tcChangeWord:          " ändern"
+    .tcChangeWord:          " ändern",
+    .tcCongratulations1:    "Herzlichen Glückwunsch ! Sie haben alle Pflichtwörter!",
+    .tcCongratulations2:    "Sie können weiterspielen um mehr Punkte zu sammeln oder den Knopf <Beenden> berühren, um das Spiel zu beenden!",
+    .tcContinuePlaying:     "Weiterspielen",
+    .tcFinishGame:          "Beenden",
 ]
 
 

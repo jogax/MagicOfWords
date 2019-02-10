@@ -1729,11 +1729,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         try! realm.write() {
             GV.playingRecord.time = timeForGame.toString()
         }
-        if myTimer!.update(time: timeForGame) {
-            timer!.invalidate()
-            timer = nil
-            showGameFinished(status: .TimeOut)
-        }
+//        if myTimer!.update(time: timeForGame) {
+//            timer!.invalidate()
+//            timer = nil
+//            showGameFinished(status: .TimeOut)
+//        }
     }
     
     private func saveArrayOfPieces() {
@@ -2036,21 +2036,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                activityItems.append(activityItem)
                 createUndo(enabled: true)
 //                undoSprite.alpha = 1.0
-                let fixedName = "Pos\(movedIndex)"
-                removeNodesWith(name: fixedName)
+//                let fixedName = "Pos\(movedIndex)"
+//                removeNodesWith(name: fixedName)
                 if movedIndex < lastPosition {
                     for index in movedIndex..<lastPosition {
                         pieceArray[index] = pieceArray[index + 1]
+                        removeNodesWith(name: "Pos\(String(index + 1))")
                         pieceArray[index].name = "Pos\(String(index))"
                         pieceArray[index].position = origPosition[index]
                         pieceArray[index].setPieceFromPosition(index: index)
                         origSize[index] = pieceArray[index].size
+                        self.addChild(pieceArray[index])
                     }
                 }
                 pieceArray[lastPosition] = getNextPiece(horizontalPosition: lastPosition)
                 pieceArray[lastPosition].position = origPosition[lastPosition]
                 pieceArray[lastPosition].name = "Pos\(lastPosition)"
                 pieceArray[lastPosition].setPieceFromPosition(index: lastPosition)
+                removeNodesWith(name: pieceArray[lastPosition].name!)
                 self.addChild(pieceArray[lastPosition])
                 
                saveActualState()
@@ -2243,21 +2246,55 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func checkIfGameFinished()->Bool {
 //        if GV.allMandatoryWordsFounded() {
         if WTGameWordList.shared.gameFinished() {
-            try! realm.write() {
-                GV.playingRecord.score = GV.totalScore
-                GV.playingRecord.gameStatus = GV.GameStatusFinished
-                GV.playingRecord.nowPlaying = false
-                GV.playingRecord.pieces = ""
-                GV.playingRecord.time = timeInitValue
-                GV.playingRecord.rounds.removeAll()
-            }
-            enabled = false
-            showGameFinished(status: .OK)
+            congratulations()
+//            try! realm.write() {
+//                GV.playingRecord.score = GV.totalScore
+//                GV.playingRecord.gameStatus = GV.GameStatusFinished
+//                GV.playingRecord.nowPlaying = false
+//                GV.playingRecord.pieces = ""
+//                GV.playingRecord.time = timeInitValue
+//                GV.playingRecord.rounds.removeAll()
+//            }
+//            enabled = false
+//            showGameFinished(status: .OK)
 //            wtGameFinishedSprite.showFinish(status: .OK)
             saveToRealmCloud(finished: true)
             return true
         }
         return false
+    }
+    
+    var goOnPlaying = false
+    
+    private func congratulations() {
+        if !goOnPlaying {
+            let title = GV.language.getText(.tcCongratulations1)
+            let message = GV.language.getText(.tcCongratulations2)
+            let continueTitle = GV.language.getText(.tcContinuePlaying)
+            let finishTitle = GV.language.getText(.tcFinishGame)
+            let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            let continueAction =  UIAlertAction(title: continueTitle, style: .default, handler: {alert -> Void in
+                self.gameboardEnabled = true
+                self.createFinishButton()
+                self.goOnPlaying = true
+            })
+            let finishAction =  UIAlertAction(title: finishTitle, style: .default, handler: {alert -> Void in
+                self.gameboardEnabled = true
+                self.finishButtonTapped()
+                self.saveToRealmCloud(finished: true)
+            })
+            alertController.addAction(continueAction)
+            alertController.addAction(finishAction)
+            self.parentViewController!.present(alertController, animated: true, completion: nil)
+        }
+    }
+    
+    private func createFinishButton() {
+        
+    }
+    
+    private func finishButtonTapped() {
+        
     }
     
     private func showGameFinished(status: GameFinishedStatus) {
@@ -2429,15 +2466,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         movePieceToPosition(from: pieceArray[0], to: 1)
                         movePieceToPosition(from: tileForGame, to: 0)
                         tileForGame.alpha = 1.0
+                        removeNodesWith(name: pieceArray[0].name!)
                         self.addChild(pieceArray[0])
                     case 1:
                         movePieceToPosition(from: pieceArray[1], to: 2, remove: true)
                         movePieceToPosition(from: tileForGame, to: 1)
                         tileForGame.alpha = 1.0
+                        removeNodesWith(name: pieceArray[1].name!)
                         self.addChild(pieceArray[1])
                     case 2:
                         movePieceToPosition(from: tileForGame, to: 2, remove: true)
                         tileForGame.alpha = 1.0
+                        removeNodesWith(name: pieceArray[2].name!)
                         self.addChild(pieceArray[2])
                     default: break
                     }
@@ -2606,6 +2646,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 print(word)
                 splittingWord(word: word)
             }
+            
         } else {
             for word in usedWords {
                 for letter in word.uppercased() {

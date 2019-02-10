@@ -94,5 +94,9 @@ let huDictionary: [TextConstants: String] = [
     .tcSearchingWord:       " Kereső szó: %",
     .tcCollectMandatory:    "Kötelező szavak keresése",
     .tcCreateMandatory:     "Kötelező szavak generálása",
-    .tcChangeWord:          " módosít"
+    .tcChangeWord:          " módosít",
+    .tcCongratulations1:    "Gratulálok! Minden kötelező szót kiraktál!",
+    .tcCongratulations2:    "Tovább játszhatsz és pontokat gyűjthetsz vagy a <Befejezem> gomb megérintésével befejezheted a játékot!",
+    .tcContinuePlaying:     "Tovább játszom",
+    .tcFinishGame:          "Befejezem",
 ]

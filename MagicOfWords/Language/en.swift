@@ -94,5 +94,9 @@ let enDictionary: [TextConstants: String] = [
     .tcSearchingWord:       " Searching word: %",
     .tcCollectMandatory:    "Search mandatory words",
     .tcCreateMandatory:     "Create mandatory words",
-    .tcChangeWord:          " change"
+    .tcChangeWord:          " change",
+    .tcCongratulations1:    "Congratulations! You have all the mandatory words!",
+    .tcCongratulations2:    "You can continue playing and earn more points or touch <Finish> to finish the game!",
+    .tcContinuePlaying:     "Continue playing",
+    .tcFinishGame:          "Finish",
 ]
