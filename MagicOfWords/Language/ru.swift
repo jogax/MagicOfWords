@@ -54,8 +54,8 @@ let ruDictionary: [TextConstants: String] = [
 //    .tcNoMoreStepsAnswer1: "Да",
     .tcNoMoreStepsAnswer2: "Следующий раунд",
     .tcNoMoreStepsAnswer3: "Указать собственные слова",
-    .tcAlphabet:           "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ", //Ъ !!!
-    .tcFrequency:           "А°10/Б°2/В°3/Г°2/Д°3/Е°8/Ё°1/Ж°1/З°2/И°9/Й°1/К°5/Л°4/М°3/Н°7/О°10/П°3/Р°7/С°5/Т°7/У°2/Ф°1/Х°1/Ц°1/Ч°1/Ш°1/Щ°1/Ы°1/Ь°2/Э°1/Ю°0/Я°1",
+    .tcAlphabet:           "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЪЭЮЯ", //Ъ !!!
+//    .tcFrequency:           "А°10/Б°2/В°3/Г°2/Д°3/Е°8/Ё°1/Ж°1/З°2/И°9/Й°1/К°5/Л°4/М°3/Н°7/О°10/П°3/Р°7/С°5/Т°7/У°2/Ф°1/Х°1/Ц°1/Ч°1/Ш°1/Щ°1/Ы°1/Ь°2/Э°1/Ю°0/Я°1",
     .tcNickNameLetters:    "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭ",
     .tcGameNumber:          "Игра",
     .tcOK:                  "OK",
@@ -88,8 +88,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcMyHeader:            "Мои очки/Mecто",
     .tcMyNickName:          "Мой псевдоним: %",
     .tcGameIsFinished:      "Игра % уже закончена!",
-    .tcRestartGameQuestion: "При перезапуске очки будут удалены!",
-    .tcRestartGame:         "Запуск",
+    .tcRestartGameQuestion: "Вы можете продолжить или перезапустить игру! Если перезапустить, очки будут удалены!",
+    .tcRestartGame:         "Перезапуск",
+    .tcContinueGame:        "Продолжение",
     .tcShowWordlistHeader:  " Список найденных слов (%)",
     .tcSearchingWord:       " Поисковое слово: %",
     .tcCollectMandatory:    "Поиск обязательных слов",

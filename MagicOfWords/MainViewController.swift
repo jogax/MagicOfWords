@@ -70,20 +70,20 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     
     var showGamesScene: ShowGamesScene?
     func backFromSettingsScene() {
-        try! realm.write {
+        try! realm.write() {
             GV.basicDataRecord.actLanguage = GV.actLanguage
         }
         showMenu()
 //        startMenuScene()
     }
     
-    func backToMenuScene(gameNumberSelected: Bool = false, gameNumber: Int = 0) {
+    func backToMenuScene(gameNumberSelected: Bool = false, gameNumber: Int = 0, restart: Bool) {
         if showGamesScene != nil {
             showGamesScene!.removeFromParent()
             showGamesScene = nil
         }
         if gameNumberSelected {
-            startWTScene(new: false, next: .GameNumber, gameNumber: gameNumber)
+            startWTScene(new: false, next: .GameNumber, gameNumber: gameNumber, restart: restart)
         } else {
             showMenu()
         }
@@ -130,11 +130,11 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         return
     }
     
-    func startWTScene(new: Bool, next: StartType, gameNumber: Int) {
+    func startWTScene(new: Bool, next: StartType, gameNumber: Int, restart: Bool = false) {
         let wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
             wtScene.setDelegate(delegate: self)
-            wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber)
+            wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
             wtScene.parentViewController = self
             view.presentScene(wtScene)
         }
@@ -236,6 +236,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
+        #if DEBUG
+            GV.debug = true
+        #endif
         showBackgroundPicture()
 //        printDEWordsSorted()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
@@ -390,16 +393,18 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         })
         alertController.addAction(chooseLanguageAction)
         //--------------------- nickNameAction ---------------------
-        nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
-            alert -> Void in
-            if GV.connectedToInternet && playerActivity != nil {
-                self.chooseNickname()
-            } else {
-                self.showMenu()
-            }
-        })
-        nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-        alertController.addAction(nickNameAction!)
+        if !GV.debug {
+            nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
+                alert -> Void in
+                if GV.connectedToInternet && playerActivity != nil {
+                    self.chooseNickname()
+                } else {
+                    self.showMenu()
+                }
+            })
+            nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+            alertController.addAction(nickNameAction!)
+        }
         #if DEBUG
         //--------------------- showRealmCloudAction ---------------------
             showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
@@ -428,21 +433,20 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     private func generateBasicDataRecordIfNeeded() {
-            if realm.objects(BasicDataModel.self).count == 0 {
-                let myName = generateRandomNameFromDeviceID()
-                GV.basicDataRecord = BasicDataModel()
-                GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
-                GV.basicDataRecord.myName = myName
-                GV.basicDataRecord.myNickname = generateMyNickname()
-                GV.basicDataRecord.creationTime = Date()
-                try! realm.write {
-                    realm.add(GV.basicDataRecord)
-                }
-            } else {
-                GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
-                GV.language.setLanguage(GV.basicDataRecord.actLanguage)
+        if realm.objects(BasicDataModel.self).count == 0 {
+            let myName = generateRandomNameFromDeviceID()
+            GV.basicDataRecord = BasicDataModel()
+            GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
+            GV.basicDataRecord.myName = myName
+            GV.basicDataRecord.myNickname = generateMyNickname()
+            GV.basicDataRecord.creationTime = Date()
+            try! realm.write() {
+                realm.add(GV.basicDataRecord)
             }
-
+        } else {
+            GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
+            GV.language.setLanguage(GV.basicDataRecord.actLanguage)
+        }
     }
     
     
@@ -481,7 +485,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     func generateMyNickname()->String {
-        var nickName = GV.onIpad ? "Pd" : "Ph"
+        var nickName = GV.debug ? "Sim" : (GV.onIpad ? "Pd" : "Ph")
         let letters = GV.language.getText(.tcNickNameLetters)
         for _ in 0...4 {
             nickName += letters.subString(at: Int.random(min: 0, max: letters.count - 1), length: 1)
@@ -507,11 +511,11 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             playerActivityByNickNameToken = playerActivityByNickNameSubscription!.observe(\.state) { [weak self]  state in
                 if state == .complete {
                     if self!.playerActivityByNickName!.count == 0 {
-                        try! realmSync?.write {
+                        try! realmSync?.write() {
                             playerActivity![0].nickName = nickName
                             playerActivity![0].keyWord = keyWord
                         }
-                        try! realm.write {
+                        try! realm.write() {
                             GV.basicDataRecord.myNickname = nickName
                             GV.basicDataRecord.keyWord = keyWord
                         }
@@ -529,11 +533,11 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                             self!.present(alertController, animated: true, completion: nil)
                         } else {
                             if self!.playerActivityByNickName![0].keyWord == keyWord {
-                                try! realmSync?.write {
+                                try! realmSync?.write() {
                                     playerActivity![0].nickName = nickName
                                     playerActivity![0].keyWord = keyWord
                                 }
-                                try! realm.write {
+                                try! realm.write() {
                                     GV.basicDataRecord.myNickname = nickName
                                     GV.basicDataRecord.keyWord = keyWord
                                 }

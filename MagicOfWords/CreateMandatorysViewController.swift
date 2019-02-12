@@ -361,7 +361,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
                 wordsInCloud.gameNumber = gameNumber
                 wordsInCloud.language = GV.actLanguage
                 wordsInCloud.mandatoryWords = words
-                try! RealmService.write {
+                try! RealmService.write() {
                     RealmService.add(wordsInCloud)
                 }
             }
@@ -583,7 +583,7 @@ private func generateWordList(language: String) {
     //                    let wordModel = WordListModel()
     //                    wordModel.word = (language + word).lowercased()
     //                    if realm.objects(WordListModel.self).filter("word = %d", wordModel.word).count == 0 {
-    //                        try! realm.write {
+    //                        try! realm.write() {
     //                            realm.add(wordModel)
     //                        }
     //                    }

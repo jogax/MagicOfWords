@@ -12,7 +12,7 @@ import UIKit
 import RealmSwift
 
 public protocol ShowGamesSceneDelegate: class {
-    func backToMenuScene(gameNumberSelected: Bool, gameNumber: Int)
+    func backToMenuScene(gameNumberSelected: Bool, gameNumber: Int, restart: Bool)
 }
 class ShowGamesScene: SKScene, WTTableViewDelegate {
     struct FinishedGameData {
@@ -68,14 +68,14 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         goBack(gameNumberSelected: false, gameNumber: 0)
     }
     
-    private func goBack(gameNumberSelected: Bool, gameNumber: Int) {
+    private func goBack(gameNumberSelected: Bool, gameNumber: Int, restart: Bool = false) {
         showGamesInTableView!.isHidden = true
         showGamesInTableView = nil
 //        subscription.unsubscribe()
          if myDelegate == nil {
             return
         }
-        myDelegate!.backToMenuScene(gameNumberSelected: gameNumberSelected, gameNumber: gameNumber)
+        myDelegate!.backToMenuScene(gameNumberSelected: gameNumberSelected, gameNumber: gameNumber, restart: restart)
     }
     
     var showGamesInTableView: WTTableView?
@@ -114,6 +114,9 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         subscriptionToken = subscription.observe(\.state) { [weak self]  state in
             print("state: \(state)")
            if state == .complete {
+            #if DEBUG
+                self!.checkContinuity()
+            #endif
                 self!.gamesForShow = self!.getGamesForShow()
                 self!.calculateColumnWidths()
                 let origin = CGPoint(x: 0, y: 0)
@@ -176,6 +179,72 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         }
 
     }
+    var timer = Timer()
+    var missingRecords = [Int]()
+    
+    private func checkContinuity() {
+        var checkGameNumber = 0
+        for record in allResultsItems! {
+            repeat {
+                checkGameNumber += 1
+                if record.gameNumber != checkGameNumber {
+                    missingRecords.append(checkGameNumber)
+                    print("GameNumber : \(checkGameNumber) will be corrected")
+                } else {
+                    break
+                }
+            } while true
+        }
+        if missingRecords.count > 0 {
+            timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(insertBestPlayer(timerX: )), userInfo: nil, repeats: false)
+        }
+    }
+    
+    @objc public func insertBestPlayer(timerX: Timer) {
+        if missingRecords.count > 0 {
+            if goOn {
+                    setBestPlayerFor(gameNumber: missingRecords[0])
+                    missingRecords.removeFirst()
+                    goOn = false
+            }
+            timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(insertBestPlayer(timerX: )), userInfo: nil, repeats: false)
+        }
+    }
+    
+    var goOn = true
+    var bestPlayers: Results<BestScoreSync>?
+    var bestPlayersSubscription: SyncSubscription<BestScoreSync>?
+    var bestPlayersSubscriptionToken: NotificationToken?
+    
+    private func setBestPlayerFor(gameNumber: Int) {
+        let language = GV.basicDataRecord.actLanguage
+        let combinedPrimary = String(gameNumber) + language
+        bestPlayers = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary BEGINSWITH %@", combinedPrimary).sorted(byKeyPath: "score", ascending: false)
+        if bestPlayersSubscription != nil {
+            bestPlayersSubscriptionToken!.invalidate()
+            bestPlayersSubscription!.unsubscribe()
+        }
+        bestPlayersSubscription = bestPlayers!.subscribe(named: "BestListCorrection:\(combinedPrimary)")
+        bestPlayersSubscriptionToken = bestPlayersSubscription!.observe(\.state) { [weak self]  state in
+            if state == .complete {
+                let bestPlayer = BestScoreForGame()
+                bestPlayer.combinedPrimary = combinedPrimary
+                bestPlayer.gameNumber = gameNumber
+                bestPlayer.language = language
+                bestPlayer.bestScore = self!.bestPlayers![0].score
+                bestPlayer.timeStamp = Date()
+                bestPlayer.owner = self!.bestPlayers![0].owner
+                try! realmSync!.write() {
+                    realmSync!.add(bestPlayer)
+                }
+                self!.goOn = true
+                print("GameNumber : \(gameNumber) corrected")
+             } else {
+                print("state: \(state)")
+            }
+        }
+
+    }
     private func getGamesForShow()->[FinishedGameData] {
         let notExists:String = "---"
         var returnArray = [FinishedGameData]()
@@ -199,9 +268,11 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
             if let index =  returnArray.index(where: {Int($0.gameNumber) == bestGame.gameNumber}) {
                 if bestGame.owner != nil {
                     if bestGame.bestScore < Int(returnArray[index].score)! {
-                        try! realmSync!.write() {
-                            bestGame.bestScore = Int(returnArray[index].score)!
-                            bestGame.owner = playerActivity!.first!
+                        if !GV.debug {
+                            try! realmSync!.write() {
+                                bestGame.bestScore = Int(returnArray[index].score)!
+                                bestGame.owner = playerActivity!.first!
+                            }
                         }
                     }
                     returnArray[index].bestPlayer = bestGame.owner!.nickName!
@@ -270,12 +341,17 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                                                         preferredStyle: .alert)
                 alertController.addAction(UIAlertAction(title: GV.language.getText(.tcRestart), style: .default, handler: { [unowned self]
                     alert -> Void in
-                    self.goBack(gameNumberSelected: true, gameNumber: gameNumber)
+                    self.goBack(gameNumberSelected: true, gameNumber: gameNumber, restart: true)
                 }))
+                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcContinue), style: .default, handler: { [unowned self]
+                    alert -> Void in
+                    self.goBack(gameNumberSelected: true, gameNumber: gameNumber, restart: false)
+                }))
+
                 alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: nil))
                 self.parentViewController!.present(alertController, animated: true, completion: nil)
             } else {
-                goBack(gameNumberSelected: true, gameNumber: gameNumber)
+                goBack(gameNumberSelected: true, gameNumber: gameNumber, restart: false)
             }
         }
     }

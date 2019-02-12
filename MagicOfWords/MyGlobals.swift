@@ -54,6 +54,8 @@ struct GV {
 //    static var gameType = 0
     static var connectedToInternet = false
     static let onIpad = UIDevice.current.model.hasSuffix("iPad")
+    static let onSimulator = UIDevice.current.modelName.contains(strings: ["Simulator", "i386", "x86_64"])
+    static var debug = false
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static var activated = false
     static var gameArray: [[WTGameboardItem]] = [[WTGameboardItem]]()

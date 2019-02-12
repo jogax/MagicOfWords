@@ -29,7 +29,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
         var word = mandatoryWordsTable[indexPath.row]
-        try! RealmService.write {
+        try! RealmService.write() {
             let wordModel = CommonString()
             if word.length > savePhrase.length && word.ends(with: savePhrase) {
                 word = word.startingSubString(length: word.length - savePhrase.length).lowercased()
@@ -516,7 +516,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                     let wordModel = CommonString()
                     wordModel.word = language + word
                     if !savedMandatoryWords.contains(where: {$0 == word}) {
-                        try! RealmService.write {
+                        try! RealmService.write() {
                             print("new word founded: \(word)")
                             RealmService.add(wordModel)
                             savedMandatoryWords.append(word)
@@ -554,7 +554,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                     let word = item.word.endingSubString(at:2)
                     if word.length > 4 {
                         if word == "" {
-                            try! RealmService.write {
+                            try! RealmService.write() {
                                 RealmService.delete(item)
                             }
                         } else {

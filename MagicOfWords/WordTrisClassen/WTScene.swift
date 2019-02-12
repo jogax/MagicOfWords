@@ -481,6 +481,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var new: Bool = true
     var nextGame: StartType = .NoMore
     var newGameNumber: Int = 0
+    var restart: Bool = false
     var startTouchedNodes = TouchedNodes()
 //    var wtGameFinishedSprite = WTGameFinished()
 
@@ -550,6 +551,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.backgroundColor = bgColor
 //        generateReadOnly()
 //        exit(0)
+        if restart {
+            let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, newGameNumber)
+            if recordToDelete.count == 1 {
+                try! realm.write() {
+                    realm.delete(recordToDelete)
+                }
+            }
+        }
         getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber)
         createHeader()
         buttonHeight = self.frame.width * 0.08
@@ -762,10 +771,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         wtSceneDelegate = delegate
     }
     
-    public func setGameArt(new: Bool = false, next: StartType = .NoMore, gameNumber: Int = 0) {
+    public func setGameArt(new: Bool = false, next: StartType = .NoMore, gameNumber: Int = 0, restart: Bool) {
         self.new = new
         self.nextGame = next
         self.newGameNumber = gameNumber
+        self.restart = restart
     }
     
     let gameNumberLinePosition:CGFloat = 0.93
@@ -774,7 +784,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let bonusPointsLinePosition:CGFloat = 0.86
     let ownWordsLinePosition:CGFloat = 0.84
     let mandatoryWordsLinePosition:CGFloat = 0.82
-    let showAllWordsButtonCenterY:CGFloat = 0.265
+    let buttonLineCenterY:CGFloat = 0.265
     let gameboardCenterY: CGFloat = 0.42
     let pieceArrayCenterY: CGFloat = 0.10
     
@@ -1364,6 +1374,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var goToNextGameButton: UIButton?
     var undoButton: UIButton?
     var allWordsButton: UIButton?
+    var finishButton: UIButton?
     var goBackButton: UIButton?
     var wordListButton: UIButton?
     var buttonHeight = CGFloat(0)
@@ -1394,7 +1405,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.view?.addSubview(goToNextGameButton!)
     }
     
-    func createShowAllWordsButton() {
+    private func createShowAllWordsButton() {
         if allWordsButton != nil {
             allWordsButton?.removeFromSuperview()
             allWordsButton = nil
@@ -1405,7 +1416,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let wordLength = title.width(font: myTitleFont!)
         let wordHeight = title.height(font: myTitleFont!)
         let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
-        ownHeaderYPos = self.frame.height * showAllWordsButtonCenterY// - ownHeader.frame.maxY + frame.height
+        ownHeaderYPos = self.frame.height * buttonLineCenterY// - ownHeader.frame.maxY + frame.height
         allWordsButtonCenter = CGPoint(x:self.frame.width * 0.5, y: ownHeaderYPos) //self.frame.height * 0.20)
         let radius = frame.height * 0.5
         allWordsButton = createButton(imageName: "", title: title, frame: frame, center: allWordsButtonCenter, cornerRadius: radius, enabled: true )
@@ -1413,6 +1424,32 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         allWordsButton?.layer.zPosition = -100
         self.view?.addSubview(allWordsButton!)
     }
+    
+    private func createFinishButton() {
+        if finishButton != nil {
+            finishButton?.removeFromSuperview()
+            finishButton = nil
+        }
+        let title = GV.language.getText(.tcFinishGame)
+        let wordLength = title.width(font: myTitleFont!)
+        let wordHeight = title.height(font: myTitleFont!)
+        let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
+        let ownHeaderYPos = self.frame.height * buttonLineCenterY// - ownHeader.frame.maxY + frame.height
+        let finishButtonCenter = CGPoint(x:self.frame.width * 0.20, y: ownHeaderYPos) //self.frame.height * 0.20)
+        let radius = frame.height * 0.5
+        finishButton = createButton(imageName: "", title: title, frame: frame, center: finishButtonCenter, cornerRadius: radius, enabled: true )
+        finishButton!.isHidden = true
+        finishButton!.addTarget(self, action: #selector(self.finishButtonTapped), for: .touchUpInside)
+//        finishButton?.layer.zPosition = -100
+        self.view?.addSubview(finishButton!)
+    }
+    
+    @objc private func finishButtonTapped() {
+        print ("finish!")
+        showGameFinished(status: .OK)
+    }
+    
+
     
     var allWordsButtonCenter = CGPoint(x:0, y:0)
     
@@ -1628,6 +1665,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         createGoToPreviousGameButton(enabled: hasPreviousRecords(playingRecord: GV.playingRecord))
         createGoToNextGameButton(enabled: hasNextRecords(playingRecord: GV.playingRecord))
         createShowAllWordsButton()
+        createFinishButton()
         createWordListButton()
 //        if  hasPreviousRecords(playingRecord: GV.playingRecord) {
 //
@@ -2149,8 +2187,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
                 //                    print("in Subscription!")
                 if state == .complete {
-                    try! realmSync!.write {
-                        if self!.bestScoreSync!.count == 0 {
+                    if self!.bestScoreSync!.count == 0 && !GV.debug {
+                        try! realmSync!.write {
                             let bestScoreSyncRecord = BestScoreSync()
                             bestScoreSyncRecord.gameNumber = gameNumber
                             bestScoreSyncRecord.language = language
@@ -2175,23 +2213,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             forGameSubscriptionToken = bestScoreForActualGameSubscription!.observe(\.state) { [weak self]  state in
                 //                print("in Subscription!")
                 if state == .complete {
-                    if self!.bestScoreForActualGame!.count == 0 {
-                        try! realmSync!.write {
-                            let bestScoreForActualGameRecord = BestScoreForGame()
-                            bestScoreForActualGameRecord.gameNumber = gameNumber
-                            bestScoreForActualGameRecord.language = language
-                            bestScoreForActualGameRecord.combinedPrimary = combinedPrimaryForGame
-                            bestScoreForActualGameRecord.bestScore = 0
-                            bestScoreForActualGameRecord.owner = playerActivity?[0]
-                            realmSync!.add(bestScoreForActualGameRecord)
-                        }
-                    } else {
-                        if self!.bestScoreForActualGame![0].owner == nil {
-                            try! realmSync!.write {
-                                self!.bestScoreForActualGame![0].owner = playerActivity![0]
+                    if !GV.debug {
+                        if self!.bestScoreForActualGame!.count == 0 {
+                            try! realmSync!.write{
+                                let bestScoreForActualGameRecord = BestScoreForGame()
+                                bestScoreForActualGameRecord.gameNumber = gameNumber
+                                bestScoreForActualGameRecord.language = language
+                                bestScoreForActualGameRecord.combinedPrimary = combinedPrimaryForGame
+                                bestScoreForActualGameRecord.bestScore = 0
+                                bestScoreForActualGameRecord.owner = playerActivity?[0]
+                                realmSync!.add(bestScoreForActualGameRecord)
+                            }
+                        } else {
+                            if self!.bestScoreForActualGame![0].owner == nil {
+                                try! realmSync!.write {
+                                    self!.bestScoreForActualGame![0].owner = playerActivity![0]
+                                }
                             }
                         }
-
                     }
                     self!.syncedRecordsOK = self!.bestScoreForActualGame!.count > 0
                     self!.waitingForSynceRecords = !self!.syncedRecordsOK
@@ -2221,9 +2260,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     private func saveToRealmCloud(finished: Bool = false) {
+        if GV.debug {
+            return
+        }
         if GV.connectedToInternet {
             if self.syncedRecordsOK {
-                try! realmSync!.write {
+                try! realmSync!.write() {
                     self.bestScoreSync![0].score = GV.totalScore
                     self.bestScoreSync![0].usedTime = self.timeForGame.time
                     self.bestScoreSync![0].timeStamp = Date()
@@ -2268,6 +2310,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func congratulations() {
         if !goOnPlaying {
+            finishButton!.isHidden = false
             let title = GV.language.getText(.tcCongratulations1)
             let message = GV.language.getText(.tcCongratulations2)
             let continueTitle = GV.language.getText(.tcContinuePlaying)
@@ -2275,7 +2318,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
             let continueAction =  UIAlertAction(title: continueTitle, style: .default, handler: {alert -> Void in
                 self.gameboardEnabled = true
-                self.createFinishButton()
+                
                 self.goOnPlaying = true
             })
             let finishAction =  UIAlertAction(title: finishTitle, style: .default, handler: {alert -> Void in
@@ -2287,14 +2330,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             alertController.addAction(finishAction)
             self.parentViewController!.present(alertController, animated: true, completion: nil)
         }
-    }
-    
-    private func createFinishButton() {
-        
-    }
-    
-    private func finishButtonTapped() {
-        
     }
     
     private func showGameFinished(status: GameFinishedStatus) {
@@ -2635,7 +2670,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 let rotateIndex = random!.getRandomInt(0, max: 3)
 
                 let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
-                tilesForGame.append(tileForGameItem)
+                let newIndex = random!.getRandomInt(0, max: tilesForGame.count)
+                if newIndex == tilesForGame.count || !first || usedWords.count > 6 {
+                    tilesForGame.append(tileForGameItem)
+                } else {
+                    tilesForGame.insert(tileForGameItem, at: newIndex)
+                }
 
             } while inputWord.length > 0
         }
@@ -2643,7 +2683,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(GV.playingRecord.gameNumber))[0]
             let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
             for word in words {
-                print(word)
+//                print(word)
                 splittingWord(word: word)
             }
             
@@ -2698,203 +2738,203 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     
     
-    private func oldGenerateArrayOfWordPieces()->String {
-        var allLettersTable = [String]()
-        var origAllLettersTable = [String]()
-        let gameNumber =  GV.playingRecord.gameNumber
-        let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
-        let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
-        let random = MyRandom()
-//        random.generateRandomInts()
-        tilesForGame.removeAll()
-        var oneLetterPieces = [String]()
-//        var oneLetterPiecesArchiv = [String]()
-        var twoLetterPieces = [String]()
-        var twoLetterPiecesArchiv = [String]()
-        var letterFrequencyTable = [String:Int]()
-        var mandatoryLetterFrequencyTable = [String:Int]()
-        var countMandatoryLetters = 0
-//        let letterFrequencyRecords = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", GV.language.getText(.tcAktLanguage) + GV.frequencyString)
-        // calculating letterFrequency
-//        for record in letterFrequencyRecords {
-//            let separatedValues = record.word.components(separatedBy: itemSeparator)
-//            let char = separatedValues[1].uppercased()
-//            let specChar = char == " " || char == "," || char == "<" || char == "." || char == "÷" || char == "È" || char == "Ò" || char == "'"
-//            if !specChar {
-//                letterFrequencyTable[separatedValues[1].uppercased()] = Int(Double(separatedValues[2])!)
-//            } else {
-//                print(char)
+//    private func oldGenerateArrayOfWordPieces()->String {
+//        var allLettersTable = [String]()
+//        var origAllLettersTable = [String]()
+//        let gameNumber =  GV.playingRecord.gameNumber
+//        let words = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
+//        let blockSize = frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+//        let random = MyRandom()
+////        random.generateRandomInts()
+//        tilesForGame.removeAll()
+//        var oneLetterPieces = [String]()
+////        var oneLetterPiecesArchiv = [String]()
+//        var twoLetterPieces = [String]()
+//        var twoLetterPiecesArchiv = [String]()
+//        var letterFrequencyTable = [String:Int]()
+//        var mandatoryLetterFrequencyTable = [String:Int]()
+//        var countMandatoryLetters = 0
+////        let letterFrequencyRecords = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", GV.language.getText(.tcAktLanguage) + GV.frequencyString)
+//        // calculating letterFrequency
+////        for record in letterFrequencyRecords {
+////            let separatedValues = record.word.components(separatedBy: itemSeparator)
+////            let char = separatedValues[1].uppercased()
+////            let specChar = char == " " || char == "," || char == "<" || char == "." || char == "÷" || char == "È" || char == "Ò" || char == "'"
+////            if !specChar {
+////                letterFrequencyTable[separatedValues[1].uppercased()] = Int(Double(separatedValues[2])!)
+////            } else {
+////                print(char)
+////            }
+////        }
+//        // fill mandatoryLetterFrequencyTable with 0 for all letters
+//        let innerSeparator = "°"
+//        let letterSeparator = "/"
+//        let letterFrequency = GV.language.getText(.tcFrequency)
+//        let letterTable = letterFrequency.components(separatedBy: letterSeparator)
+//        for letterWithFrequency in letterTable {
+//            let letterComponents = letterWithFrequency.components(separatedBy:innerSeparator)
+//            letterFrequencyTable[letterComponents[0]] = Int(letterComponents[1])
+//        }
+//        for (letter, _) in letterFrequencyTable {
+//            mandatoryLetterFrequencyTable[letter] = 0
+//        }
+//        for word in words {
+//            countMandatoryLetters += word.length
+//            for letter in word.uppercased() {
+//                mandatoryLetterFrequencyTable[String(letter)]! += 1
 //            }
 //        }
-        // fill mandatoryLetterFrequencyTable with 0 for all letters
-        let innerSeparator = "°"
-        let letterSeparator = "/"
-        let letterFrequency = GV.language.getText(.tcFrequency)
-        let letterTable = letterFrequency.components(separatedBy: letterSeparator)
-        for letterWithFrequency in letterTable {
-            let letterComponents = letterWithFrequency.components(separatedBy:innerSeparator)
-            letterFrequencyTable[letterComponents[0]] = Int(letterComponents[1])
-        }
-        for (letter, _) in letterFrequencyTable {
-            mandatoryLetterFrequencyTable[letter] = 0
-        }
-        for word in words {
-            countMandatoryLetters += word.length
-            for letter in word.uppercased() {
-                mandatoryLetterFrequencyTable[String(letter)]! += 1
-            }
-        }
-        var allProcent = 0
-        for (letter, origValue) in mandatoryLetterFrequencyTable {
-            let absValue = Double(origValue) //Double(mandatoryLetterFrequencyTable[letter]!)
-            let procentValue = Int(round(100.0 * absValue / Double(countMandatoryLetters)))
-            let newValue = procentValue > letterFrequencyTable[letter]! ?
-                (procentValue > 25 ? 25 : procentValue) :
-                letterFrequencyTable[letter]! * (procentValue == 0 ? 2 : 1)
-            mandatoryLetterFrequencyTable[letter] = newValue
-            allProcent += newValue
-        }
-        for (letter, frequency) in letterFrequencyTable {
-            if mandatoryLetterFrequencyTable[letter]! > frequency {
-                letterFrequencyTable[letter] = mandatoryLetterFrequencyTable[letter]
-            }
-        }
-        for (letter, frequency) in letterFrequencyTable.sorted(by: {$0 < $1}) {
-            for _ in 0..<frequency {
-                origAllLettersTable.append(letter)
-            }
-        }
-        allLettersTable = origAllLettersTable
-        
-
-        var count = 1
-        for word in words {
-            for index in 0..<word.count / 2 {
-                let twoLetterPiece = word.subString(at: index * 2, length: 2).uppercased()
-                let reversedTwoLetterPiece = twoLetterPiece.char(from: 1) + twoLetterPiece.firstChar()
-                if !twoLetterPieces.contains(where: {$0 == twoLetterPiece}) &&
-                   !twoLetterPieces.contains(where: {$0 == reversedTwoLetterPiece}) {
-                    twoLetterPieces.append(twoLetterPiece)
-                    for letter in twoLetterPiece {
-                        if mandatoryLetterFrequencyTable[String(letter)]! > 1 {
-                            mandatoryLetterFrequencyTable[String(letter)]! -= 1
-                        }
-                    }
-                }
-            }
-            count += 1
-            if count > 6 {
-                break
-            }
-        }
-        twoLetterPiecesArchiv = twoLetterPieces
-        for (letter, counter) in mandatoryLetterFrequencyTable {
-            for _ in 0..<counter {
-                oneLetterPieces.append(String(letter))
-            }
-        }
-        var typesWithLen1 = [MyShapes]()
-        var typesWithLen2 = [MyShapes]()
-        var typesWithLen3 = [MyShapes]()
-        var typesWithLen4 = [MyShapes]()
-        
-        for index in 0..<MyShapes.count - 1 {
-            guard let type = MyShapes(rawValue: index) else {
-                return ""
-            }
-            if type == .NotUsed {
-                break
-            }
-            let length = myForms[type]![0].count
-            switch length {
-            case 1: typesWithLen1.append(type)
-            case 2: typesWithLen2.append(type)
-            case 3: typesWithLen3.append(type)
-            case 4: typesWithLen4.append(type)
-            default: break
-            }
-        }
-        var lengths = [Int]()
-        for index in 1...100 {
-            switch index {
-            case 1...45: lengths.append(1)
-            case 46...96: lengths.append(2)
-            case 97...99: lengths.append(3)
-            default:      lengths.append(4)
-            }
-        }
-        
-        func getTwoLetterPieces()->[String] {
-            var letters = [String]()
-            if twoLetterPieces.count == 0 {
-                twoLetterPieces = twoLetterPiecesArchiv
-            }
-            let index = random.getRandomInt(0, max: twoLetterPieces.count - 1)
-            letters.append(twoLetterPieces[index].firstChar())
-            letters.append(twoLetterPieces[index].char(from: 1))
-            twoLetterPieces.remove(at: index)
-            return letters
-        }
-        func getLetters(length: Int)->[String] {
-            var piece = [String]()
-            for _ in 0..<length {
-                if allLettersTable.count == 0 {
-                    allLettersTable = origAllLettersTable
-                }
-                let index = random.getRandomInt(0, max: allLettersTable.count - 1)
-                let letter = allLettersTable[index]
-                allLettersTable.remove(at: index)
-                piece.append(letter)
-            }
-            return piece
-        }
-
-        var generateLength = 0
-        repeat {
-            let lengthIndex = random.getRandomInt(0, max: lengths.count - 1)
-            let tileLength = lengths[lengthIndex]
-            var tileType = MyShapes.NotUsed
-            var letters = [String]()
-            switch tileLength {
-            case 1: tileType = typesWithLen1[0]
-                letters += getLetters(length: 1)
-            case 2: tileType = typesWithLen2[0]
-                if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
-                    letters += getTwoLetterPieces()
-
-               } else {
-                    letters = getLetters(length: 2)
-                }
-            case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
-                if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
-                    letters = getTwoLetterPieces()
-                    letters += getLetters(length: 1)
-                } else {
-                    letters = getLetters(length:3)
-                }
-            case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
-                if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
-                    letters = getTwoLetterPieces()
-                    letters += getTwoLetterPieces()
-                } else {
-                    letters = getLetters(length:4)
-                }
-            default: break
-            }
-
-            let rotateIndex = random.getRandomInt(0, max: 3)
-            
-            //            let tileForGameItem = TilesForGame(type: tileType, rotateIndex: rotateIndex, letters: letters)
-            let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
-            tilesForGame.append(tileForGameItem)
-            generateLength += tileLength
-        } while generateLength < 1000
-        var generatedArrayInStringForm = ""
-        for tile in tilesForGame {
-            generatedArrayInStringForm += tile.toString() + "°"
-        }
-        return generatedArrayInStringForm
-    }
+//        var allProcent = 0
+//        for (letter, origValue) in mandatoryLetterFrequencyTable {
+//            let absValue = Double(origValue) //Double(mandatoryLetterFrequencyTable[letter]!)
+//            let procentValue = Int(round(100.0 * absValue / Double(countMandatoryLetters)))
+//            let newValue = procentValue > letterFrequencyTable[letter]! ?
+//                (procentValue > 25 ? 25 : procentValue) :
+//                letterFrequencyTable[letter]! * (procentValue == 0 ? 2 : 1)
+//            mandatoryLetterFrequencyTable[letter] = newValue
+//            allProcent += newValue
+//        }
+//        for (letter, frequency) in letterFrequencyTable {
+//            if mandatoryLetterFrequencyTable[letter]! > frequency {
+//                letterFrequencyTable[letter] = mandatoryLetterFrequencyTable[letter]
+//            }
+//        }
+//        for (letter, frequency) in letterFrequencyTable.sorted(by: {$0 < $1}) {
+//            for _ in 0..<frequency {
+//                origAllLettersTable.append(letter)
+//            }
+//        }
+//        allLettersTable = origAllLettersTable
+//        
+//
+//        var count = 1
+//        for word in words {
+//            for index in 0..<word.count / 2 {
+//                let twoLetterPiece = word.subString(at: index * 2, length: 2).uppercased()
+//                let reversedTwoLetterPiece = twoLetterPiece.char(from: 1) + twoLetterPiece.firstChar()
+//                if !twoLetterPieces.contains(where: {$0 == twoLetterPiece}) &&
+//                   !twoLetterPieces.contains(where: {$0 == reversedTwoLetterPiece}) {
+//                    twoLetterPieces.append(twoLetterPiece)
+//                    for letter in twoLetterPiece {
+//                        if mandatoryLetterFrequencyTable[String(letter)]! > 1 {
+//                            mandatoryLetterFrequencyTable[String(letter)]! -= 1
+//                        }
+//                    }
+//                }
+//            }
+//            count += 1
+//            if count > 6 {
+//                break
+//            }
+//        }
+//        twoLetterPiecesArchiv = twoLetterPieces
+//        for (letter, counter) in mandatoryLetterFrequencyTable {
+//            for _ in 0..<counter {
+//                oneLetterPieces.append(String(letter))
+//            }
+//        }
+//        var typesWithLen1 = [MyShapes]()
+//        var typesWithLen2 = [MyShapes]()
+//        var typesWithLen3 = [MyShapes]()
+//        var typesWithLen4 = [MyShapes]()
+//        
+//        for index in 0..<MyShapes.count - 1 {
+//            guard let type = MyShapes(rawValue: index) else {
+//                return ""
+//            }
+//            if type == .NotUsed {
+//                break
+//            }
+//            let length = myForms[type]![0].count
+//            switch length {
+//            case 1: typesWithLen1.append(type)
+//            case 2: typesWithLen2.append(type)
+//            case 3: typesWithLen3.append(type)
+//            case 4: typesWithLen4.append(type)
+//            default: break
+//            }
+//        }
+//        var lengths = [Int]()
+//        for index in 1...100 {
+//            switch index {
+//            case 1...45: lengths.append(1)
+//            case 46...96: lengths.append(2)
+//            case 97...99: lengths.append(3)
+//            default:      lengths.append(4)
+//            }
+//        }
+//        
+//        func getTwoLetterPieces()->[String] {
+//            var letters = [String]()
+//            if twoLetterPieces.count == 0 {
+//                twoLetterPieces = twoLetterPiecesArchiv
+//            }
+//            let index = random.getRandomInt(0, max: twoLetterPieces.count - 1)
+//            letters.append(twoLetterPieces[index].firstChar())
+//            letters.append(twoLetterPieces[index].char(from: 1))
+//            twoLetterPieces.remove(at: index)
+//            return letters
+//        }
+//        func getLetters(length: Int)->[String] {
+//            var piece = [String]()
+//            for _ in 0..<length {
+//                if allLettersTable.count == 0 {
+//                    allLettersTable = origAllLettersTable
+//                }
+//                let index = random.getRandomInt(0, max: allLettersTable.count - 1)
+//                let letter = allLettersTable[index]
+//                allLettersTable.remove(at: index)
+//                piece.append(letter)
+//            }
+//            return piece
+//        }
+//
+//        var generateLength = 0
+//        repeat {
+//            let lengthIndex = random.getRandomInt(0, max: lengths.count - 1)
+//            let tileLength = lengths[lengthIndex]
+//            var tileType = MyShapes.NotUsed
+//            var letters = [String]()
+//            switch tileLength {
+//            case 1: tileType = typesWithLen1[0]
+//                letters += getLetters(length: 1)
+//            case 2: tileType = typesWithLen2[0]
+//                if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
+//                    letters += getTwoLetterPieces()
+//
+//               } else {
+//                    letters = getLetters(length: 2)
+//                }
+//            case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
+//                if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
+//                    letters = getTwoLetterPieces()
+//                    letters += getLetters(length: 1)
+//                } else {
+//                    letters = getLetters(length:3)
+//                }
+//            case 4: tileType = typesWithLen4[random.getRandomInt(0, max: typesWithLen4.count - 1)]
+//                if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
+//                    letters = getTwoLetterPieces()
+//                    letters += getTwoLetterPieces()
+//                } else {
+//                    letters = getLetters(length:4)
+//                }
+//            default: break
+//            }
+//
+//            let rotateIndex = random.getRandomInt(0, max: 3)
+//            
+//            //            let tileForGameItem = TilesForGame(type: tileType, rotateIndex: rotateIndex, letters: letters)
+//            let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
+//            tilesForGame.append(tileForGameItem)
+//            generateLength += tileLength
+//        } while generateLength < 1000
+//        var generatedArrayInStringForm = ""
+//        for tile in tilesForGame {
+//            generatedArrayInStringForm += tile.toString() + "°"
+//        }
+//        return generatedArrayInStringForm
+//    }
 
     private func createButton(withText: String, position: CGPoint, name: String, buttonSize: CGSize? = nil)->SKSpriteNode {
         func createLabel(withText: String, position: CGPoint, fontSize: CGFloat, name: String)->SKLabelNode {
