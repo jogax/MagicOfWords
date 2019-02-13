@@ -39,6 +39,7 @@ struct GV {
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2
+    static let GameStatusContinued = 3
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()
     static let frequencyString = ":freq:"

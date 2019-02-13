@@ -208,6 +208,11 @@ public class WTGameWordList {
         wordsInRound = [WordInRound]()
         mandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
     }
+    public func reset() {
+        wordsInRound = [WordInRound]()
+        allWords = [WordWithCounter]()
+        setMandatoryWords()
+    }
     public func setDelegate(delegate: WTGameWordListDelegate) {
         self.delegate = delegate
     }
