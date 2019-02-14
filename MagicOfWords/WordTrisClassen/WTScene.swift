@@ -1589,15 +1589,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        setOwnWordsIndex()
     }
     
-//    private func setOwnWordsIndex() {
-//        let countOwnWords = WTGameWordList.shared.getCountWords(mandatory: false)
-//        if countOwnWords > countShowingOwnWords {
-//            let countShowedRows = countShowingOwnWords / countWordsInRow
-//            let startRow = countOwnWords / countWordsInRow - countShowedRows + 1
-//            showingOwnWordsIndex =  startRow * countWordsInRow
-//        }
-//    }
-//    
     private func createLabel(word: String, linePosition: CGFloat, name: String) {
 //        let ownYPosition: [CGFloat] = [0.02, 0.04, 0.06]
         let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
@@ -2161,7 +2152,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.removeNodesWith(name: self.answer2Name)
     }
 
-    
     private func getSyncedRecords() {
         if realmSync != nil {
             let gameNumber = GV.playingRecord.gameNumber % 1000 + 1
