@@ -637,30 +637,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         }
-        func createPlayingRecord(gameNumber: Int) {
-            let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.actLanguage).first!
-            if mandatoryRecord != nil {
-                try! realm.write {
-                    let components = mandatoryRecord!.mandatoryWords.components(separatedBy: "°")
-                    var newString = ""
-                    for index in 0...5 {
-                        newString += components[index] + "°"
-                    }
-                    newString.removeLast()
-                    GV.playingRecord = GameDataModel()
-                    GV.playingRecord.combinedKey = GV.actLanguage + String(gameNumber)
-                    GV.playingRecord.mandatoryWords = newString
-                    GV.playingRecord.gameNumber = gameNumber
-                    GV.playingRecord.language = GV.actLanguage
-                    GV.playingRecord.time = timeInitValue
-                    GV.playingRecord.nowPlaying = true
-                    realm.add(GV.playingRecord)
-                }
-            }
-        }
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.actLanguage)
         if new {
-            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusNew, GV.actLanguage)
+            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusNew, GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
             /// reset all records with nowPlaying status
             if actGames.count > 0 {
                 try! realm.write {
@@ -767,6 +746,29 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         setMandatoryWords()
     }
+    
+    private func createPlayingRecord(gameNumber: Int) {
+        let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumber, GV.actLanguage).first!
+        if mandatoryRecord != nil {
+            try! realm.write {
+                let components = mandatoryRecord!.mandatoryWords.components(separatedBy: "°")
+                var newString = ""
+                for index in 0...5 {
+                    newString += components[index] + "°"
+                }
+                newString.removeLast()
+                GV.playingRecord = GameDataModel()
+                GV.playingRecord.combinedKey = GV.actLanguage + String(gameNumber)
+                GV.playingRecord.mandatoryWords = newString
+                GV.playingRecord.gameNumber = gameNumber
+                GV.playingRecord.language = GV.actLanguage
+                GV.playingRecord.time = timeInitValue
+                GV.playingRecord.nowPlaying = true
+                realm.add(GV.playingRecord)
+            }
+        }
+    }
+
 
     public func setDelegate(delegate: WTSceneDelegate) {
         wtSceneDelegate = delegate
@@ -2334,29 +2336,37 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let bestScorelabel = self.childNode(withName: bestScoreName) as? SKLabelNode
             bestScorelabel!.text = bestScoretext
         }
-            
-        let textConstant: TextConstants =
-            status == .OK ? .tcGameFinished :
-            status == .TimeOut ? .tcTaskNotCompletedWithTimeOut : .tcTaskNotCompletedWithNoMoreSteps
-        let message = status == .OK ? "" : GV.language.getText(.tcWillBeRestarted)
-        let buttonTitle = GV.language.getText(status == .OK ? .tcOK : .tcRestart)
-        let title = GV.language.getText(textConstant)
-        let action =  UIAlertAction(title: buttonTitle, style: .default, handler: {alert -> Void in
+        var title = ""
+        var message = ""
+        var action1Title = ""
+        let action2Title = GV.language.getText(.tcBack)
+        if status == .OK {
+            title = GV.language.getText(.tcGameFinished1)
+            message = GV.language.getText(.tcGameFinished2)
+            action1Title = GV.language.getText(.tcFinishGame)
+        } else {
+            title = GV.language.getText(.tcTaskNotCompletedWithNoMoreSteps)
+            message = GV.language.getText(.tcWillBeRestarted)
+            action1Title = GV.language.getText(.tcRestartGame)
+        }
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action1 =  UIAlertAction(title: action1Title, style: .default, handler: {alert -> Void in
             self.gameboardEnabled = true
             if status == .OK {
+                try! realm.write() {
+                    GV.playingRecord.gameStatus = GV.GameStatusFinished
+                }
                 self.startNewGame()
             } else {
                 self.restartThisGame()
             }
         })
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertController.addAction(action)
+        let action2 =  UIAlertAction(title: action2Title, style: .default, handler: {alert -> Void in
+            self.gameboardEnabled = true
+        })
+        alertController.addAction(action1)
+        alertController.addAction(action2)
         self.parentViewController!.present(alertController, animated: true, completion: nil)
-        if status == .OK {
-            try! realm.write() {
-                GV.playingRecord.gameStatus = GV.GameStatusFinished
-            }
-        }
     }
     
     private func saveActualState() {
@@ -2423,23 +2433,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if placeFound {break}
         }
         if !placeFound {
-            let answer1Action =  UIAlertAction(title: GV.language.getText(.tcBack), style: .default, handler: {alert -> Void in
-                self.startUndo()
-            })
-            let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
-                self.stopShowingTableIfNeeded()
-                self.startNextRound()
-                self.modifyHeader()
-            })
-            let answer3Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer3), style: .default, handler: {alert -> Void in
-            })
-            let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
-                                                    message: "", //GV.language.getText(.tcNoMoreStepsQuestion2),
-                                                    preferredStyle: .alert)
-            alertController.addAction(answer1Action)
-            alertController.addAction(answer2Action)
-            alertController.addAction(answer3Action)
-            self.parentViewController!.present(alertController, animated: true, completion: nil)
+            let greenWordsCount = WTGameWordList.shared.getCountWordsInLastRound()
+            if greenWordsCount > 0 {
+                let answer1Action =  UIAlertAction(title: GV.language.getText(.tcBack), style: .default, handler: {alert -> Void in
+                    self.startUndo()
+                })
+                let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
+                    self.stopShowingTableIfNeeded()
+                    self.startNextRound()
+                    self.modifyHeader()
+                })
+                let answer3Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer3), style: .default, handler: {alert -> Void in
+                })
+                let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
+                                                        message: "", //GV.language.getText(.tcNoMoreStepsQuestion2),
+                                                        preferredStyle: .alert)
+                alertController.addAction(answer1Action)
+                alertController.addAction(answer2Action)
+                alertController.addAction(answer3Action)
+                self.parentViewController!.present(alertController, animated: true, completion: nil)
+            } else {
+                showGameFinished(status: .NoMoreSteps)
+            }
         }
         return placeFound
     }
@@ -2481,7 +2496,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     modifyHeader()
                 } else {
                     createUndo(enabled: false)
-//                    undoSprite.alpha = 0.1
+                    let gameNumber = GV.playingRecord.gameNumber
+                    try! realm.write() {
+                        realm.delete(GV.playingRecord)
+                    }
+                    createPlayingRecord(gameNumber: gameNumber)
+                    generateArrayOfWordPieces(new: new)
                 }
             }
 
@@ -2538,7 +2558,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
             createUndo(enabled: false)
-//            undoSprite.alpha = 0.1
+            let gameNumber = GV.playingRecord.gameNumber
+            try! realm.write() {
+                realm.delete(GV.playingRecord)
+            }
+            createPlayingRecord(gameNumber: gameNumber)
+            generateArrayOfWordPieces(new: new)
         }
             
     }

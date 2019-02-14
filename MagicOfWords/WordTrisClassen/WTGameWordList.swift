@@ -478,7 +478,7 @@ public class WTGameWordList {
         
         cleanGameArray()
         for word in wordsInRound.last!.wordsInGame
- {
+        {
             for index in 0..<word.usedLetters.count {
                 let col = word.usedLetters[index].col
                 let row = word.usedLetters[index].row
@@ -486,6 +486,10 @@ public class WTGameWordList {
                 GV.gameArray[col][row].setConnectionType(connectionType: connectionType)
             }
         }
+    }
+    
+    public func getCountWordsInLastRound()->Int {
+        return wordsInRound.last!.wordsInGame.count
     }
     
     private func isThisPositionFree(letter: UsedLetter)->Bool {
