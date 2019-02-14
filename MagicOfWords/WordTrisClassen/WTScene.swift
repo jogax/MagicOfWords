@@ -2203,7 +2203,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         }
                     }
                 } else {
-                    print("state: \(state)")
+//                    print("state: \(state)")
                 }
                 
             }
@@ -2213,6 +2213,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 //                print("in Subscription!")
                 if state == .complete {
                     if !GV.debug {
+                        
                         if self!.bestScoreForActualGame!.count == 0 {
                             try! realmSync!.write{
                                 let bestScoreForActualGameRecord = BestScoreForGame()
@@ -2222,6 +2223,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                                 bestScoreForActualGameRecord.bestScore = 0
                                 bestScoreForActualGameRecord.owner = playerActivity?[0]
                                 realmSync!.add(bestScoreForActualGameRecord)
+                                
                             }
                         } else {
                             if self!.bestScoreForActualGame![0].owner == nil {
