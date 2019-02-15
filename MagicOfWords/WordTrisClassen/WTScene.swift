@@ -656,18 +656,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     GV.playingRecord.time = timeInitValue
                 }
             } else {
-                var oldGameNumber = 0
-                var newGameNumber = 0
-                let playedGames = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage)
-                for playedGame in playedGames {
-                    if playedGame.gameNumber - oldGameNumber > 1 {
-                        newGameNumber = oldGameNumber + 1
-                        break
-                    }
-                    oldGameNumber = playedGame.gameNumber
-                    newGameNumber = oldGameNumber + 1
+                var freeGameNumbers = [Int]()
+                for number in 0...999 {
+                    freeGameNumbers.append(number)
                 }
-                createPlayingRecord(gameNumber: newGameNumber)
+                let playedGames = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: false)
+                for playedGame in playedGames {
+                    freeGameNumbers.remove(at: playedGame.gameNumber)
+                }
+                createPlayingRecord(gameNumber: freeGameNumbers.first!)
             }
         } else if next == .GameNumber {
             if actGames.count > 0 {
@@ -1619,7 +1616,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
         }
-        random = MyRandom()
         generateArrayOfWordPieces(new: new)
         indexOfTilesForGame = 0
 //        getOnlineRecords()
@@ -1779,6 +1775,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func generateArrayOfWordPieces(new: Bool) {
         if new || GV.playingRecord.pieces.count == 0 {
+            try! realm.write() {
+                GV.playingRecord.randomCounts = 0
+                GV.playingRecord.words = ""
+                random = MyRandom()
+            }
             let pieces = generateArrayOfWordPieces(first: true)
              try! realm.write {
                 GV.playingRecord.pieces = pieces
@@ -2478,6 +2479,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             pieceArray[to].setPieceFromPosition(index: to)
             origSize[to] = pieceArray[to].size
         }
+        func restartGame() {
+            let gameNumber = GV.playingRecord.gameNumber
+            let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, gameNumber)
+            if recordToDelete.count == 1 {
+                try! realm.write() {
+                    realm.delete(recordToDelete)
+                }
+            }
+            tilesForGame = [WTPiece]()
+            indexOfTilesForGame = 0
+            createPlayingRecord(gameNumber: gameNumber)
+            generateArrayOfWordPieces(new: new)
+            restoreGameArray()
+            createUndo(enabled: false)
+        }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
             actRound = GV.playingRecord.rounds.count - 1
             try! realm.write() {
@@ -2495,13 +2511,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     restoreGameArray()
                     modifyHeader()
                 } else {
-                    createUndo(enabled: false)
-                    let gameNumber = GV.playingRecord.gameNumber
-                    try! realm.write() {
-                        realm.delete(GV.playingRecord)
-                    }
-                    createPlayingRecord(gameNumber: gameNumber)
-                    generateArrayOfWordPieces(new: new)
+                    restartGame()
                 }
             }
 
@@ -2557,13 +2567,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
-            createUndo(enabled: false)
-            let gameNumber = GV.playingRecord.gameNumber
-            try! realm.write() {
-                realm.delete(GV.playingRecord)
-            }
-            createPlayingRecord(gameNumber: gameNumber)
-            generateArrayOfWordPieces(new: new)
+            restartGame()
         }
             
     }
