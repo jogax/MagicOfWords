@@ -10,7 +10,7 @@ import UIKit
 import RealmSwift
 import GameplayKit
 
-#if DEBUG
+#if MYDEBUG
 
 class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate {
     var showMandatoryWordsView: WTTableView? = WTTableView()
@@ -143,6 +143,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
         self.view.insertSubview(myBackgroundImage, at: 0)
         tableviewAdded = false
+//        updateCommonString()
         getSavedMandatoryWords()
         showMandatoryWordsView!.setDelegate(delegate: self)
         showViewTable()
@@ -156,6 +157,45 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     @objc func inputFieldDidChange(_ textField: UITextField) {
         showMandatoryWords()
     }
+    var readMandatoryItems: Results<Mandatory>?
+    var readMandatorySubscription: SyncSubscription<Mandatory>?
+
+    
+    private func updateCommonString() {
+        readMandatoryItems = RealmService.objects(Mandatory.self).sorted(byKeyPath: "language")
+//        mandatoryItems = RealmService.objects(Mandatory.self).sorted(byKeyPath: "language",ascending: true)
+        readMandatorySubscription = readMandatoryItems!.subscribe(named: "mandatoryQuery3")
+        mandatorySubscriptionToken = readMandatorySubscription!.observe(\.state) { [weak self]  state in
+            switch state {
+            case .creating:
+                print("creating")
+            // The subscription has not yet been written to the Realm
+            case .pending:
+                print("pending")
+                // The subscription has been written to the Realm and is waiting
+            // to be processed by the server
+            case .complete:
+                for mandatoryLine in self!.readMandatoryItems! {
+                    let words = mandatoryLine.mandatoryWords.components(separatedBy: "°")
+                    for word in words {
+                        let commonString = CommonString()
+                        commonString.word = mandatoryLine.language + word
+                        if RealmService.objects(CommonString.self).filter("word = %@", mandatoryLine.language + word).count == 0 {
+                            try! RealmService.write() {
+                                RealmService.add(commonString)
+                            }
+                        }
+                    }
+                }
+            
+//                exit(0)
+            default:
+                print("state: \(state)")
+            }
+        }
+    }
+
+        
     
     private func incrementString(string: String)->String {
         var returnValue:String = ""
