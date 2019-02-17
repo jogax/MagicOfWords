@@ -61,14 +61,12 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     #endif
     
-    #if MYDEBUG
     func displayCollectMandatoryViewController() {
-        if GV.myUser != nil {
+        if GV.myUser != nil && GV.expertUser {
             let collectMandatoryViewController = CollectMandatoryWordsViewController()
             self.present(collectMandatoryViewController, animated: true, completion: nil)
         }
     }
-    #endif
     
     var showGamesScene: ShowGamesScene?
     func backFromSettingsScene() {
@@ -284,14 +282,33 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         backgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
         self.view.insertSubview(backgroundImage, at: 0)
     }
-    
+    let callerName = "MainViewController"
+    ////
     override func viewWillAppear(_ animated: Bool) {
         NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: reachability)
-        do{
+        do {
             try reachability.startNotifier()
         }catch{
             print("could not start reachability notifier")
         }
+        if !GV.callBackExpertUser.contains(where: {$0.myCaller == callerName}) {
+            GV.callBackExpertUser.append(GV.CallBackStruct(caller: callerName, callBackFunction: expertUserChanged))
+        }
+        expertUserChanged()
+    }
+    
+    public func expertUserChanged() {
+        if GV.expertUser {
+            let title = GV.language.getText(.tcCollectMandatory)
+            if alertController!.actions.last!.title != title {
+                collectMandatoryAction = UIAlertAction(title: title, style: .default, handler: { [unowned self]
+                    alert -> Void in
+                    self.displayCollectMandatoryViewController()
+                })
+                collectMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+                alertController!.addAction(collectMandatoryAction!)
+            }
+        } 
     }
     
     
@@ -307,9 +324,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             if nickNameAction != nil {
                 nickNameAction!.isEnabled = true
             }
-            #if MYDEBUG
+            if GV.expertUser {
                 collectMandatoryAction!.isEnabled = true
-            #endif
+            }
             #if DEBUG
             if showRealmCloudAction != nil {
                 showRealmCloudAction!.isEnabled = true
@@ -321,9 +338,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             if nickNameAction != nil {
                 nickNameAction!.isEnabled = true
             }
-            #if MYDEBUG
+            if GV.expertUser {
                 collectMandatoryAction!.isEnabled = true
-            #endif
+            }
             #if DEBUG
             if showRealmCloudAction != nil {
                 showRealmCloudAction!.isEnabled = true
@@ -335,9 +352,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             if nickNameAction != nil {
                 nickNameAction!.isEnabled = false
             }
-            #if MYDEBUG
+            if GV.expertUser {
                 collectMandatoryAction!.isEnabled = false
-            #endif
+            }
 
             #if DEBUG
             if showRealmCloudAction != nil {
@@ -348,10 +365,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         }
     }
 
+    var alertController: UIAlertController?
     var nickNameAction: UIAlertAction?
-    #if MYDEBUG
     var collectMandatoryAction: UIAlertAction?
-    #endif
 
     #if DEBUG
     var showRealmCloudAction: UIAlertAction?
@@ -362,7 +378,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     func showMenu() {
         getRecordCounts()
         let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
-        let alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
+        alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
                                                 message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname),
                                                 preferredStyle: .alert)
 
@@ -378,7 +394,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         if !newOK {
             newGameAction.setValue(disabledColor, forKey: "TitleTextColor")
         }
-        alertController.addAction(newGameAction)
+        alertController!.addAction(newGameAction)
         //--------------------- continueAction ---------------------
         let continueAction = UIAlertAction(title: "\(GV.language.getText(.tcContinue))", style: .default, handler: { [unowned self]
             alert -> Void in
@@ -391,19 +407,19 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             continueAction.isEnabled = false
 //            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
         }
-        alertController.addAction(continueAction)
+        alertController!.addAction(continueAction)
         //--------------------- bestScoreAction ---------------------
         let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
             alert -> Void in
             self.showGames(all: true)
         })
-        alertController.addAction(bestScoreAction)
+        alertController!.addAction(bestScoreAction)
         //--------------------- chooseLanguageAction ---------------------
         let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
             alert -> Void in
             self.chooseLanguage()
         })
-        alertController.addAction(chooseLanguageAction)
+        alertController!.addAction(chooseLanguageAction)
         //--------------------- nickNameAction ---------------------
         if !GV.debug {
             nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
@@ -415,16 +431,9 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                 }
             })
             nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-            alertController.addAction(nickNameAction!)
+            alertController!.addAction(nickNameAction!)
         }
-        #if MYDEBUG
-            collectMandatoryAction = UIAlertAction(title: GV.language.getText(.tcCollectMandatory), style: .default, handler: { [unowned self]
-                alert -> Void in
-                self.displayCollectMandatoryViewController()
-            })
-            collectMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-            alertController.addAction(collectMandatoryAction!)
-        #endif
+        expertUserChanged()
         #if DEBUG
         //--------------------- showRealmCloudAction ---------------------
             showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
@@ -432,17 +441,17 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                 self.displayCloudRecordsViewController()
             })
             showRealmCloudAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-            alertController.addAction(showRealmCloudAction!)
+            alertController!.addAction(showRealmCloudAction!)
             createMandatoryAction = UIAlertAction(title: GV.language.getText(.tcCreateMandatory), style: .default, handler: { [unowned self]
             alert -> Void in
                 self.displayCreateMandatoryViewController()
             })
             createMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-            alertController.addAction(createMandatoryAction!)
+        alertController!.addAction(createMandatoryAction!)
 
         #endif
         //--------------------- Present alert ---------------------
-        present(alertController, animated: true, completion: nil)
+        present(alertController!, animated: true, completion: nil)
 
     }
     

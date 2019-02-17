@@ -10,7 +10,6 @@ import UIKit
 import RealmSwift
 import GameplayKit
 
-#if MYDEBUG
 
 class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate {
     var showMandatoryWordsView: WTTableView? = WTTableView()
@@ -28,28 +27,28 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 20 : 15)
     
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
-        var word = mandatoryWordsTable[indexPath.row]
-        try! RealmService.write() {
-            let wordModel = CommonString()
-            if word.length > savePhrase.length && word.ends(with: savePhrase) {
-                word = word.startingSubString(length: word.length - savePhrase.length).lowercased()
-
-                let toDelete = RealmService.objects(CommonString.self).filter("word = %@", GV.actLanguage + word).first!
-                savedMandatoryWords.removeAll { $0 == toDelete.word.endingSubString(at:2) }
-                RealmService.delete(toDelete)
-                mandatoryWordsTable[indexPath.row] = word.endingSubString(at: 2)
-                wordLengths[word.length - 4] -= 1
-                wordLengths[0] -= 1
-            } else {
-                wordModel.word = (GV.actLanguage + word).lowercased()
-                RealmService.add(wordModel)
-                savedMandatoryWords.append(word)
-                wordLengths[word.length - 4] += 1
-                wordLengths[0] += 1
-            }
-        }
-        print("wordLengths: \(wordLengths)")
-        showMandatoryWords()
+//        var word = mandatoryWordsTable[indexPath.row]
+//        try! RealmService.write() {
+//            let wordModel = CommonString()
+//            if word.length > savePhrase.length && word.ends(with: savePhrase) {
+//                word = word.startingSubString(length: word.length - savePhrase.length).lowercased()
+//
+//                let toDelete = RealmService.objects(CommonString.self).filter("word = %@", GV.actLanguage + word).first!
+//                savedMandatoryWords.removeAll { $0 == toDelete.word.endingSubString(at:2) }
+//                RealmService.delete(toDelete)
+//                mandatoryWordsTable[indexPath.row] = word.endingSubString(at: 2)
+//                wordLengths[word.length - 4] -= 1
+//                wordLengths[0] -= 1
+//            } else {
+//                wordModel.word = (GV.actLanguage + word).lowercased()
+//                RealmService.add(wordModel)
+//                savedMandatoryWords.append(word)
+//                wordLengths[word.length - 4] += 1
+//                wordLengths[0] += 1
+//            }
+//        }
+//        print("wordLengths: \(wordLengths)")
+//        showMandatoryWordsView!.reloadData()
     }
     
     func getNumberOfSections() -> Int {
@@ -57,10 +56,16 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     
     func getNumberOfRowsInSections(section: Int) -> Int {
-        return mandatoryWordsTable.count
+        var returnValue = 0
+        if allWordsTable.count > 0 {
+            returnValue = allWordsTable[choosedLength].count
+        }
+        return returnValue
+        
     }
     
-    var mandatoryWordsTable = [String]()
+    var mandatoryWordsTable = [[String]]()
+    var allWordsTable = [[String]]()
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let actColor = UIColor.white
@@ -73,7 +78,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //        case 0:
 //            cell.addColumn(text: " " + (String(wordLengths[indexPath.row]).fixLength(length: 100, leadingBlanks: false)), color: actColor)
 //        default:
-            cell.addColumn(text: " " + (mandatoryWordsTable[indexPath.row].fixLength(length: 100, leadingBlanks: false)), color: actColor)
+            cell.addColumn(text: " " + (allWordsTable[choosedLength][indexPath.row].uppercased().fixLength(length: 100, leadingBlanks: false)), color: actColor)
 //        }
         return cell
     }
@@ -86,18 +91,21 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
+        let headerLine = "   \(GV.language.getText(.tcCollectMandatory))"
         let lineHeight = headerLine.height(font: myFont!)
-        var title = ""
-        if wordLengths.count > 0 {
-            title = " all: \(wordLengths[0]), 5: \(wordLengths[1]), 6: \(wordLengths[2]), 7: \(wordLengths[3]), 8: \(wordLengths[4]), 9: \(wordLengths[5]), 10: \(wordLengths[6])"
-        }
-        let width = title.width(withConstrainedHeight: 0, font: myFont!)
+//        if wordLengths.count > 0 {
+//            title = " all: \(wordLengths[0]), 5: \(wordLengths[1]), 6: \(wordLengths[2]), 7: \(wordLengths[3]), 8: \(wordLengths[4]), 9: \(wordLengths[5]), 10: \(wordLengths[6])"
+//        }
+        let allWordsCount = String(allWordsTable[choosedLength].count)
+        let mandatoryCount = String(mandatoryWordsTable[choosedLength].count)
+        let title = "   \(GV.language.getText(.tcAllWords, values: allWordsCount, mandatoryCount))"
+        let width = title.width(withConstrainedHeight: 0, font: myFont!) * 2
         let view = UIView()
-//        let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
-//        label1.font = myFont!
-//        label1.text = headerLine
-//        view.addSubview(label1)
-        let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight * 0.5, width: width, height: lineHeight))
+        let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight + 1.5))
+        label1.font = myFont!
+        label1.text = headerLine
+        view.addSubview(label1)
+        let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight * 1.0, width: width, height: lineHeight * 1.5))
         label2.font = myFont!
         label2.text = title
         view.addSubview(label2)
@@ -106,7 +114,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     
     func getHeightForHeaderInSection(tableView: UITableView, section: Int) -> CGFloat {
-        return headerLine.height(font: myFont!) * 2
+        return headerLine.height(font: myFont!) * 3
     }
     
     //    let realm: Realm
@@ -117,10 +125,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var allWordsSubscription: SyncSubscription<WordListModel>?
     
     var allWordsSubscriptionToken: NotificationToken?
-    //    var OKButton: UIButton?
-    
-    
-    
+
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         //        let syncConfig = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL, isPartial: true)
         //        self.realm = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[PlayerActivity.self]))
@@ -147,16 +152,18 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         getSavedMandatoryWords()
         showMandatoryWordsView!.setDelegate(delegate: self)
         showViewTable()
-        getStartingPhrase()
+//        getStartingPhrase()
         buttonsCreated = false
         buttonRadius = self.view.frame.width / 25
+        createButtons()
+        fillAllWordsTable()
     }
-    var inputField: UITextField?
+//    var inputField: UITextField?
     var tableviewAdded = false
     
-    @objc func inputFieldDidChange(_ textField: UITextField) {
-        showMandatoryWords()
-    }
+//    @objc func inputFieldDidChange(_ textField: UITextField) {
+//        fillAllWordsTable()
+//    }
     var readMandatoryItems: Results<Mandatory>?
     var readMandatorySubscription: SyncSubscription<Mandatory>?
 
@@ -220,24 +227,24 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         return returnValue
     }
 
-    private func getStartingPhrase() {
-        let width = (self.view?.frame.width)! * 0.8
-        let height = (self.view?.frame.height)! * 0.03
-        let yPos = (self.view?.frame.height)! * 0.7
-        inputField = UITextField (frame:CGRect(x:0, y:0, width:width, height: height))
-        inputField!.center = CGPoint(x:(self.view?.center.x)!, y: yPos)
-        inputField!.font = myFont
-        inputField!.borderStyle = UITextField.BorderStyle.line
-        inputField!.addTarget(self, action: #selector(inputFieldDidChange(_:)), for: .editingChanged)
-        
-        inputField!.text = GV.basicDataRecord.searchPhrase// Set UITextField background colour
-        inputField!.backgroundColor = UIColor.white
-        
-        // Set UITextField text color
-        inputField!.textColor = UIColor.black
-//        inputField!.placeholder = "search..."
-        self.view?.addSubview(inputField!)
-    }
+//    private func getStartingPhrase() {
+//        let width = (self.view?.frame.width)! * 0.8
+//        let height = (self.view?.frame.height)! * 0.03
+//        let yPos = (self.view?.frame.height)! * 0.7
+//        inputField = UITextField (frame:CGRect(x:0, y:0, width:width, height: height))
+//        inputField!.center = CGPoint(x:(self.view?.center.x)!, y: yPos)
+//        inputField!.font = myFont
+//        inputField!.borderStyle = UITextField.BorderStyle.line
+//        inputField!.addTarget(self, action: #selector(inputFieldDidChange(_:)), for: .editingChanged)
+//
+//        inputField!.text = GV.basicDataRecord.searchPhrase// Set UITextField background colour
+//        inputField!.backgroundColor = UIColor.white
+//
+//        // Set UITextField text color
+//        inputField!.textColor = UIColor.black
+////        inputField!.placeholder = "search..."
+//        self.view?.addSubview(inputField!)
+//    }
     
     @objc func stopShowingTable() {
         showMandatoryWordsView!.isHidden = true
@@ -247,13 +254,8 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     
     var enabled = true
-    var doneButton: UIButton?
-    var no5Button: UIButton?
-    var no6Button: UIButton?
-    var no7Button: UIButton?
-    var no8Button: UIButton?
-    var no9Button: UIButton?
-    var no10Button: UIButton?
+
+    
     let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
     let playersTitle = "Player"
     let allTitle = "All"
@@ -261,62 +263,103 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     let myTitleFont = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
     var sortUp = true
     var buttonsCreated = false
-    
-    
+    var buttonTable = [UIButton]()
+    var actButtonIndex = 1
+    let buttonNames = ["", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
+    let buttonXPositons = [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75,80]
+
     private func createButtons() {
-        let buttonCenterDistance = (showMandatoryWordsView!.frame.size.width - 2 * buttonRadius) / 4
+//        let buttonCenterDistanceX = (showMandatoryWordsView!.frame.size.width - 2 * buttonRadius) / 4
+//        let buttonCenterDistanceY = (showMandatoryWordsView!.frame.size.height - 2 * buttonRadius) / 4
         let buttonFrameWidth = 2 * buttonRadius
-        let buttonFrame = CGRect(x: 0, y: 0, width:buttonFrameWidth, height: buttonFrameWidth)
-        let yPos = showMandatoryWordsView!.frame.maxY + buttonRadius * 1.2
-        let xPos1 = showMandatoryWordsView!.frame.minX + buttonRadius
-        let center1 = CGPoint(x: xPos1, y:yPos)
-        doneButton = createButton(imageName: "hook.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center1, enabled: enabled)
-        doneButton?.addTarget(self, action: #selector(self.stopShowingTable), for: .touchUpInside)
-        self.view?.addSubview(doneButton!)
-        let xPos2 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance
-        let center2 = CGPoint(x: xPos2, y:yPos)
-        no5Button = createButton(imageName: "", title: "5", frame: buttonFrame, center: center2, enabled: enabled)
-        no5Button?.addTarget(self, action: #selector(self.no5ButtonTapped), for: .touchUpInside)
-        self.view?.addSubview(no5Button!)
-        let xPos3 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 2
-        let center3 = CGPoint(x: xPos3, y:yPos)
-        no6Button = createButton(imageName: "", title: "6", frame: buttonFrame, center: center3, enabled: enabled)
-        no6Button?.addTarget(self, action: #selector(self.no6ButtonTapped), for: .touchUpInside)
-        self.view?.addSubview(no6Button!)
-        let xPos4 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 3
-        let center4 = CGPoint(x: xPos4, y:yPos)
-        no7Button = createButton(imageName: "", title: "7", frame: buttonFrame, center: center4, enabled: enabled)
-        no7Button?.addTarget(self, action: #selector(self.no7ButtonTapped), for: .touchUpInside)
-        self.view?.addSubview(no7Button!)
-        let xPos5 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 4
-        let center5 = CGPoint(x: xPos5, y:yPos)
-        no8Button = createButton(imageName: "", title: "8", frame: buttonFrame, center: center5, enabled: enabled)
-        no8Button!.addTarget(self, action: #selector(self.no8ButtonTapped), for: .touchUpInside)
-        self.view?.addSubview(no8Button!)
-        let xPos6 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 4
-        let center6 = CGPoint(x: xPos6, y:yPos)
-        no9Button = createButton(imageName: "", title: "9", frame: buttonFrame, center: center6, enabled: enabled)
-        no9Button!.addTarget(self, action: #selector(self.no9ButtonTapped), for: .touchUpInside)
-        self.view?.addSubview(no9Button!)
-        let xPos7 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 4
-        let center7 = CGPoint(x: xPos7, y:yPos)
-        no10Button = createButton(imageName: "", title: "10", frame: buttonFrame, center: center7, enabled: enabled)
-        no10Button!.addTarget(self, action: #selector(self.no10ButtonTapped), for: .touchUpInside)
-        self.view?.addSubview(no10Button!)
+        for index in 0..<buttonNames.count {
+            let buttonFrame = CGRect(x: 0, y: 0, width:buttonFrameWidth, height: buttonFrameWidth)
+            let yPos = showMandatoryWordsView!.frame.maxY + buttonRadius * (index % 2 == 0 ? 1.2 : 2.8)
+            let xPos = showMandatoryWordsView!.frame.minX + buttonRadius * CGFloat(index + 1) * 1.5
+            let center = CGPoint(x: xPos, y: yPos)
+            var button: UIButton
+            if index == 0 {
+                button = createButton(imageName: "hook.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center, enabled: enabled)
+                button.addTarget(self, action: #selector(self.stopShowingTable), for: .touchUpInside)
+            } else {
+                let title = buttonNames[index]
+                button = createButton(imageName: "", title: title, frame: buttonFrame, center: center, enabled: enabled)
+                switch index + 2 {
+                case 3: button.addTarget(self, action: #selector(no3ButtonTapped), for: .touchUpInside)
+                case 4: button.addTarget(self, action: #selector(no4ButtonTapped), for: .touchUpInside)
+                case 5: button.addTarget(self, action: #selector(no5ButtonTapped), for: .touchUpInside)
+                case 6: button.addTarget(self, action: #selector(no6ButtonTapped), for: .touchUpInside)
+                case 7: button.addTarget(self, action: #selector(no7ButtonTapped), for: .touchUpInside)
+                case 8: button.addTarget(self, action: #selector(no8ButtonTapped), for: .touchUpInside)
+                case 9: button.addTarget(self, action: #selector(no9ButtonTapped), for: .touchUpInside)
+                case 10: button.addTarget(self, action: #selector(no10ButtonTapped), for: .touchUpInside)
+                case 11: button.addTarget(self, action: #selector(no11ButtonTapped), for: .touchUpInside)
+                case 12: button.addTarget(self, action: #selector(no12ButtonTapped), for: .touchUpInside)
+                case 13: button.addTarget(self, action: #selector(no13ButtonTapped), for: .touchUpInside)
+                case 14: button.addTarget(self, action: #selector(no14ButtonTapped), for: .touchUpInside)
+                case 15: button.addTarget(self, action: #selector(no15ButtonTapped), for: .touchUpInside)
+                default: continue
+                }
+            }
+            self.view?.addSubview(button)
+        }
         self.buttonsCreated = true
     }
     
+//    private func createButtonsOld() {
+//        let buttonCenterDistance = (showMandatoryWordsView!.frame.size.width - 2 * buttonRadius) / 4
+//        let buttonFrameWidth = 2 * buttonRadius
+//        let buttonFrame = CGRect(x: 0, y: 0, width:buttonFrameWidth, height: buttonFrameWidth)
+//        let yPos = showMandatoryWordsView!.frame.maxY + buttonRadius * 1.2
+//        let xPos1 = showMandatoryWordsView!.frame.minX + buttonRadius
+//        let center1 = CGPoint(x: xPos1, y:yPos)
+//        doneButton = createButton(imageName: "hook.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center1, enabled: enabled)
+//        doneButton?.addTarget(self, action: #selector(self.stopShowingTable), for: .touchUpInside)
+//        self.view?.addSubview(doneButton!)
+//        let xPos2 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance
+//        let center2 = CGPoint(x: xPos2, y:yPos)
+//        no5Button = createButton(imageName: "", title: "5", frame: buttonFrame, center: center2, enabled: enabled)
+//        no5Button?.addTarget(self, action: #selector(self.no5ButtonTapped), for: .touchUpInside)
+//        self.view?.addSubview(no5Button!)
+//        let xPos3 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 2
+//        let center3 = CGPoint(x: xPos3, y:yPos)
+//        no6Button = createButton(imageName: "", title: "6", frame: buttonFrame, center: center3, enabled: enabled)
+//        no6Button?.addTarget(self, action: #selector(self.no6ButtonTapped), for: .touchUpInside)
+//        self.view?.addSubview(no6Button!)
+//        let xPos4 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 3
+//        let center4 = CGPoint(x: xPos4, y:yPos)
+//        no7Button = createButton(imageName: "", title: "7", frame: buttonFrame, center: center4, enabled: enabled)
+//        no7Button?.addTarget(self, action: #selector(self.no7ButtonTapped), for: .touchUpInside)
+//        self.view?.addSubview(no7Button!)
+//        let xPos5 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 4
+//        let center5 = CGPoint(x: xPos5, y:yPos)
+//        no8Button = createButton(imageName: "", title: "8", frame: buttonFrame, center: center5, enabled: enabled)
+//        no8Button!.addTarget(self, action: #selector(self.no8ButtonTapped), for: .touchUpInside)
+//        self.view?.addSubview(no8Button!)
+//        let xPos6 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 4
+//        let center6 = CGPoint(x: xPos6, y:yPos)
+//        no9Button = createButton(imageName: "", title: "9", frame: buttonFrame, center: center6, enabled: enabled)
+//        no9Button!.addTarget(self, action: #selector(self.no9ButtonTapped), for: .touchUpInside)
+//        self.view?.addSubview(no9Button!)
+//        let xPos7 = showMandatoryWordsView!.frame.minX + buttonRadius + buttonCenterDistance * 4
+//        let center7 = CGPoint(x: xPos7, y:yPos)
+//        no10Button = createButton(imageName: "", title: "10", frame: buttonFrame, center: center7, enabled: enabled)
+//        no10Button!.addTarget(self, action: #selector(self.no10ButtonTapped), for: .touchUpInside)
+//        self.view?.addSubview(no10Button!)
+//        self.buttonsCreated = true
+//    }
+    
     private func modifyButtonsPosition() {
-        let height = showMandatoryWordsView!.frame.height * 0.5
-        let center = self.view.frame.midY
-        let calculatedYPos = center + height + self.buttonRadius * 1.2
-        doneButton!.center = CGPoint(x: doneButton!.center.x, y: calculatedYPos)
-        no5Button!.center = CGPoint(x: no5Button!.center.x, y: calculatedYPos)
-        no6Button!.center = CGPoint(x: no6Button!.center.x, y: calculatedYPos)
-        no7Button!.center = CGPoint(x: no7Button!.center.x, y: calculatedYPos)
-        no8Button!.center = CGPoint(x: no8Button!.center.x, y: calculatedYPos)
-        no9Button!.center = CGPoint(x: no9Button!.center.x, y: calculatedYPos)
-        no10Button!.center = CGPoint(x: no10Button!.center.x, y: calculatedYPos)
+//        let height = showMandatoryWordsView!.frame.height * 0.5
+//        let center = self.view.frame.midY
+//        let calculatedYPos = center + height + self.buttonRadius * 1.2
+//        doneButton!.center = CGPoint(x: doneButton!.center.x, y: calculatedYPos)
+//        no5Button!.center = CGPoint(x: no5Button!.center.x, y: calculatedYPos)
+//        no6Button!.center = CGPoint(x: no6Button!.center.x, y: calculatedYPos)
+//        no7Button!.center = CGPoint(x: no7Button!.center.x, y: calculatedYPos)
+//        no8Button!.center = CGPoint(x: no8Button!.center.x, y: calculatedYPos)
+//        no9Button!.center = CGPoint(x: no9Button!.center.x, y: calculatedYPos)
+//        no10Button!.center = CGPoint(x: no10Button!.center.x, y: calculatedYPos)
     }
     
     private func createButton(imageName: String, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool)->UIButton {
@@ -376,34 +419,75 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //        showMandatoryWordsView!.setDelegate(delegate: self)
 //    }
     
+    var choosedLength = 0
+    @objc func no3ButtonTapped() {
+        choosedLength = 3
+        showMandatoryWordsView!.reloadData()
+    }
+    @objc func no4ButtonTapped() {
+        choosedLength = 4
+        showMandatoryWordsView!.reloadData()
+    }
+
     @objc func no5ButtonTapped() {
-        showMandatoryWords()
+        choosedLength = 5
+        showMandatoryWordsView!.reloadData()
     }
     
     @objc func no6ButtonTapped() {
-        showMandatoryWords()
+        choosedLength = 6
+        showMandatoryWordsView!.reloadData()
     }
     
     @objc func no7ButtonTapped() {
-        showMandatoryWords()
+        choosedLength = 7
+        showMandatoryWordsView!.reloadData()
     }
     
     @objc func no8ButtonTapped() {
-        showMandatoryWords()
+        choosedLength = 8
+        showMandatoryWordsView!.reloadData()
     }
     
     @objc func no9ButtonTapped() {
-        showMandatoryWords()
+        choosedLength = 9
+        showMandatoryWordsView!.reloadData()
     }
     
     @objc func no10ButtonTapped() {
-        showMandatoryWords()
+        choosedLength = 10
+        showMandatoryWordsView!.reloadData()
     }
     
-//    @objc func bestButtonTapped() {
+    @objc func no11ButtonTapped() {
+        choosedLength = 11
+        showMandatoryWordsView!.reloadData()
+    }
+    
+    @objc func no12ButtonTapped() {
+        choosedLength = 12
+        showMandatoryWordsView!.reloadData()
+    }
+    
+    @objc func no13ButtonTapped() {
+        choosedLength = 13
+        showMandatoryWordsView!.reloadData()
+    }
+    
+    @objc func no14ButtonTapped() {
+        choosedLength = 14
+        showMandatoryWordsView!.reloadData()
+    }
+    
+    @objc func no15ButtonTapped() {
+        choosedLength = 15
+        showMandatoryWordsView!.reloadData()
+    }
+    
+    @objc func bestButtonTapped() {
 //        setNewTableView(tableType: .BestScoreForGame)
 //        showBestScoreForGame()
-//    }
+    }
 //
     @objc func sortButtonTapped() {
         //        showMandatoryWordsView?.removeFromSuperview()
@@ -430,10 +514,10 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     private func showViewTable() {
         if !tableviewAdded {
             let origin = CGPoint(x: 0, y: 0)
-            let height = view.frame.height * (GV.onIpad ? 0.6 : 0.3)
+            let height = view.frame.height * (GV.onIpad ? 0.8 : 0.8)
             let width = view.frame.width * (GV.onIpad ? 0.8 : 0.9)
             let size = CGSize(width: width, height: height)
-            let center = CGPoint(x: 0.5 * view.frame.width, y: 0.35 * view.frame.height)
+            let center = CGPoint(x: 0.5 * view.frame.width, y: 0.45 * view.frame.height)
             showMandatoryWordsView!.frame=CGRect(origin: origin, size: size)
             showMandatoryWordsView!.center=center
 //            createButtons()
@@ -446,73 +530,113 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     var searchLength = 0
     var showAll = true
-
-    private func showMandatoryWords() {
-        if inputField!.text!.length < 3 {
-            return
-        }
-        mandatoryWordsTable = [String]()
-        var continueCycle = true
+    
+    private func fillAllWordsTable() {
         let language = GV.actLanguage
-        var searchPhrase = ""
-        let lastCh = String(inputField!.text!.last!)
-        if lastCh == "/" {
-            searchPhrase = inputField!.text!
-            let newPhrase = incrementString(string: searchPhrase)
-            if newPhrase == "яяя" {
-                continueCycle = false
-            } else {
-                inputField!.text = newPhrase
-                searchPhrase = newPhrase
-            }
-        }
-        var newLength = 0
-        if lastCh.isMemberOf("5", "6", "7", "8", "9", "0") {
-            newLength = Int(lastCh)! == 0 ? 10 : Int(lastCh)!
-            inputField!.text!.removeLast()
-            searchLength = searchLength == newLength ? 0 : newLength
-        }
-        if lastCh.isMemberOf("[", "]") {
-            showAll = !showAll
-            inputField!.text!.removeLast()
-        }
-        searchPhrase = inputField!.text!
+        mandatoryWordsTable = [[String](), [String](), [String](), [String](), [String](), [String](),
+                               [String](), [String](), [String](), [String](), [String](), [String](),
+                               [String](), [String](), [String](), [String](), [String]()]
+        allWordsTable = [[String](), [String](), [String](), [String](), [String](), [String](),
+                         [String](), [String](), [String](), [String](), [String](), [String](),
+                         [String](), [String](), [String](), [String](), [String]()]
+//        let mandatoryItems = realmMandatoryList.objects(CommonString.self).filter("word beginsWith %@", language).sorted(byKeyPath: "word")
+////        let mandatoryItems = RealmService.objects(CommonString.self).filter("word beginsWith %@", language).sorted(byKeyPath: "word")
+//        for item in mandatoryItems {
+//            let word = item.word.endingSubString(at: 2)
+//            let length = word.length
+//            if length > 2 && length < 16 {
+//                mandatoryWordsTable[length].append(word)
+//            }
+//        }
         
-        repeat {
-            if searchPhrase.length > 2 {
-                allWordsItems = realmWordList.objects(WordListModel.self).filter("word beginsWith %@", language + searchPhrase.lowercased())
-                for item in allWordsItems! {
-                    let word = String(item.word.endingSubString(at:2))
-                    if word.length > 4 && word.length < 11 && (searchLength == 0 || word.length == searchLength) {
-                        if !savedMandatoryWords.contains(word) {
-                            mandatoryWordsTable.append(String(word))
-                        } else if showAll {
-                            mandatoryWordsTable.append("\(String(word))\(savePhrase)")
-                        }
-                    }
+        let allWordsItems = realmWordList.objects(WordListModel.self).filter("word beginsWith %@", language).sorted(byKeyPath: "word")
+    
+        for item in allWordsItems {
+            let word = item.word.endingSubString(at: 2)
+            let length = word.length
+            if length > 2 && length < 16 {
+                var suffix = ""
+                if realmMandatoryList.objects(MandatoryListModel.self).filter("word = %@", word).count > 0 {
+//                if RealmService.objects(CommonString.self).filter("word = %@", item.word).count > 0 {
+//                if mandatoryWordsTable[length].index(where: { $0 == word }) != nil {
+                    suffix = GV.language.getText(.tcChoosedWord)
                 }
-                if mandatoryWordsTable.count == 0 {
-                    searchPhrase = inputField!.text!
-                    let newPhrase = incrementString(string: searchPhrase)
-                    if newPhrase == "яяя" {
-                        continueCycle = false
-                    } else {
-                        inputField!.text = newPhrase
-                        searchPhrase = newPhrase
-                    }
-                } else {
-                    continueCycle = false
-                }
-            } else {
-                continueCycle = false
+                allWordsTable[length].append(word + suffix)
             }
-        } while continueCycle
-        try! realm.write() {
-            GV.basicDataRecord.searchPhrase = searchPhrase
         }
-        showMandatoryWordsView!.reloadData()
-
+        
+//        showMandatoryWordsView!.reloadData()
+        
     }
+
+
+//    private func showMandatoryWordsOld() {
+//        if inputField!.text!.length < 3 {
+//            return
+//        }
+//        mandatoryWordsTable = [String]()
+//        var continueCycle = true
+//        let language = GV.actLanguage
+//        var searchPhrase = ""
+//        let lastCh = String(inputField!.text!.last!)
+//        if lastCh == "/" {
+//            searchPhrase = inputField!.text!
+//            let newPhrase = incrementString(string: searchPhrase)
+//            if newPhrase == "яяя" {
+//                continueCycle = false
+//            } else {
+//                inputField!.text = newPhrase
+//                searchPhrase = newPhrase
+//            }
+//        }
+//        var newLength = 0
+//        if lastCh.isMemberOf("5", "6", "7", "8", "9", "0") {
+//            newLength = Int(lastCh)! == 0 ? 10 : Int(lastCh)!
+//            inputField!.text!.removeLast()
+//            searchLength = searchLength == newLength ? 0 : newLength
+//        }
+//        if lastCh.isMemberOf("[", "]") {
+//            showAll = !showAll
+//            inputField!.text!.removeLast()
+//        }
+//        searchPhrase = inputField!.text!
+//
+//        repeat {
+//            if searchPhrase.length > 2 {
+//                allWordsItems = realmWordList.objects(WordListModel.self).filter("word beginsWith %@", language + searchPhrase.lowercased())
+//                for item in allWordsItems! {
+//                    let word = String(item.word.endingSubString(at:2))
+//                    if word.length > 4 && word.length < 11 && (searchLength == 0 || word.length == searchLength) {
+//                        if !savedMandatoryWords.contains(word) {
+//                            mandatoryWordsTable.append(String(word))
+//                        } else if showAll {
+//                            mandatoryWordsTable.append("\(String(word))\(savePhrase)")
+//                        }
+//                    }
+//                }
+//                if mandatoryWordsTable.count == 0 {
+//                    searchPhrase = inputField!.text!
+//                    let newPhrase = incrementString(string: searchPhrase)
+//                    if newPhrase == "яяя" {
+//                        continueCycle = false
+//                    } else {
+//                        inputField!.text = newPhrase
+//                        searchPhrase = newPhrase
+//                    }
+//                } else {
+//                    continueCycle = false
+//                }
+//            } else {
+//                continueCycle = false
+//            }
+//        } while continueCycle
+//        try! realm.write() {
+//            GV.basicDataRecord.searchPhrase = searchPhrase
+//        }
+//        showMandatoryWordsView!.reloadData()
+//
+//    }
+
     
     struct PlayerData {
         var nickName = ""
@@ -574,7 +698,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var mandatoryItems: Results<CommonString>?
     var mandatorySubscription: SyncSubscription<CommonString>?
     var mandatorySubscriptionToken: NotificationToken?
-    var wordLengths = [0,0,0,0,0,0,0]
+    var wordLengths = [0,0,0,0,0,0,0,0,0,0,0]
     
     private func getSavedMandatoryWords() {
         mandatoryItems = RealmService.objects(CommonString.self).filter("word BEGINSWITH %@", GV.actLanguage).sorted(byKeyPath: "word", ascending: true)
@@ -601,7 +725,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                             self!.savedMandatoryWords.append(word)
                             self!.wordLengths[word.length - 4] += 1
                             self!.wordLengths[0] += 1
-                            print("\(word)")
+//                            print("\(word)")
                         }
                     }
                 }
@@ -621,6 +745,3 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     
 }
-
-
-#endif

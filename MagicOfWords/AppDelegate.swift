@@ -204,6 +204,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     var playerActivitySubscription: SyncSubscription<PlayerActivity>?
     var playerActivityToken: NotificationToken?
+    var playerNotificationToken: NotificationToken?
 
     func setConnection() {
         if GV.myUser == nil {
@@ -235,7 +236,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             playerActivityItem.deviceType = UIDevice().modelName
                             realmSync?.add(playerActivityItem)
                         }
+                    } 
+                    self.playerNotificationToken = playerActivity!.observe {  (changes) in
+                        if playerActivity!.count > 0 {
+                            GV.expertUser = playerActivity!.first!.expertUser
+                        }
                     }
+
                 } else {
                     print("state: \(state)")
                 }

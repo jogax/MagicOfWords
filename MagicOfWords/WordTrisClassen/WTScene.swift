@@ -709,8 +709,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 case .NoMore:
                     break
                 case .PreviousGame:
-                    let previousRecords = realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d and language = %@",
-                       GV.GameStatusPlaying, actGameNumber, GV.actLanguage)
+                    let previousRecords = realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber < %d and language = %@",
+                       GV.GameStatusPlaying, GV.GameStatusContinued, actGameNumber, GV.actLanguage)
                     if previousRecords.count == 1 {
                         actGameNumber = previousRecords[0].gameNumber
                     } else if let record = Array(previousRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).last {
@@ -719,8 +719,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         break
                     }
                 case .NextGame:
-                    let nextRecords = realm.objects(GameDataModel.self).filter(" gameStatus = %d and gameNumber > %d and language = %@",
-                       GV.GameStatusPlaying, actGameNumber, GV.actLanguage)
+                    let nextRecords = realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber > %d and language = %@",
+                       GV.GameStatusPlaying, GV.GameStatusContinued, actGameNumber, GV.actLanguage)
                     if nextRecords.count == 1 {
                         actGameNumber = nextRecords[0].gameNumber
                     } else if let record = Array(nextRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).first {
@@ -1733,13 +1733,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    }
     
     private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
-        return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber < %d and language = %@",
-            GV.GameStatusPlaying, playingRecord.gameNumber, GV.actLanguage).count > 0
+        return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber < %d and language = %@",
+            GV.GameStatusPlaying, GV.GameStatusContinued, playingRecord.gameNumber, GV.actLanguage).count > 0
     }
     
     private func hasNextRecords(playingRecord: GameDataModel)->Bool {
-        return realm.objects(GameDataModel.self).filter("gameStatus = %d and gameNumber > %d and language = %@",
-            GV.GameStatusPlaying, playingRecord.gameNumber, GV.actLanguage).count > 0
+        return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber > %d and language = %@",
+            GV.GameStatusPlaying, GV.GameStatusContinued, playingRecord.gameNumber, GV.actLanguage).count > 0
     }
     
     @objc private func countTime(timerX: Timer) {
@@ -2574,12 +2574,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     func restoreGameArray() {
         func addPieceAsChild(pieceIndex: Int, piece: WTPiece) {
-            // remove the piece from this position, if exists
-            removeNodesWith(name: "Pos\(pieceIndex)")
             pieceArray[pieceIndex] = piece
             pieceArray[pieceIndex].position = origPosition[pieceIndex]
             origSize[pieceIndex] = piece.size
             pieceArray[pieceIndex].name = "Pos\(pieceIndex)"
+            removeNodesWith(name: "Pos\(pieceIndex)")             // remove the piece from this position, if exists
             self.addChild(pieceArray[pieceIndex])
         }
         activityRoundItem = [ActivityRound]()
@@ -2668,6 +2667,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         wordsString = GV.playingRecord.words
         if wordsString.length > 0 {
             usedWords = wordsString.components(separatedBy: itemSeparator)
+            wordsString += itemSeparator
         }
         let myLetters = GV.language.getText(.tcAlphabet)
         for letter in myLetters {

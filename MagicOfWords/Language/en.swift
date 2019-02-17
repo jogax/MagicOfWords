@@ -101,4 +101,6 @@ let enDictionary: [TextConstants: String] = [
     .tcCongratulations2:    "You can continue playing and earn more points or touch <Finish> to finish the game!",
     .tcContinuePlaying:     "Continue playing",
     .tcFinishGame:          "Finish",
+    .tcChoosedWord:         "  Choosed",
+    .tcAllWords:            "% Words, choosed: %",
 ]

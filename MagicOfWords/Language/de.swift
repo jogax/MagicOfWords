@@ -101,6 +101,8 @@ let deDictionary: [TextConstants: String] = [
     .tcCongratulations2:    "Sie können weiterspielen um mehr Punkte zu sammeln oder den Knopf <Beenden> berühren, um das Spiel zu beenden!",
     .tcContinuePlaying:     "Weiterspielen",
     .tcFinishGame:          "Beenden",
+    .tcChoosedWord:         "  Gewählt",
+    .tcAllWords:            "% Wörter, gwwählt: %",
 ]
 
 

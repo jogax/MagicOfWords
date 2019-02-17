@@ -70,18 +70,26 @@ struct GV {
     static var myUser: SyncUser? = nil {
         willSet(newValue) {
             for callBack in callBackMyUser {
-                callBack.callBackMyUser
+                callBack.callBackFunc()
+            }
+        }
+    }
+    static var expertUser = false {
+        didSet(newValue) {
+            for callBack in callBackExpertUser {
+                callBack.callBackFunc()
             }
         }
     }
     struct CallBackStruct {
         var myCaller:String
-        var callBackMyUser: ()
-        init(caller: String, callBackFunction: ()) {
+        var callBackFunc: ()->()
+        init(caller: String, callBackFunction: @escaping ()->()) {
             myCaller = caller
-            callBackMyUser = callBackFunction
+            callBackFunc = callBackFunction
         }
     }
+    static var callBackExpertUser: Array<CallBackStruct> = []
     static var callBackMyUser: Array<CallBackStruct> = []
 
 
