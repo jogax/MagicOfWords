@@ -100,6 +100,10 @@ let huDictionary: [TextConstants: String] = [
     .tcCongratulations2:    "Tovább játszhatsz és pontokat gyűjthetsz vagy a <Befejezem> gomb megérintésével befejezheted a játékot!",
     .tcContinuePlaying:     "Tovább játszom",
     .tcFinishGame:          "Befejezem",
-    .tcChoosedWord:         "  Kiválasztva",
+    .tcChoosedWord:         " Hozzáadva",
+    .tcCountLetters:        "% betüs kötelező szavak keresése",
     .tcAllWords:            "% Szó, kiválasztva: %",
+    .tcIWillAdd:            " Hozzáadom",
+    .tcIWillDelete:         " Törlöm",
+    .tcIWillSeparate:       " Leválasztom",
 ]

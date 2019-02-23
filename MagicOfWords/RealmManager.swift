@@ -16,7 +16,7 @@ private class RealmManager {
     
     lazy var realm: Realm = {
         var syncUserConfig = SyncUser.current?.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true)
-        syncUserConfig!.objectTypes = [PlayerActivity.self, BestScoreSync.self, BestScoreForGame.self, CommonString.self, Mandatory.self]
+        syncUserConfig!.objectTypes = [PlayerActivity.self, BestScoreSync.self, BestScoreForGame.self, CommonString.self, Mandatory.self, ModifiedWordsModel.self]
         let realm = try! Realm(configuration: syncUserConfig!)
         return realm
     }()

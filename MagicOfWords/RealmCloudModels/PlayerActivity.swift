@@ -23,6 +23,7 @@ class PlayerActivity: Object {
     @objc dynamic var territory: String?
     @objc dynamic var deviceType: String?
     @objc dynamic var expertUser: Bool = false
+    @objc dynamic var lastTouched: Date?
 
     override static func primaryKey() -> String? {
         return "name"

@@ -66,6 +66,16 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return self.myDelegate!.getHeightForHeaderInSection(tableView: tableView, section: section)
     }
+//    public func showActivityIndicatory() {
+//        let actInd: UIActivityIndicatorView = UIActivityIndicatorView()
+//        actInd.frame = CGRect(x:0.0, y:0.0, width:40.0, height:40.0)
+//        actInd.center = self.center
+//        actInd.hidesWhenStopped = true
+//        actInd.style =
+//            UIActivityIndicatorView.Style.whiteLarge
+//        self.addSubview(actInd)
+//        actInd.startAnimating()
+//    }
 
 }
 

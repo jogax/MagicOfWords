@@ -341,7 +341,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
             }
             var words = ""
             
-            random = MyRandom()
+            random = MyRandom(gameNumber: gameNumber, modifier: 555)
             for (index, count) in actWordLength.counts.enumerated() {
                 for _ in 0..<count {
                     let max = savedMandatoryWords[index].count - 1
@@ -399,6 +399,10 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
             stringArray.append([String]())
         }
         return stringArray
+    }
+    
+    func didTappedButton(tableView: UITableView, indexPath: IndexPath, buttonName: String) {
+        
     }
     
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {

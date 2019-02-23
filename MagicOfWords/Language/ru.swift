@@ -101,7 +101,11 @@ let ruDictionary: [TextConstants: String] = [
     .tcCongratulations2:    "Вы можете дальше играть и больше очков заработать или коснуться кнопку <Закончить>, чтобы закончить игру!",
     .tcContinuePlaying:     "Продолжать",
     .tcFinishGame:          "Закончить",
-    .tcChoosedWord:         "  Выбрано",
+    .tcChoosedWord:         " Добавлено",
+    .tcCountLetters:        "Поиск обязательных слов из % букв",
     .tcAllWords:            "% Слов, выбрано: %",
+    .tcIWillAdd:            " Я добавлю",
+    .tcIWillDelete:         " Я удаляю",
+    .tcIWillSeparate:       " Я отделяю",
 ]
 

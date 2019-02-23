@@ -13,57 +13,44 @@ class MyRandom {
 //    private var index = 0
     var random: GKARC4RandomSource?
     var forName = false
-    var counts = 0
-//    var gameNumber = 0
+//    var counts = 0
+    var gameNumber = 0
+    var modifier = 0
+    var generatedNumbers = [Int]()
 //    var gameNumber = 0
 //    var stringTable = [String]()
     
-    init(forName: Bool = false) {
+    init(forName: Bool) {
         self.forName = forName
-        counts = GV.playingRecord.randomCounts
         prepareRandom()
     }
     
+    init(gameNumber: Int, modifier: Int) {
+        self.gameNumber = gameNumber
+        self.modifier = modifier + 111
+        prepareRandom()
+    }
+
     private func prepareRandom() {
         let gameData = (forName ? nameData : levelData).dataFromHexadecimalString()!
         random = GKARC4RandomSource(seed: gameData)
-        let startValue = 1111 * (GV.playingRecord.gameNumber + 555)
+        let startValue = 1111 * (gameNumber + 555) + modifier * 333
         random!.dropValues(startValue)
-        dropCounts()
-    }
-    
-    private func dropCounts() {
-        for _ in 0..<counts {
-            _ = random!.nextInt()
-        }
     }
     
     
-    public func dropValues(value: Int) {
-        for _ in 0..<value {
-            _ = getRandomInt(0, max: 1)
-        }
-    }
+//    public func dropValues(value: Int) {
+//        for _ in 0..<value {
+//            _ = getRandomInt(0, max: 1)
+//        }
+//    }
     
-    public func decrementCounts(value: Int) {
-        let adder = value + 0
-        counts -= (counts > adder ? adder : counts)
-        try! realm.write() {
-            GV.playingRecord.randomCounts = counts
-        }
-        prepareRandom()
-    }
     
     public func getRandomInt(_ min: Int, max: Int) -> Int {
-        counts += 1
-        try! realm.write() {
-            GV.playingRecord.randomCounts = counts
-        }
         let returnValue = min + random!.nextInt(upperBound: (max + 1 - min))
-//        let returnValue = min + abs(random!.nextInt()) % (max + 1 - min)
-       return returnValue
+        generatedNumbers.append(returnValue)
+        return returnValue
     }
-    
     
     private var levelData = "5ff5310cc41380bf720ce9238f984730"
     

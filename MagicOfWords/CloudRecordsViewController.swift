@@ -31,6 +31,12 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
     var tableType: TableType = .Players
     
+    func didTappedButton(tableView: UITableView, indexPath: IndexPath, buttonName: String) {
+        
+    }
+    
+
+    
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
         let nickName = bestScoreTable[indexPath.row].nickName
 //        for deleting a complete user from Realm Cloud
@@ -88,6 +94,10 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         }
     }
     
+    @objc public func buttonTapped(indexPath: IndexPath) {
+        
+    }
+    
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
@@ -97,8 +107,9 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         switch tableType {
         case .Players:
             cell.addColumn(text: "  ")
-            let image = UIImage(named: playerTable[indexPath.row].isOnline ? "online.png" : "offline.png")
-            cell.addButton(image: image!)
+            let isOnline = playerTable[indexPath.row].isOnline
+            let image = UIImage(named: isOnline ? "online.png" : "offline.png")
+            cell.addButton(image: image!, callBack: buttonTapped)
             cell.addColumn(text: " " + (playerTable[indexPath.row].nickName.fixLength(length: lengthOfNickName - 4, leadingBlanks: false)), color: actColor) // WordColumn
             cell.addColumn(text: (playerTable[indexPath.row].keyWord.fixLength(length: lengthOfKeyWord, leadingBlanks: false)), color: actColor)
 //            cell.addColumn(text: String(playerTable[indexPath.row].isOnline).fixLength(length: lengthOfIsOnline, leadingBlanks: false), color: actColor)
@@ -429,7 +440,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                         showPlayerActivityView.reloadData()
                         self!.initialLoadDone = true
                     //                print("Initial Data displayed")
-                    case .update(_, let deletions, let insertions, let modifications):
+                    case .update(_, let deletions, let insertions, _):
                         if self!.initialLoadDone && self!.tableType == .Players {
                             // Query results have changed, so apply them to the UITableView
                             if insertions.count > 0 {
@@ -440,14 +451,17 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                                 showPlayerActivityView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
                                 self!.modifyButtonsPosition()
                            }
-                            showPlayerActivityView.beginUpdates()
-                            showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-                                                              with: .automatic)
-                            showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-                                                              with: .automatic)
-                            showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-                                                              with: .automatic)
-                            showPlayerActivityView.endUpdates()
+                            self!.generatePlayerData()
+                            self!.showPlayerActivityView!.reloadData()
+
+//                            showPlayerActivityView.beginUpdates()
+//                            showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+//                                                              with: .automatic)
+//                            showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+//                                                              with: .automatic)
+//                            showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+//                                                              with: .automatic)
+//                            showPlayerActivityView.endUpdates()
                         }
                     case .error(let error):
                         // An error occurred while opening the Realm file on the background worker thread
@@ -476,20 +490,29 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     
 
     private func generatePlayerData() {
-        func addUsers(isOnline: Bool) {
-            let users = playerActivityItems!.filter("isOnline = %d", isOnline)
-            for user in users {
-                var playerData = PlayerData()
-                playerData.nickName = user.nickName!
-                playerData.keyWord = user.keyWord == nil ? "" : user.keyWord!
-                playerData.isOnline = user.isOnline
-                playerData.onlineTime = user.onlineTime
+        var countOnlineUser = 0
+        playerTable.removeAll()
+        let users = playerActivityItems!.sorted(byKeyPath: "nickName")
+        for user in users {
+            var playerData = PlayerData()
+            playerData.nickName = user.nickName!
+            playerData.keyWord = user.keyWord == nil ? "" : user.keyWord!
+            if user.lastTouched != nil {
+                playerData.isOnline = user.isOnline && getLocalDate().timeIntervalSince(user.lastTouched!) <= 60 
+            } else {
+                playerData.isOnline = false
+                try! RealmService.write() {
+                    user.isOnline = false
+                }
+            }
+            playerData.onlineTime = user.onlineTime
+            if playerData.isOnline {
+                playerTable.insert(playerData, at:countOnlineUser)
+                countOnlineUser += 1
+            } else {
                 playerTable.append(playerData)
             }
-        }
-        playerTable.removeAll()
-        addUsers(isOnline: true)
-        addUsers(isOnline: false)
+         }
     }
     
     private func showBestScoreSync() {

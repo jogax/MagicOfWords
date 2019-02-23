@@ -86,25 +86,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 16, // new item words
+            schemaVersion: 17, // new item words
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
                 switch oldSchemaVersion {
-                case 0...3:
+                case 0...13:
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
-                case 4...13:
-                    migration.deleteData(forType: GameDataModel.className())
-                    migration.deleteData(forType: RoundDataModel.className())
-
                 default: migration.enumerateObjects(ofType: GameDataModel.className())
                     { oldObject, newObject in
-                        if oldObject!["combinedKey"] == nil {
-                            newObject!["combinedKey"] = oldObject!["language"] as! String + String((oldObject!["gameNumber"] as! Int) % 1000)
-                            newObject!["gameNumber"] = Int(oldObject!["gameNumber"] as! Int % 1000)
-                        }
+//                        if oldObject!["combinedKey"] == nil {
+//                            newObject!["combinedKey"] = oldObject!["language"] as! String + String((oldObject!["gameNumber"] as! Int) % 1000)
+//                            newObject!["gameNumber"] = Int(oldObject!["gameNumber"] as! Int % 1000)
+//                        }
                     }
 
                 }
@@ -196,7 +192,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                     playerActivity![0].countOnlines += 1
                     playerActivity![0].isOnline = false
-                    playerActivity![0].onlineTime += Int(getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!))
+//                    playerActivity![0].onlineTime += Int(getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!))
                     playerActivity![0].onlineSince = nil
                 }
             }
@@ -251,7 +247,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setIsOnline()
     }
     
-    
+    var tenMinutesTimer: Timer?
     func setIsOnline() {
         if GV.myUser != nil {
             try! realmSync!.write() {
@@ -259,9 +255,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 } else {
                     playerActivity![0].isOnline = true
                     playerActivity![0].onlineSince = getLocalDate()
+                    playerActivity![0].lastTouched = getLocalDate()
+                    tenMinutesTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
                 }
             }
             checkSyncedDB()
+        }
+    }
+    
+    @objc private func setLastTouched(timerX: Timer) {
+        if playerActivity?.count == 0 {
+        } else {
+            try! RealmService.write() {
+                playerActivity![0].lastTouched = getLocalDate()
+                playerActivity![0].onlineTime += 60
+            }
+            tenMinutesTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
         }
     }
     

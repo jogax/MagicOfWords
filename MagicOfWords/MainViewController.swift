@@ -232,7 +232,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     private func getRecordCounts() {
         countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@", GV.actLanguage).count
         countExistingGames = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage).count
-        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameStatus = %@", GV.actLanguage, GV.GameStatusPlaying).count
+        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and (gameStatus = %@ or gameStatus = %@)", GV.actLanguage, GV.GameStatusPlaying, GV.GameStatusContinued).count
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
@@ -330,7 +330,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             #if DEBUG
             if showRealmCloudAction != nil {
                 showRealmCloudAction!.isEnabled = true
-                createMandatoryAction!.isEnabled = true
+//                createMandatoryAction!.isEnabled = true
             }
            #endif
         case .cellular:
@@ -344,7 +344,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             #if DEBUG
             if showRealmCloudAction != nil {
                 showRealmCloudAction!.isEnabled = true
-                createMandatoryAction!.isEnabled = true
+//                createMandatoryAction!.isEnabled = true
             }
             #endif
         case .none:
@@ -359,7 +359,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             #if DEBUG
             if showRealmCloudAction != nil {
                 showRealmCloudAction!.isEnabled = false
-                createMandatoryAction!.isEnabled = false
+//                createMandatoryAction!.isEnabled = false
             }
             #endif
         }
@@ -421,18 +421,17 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         })
         alertController!.addAction(chooseLanguageAction)
         //--------------------- nickNameAction ---------------------
-        if !GV.debug {
-            nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
-                alert -> Void in
-                if GV.connectedToInternet && playerActivity != nil {
-                    self.chooseNickname()
-                } else {
-                    self.showMenu()
-                }
-            })
-            nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-            alertController!.addAction(nickNameAction!)
-        }
+        
+        nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
+            alert -> Void in
+            if GV.connectedToInternet && playerActivity != nil {
+                self.chooseNickname()
+            } else {
+                self.showMenu()
+            }
+        })
+        nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+        alertController!.addAction(nickNameAction!)
         expertUserChanged()
         #if DEBUG
         //--------------------- showRealmCloudAction ---------------------
@@ -442,12 +441,19 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             })
             showRealmCloudAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
             alertController!.addAction(showRealmCloudAction!)
-            createMandatoryAction = UIAlertAction(title: GV.language.getText(.tcCreateMandatory), style: .default, handler: { [unowned self]
-            alert -> Void in
-                self.displayCreateMandatoryViewController()
-            })
-            createMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-        alertController!.addAction(createMandatoryAction!)
+//            collectMandatoryAction = UIAlertAction(title: GV.language.getText(.tcCollectMandatory), style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                self.displayCollectMandatoryViewController()
+//            })
+//            collectMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+//            alertController!.addAction(collectMandatoryAction!)
+
+//            createMandatoryAction = UIAlertAction(title: GV.language.getText(.tcCreateMandatory), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//                self.displayCreateMandatoryViewController()
+//            })
+//            createMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+//            alertController!.addAction(createMandatoryAction!)
 
         #endif
         //--------------------- Present alert ---------------------
@@ -508,7 +514,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     func generateMyNickname()->String {
-        var nickName = GV.debug ? "Sim" : (GV.onIpad ? "Pd" : "Ph")
+        var nickName = GV.onSimulator ? "Sim" : (GV.onIpad ? "Pd" : "Ph")
         let letters = GV.language.getText(.tcNickNameLetters)
         for _ in 0...4 {
             nickName += letters.subString(at: Int.random(min: 0, max: letters.count - 1), length: 1)

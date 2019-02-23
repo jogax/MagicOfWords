@@ -330,6 +330,12 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         }
     }
     
+    func didTappedButton(tableView: UITableView, indexPath: IndexPath, buttonName: String) {
+        
+    }
+    
+
+    
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
         if let number = Int(gamesForShow[indexPath.row].gameNumber) {
             let gameNumber = number - 1
@@ -380,9 +386,13 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: 4) )
         if gamesForShow[indexPath.row].finished {
             let image = UIImage(named: "hook.png")
-            cell.addButton(image: image!)
+            cell.addButton(image: image!, callBack: buttonTapped)
         }
         return cell
+    }
+    
+    @objc public func buttonTapped(indexPath: IndexPath) {
+        
     }
     
     func getNumberOfSections() -> Int {

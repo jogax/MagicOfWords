@@ -253,6 +253,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
         
     }
+    
+    func didTappedButton(tableView: UITableView, indexPath: IndexPath, buttonName: String) {
+        
+    }
+    
+
 
     func getHeightForHeaderInSection(tableView: UITableView, section: Int)->CGFloat {
         if tableType == .ShowFoundedWords {
@@ -679,6 +685,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 GV.playingRecord = games.first!
                 try! realm.write() {
                     GV.playingRecord.nowPlaying = true
+                    if GV.playingRecord.gameStatus == GV.GameStatusFinished {
+                        GV.playingRecord.gameStatus = GV.GameStatusContinued
+                    }
+                    if GV.playingRecord.gameStatus == GV.GameStatusContinued {
+                        goOnPlaying = true
+                    }
                 }
             } else {
                 createPlayingRecord(gameNumber: gameNumber)
@@ -695,7 +707,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     first = false
                 }
             } else {
-                actGames = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusPlaying, GV.actLanguage)
+                actGames = realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and language = %@", GV.GameStatusPlaying, GV.GameStatusContinued, GV.actLanguage)
                 if actGames.count > 0 {
                     try! realm.write {
                         actGames[0].nowPlaying = true
@@ -1602,7 +1614,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.addChild(label)
     }
     
-    var random: MyRandom?
+//    var random: MyRandom?
 
     private func play() {
         timerIsCounting = true
@@ -1776,9 +1788,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func generateArrayOfWordPieces(new: Bool) {
         if new || GV.playingRecord.pieces.count == 0 {
             try! realm.write() {
-                GV.playingRecord.randomCounts = 0
+//                GV.playingRecord.randomCounts = 0
                 GV.playingRecord.words = ""
-                random = MyRandom()
+//                random = MyRandom()
             }
             let pieces = generateArrayOfWordPieces(first: true)
              try! realm.write {
@@ -2111,7 +2123,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
         startShapeIndex = -1
         _ = checkFreePlace(showAlert: true)
-        _ = checkIfGameFinished()
+        checkIfGameFinished()
     }
     var bestScoreSync: Results<BestScoreSync>?
     var notificationToken: NotificationToken?
@@ -2253,7 +2265,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
 
-    private func saveToRealmCloud(finished: Bool = false) {
+    private func saveToRealmCloud() {
         if GV.debug {
             return
         }
@@ -2263,6 +2275,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     self.bestScoreSync![0].score = GV.totalScore
                     self.bestScoreSync![0].usedTime = self.timeForGame.time
                     self.bestScoreSync![0].timeStamp = Date()
+                    self.bestScoreSync![0].finished = GV.playingRecord.gameStatus == GV.GameStatusFinished ? true : false
                     if GV.totalScore > self.bestScoreForActualGame![0].bestScore {
                         self.bestScoreForActualGame![0].bestScore = GV.totalScore
                         self.bestScoreForActualGame![0].timeStamp = Date()
@@ -2279,25 +2292,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
     }
-    private func checkIfGameFinished()->Bool {
+    private func checkIfGameFinished() {
 //        if GV.allMandatoryWordsFounded() {
         if WTGameWordList.shared.gameFinished() {
             congratulations()
-//            try! realm.write() {
-//                GV.playingRecord.score = GV.totalScore
-//                GV.playingRecord.gameStatus = GV.GameStatusFinished
-//                GV.playingRecord.nowPlaying = false
-//                GV.playingRecord.pieces = ""
-//                GV.playingRecord.time = timeInitValue
-//                GV.playingRecord.rounds.removeAll()
-//            }
-//            enabled = false
-//            showGameFinished(status: .OK)
-//            wtGameFinishedSprite.showFinish(status: .OK)
-            saveToRealmCloud(finished: true)
-            return true
+            saveToRealmCloud()
+        } else {
+            if goOnPlaying {
+                self.saveToRealmCloud()
+                finishButton!.isHidden = true
+                goOnPlaying = false
+                try! realm.write() {
+                    GV.playingRecord.gameStatus = GV.GameStatusPlaying
+                }
+            }
         }
-        return false
     }
     
     var goOnPlaying = false
@@ -2320,7 +2329,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let finishAction =  UIAlertAction(title: finishTitle, style: .default, handler: {alert -> Void in
                 self.gameboardEnabled = true
                 self.finishButtonTapped()
-                self.saveToRealmCloud(finished: true)
+                self.saveToRealmCloud()
             })
             alertController.addAction(continueAction)
             alertController.addAction(finishAction)
@@ -2496,24 +2505,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
             actRound = GV.playingRecord.rounds.count - 1
-            try! realm.write() {
-                if activityRoundItem.count > 0 {
-                    GV.playingRecord.rounds.removeLast()
-                    activityRoundItem.removeLast()
-                    timeForGame.decrementMaxTime(value: iHalfHour)
-                    GV.totalScore = 0
-                    GV.mandatoryScore = 0
-                    GV.ownScore = 0
-                    GV.bonusScore = 0
-                    wtGameboard!.setRoundInfos()
-                    WTGameWordList.shared.reset()
-                    WTGameWordList.shared.restoreFromPlayingRecord()
-                    restoreGameArray()
-                    modifyHeader()
-                } else {
-                    restartGame()
-                }
+            if activityRoundItem.count > 0 {
+                try! realm.write() {
+                GV.playingRecord.rounds.removeLast()
             }
+            activityRoundItem.removeLast()
+            timeForGame.decrementMaxTime(value: iHalfHour)
+            GV.totalScore = 0
+            GV.mandatoryScore = 0
+            GV.ownScore = 0
+            GV.bonusScore = 0
+            wtGameboard!.setRoundInfos()
+            WTGameWordList.shared.reset()
+            WTGameWordList.shared.restoreFromPlayingRecord()
+            restoreGameArray()
+            modifyHeader()
+        }
+//            else {
+//                    restartGame()
+//                }
+
 
         } else if activityRoundItem[activityRoundItem.count - 1].activityItems.count > 0 {
             switch activityRoundItem[activityRoundItem.count - 1].activityItems.last!.type {
@@ -2560,6 +2571,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 let actItem = activityRoundItem[activityRoundItem.count - 1].activityItems.last!
                 let selectedWord = SelectedWord(word: actItem.choosedWord.word, usedLetters: actItem.choosedWord.usedLetters)
                 WTGameWordList.shared.removeLastWord(selectedWord: selectedWord)
+                checkIfGameFinished()
                 saveActualState()
                 saveToRealmCloud()
                 activityRoundItem[activityRoundItem.count - 1].activityItems.removeLast()
@@ -2567,7 +2579,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
-            restartGame()
+//            restartGame()
         }
             
     }
@@ -2636,6 +2648,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func generateArrayOfWordPieces(first: Bool)->String {
+        let random = MyRandom(gameNumber: GV.playingRecord.gameNumber, modifier: GV.playingRecord.words.count)
         var tileType = MyShapes.NotUsed
         var letters = [String]()
         var generateLength = 0
@@ -2645,6 +2658,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var typesWithLen4 = [MyShapes]()
         var usedWords = [String]()
         var wordsString = ""
+        var pieceString = ""
         var letterCounters = [String: Int]()
 
         for index in 0..<MyShapes.count - 1 {
@@ -2684,22 +2698,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             repeat {
                 var letters = [String]()
                 let randomLength = inputWord.length > 3 ? 3 : inputWord.length
-                let tileLength = random!.getRandomInt(1, max: randomLength)
+                let tileLength = random.getRandomInt(1, max: randomLength)
                 for _ in 0..<tileLength {
                     letters.append(inputWord.firstChar())
                     inputWord = inputWord.endingSubString(at: 1)
                 }
 
                 switch tileLength {
-                case 1: tileType = typesWithLen1[random!.getRandomInt(0, max: typesWithLen1.count - 1)]
-                case 2: tileType = typesWithLen2[random!.getRandomInt(0, max: typesWithLen2.count - 1)]
-                case 3: tileType = typesWithLen3[random!.getRandomInt(0, max: typesWithLen3.count - 1)]
+                case 1: tileType = typesWithLen1[random.getRandomInt(0, max: typesWithLen1.count - 1)]
+                case 2: tileType = typesWithLen2[random.getRandomInt(0, max: typesWithLen2.count - 1)]
+                case 3: tileType = typesWithLen3[random.getRandomInt(0, max: typesWithLen3.count - 1)]
                 default: continue
                 }
-                let rotateIndex = random!.getRandomInt(0, max: 3)
+                let rotateIndex = random.getRandomInt(0, max: 3)
 
                 let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
-                let newIndex = random!.getRandomInt(0, max: tilesForGame.count)
+                for letter in letters {
+                    pieceString += letter
+                }
+                pieceString += "°"
+                let newIndex = random.getRandomInt(0, max: tilesForGame.count)
                 if newIndex == tilesForGame.count || !first || usedWords.count > 6 {
                     tilesForGame.append(tileForGameItem)
                 } else {
@@ -2728,25 +2746,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        myTimer!.startTimeMessing()
         for _ in 1...(first ? 4 : 10) {
             var letters = [String]()
+            let sortedLetterCounters = letterCounters.sorted(by: { $0.0 < $1.0 })
             var minValue = 1000
-            for item in letterCounters {
+            for item in sortedLetterCounters {
                 if item.value < minValue {
                     minValue = item.value
                 }
             }
-
             
-            for item in letterCounters {
+            for item in sortedLetterCounters {
                 if item.value == minValue {
                     letters.append(item.key)
                 }
             }
-            let allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[0].lowercased())
-
+             let allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[0].lowercased())
             let counter = allRecords.count
-            let wordIndex = random!.getRandomInt(0, max: counter - 1)
+            let wordIndex = random.getRandomInt(0, max: counter - 1)
             let word = allRecords[wordIndex].word
-            
+
              splittingWord(word: word)
             
 //            print("letters: \(letters), word: \(word)")
@@ -2758,6 +2775,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             generatedArrayInStringForm += tile.toString() + "°"
         }
         wordsString.removeLast()
+        print("wordString: \(wordsString)")
         try! realm.write() {
             GV.playingRecord.words = wordsString
         }
