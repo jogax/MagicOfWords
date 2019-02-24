@@ -24,7 +24,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var lengthOfPlace = 5
     let savePhrase = " saved"
     //    var lengthOfOnlineSince = 0
-    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 20 : 12.5)
+    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 20 : 13)
     enum WillDo: Int {
         case Nothing = 0, Substract, Add, Delete
     }
@@ -48,16 +48,20 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                 }
                 switch willDo {
                 case .Substract: newPhrase += GV.language.getText(.tcIWillSeparate)
+                    substractedByMeWordCountTable[choosedLength] += 1
                 case .Add:       newPhrase += GV.language.getText(.tcIWillAdd)
+                    addedByMeWordCountTable[choosedLength] += 1
                 case .Delete:    newPhrase += GV.language.getText(.tcIWillDelete)
+                    deletedByMeWordCountTable[choosedLength] += 1
                 default: break
                 }
             } else {
 //                let modifiedWords = RealmService.objects(ModifiedWordsModel.self).filter("combinedKey = %@", combinedKey)
                 switch willDo {
-                case .Substract: break
+                case .Substract: addedByMeWordCountTable[choosedLength] -= 1
                 case .Add:       newPhrase += GV.language.getText(.tcChoosedWord)
-                case .Delete:    break
+                    substractedByMeWordCountTable[choosedLength] -= 1
+                case .Delete:    deletedByMeWordCountTable[choosedLength] -= 1
                 default: break
                 }
                 try! RealmService.write {
@@ -125,13 +129,19 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     var mandatoryWordCountTable = [Int]()
     var allWordsTable = [[String]]()
-    
+    var substractedByMeWordCountTable = [Int]()
+    var addedByMeWordCountTable = [Int]()
+    var deletedByMeWordCountTable = [Int]()
+
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let actColor = UIColor.white
         let width = tableView.frame.width
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: myFont!)
-        cell.setCellSize(size: CGSize(width: width, height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.020)))
+//        let cellHeight = UIImage(named: "Minus")!.size.height * imageSizeMultiplier
+        let cellHeight = headerLine.height(font: myFont!) * 2.5
+        cell.setCellSize(size: CGSize(width: width, height: cellHeight))
+//        cell.setCellSize(size: CGSize(width: width, height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.020)))
         cell.setBGColor(color: UIColor.white)
         cell.setIndexPath(indexPath: indexPath)
         
@@ -139,34 +149,39 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         cell.addColumn(text: " " + cellNumber.uppercased() + ":", color: actColor)
         let cellText = allWordsTable[choosedLength][indexPath.row]
         var minusAdded = false
-        cell.addColumn(text: cellText.uppercased().fixLength(length: 20, leadingBlanks: false), color: actColor)
+        let fixLength = GV.onIpad ? 20 : 15
+        cell.addColumn(text: cellText.uppercased().fixLength(length: fixLength, leadingBlanks: false), color: actColor)
         if cellText.contains(strings: [GV.language.getText(.tcIWillDelete)]) {
-            cell.addColumn(text: "   ", color: actColor)
+            cell.addColumn(text: " ", color: actColor)
         } else {
             if cellText.contains(strings: [GV.language.getText(.tcChoosedWord)]) {
                 let origImage = UIImage(named: "Minus")!
                 minusAdded = true
-                let image = origImage.resizeImage(newWidth: origImage.size.height * 0.5)
-                cell.addButton(image: image, callBack: didTapped1Button) //UIImage(named: "Minus.png"))
+                let image = origImage.resizeImage(newWidth: cellHeight)
+                let xPos = tableView.frame.width - image.size.width * 1.1
+                cell.addButton(image: image, xPos: xPos, callBack: didTapped1Button) //UIImage(named: "Minus.png"))
             } else if cellText.contains(strings: [GV.language.getText(.tcIWillAdd)]) {
                 let origImage = UIImage(named: "Minus")!
                 minusAdded = true
-                let image = origImage.resizeImage(newWidth: origImage.size.height * 0.5)
-                cell.addButton(image: image, callBack: didTapped1Button) //UIImage(named: "Minus.png"))
+                let image = origImage.resizeImage(newWidth: cellHeight) //origImage.size.height * imageSizeMultiplier)
+                let xPos = tableView.frame.width - image.size.width * 1.1
+                cell.addButton(image: image, xPos: xPos, callBack: didTapped1Button) //UIImage(named: "Minus.png"))
             } else {
                 let origImage = UIImage(named: "Plus")!
-                let image = origImage.resizeImage(newWidth: origImage.size.height * 0.5)
-                cell.addButton(image: image, callBack: didTapped2Button)
+                let image = origImage.resizeImage(newWidth: cellHeight) //origImage.size.height * imageSizeMultiplier)
+                let xPos = tableView.frame.width - image.size.width * 2.5
+                cell.addButton(image: image, xPos: xPos, callBack: didTapped2Button)
             }
+            cell.addColumn(text: " ", color: actColor)
         }
-        cell.addColumn(text: "  ", color: actColor)
         if !minusAdded {
             var origImage = UIImage(named: "Delete")!
             if cellText.contains(strings: [GV.language.getText(.tcIWillDelete)]) {
                 origImage = UIImage(named: "UnDelete")!
             }
-            let image = origImage.resizeImage(newWidth: origImage.size.height * 0.5)
-            cell.addButton(image: image, callBack: didTapped3Button)        
+            let image = origImage.resizeImage(newWidth: cellHeight) //origImage.size.height * imageSizeMultiplier)
+            let xPos = tableView.frame.width - image.size.width * 1.1
+            cell.addButton(image: image, xPos: xPos, callBack: didTapped3Button)
         }
         return cell
     }
@@ -185,11 +200,19 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //        if wordLengths.count > 0 {
 //            title = " all: \(wordLengths[0]), 5: \(wordLengths[1]), 6: \(wordLengths[2]), 7: \(wordLengths[3]), 8: \(wordLengths[4]), 9: \(wordLengths[5]), 10: \(wordLengths[6])"
 //        }
-        let allWordsCount = String(allWordsTable[choosedLength].count)
-        let mandatoryCount = String(mandatoryWordCountTable[choosedLength])
-        let title = "   \(GV.language.getText(.tcAllWords, values: allWordsCount, mandatoryCount))"
-        let width = title.width(withConstrainedHeight: 0, font: myFont!) * 2
         let view = UIView()
+        let allWordsCount = allWordsTable[choosedLength].count
+        let addedByMeCount = addedByMeWordCountTable[choosedLength]
+        let substractedByMeCount = substractedByMeWordCountTable[choosedLength]
+        let deletedByMeWordCount = deletedByMeWordCountTable[choosedLength]
+        let allWordsCountOrigString = String(allWordsCount)
+        let allWordsCountModifiedString = String(allWordsCount - deletedByMeWordCount)
+        let mandatoryCount = mandatoryWordCountTable[choosedLength]
+        let mandatoryCountOrigString = String(mandatoryCount)
+        let mandatoryCountModified = mandatoryCount + addedByMeCount - substractedByMeCount
+        let mandatoryCountModifiedString = String(mandatoryCountModified)
+        let title = "   \(GV.language.getText(.tcAllWords, values: allWordsCountModifiedString, allWordsCountOrigString, mandatoryCountModifiedString, mandatoryCountOrigString))"
+        let width = title.width(withConstrainedHeight: 0, font: myFont!) * 2
         let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight + 1.5))
         label1.font = myFont!
         label1.text = headerLine
@@ -233,6 +256,12 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         startIndicator()
+        for _ in 0...20 {
+            mandatoryWordCountTable.append(0)
+            addedByMeWordCountTable.append(0)
+            deletedByMeWordCountTable.append(0)
+            substractedByMeWordCountTable.append(0)
+        }
         let myBackgroundImage = UIImageView (frame: UIScreen.main.bounds)
         myBackgroundImage.image = UIImage(named: "magier")
         myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
@@ -244,7 +273,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         showViewTable()
 //        getStartingPhrase()
         buttonsCreated = false
-        buttonRadius = self.view.frame.width / 25
+        buttonRadius = self.view.frame.width / 20
         createButtons()
         fillAllWordsTable()
     }
@@ -325,7 +354,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     var buttonTable = [UIButton]()
     var actButtonIndex = 1
     let buttonNames = ["", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
-    let buttonXPositons = [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75,80]
+    let buttonXPositons = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
 
     private func createButtons() {
 //        let buttonCenterDistanceX = (showMandatoryWordsView!.frame.size.width - 2 * buttonRadius) / 4
@@ -333,8 +362,8 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         let buttonFrameWidth = 2 * buttonRadius
         for index in 0..<buttonNames.count {
             let buttonFrame = CGRect(x: 0, y: 0, width:buttonFrameWidth, height: buttonFrameWidth)
-            let yPos = showMandatoryWordsView!.frame.maxY + buttonRadius * (index % 2 == 0 ? 1.2 : 2.8)
-            let xPos = showMandatoryWordsView!.frame.minX + buttonRadius * CGFloat(index + 1) * 1.5
+            let yPos = showMandatoryWordsView!.frame.maxY + buttonRadius * (index % 2 == 0 ? 1.0 : 2.6)
+            let xPos = showMandatoryWordsView!.frame.minX + buttonRadius * CGFloat(index + 1) * 1.2
             let center = CGPoint(x: xPos, y: yPos)
             var button: UIButton
             if index == 0 {
@@ -563,10 +592,11 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 
     private func fillAllWordsTable() {
         let language = GV.actLanguage
-        mandatoryWordCountTable = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+//        mandatoryWordCountTable = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         allWordsTable = [[String](), [String](), [String](), [String](), [String](), [String](),
                          [String](), [String](), [String](), [String](), [String](), [String](),
                          [String](), [String](), [String](), [String](), [String]()]
+        
         let allWordsItems = realmWordList.objects(WordListModel.self).filter("word beginsWith %@", language).sorted(byKeyPath: "word")
             let searchKey = "°" + GV.actLanguage + "°"
             modifiedItems = RealmService.objects(ModifiedWordsModel.self).filter("combinedKey CONTAINS %@", searchKey).sorted(byKeyPath: "word", ascending: true)
@@ -598,8 +628,11 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                                 let willDo:WillDo = WillDo(rawValue: modifiedItem.willDo)!
                                 switch willDo {
                                 case WillDo.Substract: suffix = ""
+                                    self!.substractedByMeWordCountTable[length] += 1
                                 case WillDo.Add: suffix = GV.language.getText(.tcIWillAdd)
+                                    self!.addedByMeWordCountTable[length] += 1
                                 case WillDo.Delete: suffix = GV.language.getText(.tcIWillDelete)
+                                    self!.deletedByMeWordCountTable[length] += 1
                                 default: break
                                 }
                             }

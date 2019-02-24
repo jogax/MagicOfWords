@@ -70,7 +70,7 @@ class CustomTableViewCell: UITableViewCell {
         boxView.addSubview(label)
     }
     
-    public func addButton(image: UIImage? = nil, text: String = "", color: UIColor = .white, callBack: @escaping (_ indexPath: IndexPath)->()) {
+    public func addButton(image: UIImage? = nil, text: String = "", color: UIColor = .white, xPos: CGFloat = -1, callBack: @escaping (_ indexPath: IndexPath)->()) {
         var posForColumn: CGFloat = 2
         for subView in boxView.subviews {
             posForColumn += subView.frame.width
@@ -82,9 +82,13 @@ class CustomTableViewCell: UITableViewCell {
             return
         }
         callBackArray.append(callBack)
+        var xValue = xPos
+        if xValue < 0 {
+            xValue = posForColumn
+        }
         if image != nil {
             button.setImage(image, for: UIControl.State.normal)
-            button.frame = CGRect(x: posForColumn, y: 2.5, width: image!.size.width * 0.3, height: image!.size.width * 0.3)
+            button.frame = CGRect(x: xValue, y: 2.5, width: image!.size.width, height: image!.size.width)
 //            button.frame = CGRect(x: posForColumn, y: 2.5, width: image!.size.width * 0.2, height: image!.size.height * 0.2)
        } else {
             button.setTitle(text, for: .normal)

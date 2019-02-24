@@ -103,7 +103,7 @@ let deDictionary: [TextConstants: String] = [
     .tcFinishGame:          "Beenden",
     .tcChoosedWord:         " Hinzugefügt",
     .tcCountLetters:        "Suche nach Pflichtwörter mit 5 Buchstaben",
-    .tcAllWords:            "% Wörter, gwwählt: %",
+    .tcAllWords:            "% (%) Wörter, gwwählt: % (%)",
     .tcIWillAdd:           " Ich füge hinzu",
     .tcIWillDelete:        " Ich lösche",
     .tcIWillSeparate:      " Ich trenne",

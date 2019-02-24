@@ -103,7 +103,7 @@ let enDictionary: [TextConstants: String] = [
     .tcFinishGame:          "Finish",
     .tcChoosedWord:         " Added",
     .tcCountLetters:        "Search mandatory words with % letters",
-    .tcAllWords:            "% Words, choosed: %",
+    .tcAllWords:            "% (%) Words, choosed: % (%)",
     .tcIWillAdd:           " I will add",
     .tcIWillDelete:        " I will delete",
     .tcIWillSeparate:      " I will separate"
