@@ -101,16 +101,17 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
+        let cellHeight = self.view.frame.height * 0.03
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.010)))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
         switch tableType {
         case .Players:
-            cell.addColumn(text: "  ")
             let isOnline = playerTable[indexPath.row].isOnline
-            let image = UIImage(named: isOnline ? "online.png" : "offline.png")
-            cell.addButton(image: image!, callBack: buttonTapped)
-            cell.addColumn(text: " " + (playerTable[indexPath.row].nickName.fixLength(length: lengthOfNickName - 4, leadingBlanks: false)), color: actColor) // WordColumn
+            let origImage = UIImage(named: isOnline ? "online.png" : "offline.png")!
+            let image = origImage.resizeImage(newWidth: cellHeight * 0.5)
+            cell.addButton(image: image, xPos: cellHeight * 0.5, callBack: buttonTapped)
+            cell.addColumn(text: (playerTable[indexPath.row].nickName.fixLength(length: lengthOfNickName - 4, leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
             cell.addColumn(text: (playerTable[indexPath.row].keyWord.fixLength(length: lengthOfKeyWord, leadingBlanks: false)), color: actColor)
 //            cell.addColumn(text: String(playerTable[indexPath.row].isOnline).fixLength(length: lengthOfIsOnline, leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(playerTable[indexPath.row].onlineTime.HourMinSec).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)

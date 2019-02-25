@@ -318,12 +318,12 @@
 				201FB1C320288C2B00EC9F36 /* Info.plist */,
 				2074A64120C051780075432A /* ReadOnlyDB */,
 				20A6913E20309B2200AB47C0 /* WordTrisClassen */,
+				201FB1EA20289CEC00EC9F36 /* RealmModels */,
 				206B38C221BC102E008CDE1D /* RealmCloudModels */,
 				201FB1E92028940D00EC9F36 /* Scenes */,
 				20587FAF205A6D9F008C018A /* Pictures */,
 				201FB1E8202893E500EC9F36 /* Language */,
 				20895DF921FA143900E54BF3 /* WordFiles */,
-				201FB1EA20289CEC00EC9F36 /* RealmModels */,
 			);
 			path = MagicOfWords;
 			sourceTree = "<group>";

@@ -195,7 +195,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
         let counter = String(choosedLength)
-        let headerLine = "   \(GV.language.getText(.tcCountLetters, values: counter))"
+        let headerLine = " \(GV.language.getText(.tcCountLetters, values: counter))"
         let lineHeight = headerLine.height(font: myFont!)
 //        if wordLengths.count > 0 {
 //            title = " all: \(wordLengths[0]), 5: \(wordLengths[1]), 6: \(wordLengths[2]), 7: \(wordLengths[3]), 8: \(wordLengths[4]), 9: \(wordLengths[5]), 10: \(wordLengths[6])"
@@ -211,7 +211,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         let mandatoryCountOrigString = String(mandatoryCount)
         let mandatoryCountModified = mandatoryCount + addedByMeCount - substractedByMeCount
         let mandatoryCountModifiedString = String(mandatoryCountModified)
-        let title = "   \(GV.language.getText(.tcAllWords, values: allWordsCountModifiedString, allWordsCountOrigString, mandatoryCountModifiedString, mandatoryCountOrigString))"
+        let title = " \(GV.language.getText(.tcAllWords, values: allWordsCountModifiedString, allWordsCountOrigString, mandatoryCountModifiedString, mandatoryCountOrigString))"
         let width = title.width(withConstrainedHeight: 0, font: myFont!) * 2
         let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight + 1.5))
         label1.font = myFont!
@@ -252,6 +252,8 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     var initialLoadDone = false
     var buttonRadius = CGFloat(0)
+    var showingRowPositions = [String]()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -262,6 +264,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
             deletedByMeWordCountTable.append(0)
             substractedByMeWordCountTable.append(0)
         }
+        showingRowPositions = GV.basicDataRecord.showingRows.components(separatedBy: "°")
         let myBackgroundImage = UIImageView (frame: UIScreen.main.bounds)
         myBackgroundImage.image = UIImage(named: "magier")
         myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
@@ -445,79 +448,79 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         return button
     }
     
-//    private func setNewTableView(tableType: TableType) {
-//        sortUp = true
-//        initialLoadDone = false
-//        self.tableType = tableType
-//        showMandatoryWordsView!.removeFromSuperview()
-//        showMandatoryWordsView = nil
-//        showMandatoryWordsView = WTTableView()
-//        showMandatoryWordsView!.setDelegate(delegate: self)
-//    }
+    private func scrollToActualPositionAndReload() {
+        showMandatoryWordsView!.reloadData()
+        if let row = Int(showingRowPositions[choosedLength]) {
+            let indexPath = IndexPath(row: row, section: 0)
+            showMandatoryWordsView!.scrollToRow(at: indexPath, at: .top, animated: true)
+        }
+   }
+    
+
     
     var choosedLength = 0
     @objc func no3ButtonTapped() {
         choosedLength = 3
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     @objc func no4ButtonTapped() {
         choosedLength = 4
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
 
     @objc func no5ButtonTapped() {
         choosedLength = 5
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no6ButtonTapped() {
         choosedLength = 6
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no7ButtonTapped() {
         choosedLength = 7
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no8ButtonTapped() {
         choosedLength = 8
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no9ButtonTapped() {
         choosedLength = 9
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no10ButtonTapped() {
         choosedLength = 10
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no11ButtonTapped() {
         choosedLength = 11
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no12ButtonTapped() {
         choosedLength = 12
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no13ButtonTapped() {
         choosedLength = 13
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no14ButtonTapped() {
         choosedLength = 14
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func no15ButtonTapped() {
         choosedLength = 15
-        showMandatoryWordsView!.reloadData()
+        scrollToActualPositionAndReload()
     }
     
     @objc func bestButtonTapped() {
@@ -562,21 +565,26 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
             showMandatoryWordsView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
             view.addSubview(showMandatoryWordsView!)
             _ = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(checkTable(timerX: )), userInfo: nil, repeats: false)
-//            let indexPath = IndexPath(row: GV.basicDataRecord.showingRow, section: 0)
-//            showMandatoryWordsView!.scrollToRow(at: indexPath, at: .top, animated: true)
             tableviewAdded = true
         }
     }
     var lastHighestRow = 0
 
     @objc private func checkTable(timerX: Timer) {
-        let indexPaths = showMandatoryWordsView!.indexPathsForVisibleRows
-        if indexPaths!.count > 0 {
-            let actHighestRow = indexPaths![0].row + 2
-            if lastHighestRow != actHighestRow {
-                lastHighestRow = actHighestRow
-                try! realm.write() {
-                    GV.basicDataRecord.showingRow = actHighestRow
+        if let indexPaths = showMandatoryWordsView!.indexPathsForVisibleRows {
+            if indexPaths.count > 0 {
+                let actHighestRow = indexPaths[0].row
+                if lastHighestRow != actHighestRow {
+                    lastHighestRow = actHighestRow
+                    showingRowPositions[choosedLength] = String(actHighestRow)
+                    var showingRows = ""
+                    for item in showingRowPositions {
+                        showingRows += item + "°"
+                    }
+                    showingRows.removeLast()
+                    try! realm.write() {
+                        GV.basicDataRecord.showingRows = showingRows
+                    }
                 }
             }
         }

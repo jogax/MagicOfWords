@@ -55,14 +55,19 @@ class CustomTableViewCell: UITableViewCell {
 //        boxView = UIView.init(frame: CGRect(x : 0 , y : 0 , width :UIScreen.main.bounds.size.width - 12*2, height : self.frame.size.height))
         self.contentView.addSubview(boxView)
     }
-    public func addColumn(text: String, color: UIColor = .white) {
+    public func addColumn(text: String, color: UIColor = .white, xPos: CGFloat = -1) {
         var posForColumn: CGFloat = 2
         for subview in boxView.subviews {
             posForColumn += subview.frame.width
         }
+        var xValue = xPos
+        if xValue < 0 {
+            xValue = posForColumn
+        }
         let wordLength = text.width(font: myFont) * 1.1
         let wordHeight = text.height(font: myFont) * 2
-        let label = UILabel(frame: CGRect(x: posForColumn, y: GV.onIpad ? 6 : 3, width: wordLength, height: wordHeight))
+//        let label = UILabel(frame: CGRect(x: xValue, y: GV.onIpad ? 6 : 3, width: wordLength, height: wordHeight))
+        let label = UILabel(frame: CGRect(x: xValue, y: GV.onIpad ? 2 : 3, width: wordLength, height: wordHeight))
         label.font = myFont
         label.textColor = UIColor.black
         label.text = text
@@ -89,6 +94,10 @@ class CustomTableViewCell: UITableViewCell {
         if image != nil {
             button.setImage(image, for: UIControl.State.normal)
             button.frame = CGRect(x: xValue, y: 2.5, width: image!.size.width, height: image!.size.width)
+            let centerY = boxView.frame.midY
+            let centerX = button.frame.midX
+            button.center = CGPoint(x: centerX, y: centerY)
+//            button.frame = CGRect(x: xValue, y: 2.5, width: image!.size.width, height: image!.size.width)
 //            button.frame = CGRect(x: posForColumn, y: 2.5, width: image!.size.width * 0.2, height: image!.size.height * 0.2)
        } else {
             button.setTitle(text, for: .normal)
