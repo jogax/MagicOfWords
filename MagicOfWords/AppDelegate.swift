@@ -86,7 +86,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 18, // new item words
+            schemaVersion: 19, // new item words
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
@@ -180,7 +180,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func setIsOffline() {
         if GV.myUser != nil {
-            try! realmSync!.write() {
+            try! realmSync!.safeWrite() {
                 if playerActivity?.count == 0 {
                 } else {
                     if playerActivity![0].creationTime == nil {
@@ -220,7 +220,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 //                    print("in Subscription!")
                 if state == .complete {
                     if playerActivity?.count == 0 {
-                        try! realmSync!.write() {
+                        try! realmSync!.safeWrite() {
                             let playerActivityItem = PlayerActivity()
                             playerActivityItem.creationTime = Date()
                             playerActivityItem.name = GV.basicDataRecord.myName
@@ -250,7 +250,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var tenMinutesTimer: Timer?
     func setIsOnline() {
         if GV.myUser != nil {
-            try! realmSync!.write() {
+            try! realmSync!.safeWrite() {
                 if playerActivity?.count == 0 {
                 } else {
                     playerActivity![0].isOnline = true
@@ -266,7 +266,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     @objc private func setLastTouched(timerX: Timer) {
         if playerActivity?.count == 0 {
         } else {
-            try! RealmService.write() {
+            try! RealmService.safeWrite() {
                 playerActivity![0].lastTouched = getLocalDate()
                 playerActivity![0].onlineTime += 60
             }
@@ -295,7 +295,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 // this block sets the local DB to NotSynced
 //  ==================================
         let myGameRecords = realm.objects(GameDataModel.self).filter("language = %@ and synced = true", language).sorted(byKeyPath: "gameNumber", ascending: true)
-        try! realm.write() {
+        try! realm.safeWrite() {
             for record in myGameRecords {
                 record.synced = false
             }
@@ -314,7 +314,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 let actGameNumber = record.gameNumber + 1
                                 let syncedRecord = self!.bestScoreSync!.filter("gameNumber = %@", actGameNumber)
                                 if syncedRecord.count == 0 {
-                                    try! realmSync!.write() {
+                                    try! realmSync!.safeWrite() {
                                         let bestScoreSyncRecord = BestScoreSync()
                                         bestScoreSyncRecord.gameNumber = actGameNumber
                                         bestScoreSyncRecord.language = language
@@ -325,12 +325,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                         bestScoreSyncRecord.owner = playerActivity?[0]
                                         realmSync!.add(bestScoreSyncRecord)
                                     }
-                                    try! realm.write() {
+                                    try! realm.safeWrite() {
                                         record.synced = true
                                     }
                                 } else {
                                     if syncedRecord.first!.score < record.score {
-                                        try! realmSync!.write() {
+                                        try! realmSync!.safeWrite() {
                                             syncedRecord.first!.finished = record.gameStatus == GV.GameStatusFinished
                                             syncedRecord.first!.score = record.score
                                         }
@@ -350,7 +350,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         //                print("in Subscription!")
                         if state == .complete {
                             for record in myGameRecords {
-                                try! realm.write() {
+                                try! realm.safeWrite() {
                                     record.synced = true
                                 }
                                 let actGameNumber = record.gameNumber + 1

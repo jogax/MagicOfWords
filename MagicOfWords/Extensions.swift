@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 //let iPhone_X = "iPhone X"
 
@@ -701,6 +702,16 @@ extension UIView {
         self.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
         self.layer.shadowOpacity = 0.5
         self.layer.shadowPath = shadowPath.cgPath
+    }
+}
+
+extension Realm {
+    public func safeWrite(_ block: (() throws -> Void)) throws {
+        if isInWriteTransaction {
+            try block()
+        } else {
+            try write(block)
+        }
     }
 }
 

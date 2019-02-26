@@ -44,7 +44,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
 //            let playerActivityWithNickName = RealmService.objects(PlayerActivity.self).filter("nickName = %@", nickName).first!
 //            let name = playerActivityWithNickName.name
 //            let bestScoreItems = RealmService.objects(BestScoreForGame.self)
-//            try! RealmService.write() {
+//            try! RealmService.safeWrite() {
 //                for item in bestScoreItems {
 //                    let actName = item.owner!.name
 //                    if actName == name {
@@ -502,7 +502,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 playerData.isOnline = user.isOnline && getLocalDate().timeIntervalSince(user.lastTouched!) <= 60 
             } else {
                 playerData.isOnline = false
-                try! RealmService.write() {
+                try! RealmService.safeWrite() {
                     user.isOnline = false
                 }
             }
@@ -626,7 +626,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                     bestScoreData.score = item.bestScore
                     if item.owner == nil {
                         generateRecord = true
-                        try! RealmService.write() {
+                        try! RealmService.safeWrite() {
 //                            RealmService.delete(item)
                         }
                     } else {
@@ -645,7 +645,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
 //                    bestScoreForGameItem.bestScore = item.score
 //                    bestScoreForGameItem.timeStamp = item.timeStamp
 //                    bestScoreForGameItem.owner = item.owner!
-//                    try! RealmService.write() {
+//                    try! RealmService.safeWrite() {
 //                        RealmService.add(bestScoreForGameItem)
 //                    }
                 }

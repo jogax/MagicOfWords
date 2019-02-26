@@ -215,14 +215,14 @@ class WordDBGenerator {
             }
             let wordList = WordListModel()
             wordList.word = word.word
-            try! realm.write() {
+            try! realm.safeWrite() {
                 realm.add(wordList)
                 if countSavedWords % 1000 == 0 {
                     print("all: \(all), count: \(countSavedWords), en: \(countEn), de: \(countDe), hu: \(countHu), ru: \(countRu)")
                 }
             }
         }
-//        try! realm.write() {
+//        try! realm.safeWrite() {
 //            realm.delete(wordsToDelete)
 //        }
 //        let wordList = wordsFile.components(separatedBy: .newlines)
@@ -367,7 +367,7 @@ class WordDBGenerator {
             mandatoryRecord.gameNumber = gameNumber
             mandatoryRecord.language = language
             mandatoryRecord.mandatoryWords = text
-            try! realm.write() {
+            try! realm.safeWrite() {
                 realm.add(mandatoryRecord)
             }
             wordsToPrint.append(text)
@@ -379,7 +379,7 @@ class WordDBGenerator {
         let words = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", language)
         let sortedWords =  Array(words).sorted(by: {$0.word < $1.word})
         for word in sortedWords {
-            try! realm.write() {
+            try! realm.safeWrite() {
                 let wordListRecord = WordListModel()
                 wordListRecord.word = word.word
                 realm.add(wordListRecord)

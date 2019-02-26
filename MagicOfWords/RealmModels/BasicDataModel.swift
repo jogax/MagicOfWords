@@ -19,7 +19,8 @@ class BasicDataModel: Object {
     @objc dynamic var creationTime = Date()
     @objc dynamic var searchPhrase = ""
     @objc dynamic var showingRow = 0
-    @objc dynamic var showingRows = "0°0°0°0°0°0°0°0°0°0°0°0°0°0°0°0°0°0"
+    @objc dynamic var showingRows = ""
+    @objc dynamic var choosedCountsForLanguage = ""
     override  class func primaryKey() -> String {
         return "ID"
     }

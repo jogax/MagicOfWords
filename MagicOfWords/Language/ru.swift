@@ -103,9 +103,10 @@ let ruDictionary: [TextConstants: String] = [
     .tcFinishGame:          "Закончить",
     .tcChoosedWord:         " Добавлено",
     .tcCountLetters:        "Поиск обязательных слов из % букв",
-    .tcAllWords:            "% (%) Слов, выбрано: % (%)",
+    .tcAllWords:            "%/% Слов, выбрано: %/%",
     .tcIWillAdd:            " Я добавлю",
     .tcIWillDelete:         " Я удаляю",
     .tcIWillSeparate:       " Я отделяю",
+    .tcMyCounts:           "Я добавил:%, отделил:%, удалил:% слов",
 ]
 

@@ -91,7 +91,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 
    func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
 //        var word = mandatoryWordsTable[indexPath.row]
-//        try! RealmService.write() {
+//        try! RealmService.safeWrite() {
 //            let wordModel = CommonString()
 //            if word.length > savePhrase.length && word.ends(with: savePhrase) {
 //                word = word.startingSubString(length: word.length - savePhrase.length).lowercased()
@@ -195,8 +195,8 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
         let counter = String(choosedLength)
-        let headerLine = " \(GV.language.getText(.tcCountLetters, values: counter))"
-        let lineHeight = headerLine.height(font: myFont!)
+        let headerLine1 = " \(GV.language.getText(.tcCountLetters, values: counter))"
+        let lineHeight = headerLine.height(font: myFont!) * 1.2
 //        if wordLengths.count > 0 {
 //            title = " all: \(wordLengths[0]), 5: \(wordLengths[1]), 6: \(wordLengths[2]), 7: \(wordLengths[3]), 8: \(wordLengths[4]), 9: \(wordLengths[5]), 10: \(wordLengths[6])"
 //        }
@@ -211,22 +211,35 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         let mandatoryCountOrigString = String(mandatoryCount)
         let mandatoryCountModified = mandatoryCount + addedByMeCount - substractedByMeCount
         let mandatoryCountModifiedString = String(mandatoryCountModified)
-        let title = " \(GV.language.getText(.tcAllWords, values: allWordsCountModifiedString, allWordsCountOrigString, mandatoryCountModifiedString, mandatoryCountOrigString))"
-        let width = title.width(withConstrainedHeight: 0, font: myFont!) * 2
+        let hederLine2 = " \(GV.language.getText(.tcAllWords, values: allWordsCountModifiedString, allWordsCountOrigString, mandatoryCountModifiedString, mandatoryCountOrigString))"
+        let headerLine3 = " \(GV.language.getText(.tcMyCounts, values: String(addedByMeCount), String(substractedByMeCount), String(deletedByMeWordCount)))"
+        let width = hederLine2.width(withConstrainedHeight: 0, font: myFont!) * 2
         let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight + 1.5))
         label1.font = myFont!
-        label1.text = headerLine
+        label1.text = headerLine1
         view.addSubview(label1)
         let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight * 1.0, width: width, height: lineHeight * 1.5))
         label2.font = myFont!
-        label2.text = title
+        label2.text = hederLine2
         view.addSubview(label2)
+        let label3 = UILabel(frame: CGRect(x: 0, y: lineHeight * 2.2, width: width, height: lineHeight * 1.5))
+        label3.text = headerLine3
+        label3.font = myFont!
+        while true  {
+            if headerLine3.width(font: label3.font) <= tableView.frame.width {
+                break
+            }
+            // reducing the size of label3.text while it passed to tableview
+            label3.font = myFont!.withSize(label3.font.pointSize - 0.2)
+        }
+
+        view.addSubview(label3)
         view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
         return view
     }
     
     func getHeightForHeaderInSection(tableView: UITableView, section: Int) -> CGFloat {
-        return headerLine.height(font: myFont!) * 3
+        return "A".height(font: myFont!) * 4.2
     }
     
     //    let realm: Realm
@@ -252,7 +265,8 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     var initialLoadDone = false
     var buttonRadius = CGFloat(0)
-    var showingRowPositions = [String]()
+    var showingRowPositions = [String:[String]]()
+    var choosedCountsProLanguage = [String:Int]()
 
     
     override func viewDidLoad() {
@@ -264,7 +278,9 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
             deletedByMeWordCountTable.append(0)
             substractedByMeWordCountTable.append(0)
         }
-        showingRowPositions = GV.basicDataRecord.showingRows.components(separatedBy: "°")
+        getShowingRowPositions()
+        getChoosedCounts()
+        choosedLength = choosedCountsProLanguage[GV.actLanguage]!
         let myBackgroundImage = UIImageView (frame: UIScreen.main.bounds)
         myBackgroundImage.image = UIImage(named: "magier")
         myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
@@ -281,6 +297,59 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         fillAllWordsTable()
     }
 //    var inputField: UITextField?
+    private let languageTab = ["en", "de", "hu", "ru"]
+
+    private func getShowingRowPositions() {
+        var allShowingRowPositions = GV.basicDataRecord.showingRows.components(separatedBy: "/")
+        var showingPositions = [String]()
+        if allShowingRowPositions.count != 4 {
+            var showingPositionsString = ""
+            for index in 0...3 {
+                showingPositions = [String]()
+                showingPositions.append(languageTab[index])
+                for _ in 0...20 {
+                    showingPositions.append("0")
+                }
+                for item in showingPositions {
+                    showingPositionsString += item + "°"
+                }
+                showingPositionsString.removeLast()
+                showingPositionsString += "/"
+            }
+            showingPositionsString.removeLast()
+            try! realm.safeWrite() {
+                GV.basicDataRecord.showingRows = showingPositionsString
+            }
+        }
+        allShowingRowPositions = GV.basicDataRecord.showingRows.components(separatedBy: "/")
+        for item in allShowingRowPositions {
+            let positions = item.components(separatedBy: "°")
+            let key = positions[0]
+            let content = positions
+            showingRowPositions[key] = content
+        }
+    }
+    
+    private func getChoosedCounts() {
+        if GV.basicDataRecord.choosedCountsForLanguage.components(separatedBy: "/").count != 4 {
+            var choosedCountsString = ""
+            for language in languageTab {
+                choosedCountsProLanguage[language] = 5
+                choosedCountsString += language + ":" + String(choosedCountsProLanguage[language]!) + "/"
+            }
+            choosedCountsString.removeLast()
+            try! realm.safeWrite() {
+                GV.basicDataRecord.choosedCountsForLanguage = choosedCountsString
+            }
+        }
+        let countsProLanguage = GV.basicDataRecord.choosedCountsForLanguage.components(separatedBy: "/")
+        for item in countsProLanguage {
+            let elements = item.components(separatedBy: ":")
+            choosedCountsProLanguage[elements[0]] = Int(elements[1])
+        }
+
+    }
+    
     private func startIndicator() {
         let actInd: UIActivityIndicatorView = UIActivityIndicatorView()
         actInd.frame = CGRect(x:0.0, y:0.0, width:40.0, height:40.0)
@@ -321,7 +390,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                         let commonString = CommonString()
                         commonString.word = mandatoryLine.language + word
                         if RealmService.objects(CommonString.self).filter("word = %@", mandatoryLine.language + word).count == 0 {
-                            try! RealmService.write() {
+                            try! RealmService.safeWrite() {
                                 RealmService.add(commonString)
                             }
                         }
@@ -449,8 +518,17 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     }
     
     private func scrollToActualPositionAndReload() {
+        choosedCountsProLanguage[GV.actLanguage] = choosedLength
+        var stringToSave = ""
+        for language in languageTab {
+            stringToSave += language + ":" + String(choosedCountsProLanguage[language]!) + "/"
+        }
+        stringToSave.removeLast()
+        try! realm.safeWrite() {
+            GV.basicDataRecord.choosedCountsForLanguage = stringToSave
+        }
         showMandatoryWordsView!.reloadData()
-        if let row = Int(showingRowPositions[choosedLength]) {
+        if let row = Int(showingRowPositions[GV.actLanguage]![choosedLength]) {
             let indexPath = IndexPath(row: row, section: 0)
             showMandatoryWordsView!.scrollToRow(at: indexPath, at: .top, animated: true)
         }
@@ -576,14 +654,19 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                 let actHighestRow = indexPaths[0].row
                 if lastHighestRow != actHighestRow {
                     lastHighestRow = actHighestRow
-                    showingRowPositions[choosedLength] = String(actHighestRow)
-                    var showingRows = ""
-                    for item in showingRowPositions {
-                        showingRows += item + "°"
+                    showingRowPositions[GV.actLanguage]![choosedLength] = String(actHighestRow)
+                    
+                    var showingRowsString = ""
+                    for language in languageTab {
+                        for item in showingRowPositions[language]! {
+                            showingRowsString += item + "°"
+                        }
+                        showingRowsString.removeLast()
+                        showingRowsString += "/"
                     }
-                    showingRows.removeLast()
-                    try! realm.write() {
-                        GV.basicDataRecord.showingRows = showingRows
+                    showingRowsString.removeLast()
+                    try! realm.safeWrite() {
+                        GV.basicDataRecord.showingRows = showingRowsString
                     }
                 }
             }
@@ -648,6 +731,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                             self!.allWordsTable[length].append(word + suffix)
                         }
                     }
+                    self!.scrollToActualPositionAndReload()
 
                 default:
                     print("state: \(state)")
@@ -717,7 +801,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //                    let wordModel = CommonString()
 //                    wordModel.word = language + word
 //                    if !savedMandatoryWords.contains(where: {$0 == word}) {
-//                        try! RealmService.write() {
+//                        try! RealmService.safeWrite() {
 //                            print("new word founded: \(word)")
 //                            RealmService.add(wordModel)
 //                            savedMandatoryWords.append(word)
@@ -755,7 +839,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                     let word = item.word.endingSubString(at:2)
                     if word.length > 4 {
                         if word == "" {
-                            try! RealmService.write() {
+                            try! RealmService.safeWrite() {
                                 RealmService.delete(item)
                             }
                         } else {

@@ -70,7 +70,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     
     var showGamesScene: ShowGamesScene?
     func backFromSettingsScene() {
-        try! realm.write() {
+        try! realm.safeWrite() {
             GV.basicDataRecord.actLanguage = GV.actLanguage
         }
         showMenu()
@@ -161,7 +161,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     func chooseLanguage() {
         func setLanguage(language: String) {
             GV.language.setLanguage(language)
-            try! realm.write() {
+            try! realm.safeWrite() {
                 GV.basicDataRecord.actLanguage = language
             }
              self.showMenu()
@@ -469,7 +469,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             GV.basicDataRecord.myName = myName
             GV.basicDataRecord.myNickname = generateMyNickname()
             GV.basicDataRecord.creationTime = Date()
-            try! realm.write() {
+            try! realm.safeWrite() {
                 realm.add(GV.basicDataRecord)
             }
         } else {
@@ -540,11 +540,11 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             playerActivityByNickNameToken = playerActivityByNickNameSubscription!.observe(\.state) { [weak self]  state in
                 if state == .complete {
                     if self!.playerActivityByNickName!.count == 0 {
-                        try! realmSync?.write() {
+                        try! realmSync?.safeWrite() {
                             playerActivity![0].nickName = nickName
                             playerActivity![0].keyWord = keyWord
                         }
-                        try! realm.write() {
+                        try! realm.safeWrite() {
                             GV.basicDataRecord.myNickname = nickName
                             GV.basicDataRecord.keyWord = keyWord
                         }
@@ -562,11 +562,11 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                             self!.present(alertController, animated: true, completion: nil)
                         } else {
                             if self!.playerActivityByNickName![0].keyWord == keyWord {
-                                try! realmSync?.write() {
+                                try! realmSync?.safeWrite() {
                                     playerActivity![0].nickName = nickName
                                     playerActivity![0].keyWord = keyWord
                                 }
-                                try! realm.write() {
+                                try! realm.safeWrite() {
                                     GV.basicDataRecord.myNickname = nickName
                                     GV.basicDataRecord.keyWord = keyWord
                                 }

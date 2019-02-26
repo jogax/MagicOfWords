@@ -74,7 +74,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
                             self!.wordLengths[self!.wordLengths.count - 1] += 1
                         }
                     } else {
-                        try! RealmService.write() {
+                        try! RealmService.safeWrite() {
                             let recordToDelete = self!.mandatoryItems!.filter("word BEGINSWITH %@", GV.actLanguage + word)
                             if recordToDelete.count > 0 {
                                 RealmService.delete(recordToDelete)
@@ -177,7 +177,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
 //                    self!.showMandatoryTable()
                     return
                 }
-//                try! RealmService.write() {
+//                try! RealmService.safeWrite() {
 //                    RealmService.delete(self!.generatedItems!)
 //                }
                 self!.generateNewItems()
@@ -228,7 +228,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
                 newItem.gameNumber = item.gameNumber
                 newItem.language = item.language
                 newItem.mandatoryWords = item.mandatoryWords
-                try! newWordList.write() {
+                try! newWordList.safeWrite() {
                     newWordList.add(newItem)
                 }
             }
@@ -268,7 +268,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
                         let newItem = MandatoryListModel()
                         newItem.word = word
                         newItem.language = language
-                        try! newMandatoryList.write() {
+                        try! newMandatoryList.safeWrite() {
                             newMandatoryList.add(newItem)
                         }
                     }
@@ -306,7 +306,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
         let actHighestRow = indexPaths![0].row + 2
         if lastHighestRow != actHighestRow {
             lastHighestRow = actHighestRow
-            try! realm.write() {
+            try! realm.safeWrite() {
                 GV.basicDataRecord.showingRow = actHighestRow
             }
         }
@@ -361,7 +361,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
                 wordsInCloud.gameNumber = gameNumber
                 wordsInCloud.language = GV.actLanguage
                 wordsInCloud.mandatoryWords = words
-                try! RealmService.write() {
+                try! RealmService.safeWrite() {
                     RealmService.add(wordsInCloud)
                 }
             }
@@ -407,7 +407,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
     
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
 //        let mandatoryRecord = generatedItems![indexPath.row]
-        try! RealmService.write() {
+        try! RealmService.safeWrite() {
             generatedItems![indexPath.row].change = !generatedItems![indexPath.row].change
         }
         showMandatoryWordsView!.reloadData()
@@ -533,7 +533,7 @@ private func generateWordList(language: String) {
                 print("word \(item.word) is soon in DB")
                 continue
             }
-            try! newWordList.write() {
+            try! newWordList.safeWrite() {
                 newWordList.add(newWord)
             }
             count += 1
@@ -560,7 +560,7 @@ private func generateWordList(language: String) {
                 if newWordList.objects(WordListModel.self).filter("word = %@", newWord.word).count > 0 {
                     print("word \(item.lowercased()) is soon in DB")
                  } else {
-                    try! newWordList.write() {
+                    try! newWordList.safeWrite() {
                         newWordList.add(newWord)
                     }
                 }
@@ -575,7 +575,7 @@ private func generateWordList(language: String) {
         }
         
     }
-    //        try! realm.write() {
+    //        try! realm.safeWrite() {
     //            realm.delete(wordsToDelete)
     //        }
     //        let wordList = wordsFile.components(separatedBy: .newlines)
@@ -587,7 +587,7 @@ private func generateWordList(language: String) {
     //                    let wordModel = WordListModel()
     //                    wordModel.word = (language + word).lowercased()
     //                    if realm.objects(WordListModel.self).filter("word = %d", wordModel.word).count == 0 {
-    //                        try! realm.write() {
+    //                        try! realm.safeWrite() {
     //                            realm.add(wordModel)
     //                        }
     //                    }

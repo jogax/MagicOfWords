@@ -234,7 +234,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 bestPlayer.bestScore = self!.bestPlayers![0].score
                 bestPlayer.timeStamp = Date()
                 bestPlayer.owner = self!.bestPlayers![0].owner
-                try! realmSync!.write() {
+                try! realmSync!.safeWrite() {
                     realmSync!.add(bestPlayer)
                 }
                 self!.goOn = true
@@ -269,7 +269,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 if bestGame.owner != nil {
                     if bestGame.bestScore < Int(returnArray[index].score)! {
                         if !GV.debug {
-                            try! realmSync!.write() {
+                            try! realmSync!.safeWrite() {
                                 bestGame.bestScore = Int(returnArray[index].score)!
                                 bestGame.owner = playerActivity!.first!
                             }

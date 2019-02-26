@@ -559,7 +559,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if restart {
             let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, newGameNumber)
             if recordToDelete.count == 1 {
-                try! realm.write() {
+                try! realm.safeWrite() {
                     realm.delete(recordToDelete)
                 }
             }
@@ -601,7 +601,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let timeInitValue = "0°origMaxTime"
     func restartThisGame() {
         actRound = 1
-        try! realm.write() {
+        try! realm.safeWrite() {
     //        GV.playingRecord.ownWords = ""
             GV.playingRecord.pieces = ""
     //        GV.playingRecord.activityItems = ""
@@ -637,7 +637,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         newString += components[index] + "°"
                     }
                     newString.removeLast()
-                    try! realm.write() {
+                    try! realm.safeWrite() {
                         GV.playingRecord.mandatoryWords = newString
                     }
                 }
@@ -657,7 +657,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            wtGameWordList = WTGameWordList(delegate: self)
             if games.count > 0 {
                 GV.playingRecord = games[0]
-                try! realm.write() {
+                try! realm.safeWrite() {
                     GV.playingRecord.nowPlaying = true
                     GV.playingRecord.time = timeInitValue
                 }
@@ -683,7 +683,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let games = realm.objects(GameDataModel.self).filter("combinedKey = %d", GV.actLanguage + String(gameNumber))
             if games.count > 0 {
                 GV.playingRecord = games.first!
-                try! realm.write() {
+                try! realm.safeWrite() {
                     GV.playingRecord.nowPlaying = true
                     if GV.playingRecord.gameStatus == GV.GameStatusFinished {
                         GV.playingRecord.gameStatus = GV.GameStatusContinued
@@ -744,7 +744,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 default:
                     break
                 }
-                try! realm.write() {
+                try! realm.safeWrite() {
                     playedNowGame.first!.nowPlaying = false
                     GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@",
                         actGameNumber, GV.actLanguage).first!
@@ -1762,7 +1762,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             timeForGame.incrementTime()
         }
         timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.time.HourMinSec)
-        try! realm.write() {
+        try! realm.safeWrite() {
             GV.playingRecord.time = timeForGame.toString()
         }
 //        if myTimer!.update(time: timeForGame) {
@@ -1787,7 +1787,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func generateArrayOfWordPieces(new: Bool) {
         if new || GV.playingRecord.pieces.count == 0 {
-            try! realm.write() {
+            try! realm.safeWrite() {
 //                GV.playingRecord.randomCounts = 0
                 GV.playingRecord.words = ""
 //                random = MyRandom()
@@ -2149,7 +2149,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             self.showGameFinished(status: .NoMoreSteps)
         } else {
             actRound = GV.playingRecord.rounds.count + 1
-            try! realm.write() {
+            try! realm.safeWrite() {
                 GV.playingRecord.rounds.last!.roundScore = roundScore
                 let newRound = RoundDataModel()
                 //                newRound.index = activityItems.count - 1
@@ -2271,7 +2271,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if GV.connectedToInternet {
             if self.syncedRecordsOK {
-                try! realmSync!.write() {
+                try! realmSync!.safeWrite() {
                     self.bestScoreSync![0].score = GV.totalScore
                     self.bestScoreSync![0].usedTime = self.timeForGame.time
                     self.bestScoreSync![0].timeStamp = Date()
@@ -2282,12 +2282,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         self.bestScoreForActualGame![0].owner = playerActivity?[0]
                     }
                 }
-                try! realm.write() {
+                try! realm.safeWrite() {
                     GV.playingRecord.synced = true
                 }
             }
         } else {
-            try! realm.write() {
+            try! realm.safeWrite() {
                 GV.playingRecord.synced = false
             }
         }
@@ -2302,7 +2302,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 self.saveToRealmCloud()
                 finishButton!.isHidden = true
                 goOnPlaying = false
-                try! realm.write() {
+                try! realm.safeWrite() {
                     GV.playingRecord.gameStatus = GV.GameStatusPlaying
                 }
             }
@@ -2322,7 +2322,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let continueAction =  UIAlertAction(title: continueTitle, style: .default, handler: {alert -> Void in
                 self.gameboardEnabled = true
                 self.goOnPlaying = true
-                try! realm.write() {
+                try! realm.safeWrite() {
                     GV.playingRecord.gameStatus = GV.GameStatusContinued
                 }
             })
@@ -2363,7 +2363,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let action1 =  UIAlertAction(title: action1Title, style: .default, handler: {alert -> Void in
             self.gameboardEnabled = true
             if status == .OK {
-                try! realm.write() {
+                try! realm.safeWrite() {
                     GV.playingRecord.gameStatus = GV.GameStatusFinished
                 }
                 self.startNewGame()
@@ -2492,7 +2492,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let gameNumber = GV.playingRecord.gameNumber
             let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, gameNumber)
             if recordToDelete.count == 1 {
-                try! realm.write() {
+                try! realm.safeWrite() {
                     realm.delete(recordToDelete)
                 }
             }
@@ -2506,7 +2506,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
             actRound = GV.playingRecord.rounds.count - 1
             if activityRoundItem.count > 0 {
-                try! realm.write() {
+                try! realm.safeWrite() {
                 GV.playingRecord.rounds.removeLast()
             }
             activityRoundItem.removeLast()
@@ -2776,7 +2776,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         wordsString.removeLast()
         print("wordString: \(wordsString)")
-        try! realm.write() {
+        try! realm.safeWrite() {
             GV.playingRecord.words = wordsString
         }
         return generatedArrayInStringForm

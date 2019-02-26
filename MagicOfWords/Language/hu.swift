@@ -102,8 +102,9 @@ let huDictionary: [TextConstants: String] = [
     .tcFinishGame:          "Befejezem",
     .tcChoosedWord:         " Hozzáadva",
     .tcCountLetters:        "% betüs kötelező szavak keresése",
-    .tcAllWords:            "% (%) Szó, kiválasztva: % (%)",
+    .tcAllWords:            "%/% Szó, kiválasztva: %/%",
     .tcIWillAdd:            " Hozzáadom",
     .tcIWillDelete:         " Törlöm",
     .tcIWillSeparate:       " Leválasztom",
+    .tcMyCounts:           "Hozzáadtam:%, leválasztottam:%, töröltem:% szót",
 ]
