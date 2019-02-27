@@ -68,10 +68,12 @@ class CustomTableViewCell: UITableViewCell {
         let wordHeight = text.height(font: myFont) * 2
 //        let label = UILabel(frame: CGRect(x: xValue, y: GV.onIpad ? 6 : 3, width: wordLength, height: wordHeight))
         let label = UILabel(frame: CGRect(x: xValue, y: GV.onIpad ? 2 : 3, width: wordLength, height: wordHeight))
+//        let label = UILabel(frame: CGRect(x: xValue, y: boxView.center.y - wordHeight * 0.5, width: wordLength, height: wordHeight))
         label.font = myFont
         label.textColor = UIColor.black
         label.text = text
 //        label.backgroundColor = UIColor.green //color
+        label.center.y = boxView.center.y
         boxView.addSubview(label)
     }
     

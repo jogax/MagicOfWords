@@ -279,8 +279,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: myFont!)
+        let height = "A".height(font: myFont!)
 //        cell.setCellSize(size: CGSize(width: tableView.frame.width /* * (GV.onIpad ? 0.040 : 0.010)*/, height: self.frame.width * (GV.onIpad ? 0.040 : 0.010)))
-        cell.setCellSize(size: CGSize(width: 0 /*tableView.frame.width * (GV.onIpad ? 0.040 : 0.010)*/, height: self.frame.width * (GV.onIpad ? 0.050 : 0.010)))
+        cell.setCellSize(size: CGSize(width: 0 /*tableView.frame.width * (GV.onIpad ? 0.040 : 0.010)*/, height: height)) // self.frame.width * (GV.onIpad ? 0.050 : 0.010)))
         if tableType == .ShowFoundedWords {
             cell.setBGColor(color: myLightBlue)
         } else {
@@ -749,6 +750,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@",
                         actGameNumber, GV.actLanguage).first!
                     GV.playingRecord.nowPlaying = true
+                }
+                if GV.playingRecord.gameStatus == GV.GameStatusContinued {
+                    goOnPlaying = true
                 }
             }
             
@@ -2295,8 +2299,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func checkIfGameFinished() {
 //        if GV.allMandatoryWordsFounded() {
         if WTGameWordList.shared.gameFinished() {
-            congratulations()
-            saveToRealmCloud()
+            if !goOnPlaying {
+                congratulations()
+                saveToRealmCloud()
+            }
         } else {
             if goOnPlaying {
                 self.saveToRealmCloud()
@@ -2312,29 +2318,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var goOnPlaying = false
     
     private func congratulations() {
-        if !goOnPlaying {
-            finishButton!.isHidden = false
-            let title = GV.language.getText(.tcCongratulations1)
-            let message = GV.language.getText(.tcCongratulations2)
-            let continueTitle = GV.language.getText(.tcContinuePlaying)
-            let finishTitle = GV.language.getText(.tcFinishGame)
-            let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            let continueAction =  UIAlertAction(title: continueTitle, style: .default, handler: {alert -> Void in
-                self.gameboardEnabled = true
-                self.goOnPlaying = true
-                try! realm.safeWrite() {
-                    GV.playingRecord.gameStatus = GV.GameStatusContinued
-                }
-            })
-            let finishAction =  UIAlertAction(title: finishTitle, style: .default, handler: {alert -> Void in
-                self.gameboardEnabled = true
-                self.finishButtonTapped()
-                self.saveToRealmCloud()
-            })
-            alertController.addAction(continueAction)
-            alertController.addAction(finishAction)
-            self.parentViewController!.present(alertController, animated: true, completion: nil)
-        }
+        finishButton!.isHidden = false
+        let title = GV.language.getText(.tcCongratulations1)
+        let message = GV.language.getText(.tcCongratulations2)
+        let continueTitle = GV.language.getText(.tcContinuePlaying)
+        let finishTitle = GV.language.getText(.tcFinishGame)
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let continueAction =  UIAlertAction(title: continueTitle, style: .default, handler: {alert -> Void in
+            self.gameboardEnabled = true
+            self.goOnPlaying = true
+            try! realm.safeWrite() {
+                GV.playingRecord.gameStatus = GV.GameStatusContinued
+            }
+        })
+        let finishAction =  UIAlertAction(title: finishTitle, style: .default, handler: {alert -> Void in
+            self.gameboardEnabled = true
+            self.finishButtonTapped()
+            self.saveToRealmCloud()
+        })
+        alertController.addAction(continueAction)
+        alertController.addAction(finishAction)
+        self.parentViewController!.present(alertController, animated: true, completion: nil)
     }
     
     private func showGameFinished(status: GameFinishedStatus) {

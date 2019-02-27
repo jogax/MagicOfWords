@@ -191,7 +191,6 @@
 		205184FA20615B5C00E7FAF4 /* enGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enGameData.txt; sourceTree = "<group>"; };
 		2051A54D2191E376001AD00B /* hook.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hook.png; sourceTree = "<group>"; };
 		205211332221B37A00B25072 /* UnDelete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = UnDelete.png; sourceTree = "<group>"; };
-		205211352221B9C400B25072 /* UnDelete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UnDelete.png; path = MagicOfWords/Pictures/UnDelete.png; sourceTree = "<group>"; };
 		205234E22187902900B9935F /* deWordsOld1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deWordsOld1.txt; sourceTree = "<group>"; };
 		20531C6720B6EA5400E060E2 /* ShowGamesScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowGamesScene.swift; sourceTree = "<group>"; };
 		20552DAD211F1EF800C54538 /* whiteSprite1001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite1001.png; sourceTree = "<group>"; };
@@ -282,7 +281,6 @@
 		201FB1A520288C2B00EC9F36 = {
 			isa = PBXGroup;
 			children = (
-				205211352221B9C400B25072 /* UnDelete.png */,
 				201FB1B020288C2B00EC9F36 /* MagicOfWords */,
 				201FB1AF20288C2B00EC9F36 /* Products */,
 				2057BA262029F57B000DF337 /* Frameworks */,
@@ -316,8 +314,8 @@
 				201FB1BE20288C2B00EC9F36 /* Assets.xcassets */,
 				201FB1C020288C2B00EC9F36 /* LaunchScreen.storyboard */,
 				201FB1C320288C2B00EC9F36 /* Info.plist */,
-				2074A64120C051780075432A /* ReadOnlyDB */,
 				20A6913E20309B2200AB47C0 /* WordTrisClassen */,
+				2074A64120C051780075432A /* ReadOnlyDB */,
 				201FB1EA20289CEC00EC9F36 /* RealmModels */,
 				206B38C221BC102E008CDE1D /* RealmCloudModels */,
 				201FB1E92028940D00EC9F36 /* Scenes */,

@@ -284,16 +284,16 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         let myBackgroundImage = UIImageView (frame: UIScreen.main.bounds)
         myBackgroundImage.image = UIImage(named: "magier")
         myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
-        self.view.insertSubview(myBackgroundImage, at: 0)
+//        self.view.insertSubview(myBackgroundImage, at: 0)
         tableviewAdded = false
 //        updateCommonString()
 //        getSavedMandatoryWords()
         showMandatoryWordsView!.setDelegate(delegate: self)
-        showViewTable()
+//        showViewTable()
 //        getStartingPhrase()
         buttonsCreated = false
         buttonRadius = self.view.frame.width / 20
-        createButtons()
+//        createButtons()
         fillAllWordsTable()
     }
 //    var inputField: UITextField?
@@ -350,15 +350,17 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 
     }
     
+    var activityIndicator: UIActivityIndicatorView?
+    
     private func startIndicator() {
-        let actInd: UIActivityIndicatorView = UIActivityIndicatorView()
-        actInd.frame = CGRect(x:0.0, y:0.0, width:40.0, height:40.0)
-        actInd.center = self.view.center
-        actInd.hidesWhenStopped = true
-        actInd.style =
+        activityIndicator = UIActivityIndicatorView()
+        activityIndicator!.frame = CGRect(x:0.0, y:0.0, width:80.0, height:80.0)
+        activityIndicator!.center = self.view.center
+        activityIndicator!.hidesWhenStopped = true
+        activityIndicator!.style =
             UIActivityIndicatorView.Style.whiteLarge
-        self.view.addSubview(actInd)
-        actInd.startAnimating()
+        self.view.addSubview(activityIndicator!)
+        activityIndicator!.startAnimating()
 
     }
     var tableviewAdded = false
@@ -408,8 +410,8 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     
     @objc func stopShowingTable() {
         showMandatoryWordsView!.isHidden = true
-        dismiss(animated: true, completion: {
-            print("Dismissed")
+        dismiss(animated: false, completion: {
+//            print("Dismissed")
         })
     }
     
@@ -529,8 +531,14 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         }
         showMandatoryWordsView!.reloadData()
         if let row = Int(showingRowPositions[GV.actLanguage]![choosedLength]) {
-            let indexPath = IndexPath(row: row, section: 0)
-            showMandatoryWordsView!.scrollToRow(at: indexPath, at: .top, animated: true)
+            var adder = 3
+            switch row {
+            case 0: adder = 0
+            case 1...15: adder = 2
+            default: adder = 3
+            }
+            let indexPath = IndexPath(row: row + adder, section: 0)
+            showMandatoryWordsView!.scrollToRow(at: indexPath, at: .top, animated: false)
         }
    }
     
@@ -731,6 +739,14 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                             self!.allWordsTable[length].append(word + suffix)
                         }
                     }
+                    self!.activityIndicator!.stopAnimating()
+                    let myBackgroundImage = UIImageView (frame: UIScreen.main.bounds)
+                    myBackgroundImage.image = UIImage(named: "magier")
+                    myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
+
+                    self!.view.insertSubview(myBackgroundImage, at: 0)
+                    self!.showViewTable()
+                    self!.createButtons()
                     self!.scrollToActualPositionAndReload()
 
                 default:
