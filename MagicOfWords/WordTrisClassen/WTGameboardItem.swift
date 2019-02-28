@@ -183,12 +183,12 @@ class WTGameboardItem: SKSpriteNode {
     
     private func convertMyColorToSKColor(color: MyColor)->SKColor {
         switch color {
-        case .myRedColor: return .red
+        case .myRedColor: return .white
         case .myWhiteColor: return .white
         case .myGreenColor: return .green
-        case .myUsedColor: return usedColor
+        case .myUsedColor: return .white
         case .myGoldColor: return goldColor
-        case .myBlueColor: return turquoiseColor
+        case .myBlueColor: return .white //turquoiseColor
         case .myTemporaryColor: return temporaryColor
         case .myDarkGoldColor: return darkGoldColor
         case .myDarkGreenColor: return darkGreenColor
@@ -250,7 +250,25 @@ class WTGameboardItem: SKSpriteNode {
         } else {
             name += "0000"
         }
-        let texture = SKTexture(imageNamed: name)
+        var texture: SKTexture
+        if name == "whiteSprite0000" {
+            if self.status == .used {
+                name = "RedSprite"
+            }
+            if self.status == .used {
+                name = "LightRedSprite"
+            }
+            if self.myColor == .myBlueColor {
+                name = "BlueSprite"
+            }
+            texture = SKTexture(imageNamed: name)
+        } else {
+            if self.status == .wholeWord {
+                name = "GreenSprite0001"
+            }
+            
+            texture = SKTexture(imageNamed: name)
+        }
         self.texture = texture
     }
     public func changeColor(toColor: MyColor = .myNoColor) {

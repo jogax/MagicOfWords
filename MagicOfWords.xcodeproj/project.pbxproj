@@ -42,6 +42,10 @@
 		2049314C21E6496100BE66EA /* enMandatory.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2049314B21E6496100BE66EA /* enMandatory.txt */; };
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
 		204A8ADA2029EE6000E9C11F /* WTScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WTScene.swift */; };
+		204AC87722282A9400A5A03D /* RedSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 204AC87622282A9400A5A03D /* RedSprite.png */; };
+		204AC879222831D000A5A03D /* BlueSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 204AC878222831D000A5A03D /* BlueSprite.png */; };
+		204AC87B2228436800A5A03D /* LightRedSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 204AC87A2228436800A5A03D /* LightRedSprite.png */; };
+		204AC87D2228635600A5A03D /* GreenSprite0001.png in Resources */ = {isa = PBXBuildFile; fileRef = 204AC87C2228635600A5A03D /* GreenSprite0001.png */; };
 		204AEB39205D1F47004D2ECD /* WTGameFinished.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204AEB38205D1F47004D2ECD /* WTGameFinished.swift */; };
 		204B6FD021CD3ADD00893D58 /* players.png in Resources */ = {isa = PBXBuildFile; fileRef = 204B6FCF21CD3ADD00893D58 /* players.png */; };
 		204B6FD321CD418D00893D58 /* firstplaces.png in Resources */ = {isa = PBXBuildFile; fileRef = 204B6FD121CD418D00893D58 /* firstplaces.png */; };
@@ -177,6 +181,10 @@
 		2049314B21E6496100BE66EA /* enMandatory.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enMandatory.txt; sourceTree = "<group>"; };
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
 		204A8AD92029EE6000E9C11F /* WTScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTScene.swift; sourceTree = "<group>"; };
+		204AC87622282A9400A5A03D /* RedSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RedSprite.png; sourceTree = "<group>"; };
+		204AC878222831D000A5A03D /* BlueSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BlueSprite.png; sourceTree = "<group>"; };
+		204AC87A2228436800A5A03D /* LightRedSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightRedSprite.png; sourceTree = "<group>"; };
+		204AC87C2228635600A5A03D /* GreenSprite0001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenSprite0001.png; sourceTree = "<group>"; };
 		204AEB38205D1F47004D2ECD /* WTGameFinished.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameFinished.swift; sourceTree = "<group>"; };
 		204B6FCF21CD3ADD00893D58 /* players.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = players.png; sourceTree = "<group>"; };
 		204B6FD121CD418D00893D58 /* firstplaces.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = firstplaces.png; sourceTree = "<group>"; };
@@ -380,6 +388,10 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				204AC87C2228635600A5A03D /* GreenSprite0001.png */,
+				204AC87A2228436800A5A03D /* LightRedSprite.png */,
+				204AC878222831D000A5A03D /* BlueSprite.png */,
+				204AC87622282A9400A5A03D /* RedSprite.png */,
 				205211332221B37A00B25072 /* UnDelete.png */,
 				2084FA2C221C2523002D29D3 /* Delete.png */,
 				204D7608221B26A800DBB1B5 /* Minus.png */,
@@ -564,6 +576,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				205211342221B37A00B25072 /* UnDelete.png in Resources */,
+				204AC87D2228635600A5A03D /* GreenSprite0001.png in Resources */,
 				204D760A221B26A900DBB1B5 /* Minus.png in Resources */,
 				20552DC6211F1EFA00C54538 /* whiteSprite1101.png in Resources */,
 				202EF6C621CA9DAD000E4DA4 /* online.png in Resources */,
@@ -575,6 +588,7 @@
 				20552DC3211F1EFA00C54538 /* whiteSprite0011.png in Resources */,
 				2087444321FA1C74006C00C6 /* deRestWords.txt in Resources */,
 				20552DC2211F1EFA00C54538 /* whiteSprite1111.png in Resources */,
+				204AC87B2228436800A5A03D /* LightRedSprite.png in Resources */,
 				20552DCC211F1EFA00C54538 /* whiteSprite0100.png in Resources */,
 				20552DC0211F1EFA00C54538 /* whiteSprite0101.png in Resources */,
 				205184F920615B3100E7FAF4 /* deGameData.txt in Resources */,
@@ -585,11 +599,13 @@
 				20552DC4211F1EFA00C54538 /* whiteSprite1011.png in Resources */,
 				2084C0D62209BF73002B8F2E /* compare2.txt in Resources */,
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
+				204AC87722282A9400A5A03D /* RedSprite.png in Resources */,
 				205184F72061525C00E7FAF4 /* huGameData.txt in Resources */,
 				20552DC8211F1EFA00C54538 /* whiteSprite1100.png in Resources */,
 				205CF7F12129BF4B00C1B89D /* nextGame.png in Resources */,
 				20895DFB21FA152100E54BF3 /* enMandatoryInput.txt in Resources */,
 				208173E12103577900960800 /* balloon.png in Resources */,
+				204AC879222831D000A5A03D /* BlueSprite.png in Resources */,
 				208B278F21FB382C007259B6 /* enRestWords.txt in Resources */,
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
 				2055E2AD2215B01E004E3260 /* Mandatory.realm in Resources */,
