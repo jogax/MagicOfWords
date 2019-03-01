@@ -185,7 +185,7 @@ class WTGameboardItem: SKSpriteNode {
         switch color {
         case .myRedColor: return .white
         case .myWhiteColor: return .white
-        case .myGreenColor: return .green
+        case .myGreenColor: return .white
         case .myUsedColor: return .white
         case .myGoldColor: return goldColor
         case .myBlueColor: return .white //turquoiseColor
@@ -224,7 +224,7 @@ class WTGameboardItem: SKSpriteNode {
         self.color = convertMyColorToSKColor(color: color)
         self.status = toStatus == .noChange ? self.status : toStatus
         self.status = letter == emptyLetter ? .empty : self.status
-        setConnectionType(connectionType: connectionType)
+//        setConnectionType(connectionType: connectionType)
 //        if toStatus == .empty || toStatus == .used {
 //           countOccurencesInWords = 0
 //        }
@@ -238,38 +238,31 @@ class WTGameboardItem: SKSpriteNode {
         } else {
             self.countWordsLabel.text = ""
         }
+        setConnectionType(connectionType: connectionType)
     }
     
     private func setTexture() {
-        var name = "whiteSprite"
-        if !(self.letter == emptyLetter || self.status == .used || self.myColor == .myBlueColor) {
+        var name = "GreenSprite"
+        if self.status == .wholeWord && !(self.letter == emptyLetter || self.status == .used || self.myColor == .myBlueColor) {
             name += self.connectionType.left ? "1" : "0"
             name += self.connectionType.top ? "1" : "0"
             name += self.connectionType.right ? "1" : "0"
             name += self.connectionType.bottom ? "1" : "0"
         } else {
-            name += "0000"
-        }
-        var texture: SKTexture
-        if name == "whiteSprite0000" {
-            if self.status == .used {
-                name = "RedSprite"
-            }
-            if self.status == .used {
-                name = "LightRedSprite"
-            }
+//            print ("color: \(self.myColor), status: \(self.status)")
             if self.myColor == .myBlueColor {
                 name = "BlueSprite"
+            } else if self.myColor == .myRedColor {
+                name = "RedSprite"
+            } else if self.myColor == .myTemporaryColor {
+                name = "BlueSprite"
+            } else if self.status == .used {
+                name = "LightRedSprite"
+            } else {
+                name = "whiteSprite0000"
             }
-            texture = SKTexture(imageNamed: name)
-        } else {
-            if self.status == .wholeWord {
-                name = "GreenSprite0001"
-            }
-            
-            texture = SKTexture(imageNamed: name)
         }
-        self.texture = texture
+        self.texture = SKTexture(imageNamed: name)
     }
     public func changeColor(toColor: MyColor = .myNoColor) {
         if toColor == .myNoColor {
