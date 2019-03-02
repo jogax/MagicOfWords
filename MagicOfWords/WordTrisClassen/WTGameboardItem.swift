@@ -182,18 +182,34 @@ class WTGameboardItem: SKSpriteNode {
     }
     
     private func convertMyColorToSKColor(color: MyColor)->SKColor {
-        switch color {
-        case .myRedColor: return .white
-        case .myWhiteColor: return .white
-        case .myGreenColor: return .white
-        case .myUsedColor: return .white
-        case .myGoldColor: return goldColor
-        case .myBlueColor: return .white //turquoiseColor
-        case .myTemporaryColor: return temporaryColor
-        case .myDarkGoldColor: return darkGoldColor
-        case .myDarkGreenColor: return darkGreenColor
-        case .myLightGreenColor: return lightGreenColor
-        case .myNoColor: return .white
+        if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+            switch color {
+            case .myRedColor: return .white
+            case .myWhiteColor: return .white
+            case .myGreenColor: return .white
+            case .myUsedColor: return .white
+            case .myGoldColor: return .white //goldColor
+            case .myBlueColor: return .white //turquoiseColor
+            case .myTemporaryColor: return temporaryColor
+            case .myDarkGoldColor: return darkGoldColor
+            case .myDarkGreenColor: return darkGreenColor
+            case .myLightGreenColor: return lightGreenColor
+            case .myNoColor: return .white
+            }
+        } else {
+            switch color {
+            case .myRedColor: return .red
+            case .myWhiteColor: return .white
+            case .myGreenColor: return .green
+            case .myUsedColor: return usedColor
+            case .myGoldColor: return goldColor
+            case .myBlueColor: return turquoiseColor
+            case .myTemporaryColor: return temporaryColor
+            case .myDarkGoldColor: return darkGoldColor
+            case .myDarkGreenColor: return darkGreenColor
+            case .myLightGreenColor: return lightGreenColor
+            case .myNoColor: return .white
+            }
         }
     }
     
@@ -232,7 +248,8 @@ class WTGameboardItem: SKSpriteNode {
         if self.countOccurencesInWords > 0 && decrWords {
             self.countOccurencesInWords -= 1
         }
-        if toColor == .myGreenColor {
+        
+        if toColor == .myGreenColor || (GV.basicDataRecord.buttonType == GV.ButtonTypeNormal && (toColor == .myGoldColor || toColor == .myDarkGoldColor)) {
             self.countWordsLabel.text = String(countOccurencesInWords)
             self.countWordsLabel.fontSize = self.fontSize * (countOccurencesInWords < 10 ? 0.7 : 0.6)
         } else {
@@ -242,24 +259,37 @@ class WTGameboardItem: SKSpriteNode {
     }
     
     private func setTexture() {
-        var name = "GreenSprite"
-        if self.status == .wholeWord && !(self.letter == emptyLetter || self.status == .used || self.myColor == .myBlueColor) {
-            name += self.connectionType.left ? "1" : "0"
-            name += self.connectionType.top ? "1" : "0"
-            name += self.connectionType.right ? "1" : "0"
-            name += self.connectionType.bottom ? "1" : "0"
-        } else {
-//            print ("color: \(self.myColor), status: \(self.status)")
-            if self.myColor == .myBlueColor {
-                name = "BlueSprite"
-            } else if self.myColor == .myRedColor {
-                name = "RedSprite"
-            } else if self.myColor == .myTemporaryColor {
-                name = "BlueSprite"
-            } else if self.status == .used {
-                name = "LightRedSprite"
+        var name = ""
+        if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+             if self.status == .wholeWord && !(self.letter == emptyLetter || self.myColor == .myBlueColor || self.myColor == .myRedColor) {
+                name = myColor == .myGreenColor ? "GreenSprite" : "GoldSprite"
+                name += self.connectionType.left ? "1" : "0"
+                name += self.connectionType.top ? "1" : "0"
+                name += self.connectionType.right ? "1" : "0"
+                name += self.connectionType.bottom ? "1" : "0"
             } else {
-                name = "whiteSprite0000"
+    //            print ("color: \(self.myColor), status: \(self.status)")
+                if self.myColor == .myBlueColor {
+                    name = "BlueSprite"
+                } else if self.myColor == .myRedColor {
+                    name = "RedSprite"
+                } else if self.myColor == .myTemporaryColor {
+                    name = "BlueSprite"
+                } else if self.status == .used {
+                    name = "LightRedSprite"
+                } else {
+                    name = "whiteSprite0000"
+                }
+            }
+        } else {
+            name = "whiteSprite"
+            if !(self.letter == emptyLetter || self.status == .used || self.myColor == .myBlueColor) {
+                name += self.connectionType.left ? "1" : "0"
+                name += self.connectionType.top ? "1" : "0"
+                name += self.connectionType.right ? "1" : "0"
+                name += self.connectionType.bottom ? "1" : "0"
+            } else {
+                name += "0000"
             }
         }
         self.texture = SKTexture(imageNamed: name)
