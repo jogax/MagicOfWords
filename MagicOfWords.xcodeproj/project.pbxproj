@@ -98,6 +98,22 @@
 		2060037020348A8800023E10 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2060036F20348A8800023E10 /* Grid.swift */; };
 		2065252620FD212C00F0BC46 /* WTGameWordList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2065252520FD212C00F0BC46 /* WTGameWordList.swift */; };
 		206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206664A720A45A3000C6C5E4 /* RoundDataModel.swift */; };
+		206AD3D8222C26FE00B7C5B6 /* GraySprite0001.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3D7222C26FD00B7C5B6 /* GraySprite0001.png */; };
+		206AD3E7222C2AA800B7C5B6 /* GraySprite1000.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3D9222C2AA700B7C5B6 /* GraySprite1000.png */; };
+		206AD3E8222C2AA800B7C5B6 /* GraySprite1001.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3DA222C2AA700B7C5B6 /* GraySprite1001.png */; };
+		206AD3E9222C2AA800B7C5B6 /* GraySprite1010.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3DB222C2AA700B7C5B6 /* GraySprite1010.png */; };
+		206AD3EA222C2AA800B7C5B6 /* GraySprite0100.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3DC222C2AA700B7C5B6 /* GraySprite0100.png */; };
+		206AD3EB222C2AA800B7C5B6 /* GraySprite0110.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3DD222C2AA700B7C5B6 /* GraySprite0110.png */; };
+		206AD3EC222C2AA800B7C5B6 /* GraySprite0010.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3DE222C2AA700B7C5B6 /* GraySprite0010.png */; };
+		206AD3ED222C2AA800B7C5B6 /* GraySprite1101.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3DF222C2AA700B7C5B6 /* GraySprite1101.png */; };
+		206AD3EE222C2AA800B7C5B6 /* GraySprite0101.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3E0222C2AA700B7C5B6 /* GraySprite0101.png */; };
+		206AD3EF222C2AA800B7C5B6 /* GraySprite1011.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3E1222C2AA700B7C5B6 /* GraySprite1011.png */; };
+		206AD3F0222C2AA800B7C5B6 /* GraySprite0111.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3E2222C2AA700B7C5B6 /* GraySprite0111.png */; };
+		206AD3F1222C2AA800B7C5B6 /* GraySprite1100.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3E3222C2AA700B7C5B6 /* GraySprite1100.png */; };
+		206AD3F2222C2AA800B7C5B6 /* GraySprite1110.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3E4222C2AA800B7C5B6 /* GraySprite1110.png */; };
+		206AD3F3222C2AA800B7C5B6 /* GraySprite1111.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3E5222C2AA800B7C5B6 /* GraySprite1111.png */; };
+		206AD3F4222C2AA800B7C5B6 /* GraySprite0011.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3E6222C2AA800B7C5B6 /* GraySprite0011.png */; };
+		206AD3F6222C36C700B7C5B6 /* GraySprite0000.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3F5222C36C700B7C5B6 /* GraySprite0000.png */; };
 		208144202167B65500496AFC /* BestScoreForGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081441F2167B65500496AFC /* BestScoreForGame.swift */; };
 		208173E12103577900960800 /* balloon.png in Resources */ = {isa = PBXBuildFile; fileRef = 208173E02103577800960800 /* balloon.png */; };
 		20819320202B472900406D9A /* GameDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081931F202B472900406D9A /* GameDataModel.swift */; };
@@ -268,6 +284,22 @@
 		2060036F20348A8800023E10 /* Grid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
 		2065252520FD212C00F0BC46 /* WTGameWordList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTGameWordList.swift; sourceTree = "<group>"; };
 		206664A720A45A3000C6C5E4 /* RoundDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundDataModel.swift; sourceTree = "<group>"; };
+		206AD3D7222C26FD00B7C5B6 /* GraySprite0001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0001.png; sourceTree = "<group>"; };
+		206AD3D9222C2AA700B7C5B6 /* GraySprite1000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite1000.png; sourceTree = "<group>"; };
+		206AD3DA222C2AA700B7C5B6 /* GraySprite1001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite1001.png; sourceTree = "<group>"; };
+		206AD3DB222C2AA700B7C5B6 /* GraySprite1010.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite1010.png; sourceTree = "<group>"; };
+		206AD3DC222C2AA700B7C5B6 /* GraySprite0100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0100.png; sourceTree = "<group>"; };
+		206AD3DD222C2AA700B7C5B6 /* GraySprite0110.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0110.png; sourceTree = "<group>"; };
+		206AD3DE222C2AA700B7C5B6 /* GraySprite0010.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0010.png; sourceTree = "<group>"; };
+		206AD3DF222C2AA700B7C5B6 /* GraySprite1101.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite1101.png; sourceTree = "<group>"; };
+		206AD3E0222C2AA700B7C5B6 /* GraySprite0101.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0101.png; sourceTree = "<group>"; };
+		206AD3E1222C2AA700B7C5B6 /* GraySprite1011.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite1011.png; sourceTree = "<group>"; };
+		206AD3E2222C2AA700B7C5B6 /* GraySprite0111.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0111.png; sourceTree = "<group>"; };
+		206AD3E3222C2AA700B7C5B6 /* GraySprite1100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite1100.png; sourceTree = "<group>"; };
+		206AD3E4222C2AA800B7C5B6 /* GraySprite1110.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite1110.png; sourceTree = "<group>"; };
+		206AD3E5222C2AA800B7C5B6 /* GraySprite1111.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite1111.png; sourceTree = "<group>"; };
+		206AD3E6222C2AA800B7C5B6 /* GraySprite0011.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0011.png; sourceTree = "<group>"; };
+		206AD3F5222C36C700B7C5B6 /* GraySprite0000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0000.png; sourceTree = "<group>"; };
 		2081441F2167B65500496AFC /* BestScoreForGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestScoreForGame.swift; sourceTree = "<group>"; };
 		208173E02103577800960800 /* balloon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = balloon.png; sourceTree = "<group>"; };
 		2081931F202B472900406D9A /* GameDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDataModel.swift; sourceTree = "<group>"; };
@@ -448,6 +480,22 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				206AD3F5222C36C700B7C5B6 /* GraySprite0000.png */,
+				206AD3D7222C26FD00B7C5B6 /* GraySprite0001.png */,
+				206AD3DE222C2AA700B7C5B6 /* GraySprite0010.png */,
+				206AD3E6222C2AA800B7C5B6 /* GraySprite0011.png */,
+				206AD3DC222C2AA700B7C5B6 /* GraySprite0100.png */,
+				206AD3E0222C2AA700B7C5B6 /* GraySprite0101.png */,
+				206AD3DD222C2AA700B7C5B6 /* GraySprite0110.png */,
+				206AD3E2222C2AA700B7C5B6 /* GraySprite0111.png */,
+				206AD3D9222C2AA700B7C5B6 /* GraySprite1000.png */,
+				206AD3DA222C2AA700B7C5B6 /* GraySprite1001.png */,
+				206AD3DB222C2AA700B7C5B6 /* GraySprite1010.png */,
+				206AD3E1222C2AA700B7C5B6 /* GraySprite1011.png */,
+				206AD3E3222C2AA700B7C5B6 /* GraySprite1100.png */,
+				206AD3DF222C2AA700B7C5B6 /* GraySprite1101.png */,
+				206AD3E4222C2AA800B7C5B6 /* GraySprite1110.png */,
+				206AD3E5222C2AA800B7C5B6 /* GraySprite1111.png */,
 				203D87D422298F640077F63D /* LightBlueSprite.png */,
 				2086695A222AC84D002194C8 /* GreenSprite0001.png */,
 				20866959222AC84D002194C8 /* GreenSprite0010.png */,
@@ -671,6 +719,8 @@
 				2086696D222AC84E002194C8 /* GreenSprite0011.png in Resources */,
 				20552DC6211F1EFA00C54538 /* whiteSprite1101.png in Resources */,
 				202EF6C621CA9DAD000E4DA4 /* online.png in Resources */,
+				206AD3EF222C2AA800B7C5B6 /* GraySprite1011.png in Resources */,
+				206AD3E7222C2AA800B7C5B6 /* GraySprite1000.png in Resources */,
 				20866991222ACF2E002194C8 /* GoldSprite1001.png in Resources */,
 				20866987222ACF2E002194C8 /* GoldSprite1110.png in Resources */,
 				2086696C222AC84E002194C8 /* GreenSprite1011.png in Resources */,
@@ -701,19 +751,25 @@
 				2086698B222ACF2E002194C8 /* GoldSprite1111.png in Resources */,
 				2084C0D62209BF73002B8F2E /* compare2.txt in Resources */,
 				20866975222AC84E002194C8 /* GreenSprite1100.png in Resources */,
+				206AD3EB222C2AA800B7C5B6 /* GraySprite0110.png in Resources */,
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
 				204AC87722282A9400A5A03D /* RedSprite.png in Resources */,
 				2086696E222AC84E002194C8 /* GreenSprite0111.png in Resources */,
 				2086698A222ACF2E002194C8 /* GoldSprite1100.png in Resources */,
 				205184F72061525C00E7FAF4 /* huGameData.txt in Resources */,
 				20552DC8211F1EFA00C54538 /* whiteSprite1100.png in Resources */,
+				206AD3F3222C2AA800B7C5B6 /* GraySprite1111.png in Resources */,
 				205CF7F12129BF4B00C1B89D /* nextGame.png in Resources */,
 				20895DFB21FA152100E54BF3 /* enMandatoryInput.txt in Resources */,
 				208173E12103577900960800 /* balloon.png in Resources */,
 				204AC879222831D000A5A03D /* BlueSprite.png in Resources */,
+				206AD3EE222C2AA800B7C5B6 /* GraySprite0101.png in Resources */,
+				206AD3D8222C26FE00B7C5B6 /* GraySprite0001.png in Resources */,
 				208B278F21FB382C007259B6 /* enRestWords.txt in Resources */,
+				206AD3ED222C2AA800B7C5B6 /* GraySprite1101.png in Resources */,
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
 				2055E2AD2215B01E004E3260 /* Mandatory.realm in Resources */,
+				206AD3F2222C2AA800B7C5B6 /* GraySprite1110.png in Resources */,
 				20552DC7211F1EFA00C54538 /* whiteSprite1110.png in Resources */,
 				20866971222AC84E002194C8 /* GreenSprite1010.png in Resources */,
 				20866972222AC84E002194C8 /* GreenSprite1001.png in Resources */,
@@ -724,23 +780,29 @@
 				2086698D222ACF2E002194C8 /* GoldSprite0010.png in Resources */,
 				204B6FD321CD418D00893D58 /* firstplaces.png in Resources */,
 				2084FA2D221C2523002D29D3 /* Delete.png in Resources */,
+				206AD3EC222C2AA800B7C5B6 /* GraySprite0010.png in Resources */,
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
 				205CF7F02129BF4B00C1B89D /* previousGame.png in Resources */,
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
 				202EF6C821CAA21A000E4DA4 /* offline.png in Resources */,
 				2051A54E2191E376001AD00B /* hook.png in Resources */,
 				204B6FD021CD3ADD00893D58 /* players.png in Resources */,
+				206AD3EA222C2AA800B7C5B6 /* GraySprite0100.png in Resources */,
 				20552DBE211F1EFA00C54538 /* whiteSprite0110.png in Resources */,
 				20866985222ACF2E002194C8 /* GoldSprite0101.png in Resources */,
 				205E8E2820948E2E00314646 /* button.png in Resources */,
 				205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */,
+				206AD3F6222C36C700B7C5B6 /* GraySprite0000.png in Resources */,
 				2086698F222ACF2E002194C8 /* GoldSprite1000.png in Resources */,
 				20866992222ACF2E002194C8 /* GoldSprite1011.png in Resources */,
+				206AD3F0222C2AA800B7C5B6 /* GraySprite0111.png in Resources */,
 				20552DC9211F1EFA00C54538 /* whiteSprite0001.png in Resources */,
+				206AD3F1222C2AA800B7C5B6 /* GraySprite1100.png in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
 				205CF7ED2129BC9300C1B89D /* back.png in Resources */,
 				20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
+				206AD3E8222C2AA800B7C5B6 /* GraySprite1001.png in Resources */,
 				20866974222AC84E002194C8 /* GreenSprite1000.png in Resources */,
 				204C30B321EF789A008B1CB3 /* ruMandatory6.txt in Resources */,
 				20866968222AC84E002194C8 /* GreenSprite0010.png in Resources */,
@@ -754,11 +816,13 @@
 				20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */,
 				20866986222ACF2E002194C8 /* GoldSprite1101.png in Resources */,
 				20866967222AC84E002194C8 /* GreenSprite0101.png in Resources */,
+				206AD3F4222C2AA800B7C5B6 /* GraySprite0011.png in Resources */,
 				2086696A222AC84E002194C8 /* GreenSprite1110.png in Resources */,
 				204B6FD421CD418D00893D58 /* bestScores.png in Resources */,
 				20866993222ACF2E002194C8 /* GoldSprite0100.png in Resources */,
 				2048259921E8CC59000933B3 /* deWords.txt in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
+				206AD3E9222C2AA800B7C5B6 /* GraySprite1010.png in Resources */,
 				20866973222AC84E002194C8 /* GreenSprite1101.png in Resources */,
 				20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,

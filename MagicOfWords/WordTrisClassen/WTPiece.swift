@@ -225,15 +225,65 @@ class WTPiece: SKSpriteNode {
         let size = CGSize(width: blockSize * CGFloat(maxRow + 1), height: blockSize * CGFloat(maxCol + 1))
         return size
     }
+    
+    private func generateNameArray()->[String] {
+        let form = myForms[myType]![rotateIndex]
+        var colRowArray = [(col:Int, row:Int)]()
+        var nameArray = [String]()
+        
+        for index in 0..<form.count {
+            let col = form[index] / 10
+            let row = form[index] % 10
+            colRowArray.append((col: col, row: row))
+        }
+        if colRowArray.count == 1 {
+            nameArray.append("GraySprite0000")
+        } else if colRowArray.count == 2 {
+            if colRowArray[0].col == colRowArray[1].col {
+                if colRowArray[0].row > colRowArray[1].row {
+                    nameArray.append("GraySprite1000")
+                    nameArray.append("GraySprite0010")
+                } else {
+                    nameArray.append("GraySprite0010")
+                    nameArray.append("GraySprite1000")
+                }
+            }
+            if colRowArray[0].row == colRowArray[1].row {
+                if colRowArray[0].col > colRowArray[1].col {
+                    nameArray.append("GraySprite0001")
+                    nameArray.append("GraySprite0100")
+                } else {
+                    nameArray.append("GraySprite0100")
+                    nameArray.append("GraySprite0001")
+                }
+            }
+        }
+        return nameArray
+
+    }
     private func addLettersToPositions() {
         let form = myForms[myType]![rotateIndex]
+        let nameArray = generateNameArray()
         for index in 0..<form.count {
             let col = form[index] / 10
             let row = form[index] % 10
             let position = gridPosition(col: col, row: row)
-            let frameForLetter = SKSpriteNode(color: .clear, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
+            let frameForLetter = SKSpriteNode(color: .clear, size: CGSize(width: blockSize * 1.0, height: blockSize * 1.0))
             frameForLetter.position = position
             frameForLetter.color = .white
+            var name = ""
+            switch nameArray.count {
+            case 1:
+                name = "GraySprite0000"
+            case 2:
+                name = nameArray[index]
+            case 3:
+                name = "GraySprite0000"
+
+            default:
+                break
+            }
+            frameForLetter.texture = SKTexture(imageNamed: name)
             let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
 //            label.position = position
             label.text = letters[index]
@@ -283,7 +333,9 @@ class WTPiece: SKSpriteNode {
     }
     
     public func rotate() {
+        
         rotateIndex = (rotateIndex + 1) % 4
+        let nameArray = generateNameArray()
         let rotateAction = SKAction.rotate(byAngle: -90 * GV.oneGrad, duration: 0.1)
 //        mySprite.anchorPoint = CGPoint(x: 0.1, y: 0.1)
         self.run(rotateAction)
@@ -294,7 +346,9 @@ class WTPiece: SKSpriteNode {
             guard let child = self.childNode(withName: searchName) else {
                 continue
             }
+            
             let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
+            (child as! SKSpriteNode).texture = SKTexture(imageNamed: nameArray[index])
             child.run(rotateLetterAction)
          }
 
