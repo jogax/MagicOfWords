@@ -44,24 +44,71 @@ struct LetterCoordinates {
     var col: Int = 0
     var row: Int = 0
 }
-let myForms: [MyShapes : [[Int]]] = [
-    .Z_Shape_1 : [[00, 01, 11, 12], [20, 10, 11, 01], [12, 11, 01, 00], [01, 11, 10, 20]], //OK
-    .Z_Shape_2 : [[10, 11, 01, 02], [21, 11, 10, 00], [02, 01, 11, 10], [00, 10, 11, 21]], //OK
-    .L_Shape_1 : [[00, 10, 11], [10, 11, 01], [11, 01, 00], [01, 00, 10]], // OK
-    .L_Shape_2 : [[00, 01, 11], [10, 00, 01], [11, 10, 00], [01, 11, 10]], // OK
-    .L_Shape_3 : [[21, 20, 10, 00], [02, 12, 11, 10], [00, 01, 11, 21], [10, 00, 01, 02]], // OK
-    .L_Shape_4 : [[20, 21, 11, 01], [12, 02, 01, 00], [01, 00, 10, 20], [00, 10, 11, 12]], // OK
-    .T_Shape_1 : [[12, 11, 10, 01], [01, 11, 21, 10], [00, 01, 02, 11], [20, 10, 00, 11]],  // OK
-    .O_Shape_1  : [[00, 01, 11, 10], [10, 11, 01, 00], [11, 01, 00, 11], [01, 00, 10, 11]], // OK
-    .O_Shape_2  : [[00, 10, 11, 01], [10, 00, 01, 11], [11, 10, 00, 01], [01, 11, 10, 00]], // OK
-    .I_Shape_1 : [[00], [00], [00], [00]], // OK
-    .I_Shape_2 : [[00, 10], [00, 01], [10, 00], [01, 00]], // OK
-    .I_Shape_3 : [[00, 10, 20], [00, 01, 02], [20, 10, 00], [02, 01, 00]], // OK
-    .I_Shape_4 : [[00, 10, 20, 30], [00, 01, 02, 03], [30, 20, 10, 00], [03, 02, 01, 00]], // OK
-    .I_Shape_5 : [[00, 10, 20, 30, 40], [00, 01, 02, 03, 04], [40, 30, 20, 10, 00], [04, 03, 02, 01, 00]], // OK
-    .I_Shape_6 : [[00, 10, 20, 30, 40, 50], [00, 01, 02, 03, 04, 05], [50, 40, 30, 20, 10, 00], [05, 04, 03, 02, 01, 00]], // OK
-    .I_Shape_7 : [[00, 10, 20, 30, 40, 50, 60], [00, 01, 02, 03, 04, 05, 06], [60, 50, 40, 30, 20, 10, 00], [06, 05, 04, 03, 02, 01, 00]], // OK
-    .I_Shape_8 : [[00, 10, 20, 30, 40, 50, 60, 70], [00, 01, 02, 03, 04, 05, 06, 07], [70, 60, 50, 40, 30, 20, 10, 00], [07, 06, 05, 04, 03, 02, 01, 00]]
+let myForms: [MyShapes : [(points:[Int], connects:[String])]] = [
+    .Z_Shape_1 :    [(points:[00, 01, 11, 12], connects: ["0010", "1100", "0011", "1000"]),
+                     (points:[20, 10, 11, 01], connects: ["0001", "0110", "1001", "0100"]),
+                     (points:[12, 11, 01, 00], connects: ["1000", "0011", "1100", "0010"]),
+                     (points:[01, 11, 10, 20], connects: ["0100", "1001", "0110", "0001"])], //OK
+    
+    
+    .Z_Shape_2 :    [(points:[10, 11, 01, 02], connects: ["0010", "1001", "0110", "1000"]),
+                     (points:[21, 11, 10, 00], connects: ["0001", "1100", "0011", "0100"]),
+                     (points:[02, 01, 11, 10], connects: ["1000", "0110", "1001", "0010"]),
+                     (points:[00, 10, 11, 21], connects: ["0100", "0011", "1100", "0001"])], //OK
+    
+    .L_Shape_1 :    [(points:[00, 10, 11], connects: ["0100", "0011", "1000"]),
+                     (points:[10, 11, 01], connects: ["0010", "1001", "0100"]),
+                     (points:[11, 01, 00], connects: ["0001", "1100", "0010"]),
+                     (points:[01, 00, 10], connects: ["1000", "0110", "0001"])], // OK
+    
+    .L_Shape_2 : [(points:[00, 01, 11], connects: ["0010", "1100", "0001"]),
+                  (points:[10, 00, 01], connects: ["0001", "0110", "1000"]),
+                  (points:[11, 10, 00], connects: ["1000", "0011", "0100"]),
+                  (points:[01, 11, 10], connects: ["0100", "1001", "0001"])], // OK
+//    .L_Shape_3 : [[21, 20, 10, 00], [02, 12, 11, 10], [00, 01, 11, 21], [10, 00, 01, 02]], // OK
+//    .L_Shape_4 : [[20, 21, 11, 01], [12, 02, 01, 00], [01, 00, 10, 20], [00, 10, 11, 12]], // OK
+//    .T_Shape_1 : [[12, 11, 10, 01], [01, 11, 21, 10], [00, 01, 02, 11], [20, 10, 00, 11]],  // OK
+//    .O_Shape_1  : [[00, 01, 11, 10], [10, 11, 01, 00], [11, 01, 00, 11], [01, 00, 10, 11]], // OK
+//    .O_Shape_2  : [[00, 10, 11, 01], [10, 00, 01, 11], [11, 10, 00, 01], [01, 11, 10, 00]], // OK
+    .I_Shape_1 : [(points:[00], connects: ["0000"]),
+                  (points:[00], connects: ["0000"]),
+                  (points:[00], connects: ["0000"]),
+                  (points:[00], connects: ["0000"])], // OK
+    
+    .I_Shape_2 : [(points:[00, 10], connects: ["0100", "0001"]),
+                  (points:[00, 01], connects: ["0010", "1000"]),
+                  (points:[10, 00], connects: ["0001", "0100"]),
+                  (points:[01, 00], connects: ["1000", "0010"])], // OK
+    
+    .I_Shape_3 : [(points:[00, 10, 20], connects: ["0100", "0101", "0001"]),
+                  (points:[00, 01, 02], connects: ["0010", "1010", "1000"]),
+                  (points:[20, 10, 00], connects: ["0001", "0101", "0100"]),
+                  (points:[02, 01, 00], connects: ["1000", "1010", "0010"])], // OK
+                    
+    .I_Shape_4 : [(points:[00, 10, 20, 30], connects: ["0100", "0101", "0101", "0001"]),
+                  (points:[00, 01, 02, 03], connects: ["0010", "1010", "1010", "1000"]),
+                  (points:[30, 20, 10, 00], connects: ["0001", "0101", "0101", "0100"]),
+                  (points:[03, 02, 01, 00], connects: ["1000", "1010", "1010", "0010"])], // OK
+    
+    .I_Shape_5 : [(points:[00, 10, 20, 30, 40], connects: ["0100", "0101", "0101", "0101", "0001"]),
+                  (points:[00, 01, 02, 03, 04], connects: ["0010", "1010", "1010", "1010", "1000"]),
+                  (points:[40, 30, 20, 10, 00], connects: ["0001", "0101", "0101", "0101", "0100"]),
+                  (points:[04, 03, 02, 01, 00], connects: ["1000", "1010", "1010", "1010", "0010"])], // OK
+    
+    .I_Shape_6 : [(points:[00, 10, 20, 30, 40, 50], connects: ["0100", "0101", "0101", "0101", "0101", "0001"]),
+                  (points:[00, 01, 02, 03, 04, 05], connects: ["0010", "1010", "1010", "1010", "1010", "1000"]),
+                  (points:[50, 40, 30, 20, 10, 00], connects: ["0001", "0101", "0101", "0101", "0101", "0100"]),
+                  (points:[05, 04, 03, 02, 01, 00], connects: ["1000", "1010", "1010", "1010", "1010", "0010"])], // OK
+    
+    .I_Shape_7 : [ (points:[00, 10, 20, 30, 40, 50, 60], connects: ["0100", "0101", "0101", "0101", "0101", "0101", "0001"]),
+                   (points:[00, 01, 02, 03, 04, 05, 06], connects: ["0010", "1010", "1010", "1010", "1010", "1010", "1000"]),
+                   (points:[60, 50, 40, 30, 20, 10, 00], connects: ["0001", "0101", "0101", "0101", "0101", "0101", "0100"]),
+                   (points:[06, 05, 04, 03, 02, 01, 00], connects: ["1000", "1010", "1010", "1010", "1010", "1010", "0010"])], // OK
+    
+    .I_Shape_8 : [(points:[00, 10, 20, 30, 40, 50, 60, 70], connects: ["0100", "0101", "0101", "0101", "0101", "0101", "0101", "0001"]),
+                    (points:[00, 01, 02, 03, 04, 05, 06, 07], connects: ["0010", "1010", "1010", "1010", "1010", "1010", "1010", "1000"]),
+                    (points:[70, 60, 50, 40, 30, 20, 10, 00], connects: ["0001", "0101", "0101", "0101", "0101", "0101", "0101", "0100"]),
+                    (points:[07, 06, 05, 04, 03, 02, 01, 00], connects: ["1000", "1010", "1010", "1010", "1010", "1010", "1010", "0010"])]
 
 ]
 
@@ -115,7 +162,7 @@ class WTPiece: SKSpriteNode {
         if myType != .NotUsed {
             self.size = calculateSize()
             addLettersToPositions()
-            self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
+            self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].points.count)
             for letter in letters {
                 let usedLetter = UsedLetter(col: 0, row: 0, letter: letter)
                 usedLetters.append(usedLetter)
@@ -140,7 +187,7 @@ class WTPiece: SKSpriteNode {
         if myType != .NotUsed {
             self.size = calculateSize()
             addLettersToPositions()
-            self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
+            self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].points.count)
         }
         createdFromLetters = true
     }
@@ -201,9 +248,9 @@ class WTPiece: SKSpriteNode {
 //        minRow = 0
         for type in searchTypes {
             let forms = myForms[type]
-            if forms![0].count == usedLetters.count {
+            if forms![0].points.count == usedLetters.count {
                 for rotateIndex in 0...3 {
-                    let form = forms![rotateIndex]
+                    let form = forms![rotateIndex].points
                     if form == myPositions {
                         return (type, (rotateIndex + 1) % 4)
                     }
@@ -216,9 +263,9 @@ class WTPiece: SKSpriteNode {
         let form = myForms[myType]![rotateIndex]
         var maxCol = 0
         var maxRow = 0
-        for index in 0..<form.count {
-            let col = form[index] / 10
-            let row = form[index] % 10
+        for index in 0..<form.points.count {
+            let col = form.points[index] / 10
+            let row = form.points[index] % 10
             maxCol = col > maxCol ? col : maxCol
             maxRow = row > maxRow ? row : maxRow
         }
@@ -228,35 +275,11 @@ class WTPiece: SKSpriteNode {
     
     private func generateNameArray()->[String] {
         let form = myForms[myType]![rotateIndex]
-        var colRowArray = [(col:Int, row:Int)]()
         var nameArray = [String]()
         
-        for index in 0..<form.count {
-            let col = form[index] / 10
-            let row = form[index] % 10
-            colRowArray.append((col: col, row: row))
-        }
-        if colRowArray.count == 1 {
-            nameArray.append("GraySprite0000")
-        } else if colRowArray.count == 2 {
-            if colRowArray[0].col == colRowArray[1].col {
-                if colRowArray[0].row > colRowArray[1].row {
-                    nameArray.append("GraySprite1000")
-                    nameArray.append("GraySprite0010")
-                } else {
-                    nameArray.append("GraySprite0010")
-                    nameArray.append("GraySprite1000")
-                }
-            }
-            if colRowArray[0].row == colRowArray[1].row {
-                if colRowArray[0].col > colRowArray[1].col {
-                    nameArray.append("GraySprite0001")
-                    nameArray.append("GraySprite0100")
-                } else {
-                    nameArray.append("GraySprite0100")
-                    nameArray.append("GraySprite0001")
-                }
-            }
+        for index in 0..<form.connects.count {
+            let name = "GraySprite" + form.connects[index]
+            nameArray.append(name)
         }
         return nameArray
 
@@ -264,25 +287,14 @@ class WTPiece: SKSpriteNode {
     private func addLettersToPositions() {
         let form = myForms[myType]![rotateIndex]
         let nameArray = generateNameArray()
-        for index in 0..<form.count {
-            let col = form[index] / 10
-            let row = form[index] % 10
+        for index in 0..<form.points.count {
+            let col = form.points[index] / 10
+            let row = form.points[index] % 10
             let position = gridPosition(col: col, row: row)
             let frameForLetter = SKSpriteNode(color: .clear, size: CGSize(width: blockSize * 1.0, height: blockSize * 1.0))
             frameForLetter.position = position
             frameForLetter.color = .white
-            var name = ""
-            switch nameArray.count {
-            case 1:
-                name = "GraySprite0000"
-            case 2:
-                name = nameArray[index]
-            case 3:
-                name = "GraySprite0000"
-
-            default:
-                break
-            }
+            let name = nameArray[index]
             frameForLetter.texture = SKTexture(imageNamed: name)
             let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
 //            label.position = position
@@ -313,7 +325,7 @@ class WTPiece: SKSpriteNode {
 
     public func setGameArrayPositions(gameArrayPositions: [GameArrayPositions]) {
         self.usedLetters = [UsedLetter]()
-        if gameArrayPositions.count == myForms[myType]![0].count {
+        if gameArrayPositions.count == myForms[myType]![0].points.count {
             for index in 0..<gameArrayPositions.count {
                 let col = gameArrayPositions[index].col
                 let row = gameArrayPositions[index].row
@@ -341,7 +353,7 @@ class WTPiece: SKSpriteNode {
         self.run(rotateAction)
 //        addLettersToPositions()
         let form = myForms[myType]
-        for index in 0..<form![rotateIndex].count {
+        for index in 0..<form![rotateIndex].points.count {
             let searchName = "label\(index)"
             guard let child = self.childNode(withName: searchName) else {
                 continue
@@ -363,7 +375,7 @@ class WTPiece: SKSpriteNode {
     }
     
     public func getLetterCoordinates()->[LetterCoordinates] {
-        let coordinates = myForms[myType]![rotateIndex]
+        let coordinates = myForms[myType]![rotateIndex].points
         print("\(coordinates)")
         var returnValue = [LetterCoordinates]()
         for index in 0..<self.children.count {
@@ -396,7 +408,7 @@ class WTPiece: SKSpriteNode {
     
     public func resetGameArrayPositions() {
         if myType != .NotUsed {
-            self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].count)
+            self.gameArrayPositions = Array(repeating: "00", count: myForms[self.myType]![0].points.count)
             self.isOnGameboard = false
         }
     }

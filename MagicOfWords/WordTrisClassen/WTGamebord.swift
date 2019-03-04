@@ -360,7 +360,7 @@ class WTGameboard: SKShapeNode {
         showingSprite = true
         moveModusStarted = false
         self.shape = shape
-        let formOfShape = myForms[shape.myType]![shape.rotateIndex]
+        let formOfShape = myForms[shape.myType]![shape.rotateIndex].points
         let (myCol, myRow) = analyseColAndRow(col: col, row: row, GRow: row - 2, formOfShape: formOfShape)
         if myRow == countCols {
             clear()
@@ -386,7 +386,7 @@ class WTGameboard: SKShapeNode {
         let rightDir = 1 // rotateIndex 1
         let downDir = 2 // rotateIndex 2
         let leftDir = 3 // rotateIndex 3
-        let formOfShape = myForms[shape.myType]![shape.rotateIndex]
+        let formOfShape = myForms[shape.myType]![shape.rotateIndex].points
         let (myCol, myRow) = analyseColAndRow(col: col, row: row, GRow: GRow, formOfShape: formOfShape)
         if moveModusStarted {
             if (shape.rotateIndex == leftDir && col + shape.letters.count - 1 < countCols && col >= 0) || // OK
@@ -763,7 +763,7 @@ class WTGameboard: SKShapeNode {
         for col in 0..<countCols {
             for row in 0..<countCols {
                 var pieceOK = true
-                for formItem in form {
+                for formItem in form.points {
                     let summarizedCol = col + formItem / 10
                     let summarizedRow = row - formItem % 10
                     if summarizedCol >= countCols || summarizedRow < 0 {

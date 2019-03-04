@@ -2673,7 +2673,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if type == .NotUsed {
                 break
             }
-            let length = myForms[type]![0].count
+            let length = myForms[type]![0].points.count
             switch length {
             case 1: typesWithLen1.append(type)
             case 2: typesWithLen2.append(type)
