@@ -509,7 +509,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let countWordsInRow = 3
     var countShowingRows = 0
     var startShapeIndex = 0
-    let shapeMultiplicator = [CGFloat(0.20), CGFloat(0.50), CGFloat(0.80)]
+    let shapeMultiplicator = [CGFloat(0.25), CGFloat(0.50), CGFloat(0.75)]
     var undoSprite = SKSpriteNode()
     let letterCounts: [Int:[Int]] = [
         1: [1],
@@ -801,7 +801,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let mandatoryWordsLinePosition:CGFloat = 0.82
     let buttonLineCenterY:CGFloat = 0.265
     let gameboardCenterY: CGFloat = 0.42
-    let pieceArrayCenterY: CGFloat = 0.10
+    let pieceArrayCenterY: CGFloat = 0.08
     
     private func createHeader() {
         let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
@@ -1402,7 +1402,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.08, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
-        goToPreviousGameButton = createButton(imageName: "previousGame", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled )
+        if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+            goToPreviousGameButton = createButton(imageName: "Left", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: false )
+        } else {
+            goToPreviousGameButton = createButton(imageName: "previousGame", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled)
+        }
         goToPreviousGameButton?.addTarget(self, action: #selector(self.goPreviousGame), for: .touchUpInside)
         self.view?.addSubview(goToPreviousGameButton!)
         self.view?.addSubview(goToPreviousGameButton!)
@@ -1415,7 +1419,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.92, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
-        goToNextGameButton = createButton(imageName: "nextGame", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled )
+        if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+            goToNextGameButton = createButton(imageName: "Right", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: false )
+        } else {
+            goToNextGameButton = createButton(imageName: "nextGame", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled )
+        }
         goToNextGameButton?.addTarget(self, action: #selector(self.goNextGame), for: .touchUpInside)
         self.view?.addSubview(goToNextGameButton!)
     }
@@ -1515,7 +1523,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.view?.addSubview(undoButton!)
     }
     
-    private func createButton(imageName: String, imageSize: CGFloat = 1.0, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool, color: UIColor? = nil)->UIButton {
+    private func createButton(imageName: String, imageSize: CGFloat = 1.0, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool, color: UIColor? = nil, hasFrame: Bool = true)->UIButton {
         let button = UIButton()
         if imageName.length > 0 {
             let image = resizeImage(image: UIImage(named: imageName)!, newWidth: frame.width * imageSize)
@@ -1530,8 +1538,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         button.layer.cornerRadius = cornerRadius
         button.alpha = enabled ? 1.0 : 0.2
         button.isEnabled = enabled
-        button.layer.borderWidth = GV.onIpad ? 5 : 3
-        button.layer.borderColor = UIColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1.0).cgColor
+        if hasFrame {
+            button.layer.borderWidth = GV.onIpad ? 5 : 3
+            button.layer.borderColor = UIColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1.0).cgColor
+        }
         button.frame = frame
         button.center = center
         return button

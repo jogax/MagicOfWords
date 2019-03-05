@@ -270,11 +270,11 @@ class WTGameboardItem: SKSpriteNode {
             } else {
     //            print ("color: \(self.myColor), status: \(self.status)")
                 if self.myColor == .myBlueColor {
-                    name = "BlueSprite"
+                    name = "LightBlueSprite0000"
                 } else if self.myColor == .myRedColor {
                     name = "RedSprite"
                 } else if self.myColor == .myTemporaryColor {
-                    name = "BlueSprite"
+                    name = "LightBlueSprite0000"
                 } else if self.status == .used {
                     name = "LightRedSprite"
                 } else {

@@ -107,4 +107,7 @@ let huDictionary: [TextConstants: String] = [
     .tcIWillDelete:         " Törlöm",
     .tcIWillSeparate:       " Leválasztom",
     .tcMyCounts:           "Hozzáadtam:%, leválasztottam:%, töröltem:% szót",
+    .tcChooseStyle:        "Válassz egy játékstílust",
+    .tcSimpleStyle:        "Egyszerű",
+    .tcEliteStyle:         "Elegáns",
 ]

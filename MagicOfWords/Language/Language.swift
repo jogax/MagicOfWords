@@ -106,7 +106,11 @@ enum TextConstants: Int {
     tcIWillAdd,
     tcIWillDelete,
     tcIWillSeparate,
-    tcMyCounts
+    tcMyCounts,
+    tcChooseStyle,
+    tcSimpleStyle,
+    tcEliteStyle
+
 }
 
     let LanguageEN = "en" // index 0

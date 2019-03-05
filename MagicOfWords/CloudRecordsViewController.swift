@@ -618,43 +618,45 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 }
             }
         case .BestScoreForGame:
-            let maxGameNumber = forGameItems!.last!.gameNumber
-            var generateRecord = false
-            for actGameNumber in 1...maxGameNumber {
-                if forGameItems!.filter("gameNumber = %d", actGameNumber).count > 0 {
-                    let item = forGameItems!.filter("gameNumber = %d", actGameNumber).first!
-                    var bestScoreData = BestScoreData()
-                    bestScoreData.gameNumber = actGameNumber
-                    bestScoreData.score = item.bestScore
-                    if item.owner == nil {
-                        generateRecord = true
-                        try! RealmService.safeWrite() {
-//                            RealmService.delete(item)
+            if forGameItems!.count > 0 {
+                let maxGameNumber = forGameItems!.last!.gameNumber
+                var generateRecord = false
+                for actGameNumber in 1...maxGameNumber {
+                    if forGameItems!.filter("gameNumber = %d", actGameNumber).count > 0 {
+                        let item = forGameItems!.filter("gameNumber = %d", actGameNumber).first!
+                        var bestScoreData = BestScoreData()
+                        bestScoreData.gameNumber = actGameNumber
+                        bestScoreData.score = item.bestScore
+                        if item.owner == nil {
+                            generateRecord = true
+                            try! RealmService.safeWrite() {
+    //                            RealmService.delete(item)
+                            }
+                        } else {
+                            bestScoreData.nickName = item.owner!.nickName!
+                            bestScoreTable.append(bestScoreData)
                         }
                     } else {
-                        bestScoreData.nickName = item.owner!.nickName!
-                        bestScoreTable.append(bestScoreData)
+                        generateRecord = true
                     }
-                } else {
-                    generateRecord = true
-                }
-                if generateRecord {
-//                    let item = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false).first!
-//                    let bestScoreForGameItem = BestScoreForGame()
-//                    bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
-//                    bestScoreForGameItem.gameNumber = actGameNumber
-//                    bestScoreForGameItem.language = item.language
-//                    bestScoreForGameItem.bestScore = item.score
-//                    bestScoreForGameItem.timeStamp = item.timeStamp
-//                    bestScoreForGameItem.owner = item.owner!
-//                    try! RealmService.safeWrite() {
-//                        RealmService.add(bestScoreForGameItem)
-//                    }
+                    if generateRecord {
+    //                    let item = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false).first!
+    //                    let bestScoreForGameItem = BestScoreForGame()
+    //                    bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
+    //                    bestScoreForGameItem.gameNumber = actGameNumber
+    //                    bestScoreForGameItem.language = item.language
+    //                    bestScoreForGameItem.bestScore = item.score
+    //                    bestScoreForGameItem.timeStamp = item.timeStamp
+    //                    bestScoreForGameItem.owner = item.owner!
+    //                    try! RealmService.safeWrite() {
+    //                        RealmService.add(bestScoreForGameItem)
+    //                    }
+                    }
                 }
             }
-        default:
-            break
-        }
+            default:
+                break
+            }
     }
     
     private func deactivateSubscriptions() {

@@ -108,6 +108,9 @@ let deDictionary: [TextConstants: String] = [
     .tcIWillDelete:        " Ich lösche",
     .tcIWillSeparate:      " Ich trenne",
     .tcMyCounts:           "Ich habe hinzugefügt:%, getrennt:%, gelöscht:% Wörter",
+    .tcChooseStyle:        "Wähle einen Stil für das Spiel",
+    .tcSimpleStyle:        "Einfach",
+    .tcEliteStyle:         "Elite",
 ]
 
 

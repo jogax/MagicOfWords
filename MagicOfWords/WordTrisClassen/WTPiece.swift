@@ -56,7 +56,7 @@ let myForms: [MyShapes : [(points:[Int], connects:[String])]] = [
                      (points:[02, 01, 11, 10], connects: ["1000", "0110", "1001", "0010"]),
                      (points:[00, 10, 11, 21], connects: ["0100", "0011", "1100", "0001"])], //OK
     
-    .L_Shape_1 :    [(points:[00, 10, 11], connects: ["0100", "0011", "1000"]),
+    .L_Shape_1 :    [(points:[00, 10, 11], connects: ["0100", "0011", "1000"]),  
                      (points:[10, 11, 01], connects: ["0010", "1001", "0100"]),
                      (points:[11, 01, 00], connects: ["0001", "1100", "0010"]),
                      (points:[01, 00, 10], connects: ["1000", "0110", "0001"])], // OK
@@ -64,7 +64,7 @@ let myForms: [MyShapes : [(points:[Int], connects:[String])]] = [
     .L_Shape_2 : [(points:[00, 01, 11], connects: ["0010", "1100", "0001"]),
                   (points:[10, 00, 01], connects: ["0001", "0110", "1000"]),
                   (points:[11, 10, 00], connects: ["1000", "0011", "0100"]),
-                  (points:[01, 11, 10], connects: ["0100", "1001", "0001"])], // OK
+                  (points:[01, 11, 10], connects: ["0100", "1001", "0010"])], // OK
 //    .L_Shape_3 : [[21, 20, 10, 00], [02, 12, 11, 10], [00, 01, 11, 21], [10, 00, 01, 02]], // OK
 //    .L_Shape_4 : [[20, 21, 11, 01], [12, 02, 01, 00], [01, 00, 10, 20], [00, 10, 11, 12]], // OK
 //    .T_Shape_1 : [[12, 11, 10, 01], [01, 11, 21, 10], [00, 01, 02, 11], [20, 10, 00, 11]],  // OK
@@ -269,7 +269,8 @@ class WTPiece: SKSpriteNode {
             maxCol = col > maxCol ? col : maxCol
             maxRow = row > maxRow ? row : maxRow
         }
-        let size = CGSize(width: blockSize * CGFloat(maxRow + 1), height: blockSize * CGFloat(maxCol + 1))
+        let sizeMultiplier = blockSize * 0.8
+        let size = CGSize(width: sizeMultiplier * CGFloat(maxRow + 1), height: sizeMultiplier * CGFloat(maxCol + 1))
         return size
     }
     
@@ -291,11 +292,14 @@ class WTPiece: SKSpriteNode {
             let col = form.points[index] / 10
             let row = form.points[index] % 10
             let position = gridPosition(col: col, row: row)
-            let frameForLetter = SKSpriteNode(color: .clear, size: CGSize(width: blockSize * 1.0, height: blockSize * 1.0))
+            let width = blockSize * (GV.basicDataRecord.buttonType == GV.ButtonTypeElite ? 1.0 : 0.9)
+            let frameForLetter = SKSpriteNode(color: .clear, size: CGSize(width: width, height: width))
             frameForLetter.position = position
             frameForLetter.color = .white
             let name = nameArray[index]
-            frameForLetter.texture = SKTexture(imageNamed: name)
+            if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+                frameForLetter.texture = SKTexture(imageNamed: name)
+            }
             let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
 //            label.position = position
             label.text = letters[index]
@@ -345,25 +349,28 @@ class WTPiece: SKSpriteNode {
     }
     
     public func rotate() {
-        
-        rotateIndex = (rotateIndex + 1) % 4
-        let nameArray = generateNameArray()
-        let rotateAction = SKAction.rotate(byAngle: -90 * GV.oneGrad, duration: 0.1)
-//        mySprite.anchorPoint = CGPoint(x: 0.1, y: 0.1)
-        self.run(rotateAction)
-//        addLettersToPositions()
-        let form = myForms[myType]
-        for index in 0..<form![rotateIndex].points.count {
-            let searchName = "label\(index)"
-            guard let child = self.childNode(withName: searchName) else {
-                continue
-            }
-            
-            let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
-            (child as! SKSpriteNode).texture = SKTexture(imageNamed: nameArray[index])
-            child.run(rotateLetterAction)
-         }
 
+        let form = myForms[myType]
+        if form![0].points.count > 1 {  // rotate only pieces of 2 or 3 letters
+            rotateIndex = (rotateIndex + 1) % 4
+            let nameArray = generateNameArray()
+            let rotateAction = SKAction.rotate(byAngle: -90 * GV.oneGrad, duration: 0.1)
+    //        mySprite.anchorPoint = CGPoint(x: 0.1, y: 0.1)
+            self.run(rotateAction)
+    //        addLettersToPositions()
+            for index in 0..<form![rotateIndex].points.count {
+                let searchName = "label\(index)"
+                guard let child = self.childNode(withName: searchName) else {
+                    continue
+                }
+                
+                let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
+                if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+                    (child as! SKSpriteNode).texture = SKTexture(imageNamed: nameArray[index])
+                }
+                child.run(rotateLetterAction)
+             }
+        }
     }
     
     

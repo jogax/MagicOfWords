@@ -176,6 +176,8 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         if GV.language.getText(.tcEnglishShort) == GV.actLanguage {
             englishAction.setValue(UIColor.red, forKey: "TitleTextColor")
         }
+        let image = UIImage()
+        englishAction.setValue(image, forKey: "image")
         alertController.addAction(englishAction)
         
         let germanAction = UIAlertAction(title: GV.language.getText(.tcGerman), style: .default, handler: {
@@ -414,14 +416,21 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             self.showGames(all: true)
         })
         alertController!.addAction(bestScoreAction)
-        //--------------------- chooseLanguageAction ---------------------
-        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+        //--------------------- SettingsAction ---------------------------
+        let settingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
             alert -> Void in
-            self.chooseLanguage()
+            self.showSettingsMenu()
         })
-        alertController!.addAction(chooseLanguageAction)
+        alertController!.addAction(settingsAction)
+
+//        //--------------------- chooseLanguageAction ---------------------
+//        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.chooseLanguage()
+//        })
+//        alertController!.addAction(chooseLanguageAction)
         //--------------------- nickNameAction ---------------------
-        
+
         nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
             alert -> Void in
             if GV.connectedToInternet && playerActivity != nil {
@@ -458,6 +467,52 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         #endif
         //--------------------- Present alert ---------------------
         present(alertController!, animated: true, completion: nil)
+
+    }
+    
+    private func showSettingsMenu() {
+        let myAlertController = UIAlertController(title: GV.language.getText(.tcSettings),
+                                            message: "",
+                                            preferredStyle: .alert)
+        //--------------------- chooseLanguageAction ---------------------
+        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.chooseLanguage()
+        })
+        myAlertController.addAction(chooseLanguageAction)
+        //--------------------- choose Style action -----------------------
+        let chooseStyleAction =  UIAlertAction(title: GV.language.getText(.tcChooseStyle), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.chooseStyle()
+        })
+        myAlertController.addAction(chooseStyleAction)
+        present(myAlertController, animated: true, completion: nil)
+    }
+    
+    private func chooseStyle() {
+        func setStyle(style: String) {
+            try! realm.safeWrite() {
+                GV.basicDataRecord.buttonType = style
+            }
+        }
+        let alertController = UIAlertController(title: GV.language.getText(.tcChooseStyle),
+                                                message: "",
+                                                preferredStyle: .alert)
+        let simpleStyleAction = UIAlertAction(title: GV.language.getText(.tcSimpleStyle), style: .default, handler: {
+            alert -> Void in
+            setStyle(style: GV.ButtonTypeNormal)
+            self.showMenu()
+        })
+        alertController.addAction(simpleStyleAction)
+        
+        let eliteStyleAction = UIAlertAction(title: GV.language.getText(.tcEliteStyle), style: .default, handler: {
+            alert -> Void in
+            setStyle(style: GV.ButtonTypeElite)
+            self.showMenu()
+        })
+        alertController.addAction(eliteStyleAction)
+        
+        present(alertController, animated: true, completion: nil)
 
     }
     

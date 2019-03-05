@@ -107,5 +107,8 @@ let enDictionary: [TextConstants: String] = [
     .tcIWillAdd:           " I will add",
     .tcIWillDelete:        " I will delete",
     .tcIWillSeparate:      " I will separate",
-    .tcMyCounts:           "I have added: %, separated: %, deleted: % words"
+    .tcMyCounts:           "I have added: %, separated: %, deleted: % words",
+    .tcChooseStyle:        "Choose a style for game",
+    .tcSimpleStyle:        "Simple",
+    .tcEliteStyle:         "Elite",
 ]

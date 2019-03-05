@@ -97,8 +97,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcCollectMandatory:    "Поиск обязательных слов",
     .tcCreateMandatory:     "Создание обязательных слов",
     .tcChangeWord:          " сменить",
-    .tcCongratulations1:    "Поздравляем! У вас есть все обязательные слова!",
-    .tcCongratulations2:    "Вы можете дальше играть и больше очков заработать или коснуться кнопку <Закончить>, чтобы закончить игру!",
+    .tcCongratulations1:    "Поздравляю! У тебя есть все обязательные слова!",
+    .tcCongratulations2:    "Ты можешь дальше играть и больше очков заработать или коснуться кнопку <Закончить>, чтобы закончить игру!",
     .tcContinuePlaying:     "Продолжать",
     .tcFinishGame:          "Закончить",
     .tcChoosedWord:         " Добавлено",
@@ -108,5 +108,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcIWillDelete:         " Я удаляю",
     .tcIWillSeparate:       " Я отделяю",
     .tcMyCounts:           "Я добавил:%, отделил:%, удалил:% слов",
+    .tcChooseStyle:        "Выбери стиль для игры",
+    .tcSimpleStyle:        "Простой",
+    .tcEliteStyle:         "Изящный",
 ]
 
