@@ -387,10 +387,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func showWordAndScore(word: SelectedWord, score: Int) {
         let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.04
         let textOnBalloon = word.word + " (" + String(score) + ")"
-        
-        let balloon = SKSpriteNode(imageNamed: "balloon.png")
-        let widthMultiplier: CGFloat = 0.1 + CGFloat(textOnBalloon.length) * (GV.onIpad ? 0.015 : 0.030)
-        balloon.size = CGSize(width: self.frame.size.width * widthMultiplier, height: self.frame.size.width * 0.10)
+        let elite = GV.basicDataRecord.buttonType == GV.ButtonTypeElite
+        let balloon = SKSpriteNode(imageNamed: elite ? "BalloonElite.png" : "BalloonSimple.png")
+//        if elite {
+            let width = textOnBalloon.width(font: myFont!) * 2.0
+            let height = textOnBalloon.height(font: myFont!) * 3.0
+            balloon.size = CGSize(width: width, height: height)
+//        } else {
+//            let widthMultiplier: CGFloat = 0.1 + CGFloat(textOnBalloon.length) * (GV.onIpad ? 0.015 : 0.030)
+//            balloon.size = CGSize(width: self.frame.size.width * widthMultiplier, height: self.frame.size.width * 0.10)
+//        }
+//        let widthMultiplier: CGFloat = 0.1 + CGFloat(textOnBalloon.length) * (GV.onIpad ? 0.015 : 0.030)
+//        balloon.size = CGSize(width: self.frame.size.width * widthMultiplier, height: self.frame.size.width * 0.10)
         balloon.zPosition = 1000
 //        let atY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
         let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
@@ -414,9 +422,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        balloon.addChild(scoreLabel)
         balloon.addChild(wordLabel)
         var actions = Array<SKAction>()
-        let waitAction = SKAction.wait(forDuration: 1.0)
-        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: endPosY), duration: 3.0)
-        let fadeAway = SKAction.fadeOut(withDuration: 2.5)
+        let waitAction = SKAction.wait(forDuration: 0.5)
+        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: endPosY), duration: 5.0)
+        let fadeAway = SKAction.fadeOut(withDuration: 3.0)
         let removeNode = SKAction.removeFromParent()
         actions.append(SKAction.sequence([waitAction, movingAction]))
         actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))
@@ -1403,8 +1411,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let center = CGPoint(x:self.frame.width * 0.08, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
         let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
-        let imageName = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple ? "previousGame" : "Left"
-        goToPreviousGameButton = createButton(imageName: "Left", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
+        let imageName = hasFrame ? "LeftSimple" : "LeftElite"
+        goToPreviousGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
         goToPreviousGameButton?.addTarget(self, action: #selector(self.goPreviousGame), for: .touchUpInside)
         self.view?.addSubview(goToPreviousGameButton!)
         self.view?.addSubview(goToPreviousGameButton!)
@@ -1418,7 +1426,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let center = CGPoint(x:self.frame.width * 0.92, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
         let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
-        let imageName = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple ? "nextGame" : "Right"
+        let imageName = hasFrame ? "RightSimple" : "RightElite"
         goToNextGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame )
         goToNextGameButton?.addTarget(self, action: #selector(self.goNextGame), for: .touchUpInside)
         self.view?.addSubview(goToNextGameButton!)
@@ -1497,7 +1505,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let center = CGPoint(x:self.frame.width * 0.05, y:self.frame.height * 0.08)
         let radius = self.frame.width * 0.04
         let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
-        goBackButton = createButton(imageName: "back", title: "", frame: frame, center: center, cornerRadius: radius, enabled: true, hasFrame: hasFrame)
+        let imageName = hasFrame ? "BackSimple" : "BackElite"
+        goBackButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: true, hasFrame: hasFrame)
         goBackButton!.addTarget(self, action: #selector(self.goBackTapped), for: .touchUpInside)
         self.view?.addSubview(goBackButton!)
     }
@@ -1516,7 +1525,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let center = CGPoint(x:self.frame.width * 0.95, y:self.frame.height * 0.08)
         let radius = self.frame.width * 0.04
         let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
-        undoButton = createButton(imageName: "undo", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
+        let imageName = hasFrame ? "UndoSimple" : "UndoElite"
+        undoButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
         undoButton?.addTarget(self, action: #selector(self.undoTapped), for: .touchUpInside)
         self.view?.addSubview(undoButton!)
     }

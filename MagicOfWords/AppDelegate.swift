@@ -238,9 +238,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 GV.basicDataRecord.keyWord = playerActivity![0].keyWord!
                             }
                         }
-                        if playerActivity![0].country != Locale.current.regionCode {
+                        if playerActivity![0].country != Locale.current.regionCode || playerActivity![0].territory != GV.language.getPreferredLanguage() {
                             try! RealmService.safeWrite() {
                                 playerActivity![0].country = Locale.current.regionCode
+                                playerActivity![0].territory = GV.language.getPreferredLanguage()
                             }
                         }
                     }
