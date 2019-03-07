@@ -109,7 +109,8 @@ enum TextConstants: Int {
     tcMyCounts,
     tcChooseStyle,
     tcSimpleStyle,
-    tcEliteStyle
+    tcEliteStyle,
+    tcGenerateBestScore
 
 }
 

@@ -1402,11 +1402,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.08, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
-        if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
-            goToPreviousGameButton = createButton(imageName: "Left", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: false )
-        } else {
-            goToPreviousGameButton = createButton(imageName: "previousGame", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled)
-        }
+        let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
+        let imageName = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple ? "previousGame" : "Left"
+        goToPreviousGameButton = createButton(imageName: "Left", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
         goToPreviousGameButton?.addTarget(self, action: #selector(self.goPreviousGame), for: .touchUpInside)
         self.view?.addSubview(goToPreviousGameButton!)
         self.view?.addSubview(goToPreviousGameButton!)
@@ -1419,11 +1417,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.92, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
-        if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
-            goToNextGameButton = createButton(imageName: "Right", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: false )
-        } else {
-            goToNextGameButton = createButton(imageName: "nextGame", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled )
-        }
+        let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
+        let imageName = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple ? "nextGame" : "Right"
+        goToNextGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame )
         goToNextGameButton?.addTarget(self, action: #selector(self.goNextGame), for: .touchUpInside)
         self.view?.addSubview(goToNextGameButton!)
     }
@@ -1500,7 +1496,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.05, y:self.frame.height * 0.08)
         let radius = self.frame.width * 0.04
-        goBackButton = createButton(imageName: "back", title: "", frame: frame, center: center, cornerRadius: radius, enabled: true)
+        let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
+        goBackButton = createButton(imageName: "back", title: "", frame: frame, center: center, cornerRadius: radius, enabled: true, hasFrame: hasFrame)
         goBackButton!.addTarget(self, action: #selector(self.goBackTapped), for: .touchUpInside)
         self.view?.addSubview(goBackButton!)
     }
@@ -1518,7 +1515,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.95, y:self.frame.height * 0.08)
         let radius = self.frame.width * 0.04
-        undoButton = createButton(imageName: "undo", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled)
+        let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
+        undoButton = createButton(imageName: "undo", title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
         undoButton?.addTarget(self, action: #selector(self.undoTapped), for: .touchUpInside)
         self.view?.addSubview(undoButton!)
     }

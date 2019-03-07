@@ -209,21 +209,12 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         let subview = (alertController.view.subviews.first?.subviews.first?.subviews.first!)! as UIView
         subview.layer.cornerRadius = 15
         subview.backgroundColor = UIColor(red: (255/255.0), green: (224/255.0), blue: (224/255.0), alpha: 1.0)
-
+        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
+            alert -> Void in
+            self.showMenu()
+        })
+        alertController.addAction(cancelAction)
         present(alertController, animated: true, completion: nil)
-//        GV.language.setLanguage(GV.language.getText(.tcEnglishShort))
-        //                    case String(TextConstants.tcGerman.rawValue):
-        //                        GV.language.setLanguage(GV.language.getText(.tcGermanShort))
-        //
-        //                    case String(TextConstants.tcHungarian.rawValue):
-        //                        GV.language.setLanguage(GV.language.getText(.tcHungarianShort))
-        //
-        //                    case String(TextConstants.tcRussian.rawValue):
-        //                        GV.language.setLanguage(GV.language.getText(.tcRussianShort))
-        //
-        //                   case String(TextConstants.tcCancel.rawValue):
-        //                        settingsSceneDelegate!.backFromSettingsScene()
-        //
     }
     
 //    override func viewDidLoad() {
@@ -486,7 +477,108 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             self.chooseStyle()
         })
         myAlertController.addAction(chooseStyleAction)
+        //-------------------- generate BestScoreForGame ------------------
+        #if DEBUG
+            let generateListAction =  UIAlertAction(title: GV.language.getText(.tcGenerateBestScore), style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.generateBestScoreList()
+                self.showMenu()
+            })
+            myAlertController.addAction(generateListAction)
+        #endif
+        let cancelAction =  UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.showMenu()
+        })
+        myAlertController.addAction(cancelAction)
+
         present(myAlertController, animated: true, completion: nil)
+    }
+    
+    var bestScoreItems: Results<BestScoreSync>?
+    var bestScoreNotificationToken: NotificationToken?
+    var bestScoreSubscription: SyncSubscription<BestScoreSync>!
+    var forGameItems: Results<BestScoreForGame>?
+    var forGameNotificationToken: NotificationToken?
+    var forGameSubscription: SyncSubscription<BestScoreForGame>!
+    var bestScoreSubscriptionToken: NotificationToken?
+    var forGameSubscriptionToken: NotificationToken?
+
+    private func deactivateSubscriptions() {
+        if forGameSubscription != nil {
+            forGameSubscriptionToken!.invalidate()
+            forGameSubscription!.unsubscribe()
+        }
+        if bestScoreSubscription != nil {
+            bestScoreSubscriptionToken!.invalidate()
+            bestScoreSubscription!.unsubscribe()
+        }
+    }
+
+    private func generateBestScoreList() {
+        deactivateSubscriptions()
+        bestScoreItems = RealmService.objects(BestScoreSync.self).filter("language = %@ AND score > 0", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+        bestScoreSubscription = bestScoreItems!.subscribe(named: "\(GV.actLanguage)bestScoreQuery")
+        bestScoreSubscriptionToken = bestScoreSubscription.observe(\.state) { [weak self]  state in
+            print("in Subscription!")
+            switch state {
+            case .creating:
+                print("creating")
+            // The subscription has not yet been written to the Realm
+            case .pending:
+                print("pending")
+                // The subscription has been written to the Realm and is waiting
+            // to be processed by the server
+            case .complete:
+                self!.forGameItems = RealmService.objects(BestScoreForGame.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+                self!.forGameSubscription = self!.forGameItems!.subscribe(named: "\(GV.actLanguage)bestForGameList")
+                self!.forGameSubscriptionToken = self!.forGameSubscription.observe(\.state) { [weak self]  state in
+                    switch state {
+                    case .creating:
+                        print("creating")
+                    // The subscription has not yet been written to the Realm
+                    case .pending:
+                        print("pending")
+                        // The subscription has been written to the Realm and is waiting
+                    // to be processed by the server
+                    case .complete:
+                        print("Both table are complete")
+                        for gameNumber in 0...999 {
+                             if self!.bestScoreItems!.filter("gameNumber = %d", gameNumber).count > 0 {
+                                if self!.forGameItems!.filter("gameNumber = %d", gameNumber).count == 0 {
+                                    let item = self!.bestScoreItems!.filter("gameNumber = %d", gameNumber).sorted(byKeyPath: "score", ascending: false).first!
+                                    let bestScoreForGameItem = BestScoreForGame()
+                                    bestScoreForGameItem.combinedPrimary = String(gameNumber) + item.language
+                                    bestScoreForGameItem.gameNumber = gameNumber
+                                    bestScoreForGameItem.language = item.language
+                                    bestScoreForGameItem.bestScore = item.score
+                                    bestScoreForGameItem.timeStamp = item.timeStamp
+                                    bestScoreForGameItem.owner = item.owner!
+                                    try! RealmService.safeWrite() {
+                                        RealmService.add(bestScoreForGameItem)
+                                    }
+                                }
+                            }
+                        }
+                    case .invalidated:
+                        print("invalitdated")
+                    // The subscription has been removed
+                    case .error(let error):
+                        print("error: \(error)")
+                        // An error occurred while processing the subscription
+                    }
+                }
+
+            case .invalidated:
+                print("invalitdated")
+            // The subscription has been removed
+            case .error(let error):
+                print("error: \(error)")
+                // An error occurred while processing the subscription
+            }
+            
+        }
+
     }
     
     private func chooseStyle() {
@@ -500,7 +592,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
                                                 preferredStyle: .alert)
         let simpleStyleAction = UIAlertAction(title: GV.language.getText(.tcSimpleStyle), style: .default, handler: {
             alert -> Void in
-            setStyle(style: GV.ButtonTypeNormal)
+            setStyle(style: GV.ButtonTypeSimple)
             self.showMenu()
         })
         alertController.addAction(simpleStyleAction)

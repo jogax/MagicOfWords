@@ -40,7 +40,7 @@ struct GV {
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2
     static let GameStatusContinued = 3
-    static let ButtonTypeNormal = "N"
+    static let ButtonTypeSimple = "S"
     static let ButtonTypeElite = "E"
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()

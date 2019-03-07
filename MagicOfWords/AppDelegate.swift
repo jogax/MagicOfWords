@@ -86,18 +86,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 20, // new item words
+            schemaVersion: 21, // new item words
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
                 switch oldSchemaVersion {
-                case 0...13:
+                case 0...19:
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
                 default: migration.enumerateObjects(ofType: BasicDataModel.className())
                     { oldObject, newObject in
-                            newObject!["buttonType"] = GV.ButtonTypeNormal
+                            newObject!["buttonType"] = GV.ButtonTypeSimple
                     }
 
                 }
@@ -222,17 +222,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             playerActivityItem.creationTime = Date()
                             playerActivityItem.name = GV.basicDataRecord.myName
                             playerActivityItem.nickName = GV.basicDataRecord.myNickname
+                            playerActivityItem.keyWord = GV.basicDataRecord.keyWord
                             playerActivityItem.isOnline = true
                             playerActivityItem.onlineSince = getLocalDate()
                             playerActivityItem.onlineTime = 0
                             playerActivityItem.territory = GV.language.getPreferredLanguage()
+                            playerActivityItem.country = Locale.current.regionCode
                             playerActivityItem.deviceType = UIDevice().modelName
-                            realmSync?.add(playerActivityItem)
+                            realmSync!.add(playerActivityItem)
                         }
-                    } 
+                    }  else {
+                        if GV.basicDataRecord.notSaved {
+                            try! realm.safeWrite() {
+                                GV.basicDataRecord.myNickname = playerActivity![0].nickName!
+                                GV.basicDataRecord.keyWord = playerActivity![0].keyWord!
+                            }
+                        }
+                        if playerActivity![0].country != Locale.current.regionCode {
+                            try! RealmService.safeWrite() {
+                                playerActivity![0].country = Locale.current.regionCode
+                            }
+                        }
+                    }
                     self.playerNotificationToken = playerActivity!.observe {  (changes) in
                         if playerActivity!.count > 0 {
                             GV.expertUser = playerActivity!.first!.expertUser
+                        }
+                    }
+                    if GV.basicDataRecord.notSaved {
+                        try! realm.safeWrite() {
+                            GV.basicDataRecord.notSaved = false
                         }
                     }
 

@@ -66,7 +66,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcCount:               "Штк.",
     .tcLength:              "Дл.",
     .tcMinutes:             "Мин.",
-    .tcShowAllWords:        "Покажи все слова",
+    .tcShowAllWords:        "Мои слова",//"Покажи все слова",
     .tcWordsOverLetter:     "Слова над буквой",
     .tcMe:                  "Я",
     .tcShowRealmCloud:      "Покажи Realm Cloud",
@@ -111,5 +111,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcChooseStyle:        "Выбери стиль для игры",
     .tcSimpleStyle:        "Простой",
     .tcEliteStyle:         "Изящный",
+    .tcGenerateBestScore:  "Создать список лучших результатов",
 ]
 

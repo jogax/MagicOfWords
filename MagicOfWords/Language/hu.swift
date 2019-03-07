@@ -65,7 +65,7 @@ let huDictionary: [TextConstants: String] = [
     .tcCount:               "Db.",
     .tcLength:              "Hossz",
     .tcMinutes:             "Perc",
-    .tcShowAllWords:        "Mutasd az összes szót",
+    .tcShowAllWords:        "Szavaim", //"Mutasd az összes szót",
     .tcWordsOverLetter:     "Szavak a betü felett",
     .tcMe:                  "Én",
     .tcShowRealmCloud:      "Mutasd a Realm Cloud-ot",
@@ -110,4 +110,5 @@ let huDictionary: [TextConstants: String] = [
     .tcChooseStyle:        "Válassz egy játékstílust",
     .tcSimpleStyle:        "Egyszerű",
     .tcEliteStyle:         "Elegáns",
+    .tcGenerateBestScore:  "Legjobb eredmények lista generálása",
 ]

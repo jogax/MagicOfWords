@@ -385,8 +385,9 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: 8)/*, color: color*/) // My Score
         cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: 4) )
         if gamesForShow[indexPath.row].finished {
-            let image = UIImage(named: "hook.png")
-            cell.addButton(image: image!, callBack: buttonTapped)
+//            let image = UIImage(named: "hook")
+            let image = UIImage(named: "hook")!.resizeImage(newWidth: lineHeight)
+            cell.addButton(image: image, callBack: buttonTapped)
         }
         return cell
     }

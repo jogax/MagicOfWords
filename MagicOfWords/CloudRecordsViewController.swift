@@ -603,18 +603,20 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         bestScoreTable.removeAll()
         switch tableType {
         case .BestScoreSync:
-            let maxGameNumber = bestScoreItems!.last!.gameNumber
-            for actGameNumber in 1...maxGameNumber {
-                let scoreItems = bestScoreItems!.filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false)
-                for (place, item) in scoreItems.enumerated() {
-                    var bestScoreData = BestScoreData()
-                    bestScoreData.gameNumber = actGameNumber
-                    bestScoreData.place = place + 1
-                    bestScoreData.score = item.score
-                    if item.owner != nil {
-                        bestScoreData.nickName = item.owner!.nickName!
+            if bestScoreItems!.count > 0 {
+                let maxGameNumber = bestScoreItems!.last!.gameNumber
+                for actGameNumber in 1...maxGameNumber {
+                    let scoreItems = bestScoreItems!.filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false)
+                    for (place, item) in scoreItems.enumerated() {
+                        var bestScoreData = BestScoreData()
+                        bestScoreData.gameNumber = actGameNumber
+                        bestScoreData.place = place + 1
+                        bestScoreData.score = item.score
+                        if item.owner != nil {
+                            bestScoreData.nickName = item.owner!.nickName!
+                        }
+                        bestScoreTable.append(bestScoreData)
                     }
-                    bestScoreTable.append(bestScoreData)
                 }
             }
         case .BestScoreForGame:
@@ -640,17 +642,17 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                         generateRecord = true
                     }
                     if generateRecord {
-    //                    let item = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false).first!
-    //                    let bestScoreForGameItem = BestScoreForGame()
-    //                    bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
-    //                    bestScoreForGameItem.gameNumber = actGameNumber
-    //                    bestScoreForGameItem.language = item.language
-    //                    bestScoreForGameItem.bestScore = item.score
-    //                    bestScoreForGameItem.timeStamp = item.timeStamp
-    //                    bestScoreForGameItem.owner = item.owner!
-    //                    try! RealmService.safeWrite() {
-    //                        RealmService.add(bestScoreForGameItem)
-    //                    }
+                        let item = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false).first!
+                        let bestScoreForGameItem = BestScoreForGame()
+                        bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
+                        bestScoreForGameItem.gameNumber = actGameNumber
+                        bestScoreForGameItem.language = item.language
+                        bestScoreForGameItem.bestScore = item.score
+                        bestScoreForGameItem.timeStamp = item.timeStamp
+                        bestScoreForGameItem.owner = item.owner!
+                        try! RealmService.safeWrite() {
+                            RealmService.add(bestScoreForGameItem)
+                        }
                     }
                 }
             }

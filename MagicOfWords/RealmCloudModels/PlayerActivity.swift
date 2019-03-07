@@ -21,6 +21,7 @@ class PlayerActivity: Object {
     @objc dynamic var countOnlines: Int = 0
     @objc dynamic var creationTime: Date?
     @objc dynamic var territory: String?
+    @objc dynamic var country: String?
     @objc dynamic var deviceType: String?
     @objc dynamic var expertUser: Bool = false
     @objc dynamic var lastTouched: Date?

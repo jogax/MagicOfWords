@@ -66,7 +66,7 @@ let enDictionary: [TextConstants: String] = [
     .tcCount:               "Cnt:",
     .tcLength:              "Len:",
     .tcMinutes:             "Min:",
-    .tcShowAllWords:        "Show all words",
+    .tcShowAllWords:        "My Words", //"Show all words",
     .tcWordsOverLetter:   "Words over the letter",
     .tcMe:                  "Me",
     .tcShowRealmCloud:      "Show Realm Cloud",
@@ -111,4 +111,5 @@ let enDictionary: [TextConstants: String] = [
     .tcChooseStyle:        "Choose a style for game",
     .tcSimpleStyle:        "Simple",
     .tcEliteStyle:         "Elite",
+    .tcGenerateBestScore:  "Generate BestScore List",
 ]

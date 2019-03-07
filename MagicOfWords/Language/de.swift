@@ -66,7 +66,7 @@ let deDictionary: [TextConstants: String] = [
     .tcCount:               "Cnt:",
     .tcLength:              "Len:",
     .tcMinutes:             "Min:",
-    .tcShowAllWords:        "Zeige alle Wörter",
+    .tcShowAllWords:        "Meine Wörter",//"Zeige alle Wörter",
     .tcWordsOverLetter:   "Wörter über den Buchstaben",
     .tcMe:                  "Ich",
     .tcShowRealmCloud:      "Zeige Realm Cloud",
@@ -111,6 +111,7 @@ let deDictionary: [TextConstants: String] = [
     .tcChooseStyle:        "Wähle einen Stil für das Spiel",
     .tcSimpleStyle:        "Einfach",
     .tcEliteStyle:         "Elite",
+    .tcGenerateBestScore:  "BestScore-Liste generieren",
 ]
 
 

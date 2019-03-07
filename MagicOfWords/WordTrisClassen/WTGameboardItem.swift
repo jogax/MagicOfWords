@@ -249,7 +249,7 @@ class WTGameboardItem: SKSpriteNode {
             self.countOccurencesInWords -= 1
         }
         
-        if toColor == .myGreenColor || (GV.basicDataRecord.buttonType == GV.ButtonTypeNormal && (toColor == .myGoldColor || toColor == .myDarkGoldColor)) {
+        if toColor == .myGreenColor || (GV.basicDataRecord.buttonType == GV.ButtonTypeSimple && (toColor == .myGoldColor || toColor == .myDarkGoldColor)) {
             self.countWordsLabel.text = String(countOccurencesInWords)
             self.countWordsLabel.fontSize = self.fontSize * (countOccurencesInWords < 10 ? 0.7 : 0.6)
         } else {
