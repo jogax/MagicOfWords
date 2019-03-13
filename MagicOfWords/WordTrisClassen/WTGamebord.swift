@@ -781,15 +781,85 @@ class WTGameboard: SKShapeNode {
         }
         return false
     }
+    var countReadyAnimations = 0
     
     public func clearGreenFieldsForNextRound() {
+        countReadyAnimations = 0
+//        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+//            guard let self = self else {
+//                return
+//            }
+//            for col in 0..<self.countCols {
+//                for row in 0..<self.countCols {
+//                    self.animateClearing(col: col, row: row)
+//                    GV.gameArray[col][row].clearIfUsed()
+//                    GV.gameArray[col][row].resetCountOccurencesInWords()
+//                }
+//            }
+//            // 2
+//            DispatchQueue.main.async { [weak self] in
+//                // 3
+//                while(self!.countReadyAnimations < 100) {
+//                    sleep(1)
+//                }
+//            }
+//        }
         for col in 0..<countCols {
             for row in 0..<countCols {
-                GV.gameArray[col][row].clearIfUsed()
-                GV.gameArray[col][row].resetCountOccurencesInWords()
+                animateClearing(col: col, row: row)
+//                GV.gameArray[col][row].clearIfUsed()
+//                GV.gameArray[col][row].resetCountOccurencesInWords()
             }
         }
-        roundInfos.append(RoundInfos())
+//        delay(bySeconds: 1) {
+//            if self.countReadyAnimations == 100 {
+                self.roundInfos.append(RoundInfos())
+//                return
+//            }
+//        }
+    }
+    
+    var waiting = 0.1
+    
+    private func animateClearing(col: Int, row:Int) {
+        if GV.buttonType == GV.ButtonTypeSimple {
+            return
+        }
+        if GV.gameArray[col][row].status != .wholeWord {
+            return
+        }
+        let greenSprite = (GV.gameArray[col][row]).copyMe(imageNamed: "GreenSprite0000")
+        greenSprite.zPosition = 1000
+//        greenSprite.texture = SKTexture(imageNamed: "GreenSprite0000")
+
+        let childToRemove = greenSprite.childNode(withName: "counter")
+        if childToRemove != nil {
+            childToRemove!.removeFromParent()
+        }
+        greenSprite.position = grid!.gridPosition(col: col, row: row)
+        grid!.addChild(greenSprite)
+        var actions = Array<SKAction>()
+        let waitAction = SKAction.wait(forDuration: waiting)
+        waiting += 0.05
+        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: parent!.frame.size.height * 0.1), duration: 0.5)
+        let removeNodeAction = SKAction.removeFromParent()
+        actions.append(SKAction.sequence([waitAction, movingAction, removeNodeAction]))
+        //        actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))
+        let group = SKAction.group(actions)
+        GV.greenSpriteArray.append(greenSprite)
+//        self.addChild(greenSprite)
+        greenSprite.run(group, completion: {
+            GV.gameArray[col][row].clearIfUsed()
+            GV.gameArray[col][row].resetCountOccurencesInWords()
+            self.countReadyAnimations += 1
+            if self.countReadyAnimations == 100 {
+                for sprite in GV.greenSpriteArray {
+                    sprite.removeFromParent()
+                }
+                GV.greenSpriteArray.removeAll()
+            }
+        }
+)
     }
     
     public func removeFromGameboard(sprite: WTPiece) {
@@ -803,14 +873,14 @@ class WTGameboard: SKShapeNode {
         }
     }
     
-//    public func clearGameArray() {
-//        for row in 0..<countCols {
-//            for col in 0..<countCols {
-//                GV.gameArray[col][row].remove()
-//            }
-//        }
-//    }
-//    
+    public func clearGameArray() {
+        for row in 0..<countCols {
+            for col in 0..<countCols {
+                GV.gameArray[col][row].remove()
+            }
+        }
+    }
+    
     public func getCellPosition(col: Int, row: Int)->CGPoint {
         let addPosition = grid!.position
         return grid!.gridPosition(col: col, row: row) + addPosition
@@ -853,6 +923,25 @@ class WTGameboard: SKShapeNode {
             }
         }
     }
+    
+    public func delay(bySeconds seconds: Double, dispatchLevel: DispatchLevel = .main, closure: @escaping () -> Void) {
+        let dispatchTime = DispatchTime.now() + seconds
+        dispatchLevel.dispatchQueue.asyncAfter(deadline: dispatchTime, execute: closure)
+    }
+    
+    public enum DispatchLevel {
+        case main, userInteractive, userInitiated, utility, background
+        var dispatchQueue: DispatchQueue {
+            switch self {
+            case .main:                 return DispatchQueue.main
+            case .userInteractive:      return DispatchQueue.global(qos: .userInteractive)
+            case .userInitiated:        return DispatchQueue.global(qos: .userInitiated)
+            case .utility:              return DispatchQueue.global(qos: .utility)
+            case .background:           return DispatchQueue.global(qos: .background)
+            }
+        }
+    }
+
 
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

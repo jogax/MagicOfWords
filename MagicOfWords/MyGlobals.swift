@@ -42,6 +42,29 @@ struct GV {
     static let GameStatusContinued = 3
     static let ButtonTypeSimple = "S"
     static let ButtonTypeElite = "E"
+    static var buttonType = ButtonTypeElite
+    static let LabelFontElite = "CourierNewPS-BoldMT"
+    static let LabelFontSimple = "CourierNewPS-BoldMT"
+    static let FontTypeElite = "TimesNewRomanPS-BoldMT"
+    static let FontTypeSimple = "TimesNewRomanPS-BoldMT"
+    static let PieceFontElite = "HelveticaNeue-Light"//"HelveticaNeue-Thin" //"GillSans-Light"
+    static let PieceFontSimple = "KohinoorBangla-Regular"
+    static var actFont: String {
+        get {
+            return buttonType == ButtonTypeElite ? FontTypeElite : FontTypeSimple
+        }
+    }
+    static var actLabelFont: String {
+        get {
+            return buttonType == ButtonTypeElite ? LabelFontElite : LabelFontSimple
+        }
+    }
+    static var actPieceFont: String {
+        get {
+            return buttonType == ButtonTypeElite ? PieceFontElite : PieceFontSimple
+        }
+    } 
+    static var playing = false
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()
     static let frequencyString = ":freq:"
@@ -69,6 +92,8 @@ struct GV {
     static var bonusScore = 0
     static var totalScore = 0
     static var mandatoryWords = [String]()
+    static var greenSpriteArray = [WTGameboardItem]()
+
     static var myUser: SyncUser? = nil {
         willSet(newValue) {
             for callBack in callBackMyUser {

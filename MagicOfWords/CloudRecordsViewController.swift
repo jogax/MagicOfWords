@@ -16,10 +16,11 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     var showPlayerActivityView: WTTableView? = WTTableView()
     var headerLine = ""
     let color = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
-    var lengthOfNickName = 18
-    var lengthOfKeyWord = 12
+    var lengthOfNickName = 16
+    var lengthOfKeyWord = 9
+    var lengthOfComment = 9
     var lengthOfIsOnline = 0
-    var lengthOfOnlineTime = 10
+    var lengthOfOnlineTime = 9
     var lengthOfGameNumber = 6
     var lengthOfScore = 5
     var lengthOfPlace = 5
@@ -28,7 +29,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     
     
     //    var lengthOfOnlineSince = 0
-    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
+    let myFont = UIFont(name: GV.actLabelFont, size: GV.onIpad ? 18 : 12)
     var tableType: TableType = .Players
     
     func didTappedButton(tableView: UITableView, indexPath: IndexPath, buttonName: String) {
@@ -116,6 +117,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             cell.addColumn(text: " " + (playerTable[indexPath.row].nickName.fixLength(length: lengthOfNickName - 4, leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
             cell.addColumn(text: (playerTable[indexPath.row].keyWord.fixLength(length: lengthOfKeyWord, leadingBlanks: false)), color: actColor)
 //            cell.addColumn(text: String(playerTable[indexPath.row].isOnline).fixLength(length: lengthOfIsOnline, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: (playerTable[indexPath.row].comment.fixLength(length: 10, leadingBlanks: false)), color: actColor)
             cell.addColumn(text: String(playerTable[indexPath.row].onlineTime.HourMinSec).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
         case .BestScoreSync:
             let actColor = (bestScoreTable[indexPath.row].gameNumber % 2 == 0 ? UIColor.white : color)
@@ -170,7 +172,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         case .Players:
             text1 = "\(GV.language.getText(.tcNickName)) ".fixLength(length: lengthOfNickName, center: true)
             text2 = "\(GV.language.getText(.tcKeywordHeader)) ".fixLength(length: lengthOfKeyWord, center: true)
-//            text3 = "\(GV.language.getText(.tcIsOnline)) ".fixLength(length: lengthOfIsOnline, center: true)
+            text3 = "\(GV.language.getText(.tcComment)) ".fixLength(length: lengthOfComment, center: true)
             text4 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengthOfOnlineTime, center: true)
         case .BestScoreSync:
             text1 = "\(GV.language.getText(.tcGameNumber))".fixLength(length: lengthOfGameNumber, center: true)
@@ -256,7 +258,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     let playersTitle = "Player"
     let allTitle = "All"
     let bestTitle = "Best"
-    let myTitleFont = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
+    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 18)
     var sortUp = true
     var buttonsCreated = false
     enum TableType: Int {
@@ -317,7 +319,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         if title.length > 0 {
             button.setTitle(title, for: .normal)
             button.setTitleColor(UIColor.black, for: .normal)
-            button.titleLabel?.font = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
+            button.titleLabel?.font = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 18)
             
         }
         button.backgroundColor = bgColor
@@ -402,8 +404,9 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     
     private func showPlayerActivity() {
         deactivateSubscriptions()
-        self.playerActivityItems = RealmService.objects(PlayerActivity.self).sorted(byKeyPath: "nickName", ascending: true)
-        playerSubscription = playerActivityItems!.subscribe(named: "playerActivityQuery")
+        let sort = "myCommentar"
+        self.playerActivityItems = RealmService.objects(PlayerActivity.self).sorted(byKeyPath: sort, ascending: true)
+        playerSubscription = playerActivityItems!.subscribe(named: "playerActivitySortedBy:\(sort)")
         playerSubscriptionToken = playerSubscription!.observe(\.state) { [weak self]  state in
 //                print("in Subscription!")
             switch state {
@@ -486,6 +489,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     struct PlayerData {
         var nickName = ""
         var keyWord = ""
+        var comment = ""
         var isOnline = false
         var onlineTime = 0
     }
@@ -495,11 +499,12 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     private func generatePlayerData() {
         var countOnlineUser = 0
         playerTable.removeAll()
-        let users = playerActivityItems!.sorted(byKeyPath: "nickName")
+        let users = playerActivityItems!.sorted(byKeyPath: "myCommentar")
         for user in users {
             var playerData = PlayerData()
             playerData.nickName = user.nickName!
             playerData.keyWord = user.keyWord == nil ? "" : user.keyWord!
+            playerData.comment = user.myCommentar == nil ? "" : user.myCommentar!
             if user.lastTouched != nil {
                 playerData.isOnline = user.isOnline && getLocalDate().timeIntervalSince(user.lastTouched!) <= 60 
             } else {
@@ -687,7 +692,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     private func showBestScoreForGame() {
         deactivateSubscriptions()
         forGameItems = RealmService.objects(BestScoreForGame.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
-        forGameSubscription = forGameItems!.subscribe(named: "bestForGameQuery")
+        forGameSubscription = forGameItems!.subscribe(named: "\(GV.actLanguage)bestForGameQuery")
         forGameSubscriptionToken = forGameSubscription.observe(\.state) { [weak self]  state in
             switch state {
             case .creating:

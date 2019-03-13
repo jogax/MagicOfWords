@@ -18,6 +18,7 @@ class PlayerActivity: Object {
     @objc dynamic var isOnline: Bool = false
     @objc dynamic var onlineSince: Date?
     @objc dynamic var onlineTime: Int = 0
+    @objc dynamic var playingTime: Int = 0
     @objc dynamic var countOnlines: Int = 0
     @objc dynamic var creationTime: Date?
     @objc dynamic var territory: String?

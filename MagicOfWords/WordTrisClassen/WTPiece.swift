@@ -312,15 +312,15 @@ class WTPiece: SKSpriteNode {
             let col = form.points[index] / 10
             let row = form.points[index] % 10
             let position = gridPosition(col: col, row: row)
-            let width = blockSize * (GV.basicDataRecord.buttonType == GV.ButtonTypeElite ? 1.0 : 0.9)
+            let width = blockSize * (GV.buttonType == GV.ButtonTypeElite ? 1.0 : 0.9)
             let frameForLetter = SKSpriteNode(color: .clear, size: CGSize(width: width, height: width))
             frameForLetter.position = position
             frameForLetter.color = .white
             let name = nameArray[index]
-            if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+            if GV.buttonType == GV.ButtonTypeElite {
                 frameForLetter.texture = SKTexture(imageNamed: name)
             }
-            let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+            let label = SKLabelNode(fontNamed: GV.actPieceFont)
 //            label.position = position
             label.text = letters[index]
             label.fontColor = .black
@@ -385,7 +385,7 @@ class WTPiece: SKSpriteNode {
                 }
                 
                 let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
-                if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+                if GV.buttonType == GV.ButtonTypeElite {
                     (child as! SKSpriteNode).texture = SKTexture(imageNamed: nameArray[index])
                 }
                 child.run(rotateLetterAction)

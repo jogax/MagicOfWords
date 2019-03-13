@@ -422,7 +422,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
     let playersTitle = "Player"
     let allTitle = "All"
     let bestTitle = "Best"
-    let myTitleFont = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
+    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 18)
     var sortUp = true
     var buttonsCreated = false
     var buttonTable = [UIButton]()
@@ -481,7 +481,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         if title.length > 0 {
             button.setTitle(title, for: .normal)
             button.setTitleColor(UIColor.black, for: .normal)
-            button.titleLabel?.font = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
+            button.titleLabel?.font = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 18)
             
         }
         button.backgroundColor = bgColor

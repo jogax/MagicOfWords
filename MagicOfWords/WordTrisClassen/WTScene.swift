@@ -206,12 +206,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let view = UIView()
         var width:CGFloat = title.width(withConstrainedHeight: 0, font: myFont!)
         var length: Int = 0
+        let widthOfChar = "A".width(font: myFont!)
+        let lengthOfTableView = Int(tableView.frame.width / widthOfChar) + 1
         switch tableType {
         case .ShowAllWords:
             if section == 0 {
-                text = GV.language.getText(.tcCollectedRequiredWords).fixLength(length: title.length, center: true)
+                let suffix = " (\(mandatoryWordsForShow!.countWords)/\(mandatoryWordsForShow!.countAllWords)/\(mandatoryWordsForShow!.score))"
+                text = (GV.language.getText(.tcCollectedRequiredWords) + suffix).fixLength(length: lengthOfTableView, center: true)
             } else {
-                text = GV.language.getText(.tcCollectedOwnWords).fixLength(length: title.length, center: true)
+                let suffix = " (\(ownWordsForShow!.countWords)/\(ownWordsForShow!.countAllWords)/\(ownWordsForShow!.score))"
+                text = (GV.language.getText(.tcCollectedOwnWords) + suffix).fixLength(length: lengthOfTableView, center: true)
             }
         case .ShowWordsOverPosition:
             text = GV.language.getText(.tcWordsOverLetter).fixLength(length: title.length, center: true)
@@ -290,17 +294,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         switch tableType {
         case .ShowAllWords:
             if indexPath.section == 0 {
-                cell.addColumn(text: "  " + mandatoryWordsForShow[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
-                cell.addColumn(text: String(mandatoryWordsForShow[indexPath.row].counter).fixLength(length: lengthOfCnt), color: color) // Counter column
-                cell.addColumn(text: String(mandatoryWordsForShow[indexPath.row].word.length).fixLength(length: lengthOfLength))
-                cell.addColumn(text: String(mandatoryWordsForShow[indexPath.row].score).fixLength(length: lengthOfScore), color: color) // Score column
-                cell.addColumn(text: "+\(mandatoryWordsForShow[indexPath.row].minutes)".fixLength(length: lengthOfMin))
+                let wordForShow = mandatoryWordsForShow!.words[indexPath.row]
+                cell.addColumn(text: "  " + wordForShow.word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
+                cell.addColumn(text: String(wordForShow.counter).fixLength(length: lengthOfCnt), color: color) // Counter column
+                cell.addColumn(text: String(wordForShow.word.length).fixLength(length: lengthOfLength))
+                cell.addColumn(text: String(wordForShow.score).fixLength(length: lengthOfScore), color: color) // Score column
+                cell.addColumn(text: "+\(wordForShow.minutes)".fixLength(length: lengthOfMin))
             } else {
-                cell.addColumn(text: "  " + ownWordsForShow[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
-                cell.addColumn(text: String(ownWordsForShow[indexPath.row].counter).fixLength(length: lengthOfCnt), color: color) // Counter column
-                cell.addColumn(text: String(ownWordsForShow[indexPath.row].word.length).fixLength(length: lengthOfLength))
-                cell.addColumn(text: String(ownWordsForShow[indexPath.row].score).fixLength(length: lengthOfScore), color: color) // Score column
-                cell.addColumn(text: "+\(ownWordsForShow[indexPath.row].minutes)".fixLength(length: lengthOfMin))
+                let wordForShow = ownWordsForShow!.words[indexPath.row]
+                cell.addColumn(text: "  " + wordForShow.word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
+                cell.addColumn(text: String(wordForShow.counter).fixLength(length: lengthOfCnt), color: color) // Counter column
+                cell.addColumn(text: String(wordForShow.word.length).fixLength(length: lengthOfLength))
+                cell.addColumn(text: String(wordForShow.score).fixLength(length: lengthOfScore), color: color) // Score column
+                cell.addColumn(text: "+\(wordForShow.minutes)".fixLength(length: lengthOfMin))
              }
         case .ShowWordsOverPosition:
             cell.addColumn(text: "  " + wordList[indexPath.row].word.fixLength(length: lengthOfWord + 2, leadingBlanks: false)) // WordColumn
@@ -387,33 +393,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func showWordAndScore(word: SelectedWord, score: Int) {
         let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.04
         let textOnBalloon = word.word + " (" + String(score) + ")"
-        let elite = GV.basicDataRecord.buttonType == GV.ButtonTypeElite
-        let balloon = SKSpriteNode(imageNamed: elite ? "BalloonElite.png" : "BalloonSimple.png")
-//        if elite {
-            let width = textOnBalloon.width(font: myFont!) * 2.0
-            let height = textOnBalloon.height(font: myFont!) * 3.0
-            balloon.size = CGSize(width: width, height: height)
-//        } else {
-//            let widthMultiplier: CGFloat = 0.1 + CGFloat(textOnBalloon.length) * (GV.onIpad ? 0.015 : 0.030)
-//            balloon.size = CGSize(width: self.frame.size.width * widthMultiplier, height: self.frame.size.width * 0.10)
-//        }
-//        let widthMultiplier: CGFloat = 0.1 + CGFloat(textOnBalloon.length) * (GV.onIpad ? 0.015 : 0.030)
-//        balloon.size = CGSize(width: self.frame.size.width * widthMultiplier, height: self.frame.size.width * 0.10)
-        balloon.zPosition = 1000
+        let elite = GV.buttonType == GV.ButtonTypeElite
+        let balloon = SKSpriteNode(imageNamed: elite ? "bubbleGoldElite" : "BalloonSimple")
+        let width = textOnBalloon.width(font: myFont!) * 2.0
+        let height = textOnBalloon.height(font: myFont!) * 3.0
+        balloon.size = CGSize(width: width, height: height)
+        balloon.zPosition = 10
 //        let atY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
-        let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
+//        let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
+        let startPos = CGPoint(x: self.frame.width * 0.5, y: self.frame.maxY - allWordsButton!.frame.maxY + balloon.size.height * 2)
 //        let startPosY = startPos.y
-        let endPosY = score > 0 ? self.frame.size.height * 0.80 : self.frame.size.height * -0.04
+//        let endPosY = score > 0 ? self.frame.size.height * 0.80 : self.frame.size.height * -0.04
         balloon.position = CGPoint(x: startPos.x, y: startPos.y )
         self.addChild(balloon)
-        let scoreLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+        let scoreLabel = SKLabelNode(fontNamed: GV.actFont)
         scoreLabel.text = String(score)
 //        scoreLabel.verticalAlignmentMode = .center
         scoreLabel.position = CGPoint(x: balloon.size.width * 0, y: -balloon.size.width * 0.40)
         scoreLabel.horizontalAlignmentMode = .center
         scoreLabel.fontSize = fontSize
         scoreLabel.fontColor = SKColor.blue
-        let wordLabel = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
+        let wordLabel = SKLabelNode(fontNamed: GV.actFont)
         wordLabel.text = textOnBalloon
         wordLabel.verticalAlignmentMode = .center
         scoreLabel.position = CGPoint(x: balloon.size.width * 0, y: balloon.size.width * 0.20)
@@ -423,11 +423,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         balloon.addChild(wordLabel)
         var actions = Array<SKAction>()
         let waitAction = SKAction.wait(forDuration: 0.5)
-        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: endPosY), duration: 5.0)
-        let fadeAway = SKAction.fadeOut(withDuration: 3.0)
+//        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: endPosY), duration: 5.0)
+        let scaleUpAction = SKAction.scale(by: 2.0, duration: 0.5)
+        let scaleDownAction = SKAction.scale(to: 1.0, duration: 0.5)
+        let fadeAway = SKAction.fadeOut(withDuration: 0.2)
         let removeNode = SKAction.removeFromParent()
-        actions.append(SKAction.sequence([waitAction, movingAction]))
-        actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))
+        actions.append(SKAction.sequence([waitAction, scaleUpAction, scaleDownAction, scaleUpAction, scaleDownAction, scaleUpAction, scaleDownAction, fadeAway, removeNode/*movingAction*/]))
+//        actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))
         let group = SKAction.group(actions);
         balloon.run(group)
     }
@@ -812,9 +814,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let pieceArrayCenterY: CGFloat = 0.08
     
     private func createHeader() {
-        let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
+        let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
         if self.childNode(withName: timeName) == nil {
-            timeLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT") // Snell Roundhand")
+            timeLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT") // Snell Roundhand")
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let xPosition = self.frame.size.width * 0.85
             timeLabel.position = CGPoint(x: xPosition, y: YPosition)
@@ -830,7 +832,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let gameNumber = GV.playingRecord.gameNumber
             let text = GV.language.getText(.tcHeader, values: String(gameNumber), String(0))
-            headerLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
+            headerLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
             headerLabel.name = String(headerName)
             headerLabel.fontSize = fontSize
@@ -850,7 +852,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let YPosition: CGFloat = self.frame.height * bestScoreLinePosition
             //            let text = GV.language.getText(.tcBestScoreHeader, values: bestOnlineRecord!.player, bestOnlineRecord!.score)
             let text = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:15), bestName)
-            bestScoreHeaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
+            bestScoreHeaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             bestScoreHeaderLabel.text = text
             bestScoreHeaderLabel.name = String(bestScoreName)
             bestScoreHeaderLabel.fontSize = fontSize
@@ -863,7 +865,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if self.childNode(withName: myScoreName) == nil {
             let YPosition: CGFloat = self.frame.height * myScoreLinePosition
             let text = GV.language.getText(.tcMyScoreHeader, values: String(GV.playingRecord.score).fixLength(length:15), myName)
-            myScoreheaderLabel = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")// Snell Roundhand")
+            myScoreheaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             myScoreheaderLabel.text = text
             myScoreheaderLabel.name = String(myScoreName)
             myScoreheaderLabel.fontSize = fontSize
@@ -1401,6 +1403,34 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var goBackButton: UIButton?
     var wordListButton: UIButton?
     var buttonHeight = CGFloat(0)
+    
+    func hideButtons(hide: Bool) {
+        goToPreviousGameButton!.isEnabled = !hide
+        goToNextGameButton!.isEnabled = !hide
+        undoButton!.isEnabled = !hide
+        allWordsButton!.isEnabled = !hide
+        finishButton!.isEnabled = !hide
+        goBackButton!.isEnabled = !hide
+        wordListButton!.isEnabled = !hide
+        if hide {
+            goToPreviousGameButton!.alpha = 0.2
+            goToNextGameButton!.alpha = 0.2
+            undoButton!.alpha = 0.2
+            allWordsButton!.alpha = 0.2
+            finishButton!.alpha = 0.2
+            goBackButton!.alpha = 0.2
+            wordListButton!.alpha = 0.2
+        } else {
+            goToPreviousGameButton!.alpha = 1.0
+            goToNextGameButton!.alpha = 1.0
+            undoButton!.alpha = 1.0
+            allWordsButton!.alpha = 1.0
+            finishButton!.alpha = 1.0
+            goBackButton!.alpha = 1.0
+            wordListButton!.alpha = 1.0
+        }
+
+    }
 
     func createGoToPreviousGameButton(enabled: Bool) {
         if goToPreviousGameButton != nil {
@@ -1410,7 +1440,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.08, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
-        let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
+        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "LeftSimple" : "LeftElite"
         goToPreviousGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
         goToPreviousGameButton?.addTarget(self, action: #selector(self.goPreviousGame), for: .touchUpInside)
@@ -1425,7 +1455,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.92, y:self.frame.height * 0.92)
         let radius = self.frame.width * 0.045
-        let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
+        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "RightSimple" : "RightElite"
         goToNextGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame )
         goToNextGameButton?.addTarget(self, action: #selector(self.goNextGame), for: .touchUpInside)
@@ -1504,7 +1534,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.05, y:self.frame.height * 0.08)
         let radius = self.frame.width * 0.04
-        let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
+        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "BackSimple" : "BackElite"
         goBackButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: true, hasFrame: hasFrame)
         goBackButton!.addTarget(self, action: #selector(self.goBackTapped), for: .touchUpInside)
@@ -1524,7 +1554,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * 0.95, y:self.frame.height * 0.08)
         let radius = self.frame.width * 0.04
-        let hasFrame = GV.basicDataRecord.buttonType == GV.ButtonTypeSimple
+        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "UndoSimple" : "UndoElite"
         undoButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
         undoButton?.addTarget(self, action: #selector(self.undoTapped), for: .touchUpInside)
@@ -1600,7 +1630,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let mandatoryYPositionMultiplier = mandatoryWordsLinePosition
 //        let ownYPositionMultiplier:CGFloat = 0.80 // orig
         let distance: CGFloat = 0.02
-        let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")// Snell Roundhand")
+        let label = SKLabelNode(fontNamed: GV.actFont)// Snell Roundhand")
         let wordRow = CGFloat(counter / countWordsInRow)
         let wordColumn = counter % countWordsInRow
         let value = (wordRow + 1) * distance
@@ -1623,12 +1653,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func createLabel(word: String, linePosition: CGFloat, name: String) {
 //        let ownYPosition: [CGFloat] = [0.02, 0.04, 0.06]
-        let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT") // Snell Roundhand")
+        let label = SKLabelNode(fontNamed: GV.actFont) // Snell Roundhand")
 //        let yIndex = (WTGameWordList.shared.getCountWords(mandatory: true) / countWordsInRow) - 2
         let yPosition = self.frame.height * linePosition //(first ? 0 : 0.06))
         let xPosition = self.frame.size.width * 0.5
         label.position = CGPoint(x: xPosition, y: yPosition)
-        label.fontSize = self.frame.size.height * 0.018
+        label.fontSize = self.frame.size.height * 0.0175
         label.fontColor = .black
         label.text = word
         label.name = name
@@ -1638,6 +1668,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    var random: MyRandom?
 
     private func play() {
+        GV.playing = true
         timerIsCounting = true
         headerCreated = false
         WTGameWordList.shared.setDelegate(delegate: self)
@@ -2136,6 +2167,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if touchedNodes.shapeIndex >= 0 && startShapeIndex == touchedNodes.shapeIndex {
                     pieceArray[touchedNodes.shapeIndex].rotate()
                     pieceArray[touchedNodes.shapeIndex].position = origPosition[touchedNodes.shapeIndex]
+            } else {
+                if !goBackButton!.isEnabled {
+                    self.hideButtons(hide: false)
+                }
             }
         }
 //        let freePlaceFound = checkFreePlace(showAlert: true)
@@ -2166,9 +2201,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.modifyHeader()
         let roundScore = WTGameWordList.shared.getPointsForLetters()
         self.wtGameboard!.clearGreenFieldsForNextRound()
-        if !self.checkFreePlace(showAlert: false) {
-            self.showGameFinished(status: .NoMoreSteps)
-        } else {
+//        if !self.checkFreePlace(showAlert: false) {
+//            self.showGameFinished(status: .NoMoreSteps)
+//        } else {
             actRound = GV.playingRecord.rounds.count + 1
             try! realm.safeWrite() {
                 GV.playingRecord.rounds.last!.roundScore = roundScore
@@ -2181,7 +2216,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 self.activityRoundItem.append(ActivityRound())
                 self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
             }
-         }
+//         }
         self.enabled = true
         self.gameboardEnabled = false
         self.removeNodesWith(name: self.MyQuestionName)
@@ -2547,7 +2582,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                }
 
 
-        } else if activityRoundItem[activityRoundItem.count - 1].activityItems.count > 0 {
+        } else {
             switch activityRoundItem[activityRoundItem.count - 1].activityItems.last!.type {
             case .FromBottom:
                 let indexOfLastPiece = activityRoundItem[activityRoundItem.count - 1].activityItems.last!.fromBottomIndex
@@ -2577,6 +2612,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         self.addChild(pieceArray[2])
                     default: break
                     }
+                } else {
+                    var countTilesOnGameboard = 0
+                    for tile in tilesForGame {
+                        countTilesOnGameboard += tile.isOnGameboard ? 1 : 0
+                    }
+                    if countTilesOnGameboard == 0 {
+                        wtGameboard!.clearGameArray()
+                    }
                 }
 //                    wtGameboard!.checkWholeWords()
                 activityRoundItem[activityRoundItem.count - 1].activityItems.removeLast()
@@ -2602,7 +2645,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             saveToRealmCloud()
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
-//            restartGame()
+            undoButton!.alpha = 0.2
+            undoButton!.isEnabled = false
         }
             
     }
@@ -2782,11 +2826,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     letters.append(item.key)
                 }
             }
-             let allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[0].lowercased())
-            let counter = allRecords.count
-            let wordIndex = random.getRandomInt(0, max: counter - 1)
-            let word = allRecords[wordIndex].word
-
+            var index = 0
+            var counter = 0
+            var allRecords: Results<MandatoryListModel>
+            repeat {
+                allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[index].lowercased())
+                counter = allRecords.count
+                index += 1
+            } while counter < 10
+            var countRepeats = 0
+            var word = ""
+            repeat {
+                let wordIndex = random.getRandomInt(0, max: counter - 1)
+                word = allRecords[wordIndex].word
+                countRepeats += 1
+                if usedWords.contains(where: {$0 == word}) {
+                    print("word \(word) used")
+                }
+            } while usedWords.contains(where: {$0 == word}) && countRepeats < counter
              splittingWord(word: word)
             
 //            print("letters: \(letters), word: \(word)")
@@ -2809,7 +2866,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func createButton(withText: String, position: CGPoint, name: String, buttonSize: CGSize? = nil)->SKSpriteNode {
         func createLabel(withText: String, position: CGPoint, fontSize: CGFloat, name: String)->SKLabelNode {
             let label = SKLabelNode()
-            label.fontName = "TimesNewRomanPS-BoldMT"
+            label.fontName = GV.actFont
             label.fontColor = .black
 //            label.numberOfLines = 0
             label.verticalAlignmentMode = .center
@@ -2843,20 +2900,37 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    }
 //    
     var showOwnWordsTableView: WTTableView?
-    var ownWordsForShow = [FoundedWordWithCounter]()
-    var mandatoryWordsForShow = [FoundedWordWithCounter]()
+    struct WordsForShow {
+        var words = [FoundedWordWithCounter]()
+        var countWords = 0
+        var countAllWords = 0
+        var score = 0
+        init(words: [FoundedWordWithCounter]) {
+            self.words = words
+            countWords = words.count
+            for item in words {
+                countAllWords += item.counter
+                self.score += item.score
+            }
+        }
+    }
+    var ownWordsForShow: WordsForShow?
+    var mandatoryWordsForShow: WordsForShow?
     var maxLength = 0
     var showingWordsInTable = false
-    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 15)
-    let myTitleFont = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 30 : 18)
+    let myFont = UIFont(name: GV.actLabelFont /*"CourierNewPS-BoldMT"*/, size: GV.onIpad ? 18 : 15)
+    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 18)
 
     private func showOwnWordsInTableView() {
         tableType = .ShowAllWords
         showOwnWordsTableView = WTTableView()
         timerIsCounting = false
         var maxLength1 = 0
-        (mandatoryWordsForShow, maxLength) = WTGameWordList.shared.getWordsForShow(mandatory: true)
-        (ownWordsForShow, maxLength1) = WTGameWordList.shared.getWordsForShow(mandatory: false)
+        var words: [FoundedWordWithCounter]
+        (words, maxLength) = WTGameWordList.shared.getWordsForShow(mandatory: true)
+        mandatoryWordsForShow = WordsForShow(words: words)
+        (words, maxLength1) = WTGameWordList.shared.getWordsForShow(mandatory: false)
+        ownWordsForShow = WordsForShow(words: words)
         maxLength = maxLength1 > maxLength ? maxLength1 : maxLength
         calculateColumnWidths()
         showOwnWordsTableView?.setDelegate(delegate: self)
@@ -2864,9 +2938,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: self.frame.height * 0.08)
         let lineHeight = title.height(font:myFont!)
         let headerframeHeight = lineHeight * 4.6
-        var showingWordsHeight = CGFloat(ownWordsForShow.count + mandatoryWordsForShow.count) * lineHeight
+        var showingWordsHeight = CGFloat(ownWordsForShow!.words.count + mandatoryWordsForShow!.words.count) * lineHeight
         if showingWordsHeight  > self.frame.height * 0.8 {
-            var counter = CGFloat(ownWordsForShow.count)
+            var counter = CGFloat(ownWordsForShow!.words.count)
             repeat {
                 counter -= 1
                 showingWordsHeight = lineHeight * counter
@@ -2881,6 +2955,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.showOwnWordsTableView?.reloadData()
         self.scene?.alpha = 0.2
         self.scene?.view?.addSubview(showOwnWordsTableView!)
+        self.hideButtons(hide: true)
     }
     
     func startShowingWordsOverPosition(wordList: [SelectedWord]) {

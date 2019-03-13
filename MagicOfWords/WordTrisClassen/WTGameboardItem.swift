@@ -62,6 +62,7 @@ class WTGameboardItem: SKSpriteNode {
     private var fontSize: CGFloat = 0
     init(blockSize: CGFloat, fontSize: CGFloat) {
         label = SKLabelNode()
+        // Call the init        
         countWordsLabel = SKLabelNode()
         self.fontSize = fontSize
         let texture = SKTexture(imageNamed: "whiteSprite0000.png")
@@ -70,7 +71,7 @@ class WTGameboardItem: SKSpriteNode {
 //        label.fontName = "Baskerville"
 //        label.fontName = "ChalkboardSE-Light"
 //        label.fontName = "PingFangTC-Semibold"
-        label.fontName = "KohinoorBangla-Regular"
+        label.fontName = GV.actPieceFont //"KohinoorBangla-Regular"
         label.fontColor = .black
         label.verticalAlignmentMode = .center
         label.fontSize = self.fontSize
@@ -78,13 +79,39 @@ class WTGameboardItem: SKSpriteNode {
         addChild(label)
 
         countWordsLabel.position = CGPoint(x: blockSize * 0.28, y: -blockSize * 0.35)
-        countWordsLabel.fontName = "KohinoorBangla-Regular"
+        countWordsLabel.fontName = GV.actPieceFont //"KohinoorBangla-Regular"
         countWordsLabel.fontColor = .black
 //        countWordsLabel.verticalAlignmentMode = .center
         countWordsLabel.fontSize = fontSize * 0.7
 //        countWordsLabel.text = String(countOccurencesInWords)
         countWordsLabel.zPosition = self.zPosition + 2
+        countWordsLabel.name = "counter"
         addChild(countWordsLabel)
+    }
+    
+    public func copyMe(imageNamed: String)->WTGameboardItem {
+        let copyed = WTGameboardItem(blockSize: self.size.height, fontSize: self.fontSize)
+        copyed.texture = SKTexture(imageNamed: imageNamed)
+        copyed.position = self.position
+        copyed.status = self.status
+        copyed.myColor = self.myColor
+        copyed.origLetter = self.origLetter
+        copyed.origColor = self.origColor
+        copyed.blockSize = self.blockSize
+        let label = SKLabelNode()
+        label.fontName = GV.actPieceFont //"KohinoorBangla-Regular"
+        label.fontColor = .black
+        label.text = self.letter
+        label.verticalAlignmentMode = .center
+        label.fontSize = self.fontSize
+        label.zPosition = self.zPosition + 1
+ 
+        copyed.label = label
+
+        copyed.addChild(label)
+        copyed.letter = self.letter
+        copyed.fontSize = self.fontSize
+        return copyed
     }
     
     public func setLetter(letter: String, status: ItemStatus, toColor: MyColor, forcedChange: Bool = false)->Bool {
@@ -130,6 +157,7 @@ class WTGameboardItem: SKSpriteNode {
     }
     
     public func clearIfTemporary() {
+        label.removeShadow()
         if status == .temporary {
             label.text = emptyLetter
             self.letter = emptyLetter
@@ -182,7 +210,7 @@ class WTGameboardItem: SKSpriteNode {
     }
     
     private func convertMyColorToSKColor(color: MyColor)->SKColor {
-        if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+        if GV.buttonType == GV.ButtonTypeElite {
             switch color {
             case .myRedColor: return .white
             case .myWhiteColor: return .white
@@ -249,7 +277,7 @@ class WTGameboardItem: SKSpriteNode {
             self.countOccurencesInWords -= 1
         }
         
-        if toColor == .myGreenColor || (GV.basicDataRecord.buttonType == GV.ButtonTypeSimple && (toColor == .myGoldColor || toColor == .myDarkGoldColor)) {
+        if toColor == .myGreenColor || (GV.buttonType == GV.ButtonTypeSimple && (toColor == .myGoldColor || toColor == .myDarkGoldColor)) {
             self.countWordsLabel.text = String(countOccurencesInWords)
             self.countWordsLabel.fontSize = self.fontSize * (countOccurencesInWords < 10 ? 0.7 : 0.6)
         } else {
@@ -260,7 +288,7 @@ class WTGameboardItem: SKSpriteNode {
     
     private func setTexture() {
         var name = ""
-        if GV.basicDataRecord.buttonType == GV.ButtonTypeElite {
+        if GV.buttonType == GV.ButtonTypeElite {
              if self.status == .wholeWord && !(self.letter == emptyLetter || self.myColor == .myBlueColor || self.myColor == .myRedColor) {
                 name = myColor == .myGreenColor ? "GreenSprite" : "GoldSprite"
                 name += self.connectionType.left ? "1" : "0"

@@ -111,4 +111,5 @@ let huDictionary: [TextConstants: String] = [
     .tcSimpleStyle:        "Egyszerű",
     .tcEliteStyle:         "Elegáns",
     .tcGenerateBestScore:  "Legjobb eredmények lista generálása",
+    .tcComment:            "Megjegyzés",
 ]

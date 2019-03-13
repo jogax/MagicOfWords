@@ -100,6 +100,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     }
     
     func gameFinished(start: StartType) {
+        GV.playing = false
         if let view = self.view as! SKView? {
             view.presentScene(nil)
         }
@@ -586,6 +587,7 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             try! realm.safeWrite() {
                 GV.basicDataRecord.buttonType = style
             }
+            GV.buttonType = style
         }
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseStyle),
                                                 message: "",
@@ -593,6 +595,8 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         let simpleStyleAction = UIAlertAction(title: GV.language.getText(.tcSimpleStyle), style: .default, handler: {
             alert -> Void in
             setStyle(style: GV.ButtonTypeSimple)
+//            GV.actFont = GV.FontTypeSimple
+//            GV.actLabel = GV.LabelFontSimple
             self.showMenu()
         })
         alertController.addAction(simpleStyleAction)
@@ -600,6 +604,8 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         let eliteStyleAction = UIAlertAction(title: GV.language.getText(.tcEliteStyle), style: .default, handler: {
             alert -> Void in
             setStyle(style: GV.ButtonTypeElite)
+//            GV.actFont = GV.FontTypeElite
+//            GV.actLabel = GV.LabelFontElite
             self.showMenu()
         })
         alertController.addAction(eliteStyleAction)
@@ -623,6 +629,8 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
             GV.language.setLanguage(GV.basicDataRecord.actLanguage)
         }
+        GV.buttonType = GV.basicDataRecord.buttonType
+//        GV.actFont = GV.basicDataRecord.buttonType == GV.ButtonTypeElite ? GV.FontTypeElite : GV.FontTypeSimple
     }
     
     

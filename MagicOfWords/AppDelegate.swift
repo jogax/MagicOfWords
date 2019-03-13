@@ -86,12 +86,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 21, // new item words
+            schemaVersion: 23, // new item words
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
                 switch oldSchemaVersion {
-                case 0...19:
+                case 0...18:
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
@@ -273,7 +273,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     playerActivity![0].isOnline = true
                     playerActivity![0].onlineSince = getLocalDate()
                     playerActivity![0].lastTouched = getLocalDate()
-                    tenMinutesTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
+                    tenMinutesTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
                 }
             }
             checkSyncedDB()
@@ -281,14 +281,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     @objc private func setLastTouched(timerX: Timer) {
+        try! realm.safeWrite() {
+            GV.basicDataRecord.onlineTime += 1
+            if GV.playing {
+                GV.basicDataRecord.playingTime += 1
+            }
+        }
         if playerActivity?.count == 0 {
         } else {
-            try! RealmService.safeWrite() {
-                playerActivity![0].lastTouched = getLocalDate()
-                playerActivity![0].onlineTime += 60
+            if GV.basicDataRecord.onlineTime % 60 == 0 {
+                try! RealmService.safeWrite() {
+                    playerActivity![0].lastTouched = getLocalDate()
+                    playerActivity![0].onlineTime = GV.basicDataRecord.onlineTime
+                    playerActivity![0].playingTime = GV.basicDataRecord.playingTime
+                }
             }
-            tenMinutesTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
         }
+        tenMinutesTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
     }
     
     var bestScoreSync: Results<BestScoreSync>?

@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import GameplayKit
 
 //let iPhone_X = "iPhone X"
 
@@ -453,7 +454,7 @@ extension String {
                 repeat {
                     returnValue = " " + returnValue
                     if returnValue.count < length {
-                        returnValue = returnValue + " "
+                        returnValue += " "
                     }
                 } while returnValue.count < length
 
@@ -740,6 +741,34 @@ extension Realm {
         }
     }
 }
+
+extension SKLabelNode {
+    public func removeShadow() {
+        repeat {
+            if children.count > 0 {
+                self.children[0].removeFromParent()
+            }
+        } while self.children.count > 0    
+    }
+    
+    public func setText(text:String) {
+        self.text = text
+        let shadowNode = SKLabelNode(fontNamed: self.fontName)
+        shadowNode.text = self.text
+        shadowNode.zPosition = self.zPosition - 1
+        shadowNode.fontColor = .black
+        // Just create a little offset from the main text label
+        let xValue = GV.onIpad ? 3 : 1
+        let yValue = GV.onIpad ? 3 : 1
+        shadowNode.position = CGPoint(x: xValue, y: -yValue)
+        shadowNode.verticalAlignmentMode = .center
+        shadowNode.fontSize = self.fontSize
+        shadowNode.alpha = 0.5
+        self.removeShadow()
+        self.addChild(shadowNode)
+    }
+}
+
 
 //extension GCHelper {
 //    

@@ -110,7 +110,8 @@ enum TextConstants: Int {
     tcChooseStyle,
     tcSimpleStyle,
     tcEliteStyle,
-    tcGenerateBestScore
+    tcGenerateBestScore,
+    tcComment
 
 }
 

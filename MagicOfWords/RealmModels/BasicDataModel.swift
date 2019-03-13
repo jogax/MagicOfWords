@@ -21,6 +21,9 @@ class BasicDataModel: Object {
     @objc dynamic var showingRow = 0
     @objc dynamic var showingRows = ""
     @objc dynamic var buttonType = GV.ButtonTypeElite
+    @objc dynamic var onlineTime = 0
+    @objc dynamic var playingTime = 0
+    @objc dynamic var playing = false
     @objc dynamic var choosedCountsForLanguage = ""
     @objc dynamic var notSaved = true
     override  class func primaryKey() -> String {
