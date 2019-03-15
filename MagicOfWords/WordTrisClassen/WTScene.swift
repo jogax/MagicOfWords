@@ -401,7 +401,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         balloon.zPosition = 10
 //        let atY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
 //        let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
-        let startPos = CGPoint(x: self.frame.width * 0.5, y: self.frame.maxY - allWordsButton!.frame.maxY + balloon.size.height * 2)
+        let startPos = CGPoint(x: self.frame.width * 0.5, y: allWordsButton!.frame.maxY + balloon.size.height * 2)
 //        let startPosY = startPos.y
 //        let endPosY = score > 0 ? self.frame.size.height * 0.80 : self.frame.size.height * -0.04
         balloon.position = CGPoint(x: startPos.x, y: startPos.y )
@@ -810,6 +810,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let ownWordsLinePosition:CGFloat = 0.84
     let mandatoryWordsLinePosition:CGFloat = 0.82
     let buttonLineCenterY:CGFloat = 0.265
+    let mybuttonLineCenterY:CGFloat = 1 - 0.265 // 1 - buttonLineCenterY
     let gameboardCenterY: CGFloat = 0.42
     let pieceArrayCenterY: CGFloat = 0.08
     
@@ -877,21 +878,30 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
    }
     
     var headerCreated = false
+    var createNextRound = false
     
     override func update(_ currentTime: TimeInterval) {
-//        if checkIfGameFinished() {
-//            self.view?.isUserInteractionEnabled = false
-//        }
         if !syncedRecordsOK && realmSync != nil {
             if !waitingForSynceRecords {
                 getSyncedRecords()
                 waitingForSynceRecords = true
             }
         }
-//        if !headerCreated {
-//            createHeader()
-//            headerCreated = true
-//        }
+        if createNextRound && GV.nextRoundAnimationFinished {
+            try! realm.safeWrite() {
+                let roundScore = WTGameWordList.shared.getPointsForLetters()
+                GV.playingRecord.rounds.last!.roundScore = roundScore
+                let newRound = RoundDataModel()
+                newRound.gameArray = self.wtGameboard!.gameArrayToString()
+                GV.playingRecord.rounds.append(newRound)
+                self.timeForGame.incrementMaxTime(value: iHalfHour)
+                WTGameWordList.shared.addNewRound()
+                self.activityRoundItem.append(ActivityRound())
+                self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
+            }
+            createNextRound = false
+            GV.nextRoundAnimationFinished = false
+        }
     }
     
     private func modifyHeader() {
@@ -1126,10 +1136,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         pieceArray[2].isHidden = hide
         goToPreviousGameButton!.isHidden = hide
         goToNextGameButton!.isHidden = hide
-        wordListButton!.isHidden = hide
+        searchButton!.isHidden = hide
         allWordsButton!.isHidden = hide
         goBackButton!.isHidden = hide
-        wordListButton!.isHidden = hide
+        searchButton!.isHidden = hide
         if undoButton != nil {
             undoButton!.isHidden = hide
         }
@@ -1395,13 +1405,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         showingWordsInTable = true
     }
     
+    var searchButton: MyButton?
+    var allWordsButton: MyButton?
+    var finishButton: MyButton?
+
     var goToPreviousGameButton: UIButton?
     var goToNextGameButton: UIButton?
     var undoButton: UIButton?
-    var allWordsButton: UIButton?
-    var finishButton: UIButton?
     var goBackButton: UIButton?
-    var wordListButton: UIButton?
     var buttonHeight = CGFloat(0)
     
     func hideButtons(hide: Bool) {
@@ -1411,7 +1422,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         allWordsButton!.isEnabled = !hide
         finishButton!.isEnabled = !hide
         goBackButton!.isEnabled = !hide
-        wordListButton!.isEnabled = !hide
+        searchButton!.isEnabled = !hide
         if hide {
             goToPreviousGameButton!.alpha = 0.2
             goToNextGameButton!.alpha = 0.2
@@ -1419,7 +1430,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             allWordsButton!.alpha = 0.2
             finishButton!.alpha = 0.2
             goBackButton!.alpha = 0.2
-            wordListButton!.alpha = 0.2
+            searchButton!.alpha = 0.2
         } else {
             goToPreviousGameButton!.alpha = 1.0
             goToNextGameButton!.alpha = 1.0
@@ -1427,7 +1438,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             allWordsButton!.alpha = 1.0
             finishButton!.alpha = 1.0
             goBackButton!.alpha = 1.0
-            wordListButton!.alpha = 1.0
+            searchButton!.alpha = 1.0
         }
 
     }
@@ -1464,41 +1475,70 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func createShowAllWordsButton() {
         if allWordsButton != nil {
-            allWordsButton?.removeFromSuperview()
+            allWordsButton?.removeFromParent()
             allWordsButton = nil
         }
         var ownHeaderYPos = CGFloat(0)
 //        let ownHeader: SKNode = (self.childNode(withName: ownWordsHeaderName) as! SKLabelNode)
         let title = GV.language.getText(.tcShowAllWords)
         let wordLength = title.width(font: myTitleFont!)
-        let wordHeight = title.height(font: myTitleFont!)
-        let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
-        ownHeaderYPos = self.frame.height * buttonLineCenterY// - ownHeader.frame.maxY + frame.height
+//        let wordHeight = title.height(font: myTitleFont!)
+        let size = CGSize(width:wordLength * 1.5, height: buttonHeight)
+        ownHeaderYPos = self.frame.height * mybuttonLineCenterY// - ownHeader.frame.maxY + frame.height
         allWordsButtonCenter = CGPoint(x:self.frame.width * 0.5, y: ownHeaderYPos) //self.frame.height * 0.20)
-        let radius = frame.height * 0.5
-        allWordsButton = createButton(imageName: "", title: title, frame: frame, center: allWordsButtonCenter, cornerRadius: radius, enabled: true )
-        allWordsButton?.addTarget(self, action: #selector(self.showAllWordsInTableView), for: .touchUpInside)
-        allWordsButton?.layer.zPosition = -100
-        self.view?.addSubview(allWordsButton!)
+//        let radius = frame.height * 0.5
+        let myButton = createMyButton(title: title, size: size, center: allWordsButtonCenter, enabled: true )
+        myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(showAllWordsInTableView))
+//        allWordsButton?.addTarget(self, action: #selector(self.showAllWordsInTableView), for: .touchUpInside)
+        myButton.zPosition = self.zPosition + 1
+        allWordsButton = myButton
+        self.addChild(allWordsButton!)
+    }
+    
+    private func createMyButton(imageName: String = "", title: String = "", size: CGSize, center: CGPoint, enabled: Bool, newSize: CGFloat = 0)->MyButton {
+        var button: MyButton
+        if imageName != "" {
+            let texture = SKTexture(imageNamed: imageName)
+            button = MyButton(normalTexture: texture, selectedTexture:texture, disabledTexture: texture)
+        } else {
+            button = MyButton(fontName: myTitleFont!.fontName, size: size)
+            button.setButtonLabel(title: title, font: myTitleFont!)
+       }
+        button.position = center
+        button.size = size
+
+        button.alpha = enabled ? 1.0 : 0.2
+        button.isEnabled = enabled
+//        if hasFrame {
+//            button.layer.borderWidth = GV.onIpad ? 5 : 3
+//            button.layer.borderColor = UIColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1.0).cgColor
+//        }
+//        button.frame = frame
+//        button.center = center
+        return button
+
     }
     
     private func createFinishButton() {
         if finishButton != nil {
-            finishButton?.removeFromSuperview()
+            finishButton?.removeFromParent()
             finishButton = nil
         }
         let title = GV.language.getText(.tcFinishGame)
         let wordLength = title.width(font: myTitleFont!)
-        let wordHeight = title.height(font: myTitleFont!)
-        let frame = CGRect(x: 0, y: 0, width:wordLength * 1.2, height: wordHeight * 1.8)
-        let ownHeaderYPos = self.frame.height * buttonLineCenterY// - ownHeader.frame.maxY + frame.height
-        let finishButtonCenter = CGPoint(x:self.frame.width * 0.20, y: ownHeaderYPos) //self.frame.height * 0.20)
-        let radius = frame.height * 0.5
-        finishButton = createButton(imageName: "", title: title, frame: frame, center: finishButtonCenter, cornerRadius: radius, enabled: true )
-        finishButton!.isHidden = goOnPlaying ? false : true
-        finishButton!.addTarget(self, action: #selector(self.finishButtonTapped), for: .touchUpInside)
+//        let wordHeight = title.height(font: myTitleFont!)
+        let size = CGSize(width:wordLength * 1.2, height: buttonHeight)
+        let ownHeaderYPos = self.frame.height * mybuttonLineCenterY// - ownHeader.frame.maxY + frame.height
+        let finishButtonCenter = CGPoint(x:self.frame.width * 0.2, y: ownHeaderYPos) //self.frame.height * 0.20)
+//        let radius = frame.height * 0.5
+        let myButton = createMyButton(title: title, size: size, center: finishButtonCenter, enabled: true )
+        myButton.isHidden = goOnPlaying ? false : true
+        myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(finishButtonTapped))
+
+//        myButton!.addTarget(self, action: #selector(self.finishButtonTapped), for: .touchUpInside)
 //        finishButton?.layer.zPosition = -100
-        self.view?.addSubview(finishButton!)
+        finishButton = myButton
+        self.addChild(myButton)
     }
     
     @objc private func finishButtonTapped() {
@@ -1510,17 +1550,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var allWordsButtonCenter = CGPoint(x:0, y:0)
     
-    private func createWordListButton() {
-        if wordListButton != nil {
-            wordListButton?.removeFromSuperview()
-            wordListButton = nil
+    private func createSearchButton() {
+        if searchButton != nil {
+            searchButton!.removeFromParent()
+            searchButton = nil
         }
-        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
-        let center = CGPoint(x: allWordsButton!.frame.maxX + buttonHeight, y: allWordsButtonCenter.y)
-        let radius = self.frame.width * 0.04
-        wordListButton = createButton(imageName: "search", imageSize: 0.7, title: "", frame: frame, center: center, cornerRadius: radius, enabled: true)
-        wordListButton!.addTarget(self, action: #selector(self.wordListTapped), for: .touchUpInside)
-        self.view?.addSubview(wordListButton!)
+        let size = CGSize(width: buttonHeight, height: buttonHeight)
+        let center = CGPoint(x: self.frame.width - finishButton!.frame.minX - buttonHeight / 2, y: allWordsButtonCenter.y)
+//        let radius = self.frame.width * 0.04
+//        let image = UIImage(named: "search")
+        let newSize = allWordsButton!.size.height
+        let myButton = createMyButton(imageName: "search", size: size, center: center, enabled: true, newSize: newSize)
+        myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(wordListTapped))
+        //        allWordsButton?.addTarget(self, action: #selector(self.showAllWordsInTableView), for: .touchUpInside)
+        myButton.zPosition = self.zPosition + 1
+        searchButton = myButton
+//        searchButton!.addTarget(self, action: #selector(self.wordListTapped), for: .touchUpInside)
+        self.addChild(searchButton!)
     }
     
     
@@ -1585,15 +1631,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         return button
     }
     
-    func resizeImage(image: UIImage, newWidth: CGFloat) -> UIImage {
+    func resizeImage(image: UIImage, newWidth: CGFloat, resizeBoth: Bool = true) -> UIImage {
         
         let scale = newWidth / image.size.width
-        let newHeight = image.size.height * scale
+        let newHeight = resizeBoth ? image.size.height * scale : image.size.height
         UIGraphicsBeginImageContext(CGSize(width: newWidth, height: newHeight))
         image.draw(in: CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        
         return newImage!
     }
     
@@ -1675,7 +1720,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         timeForGame = TimeForGame(from: GV.playingRecord.time)
 //        createHeader()
         myTimer = MyTimer(time: timeForGame)
-        addChild(myTimer!)
+//        addChild(myTimer!)
         wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
@@ -1716,7 +1761,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         createGoToNextGameButton(enabled: hasNextRecords(playingRecord: GV.playingRecord))
         createShowAllWordsButton()
         createFinishButton()
-        createWordListButton()
+        createSearchButton()
 //        if  hasPreviousRecords(playingRecord: GV.playingRecord) {
 //
 //            goToPreviousGameButton.alpha = 1.0
@@ -2199,23 +2244,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     @objc private func startNextRound() {
         self.modifyHeader()
-        let roundScore = WTGameWordList.shared.getPointsForLetters()
+//        let roundScore = WTGameWordList.shared.getPointsForLetters()
         self.wtGameboard!.clearGreenFieldsForNextRound()
 //        if !self.checkFreePlace(showAlert: false) {
 //            self.showGameFinished(status: .NoMoreSteps)
 //        } else {
             actRound = GV.playingRecord.rounds.count + 1
-            try! realm.safeWrite() {
-                GV.playingRecord.rounds.last!.roundScore = roundScore
-                let newRound = RoundDataModel()
-                //                newRound.index = activityItems.count - 1
-                newRound.gameArray = self.wtGameboard!.gameArrayToString()
-                GV.playingRecord.rounds.append(newRound)
-                self.timeForGame.incrementMaxTime(value: iHalfHour)
-                WTGameWordList.shared.addNewRound()
-                self.activityRoundItem.append(ActivityRound())
-                self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
-            }
+            createNextRound = true
+//            try! realm.safeWrite() {
+//                GV.playingRecord.rounds.last!.roundScore = roundScore
+//                let newRound = RoundDataModel()
+//                //                newRound.index = activityItems.count - 1
+//                newRound.gameArray = self.wtGameboard!.gameArrayToString()
+//                GV.playingRecord.rounds.append(newRound)
+//                self.timeForGame.incrementMaxTime(value: iHalfHour)
+//                WTGameWordList.shared.addNewRound()
+//                self.activityRoundItem.append(ActivityRound())
+//                self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
+//            }
 //         }
         self.enabled = true
         self.gameboardEnabled = false
@@ -2644,9 +2690,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             saveActualState()
             saveToRealmCloud()
         }
-        if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
+        if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 && activityRoundItem.count == 1 {
             undoButton!.alpha = 0.2
             undoButton!.isEnabled = false
+            wtGameboard!.clearGameArray()
         }
             
     }

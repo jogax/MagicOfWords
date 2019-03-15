@@ -92,7 +92,8 @@ struct GV {
     static var bonusScore = 0
     static var totalScore = 0
     static var mandatoryWords = [String]()
-    static var greenSpriteArray = [WTGameboardItem]()
+//    static var greenSpriteArray = [WTGameboardItem]()
+    static var nextRoundAnimationFinished = true
 
     static var myUser: SyncUser? = nil {
         willSet(newValue) {

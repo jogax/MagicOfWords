@@ -182,6 +182,13 @@ class Language {
     func getText (_ textIndex: TextConstants, values: String ...) -> String {
         return aktLanguage[textIndex]!.replace("%", values: values)
     }
+    
+    func getText (_ textIndex: TextConstants, forLanguage: String, values: String ...) -> String {
+        return languages[forLanguage]![textIndex]!.replace("%", values: values)
+//        return aktLanguage[textIndex]!.replace("%", values: values)
+    }
+    
+
 
     func getAktLanguageKey() -> String {
         return aktLanguage[.tcAktLanguage]!

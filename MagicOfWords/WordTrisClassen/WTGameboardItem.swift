@@ -85,7 +85,6 @@ class WTGameboardItem: SKSpriteNode {
         countWordsLabel.fontSize = fontSize * 0.7
 //        countWordsLabel.text = String(countOccurencesInWords)
         countWordsLabel.zPosition = self.zPosition + 2
-        countWordsLabel.name = "counter"
         addChild(countWordsLabel)
     }
     
@@ -98,19 +97,13 @@ class WTGameboardItem: SKSpriteNode {
         copyed.origLetter = self.origLetter
         copyed.origColor = self.origColor
         copyed.blockSize = self.blockSize
-        let label = SKLabelNode()
-        label.fontName = GV.actPieceFont //"KohinoorBangla-Regular"
-        label.fontColor = .black
-        label.text = self.letter
-        label.verticalAlignmentMode = .center
-        label.fontSize = self.fontSize
-        label.zPosition = self.zPosition + 1
- 
-        copyed.label = label
-
-        copyed.addChild(label)
         copyed.letter = self.letter
-        copyed.fontSize = self.fontSize
+        copyed.label = self.label.copyMe()
+        copyed.label.zPosition = self.zPosition + 1
+        copyed.addChild(copyed.label)
+        copyed.countWordsLabel = self.countWordsLabel.copyMe()
+        copyed.addChild(copyed.countWordsLabel)
+        copyed.countWordsLabel.zPosition = self.zPosition + 1
         return copyed
     }
     
@@ -277,7 +270,7 @@ class WTGameboardItem: SKSpriteNode {
             self.countOccurencesInWords -= 1
         }
         
-        if toColor == .myGreenColor || (GV.buttonType == GV.ButtonTypeSimple && (toColor == .myGoldColor || toColor == .myDarkGoldColor)) {
+        if toColor == .myGreenColor || (GV.buttonType == GV.ButtonTypeElite && (toColor == .myGoldColor || toColor == .myDarkGoldColor)) {
             self.countWordsLabel.text = String(countOccurencesInWords)
             self.countWordsLabel.fontSize = self.fontSize * (countOccurencesInWords < 10 ? 0.7 : 0.6)
         } else {

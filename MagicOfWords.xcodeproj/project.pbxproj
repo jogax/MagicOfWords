@@ -124,13 +124,14 @@
 		20819320202B472900406D9A /* GameDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081931F202B472900406D9A /* GameDataModel.swift */; };
 		20819322202B484D00406D9A /* gameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20819321202B484D00406D9A /* gameData.txt */; };
 		20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20819323202B4A7100406D9A /* GenerateGameData.swift */; };
-		208424D82236B7FD00D18A12 /* bubbleGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 208424D62236B7FD00D18A12 /* bubbleGreen.png */; };
+		208424D82236B7FD00D18A12 /* greenButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 208424D62236B7FD00D18A12 /* greenButton.png */; };
 		208424D92236B7FD00D18A12 /* bubbleGoldElite.png in Resources */ = {isa = PBXBuildFile; fileRef = 208424D72236B7FD00D18A12 /* bubbleGoldElite.png */; };
 		20842DE62031EA910078FFDA /* ruWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20842DE52031EA910078FFDA /* ruWords.txt */; };
 		2084C0D62209BF73002B8F2E /* compare2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2084C0D52209BF73002B8F2E /* compare2.txt */; };
 		2084FA2D221C2523002D29D3 /* Delete.png in Resources */ = {isa = PBXBuildFile; fileRef = 2084FA2C221C2523002D29D3 /* Delete.png */; };
 		2084FA2F221C4C61002D29D3 /* ModifiedWordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2084FA2E221C4C61002D29D3 /* ModifiedWordsModel.swift */; };
 		208528F5220DB99E009ED02B /* MandatoryListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 208528F4220DB99E009ED02B /* MandatoryListModel.swift */; };
+		20858645223A89EF0097B62A /* MyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20858644223A89EF0097B62A /* MyButton.swift */; };
 		20866967222AC84E002194C8 /* GreenSprite0101.png in Resources */ = {isa = PBXBuildFile; fileRef = 20866958222AC84C002194C8 /* GreenSprite0101.png */; };
 		20866968222AC84E002194C8 /* GreenSprite0010.png in Resources */ = {isa = PBXBuildFile; fileRef = 20866959222AC84D002194C8 /* GreenSprite0010.png */; };
 		20866969222AC84E002194C8 /* GreenSprite0001.png in Resources */ = {isa = PBXBuildFile; fileRef = 2086695A222AC84D002194C8 /* GreenSprite0001.png */; };
@@ -316,7 +317,7 @@
 		2081931F202B472900406D9A /* GameDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDataModel.swift; sourceTree = "<group>"; };
 		20819321202B484D00406D9A /* gameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = gameData.txt; sourceTree = "<group>"; };
 		20819323202B4A7100406D9A /* GenerateGameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateGameData.swift; sourceTree = "<group>"; };
-		208424D62236B7FD00D18A12 /* bubbleGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bubbleGreen.png; sourceTree = "<group>"; };
+		208424D62236B7FD00D18A12 /* greenButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greenButton.png; sourceTree = "<group>"; };
 		208424D72236B7FD00D18A12 /* bubbleGoldElite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bubbleGoldElite.png; sourceTree = "<group>"; };
 		20842DE52031EA910078FFDA /* ruWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruWords.txt; sourceTree = "<group>"; };
 		2084C0D52209BF73002B8F2E /* compare2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = compare2.txt; sourceTree = "<group>"; };
@@ -324,6 +325,7 @@
 		2084FA2C221C2523002D29D3 /* Delete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Delete.png; sourceTree = "<group>"; };
 		2084FA2E221C4C61002D29D3 /* ModifiedWordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifiedWordsModel.swift; sourceTree = "<group>"; };
 		208528F4220DB99E009ED02B /* MandatoryListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryListModel.swift; sourceTree = "<group>"; };
+		20858644223A89EF0097B62A /* MyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyButton.swift; sourceTree = "<group>"; };
 		20866958222AC84C002194C8 /* GreenSprite0101.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenSprite0101.png; sourceTree = "<group>"; };
 		20866959222AC84D002194C8 /* GreenSprite0010.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenSprite0010.png; sourceTree = "<group>"; };
 		2086695A222AC84D002194C8 /* GreenSprite0001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenSprite0001.png; sourceTree = "<group>"; };
@@ -416,6 +418,7 @@
 				209A182E21ECE55600FF8AB0 /* CreateMandatorysViewController.swift */,
 				20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */,
 				20491F4A21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift */,
+				20858644223A89EF0097B62A /* MyButton.swift */,
 				201FB1CC20288CEA00EC9F36 /* MyFunctions.swift */,
 				201FB1C920288CE900EC9F36 /* MyGlobals.swift */,
 				20A604B22035D93A00DC48F0 /* MyRandom.swift */,
@@ -488,7 +491,7 @@
 			isa = PBXGroup;
 			children = (
 				208424D72236B7FD00D18A12 /* bubbleGoldElite.png */,
-				208424D62236B7FD00D18A12 /* bubbleGreen.png */,
+				208424D62236B7FD00D18A12 /* greenButton.png */,
 				205CF7EC2129BC9300C1B89D /* UndoElite.png */,
 				2038F26322316CF40028372D /* UndoSimple.png */,
 				204BB45C2063E9E000CDF085 /* BackElite.png */,
@@ -798,7 +801,7 @@
 				205BF79A21E4D952006633C6 /* huMandatory.txt in Resources */,
 				20552DC5211F1EFA00C54538 /* whiteSprite0010.png in Resources */,
 				208424D92236B7FD00D18A12 /* bubbleGoldElite.png in Resources */,
-				208424D82236B7FD00D18A12 /* bubbleGreen.png in Resources */,
+				208424D82236B7FD00D18A12 /* greenButton.png in Resources */,
 				2086698D222ACF2E002194C8 /* GoldSprite0010.png in Resources */,
 				204B6FD321CD418D00893D58 /* firstplaces.png in Resources */,
 				2084FA2D221C2523002D29D3 /* Delete.png in Resources */,
@@ -919,6 +922,7 @@
 				20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */,
 				20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */,
 				20CDA669214FFEBF00160DC6 /* CloudRecordsViewController.swift in Sources */,
+				20858645223A89EF0097B62A /* MyButton.swift in Sources */,
 				20B28AE620333273001682B2 /* WTTableView.swift in Sources */,
 				2060037020348A8800023E10 /* Grid.swift in Sources */,
 				20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */,

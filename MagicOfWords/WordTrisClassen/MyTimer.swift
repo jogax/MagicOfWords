@@ -114,7 +114,7 @@ class MyTimer: SKSpriteNode {
             timeBackgroundSprite!.name = myTimerName
             timeBackgroundSprite!.alpha = 1.0
             timeBackgroundSprite!.colorBlendFactor = 0.9
-            self.addChild(timeBackgroundSprite!)
+//            self.addChild(timeBackgroundSprite!)
         }
     }
     

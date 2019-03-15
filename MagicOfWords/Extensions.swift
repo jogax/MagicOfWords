@@ -730,6 +730,42 @@ extension UIView {
         self.layer.shadowOpacity = 0.5
         self.layer.shadowPath = shadowPath.cgPath
     }
+    
+    func createRoundedRectPath(for rect: CGRect, radius: CGFloat) -> CGMutablePath {
+        let path = CGMutablePath()
+        
+        // 1
+        let midTopPoint = CGPoint(x: rect.midX, y: rect.minY)
+        path.move(to: midTopPoint)
+        
+        // 2
+        let topRightPoint = CGPoint(x: rect.maxX, y: rect.minY)
+        let bottomRightPoint = CGPoint(x: rect.maxX, y: rect.maxY)
+        let bottomLeftPoint = CGPoint(x: rect.minX, y: rect.maxY)
+        let topLeftPoint = CGPoint(x: rect.minX, y: rect.minY)
+        
+        // 3
+        path.addArc(tangent1End: topRightPoint,
+                    tangent2End: bottomRightPoint,
+                    radius: radius)
+        
+        path.addArc(tangent1End: bottomRightPoint,
+                    tangent2End: bottomLeftPoint,
+                    radius: radius)
+        
+        path.addArc(tangent1End: bottomLeftPoint,
+                    tangent2End: topLeftPoint,
+                    radius: radius)
+        
+        path.addArc(tangent1End: topLeftPoint,
+                    tangent2End: topRightPoint,
+                    radius: radius)
+        
+        // 4
+        path.closeSubpath()
+        
+        return path
+    }
 }
 
 extension Realm {
@@ -743,6 +779,17 @@ extension Realm {
 }
 
 extension SKLabelNode {
+    public func copyMe()->SKLabelNode {
+        let returnNode = SKLabelNode()
+        returnNode.fontName = self.fontName //"KohinoorBangla-Regular"
+        returnNode.fontColor = self.fontColor
+        returnNode.fontSize = self.fontSize
+        returnNode.text = self.text
+        returnNode.verticalAlignmentMode = self.verticalAlignmentMode
+        returnNode.position = self.position
+        returnNode.zPosition = self.zPosition
+        return returnNode
+    }
     public func removeShadow() {
         repeat {
             if children.count > 0 {
