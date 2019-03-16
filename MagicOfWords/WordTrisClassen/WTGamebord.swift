@@ -786,10 +786,12 @@ class WTGameboard: SKShapeNode {
     public func clearGreenFieldsForNextRound() {
         waiting = 0
         countReadyAnimations = 0
+        countOfAnimations = 0
         GV.nextRoundAnimationFinished = false
-        for col in 0..<countCols {
-            for row in 0..<countCols {
-                animateClearing(col: col, row: row)
+        for row in 0..<countCols {
+            for col in 0..<countCols {
+                let newCol = row % 2 == 0 ? 9 - col : col
+                animateClearing(col: newCol, row: row)
             }
         }
         self.roundInfos.append(RoundInfos())
@@ -816,13 +818,13 @@ class WTGameboard: SKShapeNode {
         self.addChild(greenSprite)
         var actions = Array<SKAction>()
         let waitAction = SKAction.wait(forDuration: waiting)
-        waiting += 0.05
+        waiting += 0.2
         let clearAction = SKAction.run {
             GV.gameArray[col][row].clearIfUsed()
             GV.gameArray[col][row].resetCountOccurencesInWords()
         }
         toPositionX = toPositionX >= grid!.frame.maxX ? grid!.frame.minX : toPositionX + grid!.blockSize
-        let movingAction = SKAction.move(to: CGPoint(x: toPositionX, y: parent!.frame.maxY), duration: 3.0)
+        let movingAction = SKAction.move(to: CGPoint(x: toPositionX, y: parent!.frame.maxY), duration: 2.0)
         let removeNodeAction = SKAction.removeFromParent()
         actions.append(SKAction.sequence([clearAction, waitAction, movingAction, removeNodeAction]))
         //        actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))

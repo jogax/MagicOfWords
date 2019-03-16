@@ -395,8 +395,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let textOnBalloon = word.word + " (" + String(score) + ")"
         let elite = GV.buttonType == GV.ButtonTypeElite
         let balloon = SKSpriteNode(imageNamed: elite ? "bubbleGoldElite" : "BalloonSimple")
-        let width = textOnBalloon.width(font: myFont!) * 2.0
-        let height = textOnBalloon.height(font: myFont!) * 3.0
+        let width = textOnBalloon.width(font: myFont!) * (GV.onIpad ? 2.0 : 1.5)
+        let height = textOnBalloon.height(font: myFont!) * 2.5
         balloon.size = CGSize(width: width, height: height)
         balloon.zPosition = 10
 //        let atY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
@@ -819,7 +819,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if self.childNode(withName: timeName) == nil {
             timeLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT") // Snell Roundhand")
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
-            let xPosition = self.frame.size.width * 0.85
+            let xPosition = self.frame.size.width * 0.90
             timeLabel.position = CGPoint(x: xPosition, y: YPosition)
             timeLabel.fontSize = fontSize
             timeLabel.fontColor = .black
@@ -1571,18 +1571,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     
 
-
+    let buttonYPosition: CGFloat = 0.16
     private func createGoBackButton() {
         if goBackButton != nil {
             goBackButton?.removeFromSuperview()
             goBackButton = nil
         }
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
-        let center = CGPoint(x:self.frame.width * 0.05, y:self.frame.height * 0.08)
+        let center = CGPoint(x:self.frame.width * 0.10, y:self.frame.height * buttonYPosition)
         let radius = self.frame.width * 0.04
         let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "BackSimple" : "BackElite"
-        goBackButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: true, hasFrame: hasFrame)
+        goBackButton = createButton(imageName: imageName, imageSize: 1.5, title: "", frame: frame, center: center, cornerRadius: radius, enabled: true, hasFrame: hasFrame)
         goBackButton!.addTarget(self, action: #selector(self.goBackTapped), for: .touchUpInside)
         self.view?.addSubview(goBackButton!)
     }
@@ -1598,11 +1598,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let enabled = activityRoundItem[0].activityItems.count > 0
         let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
-        let center = CGPoint(x:self.frame.width * 0.95, y:self.frame.height * 0.08)
+        let center = CGPoint(x:self.frame.width * 0.90, y:self.frame.height * buttonYPosition)
         let radius = self.frame.width * 0.04
         let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "UndoSimple" : "UndoElite"
-        undoButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
+        undoButton = createButton(imageName: imageName, imageSize: 1.5, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
         undoButton?.addTarget(self, action: #selector(self.undoTapped), for: .touchUpInside)
         self.view?.addSubview(undoButton!)
     }
