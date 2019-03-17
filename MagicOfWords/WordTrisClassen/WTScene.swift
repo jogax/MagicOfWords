@@ -578,7 +578,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
         getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber)
         createHeader()
-        buttonHeight = self.frame.width * 0.08
+        buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
         createUndo(enabled: false)
         createGoBackButton()
 //        wtGameFinishedSprite.setDelegate(delegate: self)
@@ -829,6 +829,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             self.addChild(timeLabel)
         }
 
+        let startPosXForHeaderMultiplier: CGFloat = 0.15
         if self.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let gameNumber = GV.playingRecord.gameNumber
@@ -837,13 +838,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             headerLabel.text = text
             headerLabel.name = String(headerName)
             headerLabel.fontSize = fontSize
-            headerLabel.position = CGPoint(x: self.frame.size.width * 0.3, y: YPosition)
-            headerLabel.horizontalAlignmentMode = .center
+            headerLabel.position = CGPoint(x: self.frame.size.width * startPosXForHeaderMultiplier, y: YPosition)
+            headerLabel.horizontalAlignmentMode = .left
             headerLabel.fontColor = SKColor.black
             self.addChild(headerLabel)
         }
         
-        let xPosMultiplierForScore:CGFloat = 0.11
+//        let xPosMultiplierForScore:CGFloat = 0.15
         let myName = GV.basicDataRecord.myNickname
         
         let bestName = "nobody"
@@ -857,7 +858,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             bestScoreHeaderLabel.text = text
             bestScoreHeaderLabel.name = String(bestScoreName)
             bestScoreHeaderLabel.fontSize = fontSize
-            bestScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * xPosMultiplierForScore, y: YPosition)
+            bestScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * /*xPosMultiplierForScore*/ startPosXForHeaderMultiplier, y: YPosition)
             bestScoreHeaderLabel.horizontalAlignmentMode = .left
             bestScoreHeaderLabel.fontColor = SKColor.black
             self.addChild(bestScoreHeaderLabel)
@@ -870,7 +871,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             myScoreheaderLabel.text = text
             myScoreheaderLabel.name = String(myScoreName)
             myScoreheaderLabel.fontSize = fontSize
-            myScoreheaderLabel.position = CGPoint(x: self.frame.size.width * xPosMultiplierForScore, y: YPosition)
+            myScoreheaderLabel.position = CGPoint(x: self.frame.size.width * /*xPosMultiplierForScore*/ startPosXForHeaderMultiplier, y: YPosition)
             myScoreheaderLabel.horizontalAlignmentMode = .left
             myScoreheaderLabel.fontColor = SKColor.black
             self.addChild(myScoreheaderLabel)
@@ -1571,7 +1572,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     
 
-    let buttonYPosition: CGFloat = 0.16
+    let buttonYPosition: CGFloat = 0.145
     private func createGoBackButton() {
         if goBackButton != nil {
             goBackButton?.removeFromSuperview()

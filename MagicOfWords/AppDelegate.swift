@@ -95,9 +95,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
+                case 19:
+                    migration.enumerateObjects(ofType: BasicDataModel.className()) { oldObject, newObject in
+                        newObject!["buttonType"] = GV.ButtonTypeElite
+                    }
                 default: migration.enumerateObjects(ofType: BasicDataModel.className())
                     { oldObject, newObject in
-                            newObject!["buttonType"] = GV.ButtonTypeSimple
+                            //newObject!["buttonType"] = GV.ButtonTypeSimple
                     }
 
                 }
@@ -232,7 +236,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             realmSync!.add(playerActivityItem)
                         }
                     }  else {
-                        if GV.basicDataRecord.notSaved {
+                        if GV.basicDataRecord.notSaved || GV.basicDataRecord.myNickname != playerActivity![0].nickName! || GV.basicDataRecord.keyWord != playerActivity![0].keyWord! {
                             try! realm.safeWrite() {
                                 GV.basicDataRecord.myNickname = playerActivity![0].nickName!
                                 GV.basicDataRecord.keyWord = playerActivity![0].keyWord!

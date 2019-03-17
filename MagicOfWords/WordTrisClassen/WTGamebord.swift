@@ -788,6 +788,8 @@ class WTGameboard: SKShapeNode {
         countReadyAnimations = 0
         countOfAnimations = 0
         GV.nextRoundAnimationFinished = false
+        toPositionX = grid!.frame.maxX
+        adder = grid!.blockSize
         for row in 0..<countCols {
             for col in 0..<countCols {
                 let newCol = row % 2 == 0 ? 9 - col : col
@@ -799,7 +801,8 @@ class WTGameboard: SKShapeNode {
     
     var waiting = 0.0
     var countOfAnimations = 0
-    var toPositionX = CGFloat(10000)
+    var toPositionX = CGFloat(0)
+    var adder: CGFloat = 0
     
     private func animateClearing(col: Int, row:Int) {
         if GV.buttonType == GV.ButtonTypeSimple {
@@ -818,13 +821,21 @@ class WTGameboard: SKShapeNode {
         self.addChild(greenSprite)
         var actions = Array<SKAction>()
         let waitAction = SKAction.wait(forDuration: waiting)
-        waiting += 0.2
+        waiting += 0.05
         let clearAction = SKAction.run {
             GV.gameArray[col][row].clearIfUsed()
             GV.gameArray[col][row].resetCountOccurencesInWords()
         }
-        toPositionX = toPositionX >= grid!.frame.maxX ? grid!.frame.minX : toPositionX + grid!.blockSize
-        let movingAction = SKAction.move(to: CGPoint(x: toPositionX, y: parent!.frame.maxY), duration: 2.0)
+        toPositionX += adder
+        if toPositionX >= grid!.frame.maxX {
+            adder = -grid!.blockSize
+            toPositionX += adder
+        }
+        if toPositionX < grid!.frame.minX {
+            adder = grid!.blockSize
+            toPositionX += adder
+        }
+        let movingAction = SKAction.move(to: CGPoint(x: toPositionX, y: parent!.frame.maxY), duration: 0.75)
         let removeNodeAction = SKAction.removeFromParent()
         actions.append(SKAction.sequence([clearAction, waitAction, movingAction, removeNodeAction]))
         //        actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))
