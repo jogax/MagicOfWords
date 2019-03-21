@@ -86,7 +86,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 23, // new item words
+            schemaVersion: 24, // new item words
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
@@ -233,6 +233,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             playerActivityItem.territory = GV.language.getPreferredLanguage()
                             playerActivityItem.country = Locale.current.regionCode
                             playerActivityItem.deviceType = UIDevice().modelName
+                            playerActivityItem.version = GV.actVersion
                             realmSync!.add(playerActivityItem)
                         }
                     }  else {
@@ -246,6 +247,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             try! RealmService.safeWrite() {
                                 playerActivity![0].country = Locale.current.regionCode
                                 playerActivity![0].territory = GV.language.getPreferredLanguage()
+                            }
+                        }
+                        if playerActivity![0].version != GV.actVersion {
+                            try! RealmService.safeWrite() {
+                                playerActivity![0].version = GV.actVersion
                             }
                         }
                     }

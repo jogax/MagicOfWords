@@ -26,6 +26,7 @@ class BasicDataModel: Object {
     @objc dynamic var playing = false
     @objc dynamic var choosedCountsForLanguage = ""
     @objc dynamic var notSaved = true
+    @objc dynamic var startAnimationShown = false
     override  class func primaryKey() -> String {
         return "ID"
     }

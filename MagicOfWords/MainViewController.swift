@@ -12,9 +12,14 @@ import GameplayKit
 import RealmSwift
 import Reachability
 import Security
+//import SCLAlertView
 
 
-class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelegate, ShowGamesSceneDelegate /*SettingsSceneDelegate*/ {
+class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, ShowGamesSceneDelegate  {
+    func backFromAnimation() {
+        self.showMenu()
+    }
+    
     
     func chooseNickname() {
         let alertController = UIAlertController(title: GV.language.getText(.tcSetNickName),
@@ -260,13 +265,27 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
         // Get the SKScene from the loaded GKScene
         //-------------------------
         generateBasicDataRecordIfNeeded()
-       if countContinueGames > 0 {
-            startWTScene(new: false, next: .NoMore, gameNumber: 0)
-        } else {
-            showMenu()
-        }
+//        if !GV.basicDataRecord.startAnimationShown {
+//            let animationScene = WelcomeScene(delegate: self)
+//            if let view = self.view as! SKView? {
+////                wtScene.setDelegate(delegate: self)
+////                wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
+////                wtScene.parentViewController = self
+//                view.presentScene(animationScene)
+//            }
+//        } else {
+           if countContinueGames > 0 {
+                startWTScene(new: false, next: .NoMore, gameNumber: 0)
+            } else {
+                showMenu()
+            }
+//        }
         //------------------------
 //        startMenuScene()
+    }
+    
+    @objc private func firstButton () {
+        print("firstButton tapped")
     }
     
     
@@ -294,15 +313,17 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     public func expertUserChanged() {
         if GV.expertUser {
             let title = GV.language.getText(.tcCollectMandatory)
-            if alertController!.actions.last!.title != title {
-                collectMandatoryAction = UIAlertAction(title: title, style: .default, handler: { [unowned self]
-                    alert -> Void in
-                    self.displayCollectMandatoryViewController()
-                })
-                collectMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-                alertController!.addAction(collectMandatoryAction!)
+            if alertController != nil {
+                if alertController!.actions.last!.title != title {
+                    collectMandatoryAction = UIAlertAction(title: title, style: .default, handler: { [unowned self]
+                        alert -> Void in
+                        self.displayCollectMandatoryViewController()
+                    })
+                    collectMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+                    alertController!.addAction(collectMandatoryAction!)
+                }
             }
-        } 
+        }
     }
     
     
@@ -368,6 +389,29 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
     var createMandatoryAction: UIAlertAction?
     #endif
     
+//    func showMenu() {
+//        getRecordCounts()
+//        let newOK = countMandatory - countExistingGames > 0
+//        let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
+//        let alertView = SCLAlertView()
+//        alertView.showTitle(GV.language.getText(.tcChooseAction), // Title of view
+//            subTitle: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname), // String of view
+//            style: .success // Styles - see below.
+//        )
+////        _ title: String, subTitle: String? = nil, style: SCLAlertViewStyle, closeButtonTitle:String?=nil, timeout:SCLTimeoutConfiguration?=nil, colorStyle: UInt?=0x000000, colorTextButton: UInt=0xFFFFFF, circleIconImage: UIImage? = nil, animationStyle: SCLAnimationStyle = .topToBottom)
+//        alertView.addButton(GV.language.getText(.tcNewGame), textColor: (newOK ? nil : disabledColor)) {
+//            if newOK {
+//                self.startNewGame()
+//            }
+//        }
+//
+//        alertView.addButton(GV.language.getText(.tcContinue), textColor:
+////                            target:self, selector:#selector(self.firstButton))
+//        alertView.addButton("Second Button") {
+//        print("Second button tapped")
+//        }
+//        alertView.showSuccess("Button View", subTitle: "This alert view has buttons")
+//    }
 
     func showMenu() {
         getRecordCounts()
@@ -442,24 +486,21 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             })
             showRealmCloudAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
             alertController!.addAction(showRealmCloudAction!)
-//            collectMandatoryAction = UIAlertAction(title: GV.language.getText(.tcCollectMandatory), style: .default, handler: { [unowned self]
-//                alert -> Void in
-//                self.displayCollectMandatoryViewController()
-//            })
-//            collectMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-//            alertController!.addAction(collectMandatoryAction!)
-
-//            createMandatoryAction = UIAlertAction(title: GV.language.getText(.tcCreateMandatory), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//                self.displayCreateMandatoryViewController()
-//            })
-//            createMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-//            alertController!.addAction(createMandatoryAction!)
+            
+            let useGameDataAction = UIAlertAction(title: GV.language.getText(.tcUseCloudGameData), style: .default, handler: { [unowned self]
+            alert -> Void in
+                self.getCloudData()
+            })
+        alertController!.addAction(useGameDataAction)
 
         #endif
         //--------------------- Present alert ---------------------
         present(alertController!, animated: true, completion: nil)
 
+    }
+    
+    private func getCloudData() {
+        print("hier")
     }
     
     private func showSettingsMenu() {
@@ -852,5 +893,4 @@ class MainViewController: UIViewController, /*MenuSceneDelegate,*/ WTSceneDelega
             }
         }
     }
-
 }

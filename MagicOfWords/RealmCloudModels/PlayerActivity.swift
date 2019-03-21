@@ -25,8 +25,10 @@ class PlayerActivity: Object {
     @objc dynamic var country: String?
     @objc dynamic var deviceType: String?
     @objc dynamic var expertUser: Bool = false
+    @objc dynamic var maySaveInfos: Bool = false
     @objc dynamic var lastTouched: Date?
     @objc dynamic var myCommentar: String?
+    @objc dynamic var version: String = ""
 
     override static func primaryKey() -> String? {
         return "name"

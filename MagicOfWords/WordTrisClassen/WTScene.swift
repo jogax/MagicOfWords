@@ -437,20 +437,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     
     struct TouchedNodes {
-        var goBack = false
-        var goPreviousGame = false
-        var goNextGame = false
-        var undo = false
+//        var goPreviousGame = false
+//        var goNextGame = false
         var GCol = NoValue
         var GRow = NoValue
         var col = NoValue
         var row = NoValue
         var shapeIndex = NoValue
-        var answer1 = false
-        var answer2 = false
+//        var answer1 = false
+//        var answer2 = false
 //        var ownWordsBackground = false
-        var gameFinishedOKButton = false
-        var showOwnWordsButton = false
+//        var gameFinishedOKButton = false
+//        var showOwnWordsButton = false
     }
     
     var wtSceneDelegate: WTSceneDelegate?
@@ -544,7 +542,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let previousName = "°°°previousGame°°°"
     let nextName = "°°°nextGame°°°"
 //    let ownWordsBackgroundName = "°°°ownWordsBackgroundName°°°"
-    let ownWordsButtonName = "°°°ownWordsButtonName°°°"
+//    let ownWordsButtonName = "°°°ownWordsButtonName°°°"
 
     var timeIncreaseValues: [Int]?
     var movingSprite: Bool = false
@@ -844,7 +842,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             self.addChild(headerLabel)
         }
         
-//        let xPosMultiplierForScore:CGFloat = 0.15
         let myName = GV.basicDataRecord.myNickname
         
         let bestName = "nobody"
@@ -1401,12 +1398,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc func showAllWordsInTableView() {
+        #if HELPGEN
+            saveHelpInfo(allWordsButtonTouched:true)
+        #endif
         stopShowingTableIfNeeded()
         showOwnWordsInTableView()
         showingWordsInTable = true
     }
     
     var searchButton: MyButton?
+    var saveDataButton: MyButton?
     var allWordsButton: MyButton?
     var finishButton: MyButton?
 
@@ -1486,7 +1487,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let wordHeight = title.height(font: myTitleFont!)
         let size = CGSize(width:wordLength * 1.5, height: buttonHeight)
         ownHeaderYPos = self.frame.height * mybuttonLineCenterY// - ownHeader.frame.maxY + frame.height
-        allWordsButtonCenter = CGPoint(x:self.frame.width * 0.5, y: ownHeaderYPos) //self.frame.height * 0.20)
+        allWordsButtonCenter = CGPoint(x:self.frame.width * 0.6, y: ownHeaderYPos) //self.frame.height * 0.20)
 //        let radius = frame.height * 0.5
         let myButton = createMyButton(title: title, size: size, center: allWordsButtonCenter, enabled: true )
         myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(showAllWordsInTableView))
@@ -1543,7 +1544,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc private func finishButtonTapped() {
-        print ("finish!")
         showGameFinished(status: .OK)
     }
     
@@ -1557,7 +1557,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             searchButton = nil
         }
         let size = CGSize(width: buttonHeight, height: buttonHeight)
-        let center = CGPoint(x: self.frame.width - finishButton!.frame.minX - buttonHeight / 2, y: allWordsButtonCenter.y)
+//        let freePlaceWidth = self.frame.width - allWordsButton!.frame.maxX
+        let center = CGPoint(x: allWordsButton!.frame.maxX + (self.frame.width - allWordsButton!.frame.maxX) * 0.5, y: allWordsButtonCenter.y)
 //        let radius = self.frame.width * 0.04
 //        let image = UIImage(named: "search")
         let newSize = allWordsButton!.size.height
@@ -1569,6 +1570,75 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        searchButton!.addTarget(self, action: #selector(self.wordListTapped), for: .touchUpInside)
         self.addChild(searchButton!)
     }
+    
+    private func createSaveDataButton() {
+        if !(playerActivity![0].maySaveInfos) {
+            return
+        }
+        if saveDataButton != nil {
+            saveDataButton!.removeFromParent()
+            saveDataButton = nil
+        }
+        let size = CGSize(width: buttonHeight, height: buttonHeight)
+        //        let freePlaceWidth = self.frame.width - allWordsButton!.frame.maxX
+        let center = CGPoint(x: self.frame.width * 0.07, y: self.frame.height * 0.925)
+        let newSize = allWordsButton!.size.height
+        let myButton = createMyButton(imageName: "save", size: size, center: center, enabled: true, newSize: newSize)
+        myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(saveDataButtonTapped))
+        //        allWordsButton?.addTarget(self, action: #selector(self.showAllWordsInTableView), for: .touchUpInside)
+        myButton.zPosition = self.zPosition + 1
+        saveDataButton = myButton
+        //        searchButton!.addTarget(self, action: #selector(self.wordListTapped), for: .touchUpInside)
+        self.addChild(saveDataButton!)
+
+    }
+    #if DEBUG
+    var savedGameData: Results<GameData>?
+    var savedGameDataSubscription: SyncSubscription<GameData>?
+    var savedGameDataToken: NotificationToken?
+
+    @objc private func saveDataButtonTapped() {
+        let saveDataRecord = GameData()
+        let ownerName = playerActivity![0].name
+        let combinedKey = GV.playingRecord.combinedKey + ownerName
+        savedGameData = realmSync!.objects(GameData.self).filter("combinedKey = %@", combinedKey)
+        savedGameDataSubscription = savedGameData!.subscribe(named: "savedGameData:\(combinedKey)")
+        savedGameDataToken = savedGameDataSubscription!.observe(\.state) { [weak self]  state in
+            if state == .complete {
+                if self!.savedGameData!.count > 0 {
+                    try! RealmService.safeWrite() {
+                        for round in self!.savedGameData![0].rounds {
+                            RealmService.delete(round)
+                        }
+                        RealmService.delete(self!.savedGameData!)
+                    }
+                }
+                saveDataRecord.combinedKey = combinedKey
+                saveDataRecord.language = GV.playingRecord.language
+                saveDataRecord.gameNumber = GV.playingRecord.gameNumber
+                saveDataRecord.gameStatus = GV.playingRecord.gameStatus
+                saveDataRecord.mandatoryWords = GV.playingRecord.mandatoryWords
+                saveDataRecord.ownWords = GV.playingRecord.ownWords
+                saveDataRecord.pieces = GV.playingRecord.pieces
+                saveDataRecord.words = GV.playingRecord.words
+                saveDataRecord.score = GV.playingRecord.score
+                saveDataRecord.time = GV.playingRecord.time
+                saveDataRecord.owner = playerActivity![0]
+                try! RealmService.safeWrite() {
+                    RealmService.add(saveDataRecord)
+                    for round in GV.playingRecord.rounds {
+                        let myRound = RoundData()
+                        myRound.infos = round.infos
+                        myRound.activityItems = round.activityItems
+                        myRound.gameArray = round.gameArray
+                        myRound.roundScore = round.roundScore
+                        saveDataRecord.rounds.append(myRound)
+                    }
+                }
+            }
+        }
+    }
+    #endif
     
     
 
@@ -1757,20 +1827,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 self.addChild(pieceArray[index])
             }
         }
+        #if HELPGEN
+            if GV.playingRecord.gameNumber == 0 {
+                initiateHelpModel()
+            }
+        #endif
 //        modifyHeader()
         createGoToPreviousGameButton(enabled: hasPreviousRecords(playingRecord: GV.playingRecord))
         createGoToNextGameButton(enabled: hasNextRecords(playingRecord: GV.playingRecord))
         createShowAllWordsButton()
         createFinishButton()
         createSearchButton()
-//        if  hasPreviousRecords(playingRecord: GV.playingRecord) {
-//
-//            goToPreviousGameButton.alpha = 1.0
-//            goToPreviousGameButton.isEnabled = true
-//        } else {
-//            goToPreviousGameButton.alpha = 0.2
-//            goToPreviousGameButton.isEnabled = false
-//        }
+        createSaveDataButton()
         
         if timer != nil {
             timer!.invalidate()
@@ -1870,6 +1938,119 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
     }
     
+    var helpInfo: Realm?
+    
+    private func initiateHelpModel() {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let helpInfoURL = documentsURL.appendingPathComponent("HelpInfo.realm")
+        let config1 = Realm.Configuration(
+            fileURL: helpInfoURL,
+            shouldCompactOnLaunch: { totalBytes, usedBytes in
+                // totalBytes refers to the size of the file on disk in bytes (data + free space)
+                // usedBytes refers to the number of bytes used by data in the file
+                
+                // Compact if the file is over 100MB in size and less than 50% 'used'
+                let oneMB = 10 * 1024 * 1024
+                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+        },
+            objectTypes: [HelpModel.self])
+        do {
+            // Realm is compacted on the first open if the configuration block conditions were met.
+            _ = try Realm(configuration: config1)
+        } catch {
+            print("error")
+            // handle error compacting or opening Realm
+        }
+        let helpInfoConfig = Realm.Configuration(
+            fileURL: helpInfoURL,
+            schemaVersion: 4, // new item words
+            // Set the block which will be called automatically when opening a Realm with
+            // a schema version lower than the one set above
+            migrationBlock: { migration, oldSchemaVersion in
+                switch oldSchemaVersion {
+                case 0:
+                    migration.enumerateObjects(ofType: HelpModel.className()) { oldObject, newObject in
+                        newObject!["pieces"] = oldObject!["helpString"]
+                    }
+                case 1...3:
+                    migration.deleteData(forType: HelpModel.className())
+
+                default: migration.enumerateObjects(ofType: BasicDataModel.className())
+                { oldObject, newObject in
+                    }
+                }
+        },
+            objectTypes: [HelpModel.self])
+        
+        helpInfo = try! Realm(configuration: helpInfoConfig)
+
+    }
+    
+    private func resetHelpInfo() {
+        if GV.playingRecord.gameNumber != 0 {
+            return
+        }
+        let records = helpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage)
+        if records.count > 0 {
+            try! helpInfo!.safeWrite() {
+                helpInfo!.delete(records)
+            }
+        }
+    }
+//    var lastColIndex = NoValue
+//    var lastRowIndex = NoValue
+    
+    private func saveHelpInfo(touchLocation: CGPoint = CGPoint(x:CGFloat(0), y:CGFloat(0)), touchedNodes: TouchedNodes = TouchedNodes(), calledFrom: CalledFrom = .start, undoButtonTouched: Bool=false, allWordsButtonTouched: Bool=false) {
+        if GV.playingRecord.gameNumber != 0 {
+            return
+        }
+        let records = helpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true)
+        var lastRecord = HelpModel()
+        var counter = 0
+        if records.count > 0 {
+            lastRecord = records.last!
+            counter = records.last!.counter
+        }
+        
+        var bottomIndex = touchedNodes.shapeIndex
+        var bottomPieceTouched = bottomIndex > NoValue
+        var colIndex = touchedNodes.GCol
+        var rowIndex = touchedNodes.GRow
+        var onGameArray = true
+        
+        if bottomPieceTouched {
+            if (touchLocation - pieceArray[bottomIndex].position).length() < blockSize {
+                colIndex = NoValue
+                rowIndex = NoValue
+                onGameArray = false
+            } else {
+                colIndex = touchedNodes.col
+                rowIndex = touchedNodes.row
+                bottomPieceTouched = false
+                bottomIndex = NoValue
+            }
+        }
+
+        let helpModel = HelpModel()
+        helpModel.combinedKey = GV.actLanguage + String(counter + 1)
+        helpModel.language = GV.actLanguage
+        helpModel.counter = counter + 1
+        helpModel.typeOfTouch = calledFrom.rawValue
+        helpModel.bottomPieceTouched = bottomPieceTouched
+        helpModel.onGameArray = onGameArray
+        helpModel.bottomIndex = bottomIndex
+        helpModel.colIndex = colIndex
+        helpModel.rowIndex = rowIndex
+        helpModel.undoButtonTouched = undoButtonTouched
+        helpModel.allWordsButtonTouched = allWordsButtonTouched
+        if undoButtonTouched || allWordsButtonTouched || calledFrom != CalledFrom.move || (calledFrom == CalledFrom.move && (lastRecord.bottomPieceTouched != helpModel.bottomPieceTouched || lastRecord.bottomIndex != helpModel.bottomIndex || lastRecord.onGameArray != helpModel.onGameArray || lastRecord.colIndex != helpModel.colIndex || lastRecord.rowIndex != helpModel.rowIndex)) {
+            print("helpModel: language: \(helpModel.language), counter: \(helpModel.counter), typeOfTouch: \(helpModel.typeOfTouch), bottomPieceTouched:\(helpModel.bottomPieceTouched), onGameArray:\(onGameArray), bottomIndex: \(bottomIndex), colIndex: \(colIndex), rowIndex: \(rowIndex),  ")
+
+            try! helpInfo!.safeWrite() {
+                helpInfo!.add(helpModel)
+            }
+        }
+    }
     private func saveArrayOfPieces() {
         tilesForGame.removeAll()
         let piecesToPlay = GV.playingRecord.pieces.components(separatedBy: "°")
@@ -1984,9 +2165,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else if touchedNodes.GCol.between(min: 0, max: GV.sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: GV.sizeOfGrid - 1){
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
-//        } else if touchedNodes.ownWordsBackground {
-//            ownWordsScrolling = true
-//            ownWordsScrollingStartPos = firstTouchLocation
         }
 
     }
@@ -2075,23 +2253,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 continue
             }
             if enabled || gameboardEnabled {
-//                if name == goBackName {
-//                    touchedNodes.goBack = enabled
-//                }
-//                if name == previousName {
-//                    touchedNodes.goPreviousGame = enabled
-//                }
-//                if name == nextName {
-//                    touchedNodes.goNextGame = enabled
-//                } else if name == undoName {
-//                    touchedNodes.undo = enabled
-//                } else
-//                if name == GameFinishedOKName {
-//                    touchedNodes.gameFinishedOKButton = true
-//                } else
-                if name == ownWordsButtonName {
-                    touchedNodes.showOwnWordsButton = true
-                } else if name.begins(with: "GBD") {
+                if name.begins(with: "GBD") {
                     touchedNodes.GCol = Int(name.subString(at: 4, length:1))!
                     touchedNodes.GRow = Int(name.subString(at: 6, length:1))!
                 } else if let number = Int(name.subString(at: 3, length: name.count - 3)) {
@@ -2115,6 +2277,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         }
+        #if HELPGEN
+        saveHelpInfo(touchLocation: touchLocation, touchedNodes: touchedNodes, calledFrom: calledFrom)
+        #endif
         return touchedNodes
     }
     let answer1Name = "Answer1"
@@ -2170,14 +2335,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                pieceArray[movedIndex].zPosition = 1
                 pieceArray[movedIndex].setPieceFromPosition(index: movedIndex)
                 let activityItem = ActivityItem(type: .FromBottom, fromBottomIndex: pieceArray[movedIndex].getArrayIndex())
-                if activityRoundItem.count > 0 {
-                    if activityRoundItem.last!.activityItems.count == 0 {
-                        activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
-                    }
-                } else {
+                if activityRoundItem.count == 0 {
                     activityRoundItem.append(ActivityRound())
+                }
+                if activityRoundItem.last!.activityItems.count == 0 {
                     activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
                 }
+//                if activityRoundItem.count > 0 {
+//                    if activityRoundItem.last!.activityItems.count == 0 {
+//                        activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
+//                    }
+//                } else {
+//                    activityRoundItem.append(ActivityRound())
+//                    activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
+//                }
                 activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
 //                activityItems.append(activityItem)
                 createUndo(enabled: true)
@@ -2426,6 +2597,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let continueAction =  UIAlertAction(title: continueTitle, style: .default, handler: {alert -> Void in
             self.gameboardEnabled = true
             self.goOnPlaying = true
+//            self.saveHelpInfo(touchLocation:)
             try! realm.safeWrite() {
                 GV.playingRecord.gameStatus = GV.GameStatusContinued
             }
@@ -2437,6 +2609,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         })
         alertController.addAction(continueAction)
         alertController.addAction(finishAction)
+ //        let subViewPosition = UIAlertController.subviews[0].view.frame
         self.parentViewController!.present(alertController, animated: true, completion: nil)
     }
     
@@ -2606,29 +2779,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             restoreGameArray()
             createUndo(enabled: false)
         }
+        #if HELPGEN
+            saveHelpInfo(undoButtonTouched:true)
+        #endif
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
             actRound = GV.playingRecord.rounds.count - 1
             if activityRoundItem.count > 0 {
                 try! realm.safeWrite() {
-                GV.playingRecord.rounds.removeLast()
+                    GV.playingRecord.rounds.removeLast()
+                }
+                activityRoundItem.removeLast()
+                timeForGame.decrementMaxTime(value: iHalfHour)
+                GV.totalScore = 0
+                GV.mandatoryScore = 0
+                GV.ownScore = 0
+                GV.bonusScore = 0
+                wtGameboard!.setRoundInfos()
+                WTGameWordList.shared.reset()
+                WTGameWordList.shared.restoreFromPlayingRecord()
+                restoreGameArray()
+                modifyHeader()
             }
-            activityRoundItem.removeLast()
-            timeForGame.decrementMaxTime(value: iHalfHour)
-            GV.totalScore = 0
-            GV.mandatoryScore = 0
-            GV.ownScore = 0
-            GV.bonusScore = 0
-            wtGameboard!.setRoundInfos()
-            WTGameWordList.shared.reset()
-            WTGameWordList.shared.restoreFromPlayingRecord()
-            restoreGameArray()
-            modifyHeader()
-        }
-//            else {
-//                    restartGame()
-//                }
-
-
         } else {
             switch activityRoundItem[activityRoundItem.count - 1].activityItems.last!.type {
             case .FromBottom:
@@ -2692,6 +2863,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             saveToRealmCloud()
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 && activityRoundItem.count == 1 {
+            #if HELPGEN
+            resetHelpInfo()
+            #endif
             undoButton!.alpha = 0.2
             undoButton!.isEnabled = false
             wtGameboard!.clearGameArray()
@@ -2833,7 +3007,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 pieceString += "°"
                 let newIndex = random.getRandomInt(0, max: tilesForGame.count)
-                if newIndex == tilesForGame.count || !first || usedWords.count > 6 {
+                if newIndex == tilesForGame.count || !first || usedWords.count > 6 || GV.playingRecord.gameNumber == 0 {
                     tilesForGame.append(tileForGameItem)
                 } else {
                     tilesForGame.insert(tileForGameItem, at: newIndex)

@@ -113,6 +113,7 @@ let deDictionary: [TextConstants: String] = [
     .tcEliteStyle:         "Elite",
     .tcGenerateBestScore:  "BestScore-Liste generieren",
     .tcComment:            "Kommentar",
+    .tcUseCloudGameData:   "Spiel aus der Cloud",
 ]
 
 

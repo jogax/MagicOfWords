@@ -111,7 +111,8 @@ enum TextConstants: Int {
     tcSimpleStyle,
     tcEliteStyle,
     tcGenerateBestScore,
-    tcComment
+    tcComment,
+    tcUseCloudGameData
 
 }
 

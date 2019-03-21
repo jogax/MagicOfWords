@@ -113,4 +113,5 @@ let enDictionary: [TextConstants: String] = [
     .tcEliteStyle:         "Elite",
     .tcGenerateBestScore:  "Generate BestScore List",
     .tcComment:            "Comment",
+    .tcUseCloudGameData:   "Get Game from Cloud",
 ]
