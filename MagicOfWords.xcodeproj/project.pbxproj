@@ -122,9 +122,6 @@
 		207B67862243BDBB001456C8 /* GameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207B67852243BDBB001456C8 /* GameData.swift */; };
 		207B67882243BE87001456C8 /* RoundData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207B67872243BE87001456C8 /* RoundData.swift */; };
 		207B678A2243C9F8001456C8 /* save.png in Resources */ = {isa = PBXBuildFile; fileRef = 207B67892243C9F7001456C8 /* save.png */; };
-		2080737C2242746600BE38E9 /* SCLAlertView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2080737B2242746600BE38E9 /* SCLAlertView.framework */; };
-		2080737D22427D8200BE38E9 /* SCLAlertView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2080737B2242746600BE38E9 /* SCLAlertView.framework */; };
-		2080737E22427D8200BE38E9 /* SCLAlertView.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2080737B2242746600BE38E9 /* SCLAlertView.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		208073802242933700BE38E9 /* WelcomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2080737F2242933700BE38E9 /* WelcomeScene.swift */; };
 		208144202167B65500496AFC /* BestScoreForGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081441F2167B65500496AFC /* BestScoreForGame.swift */; };
 		208173E12103577900960800 /* BalloonSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = 208173E02103577800960800 /* BalloonSimple.png */; };
@@ -189,20 +186,6 @@
 		20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		209D91D920B5877700EC141E /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				2080737E22427D8200BE38E9 /* SCLAlertView.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		201FB1AE20288C2B00EC9F36 /* MagicOfWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MagicOfWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -396,13 +379,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2080737C2242746600BE38E9 /* SCLAlertView.framework in Frameworks */,
 				203D250D21F73D65009897BD /* Realm.framework in Frameworks */,
 				203D250B21F73D44009897BD /* RealmSwift.framework in Frameworks */,
 				20437F9A217B793100F16F99 /* Reachability.framework in Frameworks */,
 				2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */,
 				2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */,
-				2080737D22427D8200BE38E9 /* SCLAlertView.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -697,7 +678,6 @@
 				201FB1AA20288C2B00EC9F36 /* Sources */,
 				201FB1AB20288C2B00EC9F36 /* Frameworks */,
 				201FB1AC20288C2B00EC9F36 /* Resources */,
-				209D91D920B5877700EC141E /* Embed Frameworks */,
 				20F1760A21626C6000AF37D7 /* ShellScript */,
 			);
 			buildRules = (
