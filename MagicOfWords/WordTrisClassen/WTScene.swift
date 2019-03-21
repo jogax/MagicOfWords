@@ -1592,12 +1592,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.addChild(saveDataButton!)
 
     }
-    #if DEBUG
     var savedGameData: Results<GameData>?
     var savedGameDataSubscription: SyncSubscription<GameData>?
     var savedGameDataToken: NotificationToken?
 
-    @objc private func saveDataButtonTapped() {
+    @objc public func saveDataButtonTapped() {
         let saveDataRecord = GameData()
         let ownerName = playerActivity![0].name
         let combinedKey = GV.playingRecord.combinedKey + ownerName
@@ -1638,9 +1637,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
     }
-    #endif
-    
-    
 
     let buttonYPosition: CGFloat = 0.145
     private func createGoBackButton() {

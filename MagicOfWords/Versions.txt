@@ -7,3 +7,6 @@ Build 4, Version 1.04
 - Nicer Font in Gameboard
 - changing of language is now possible
 - merged into master
+
+Build 12, Version 1.12
+- allows to save the actual state of a game to cloud --> for analyseing of errors by users
