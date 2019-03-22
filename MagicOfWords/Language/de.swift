@@ -114,6 +114,8 @@ let deDictionary: [TextConstants: String] = [
     .tcGenerateBestScore:  "BestScore-Liste generieren",
     .tcComment:            "Kommentar",
     .tcUseCloudGameData:   "Spiel aus der Cloud",
+    .tcChooseGameToGet:    "Wähle einen Spiel für einlesen vom Cloud",
+    .tcGameLine:           "Notifier: %, GameNumber: %",
 ]
 
 

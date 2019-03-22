@@ -112,7 +112,9 @@ enum TextConstants: Int {
     tcEliteStyle,
     tcGenerateBestScore,
     tcComment,
-    tcUseCloudGameData
+    tcUseCloudGameData,
+    tcChooseGameToGet,
+    tcGameLine
 
 }
 

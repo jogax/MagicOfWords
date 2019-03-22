@@ -113,4 +113,6 @@ let huDictionary: [TextConstants: String] = [
     .tcGenerateBestScore:  "Legjobb eredmények lista generálása",
     .tcComment:            "Megjegyzés",
     .tcUseCloudGameData:   "Játék a felhőből",
+    .tcChooseGameToGet:    "Válassz egy játékot a letöltéshez",
+    .tcGameLine:           "Bejelentő: %, Játék: %",
 ]

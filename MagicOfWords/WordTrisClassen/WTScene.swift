@@ -1595,6 +1595,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var savedGameData: Results<GameData>?
     var savedGameDataSubscription: SyncSubscription<GameData>?
     var savedGameDataToken: NotificationToken?
+    
+    
 
     @objc public func saveDataButtonTapped() {
         let saveDataRecord = GameData()

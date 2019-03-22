@@ -389,29 +389,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     var createMandatoryAction: UIAlertAction?
     #endif
     
-//    func showMenu() {
-//        getRecordCounts()
-//        let newOK = countMandatory - countExistingGames > 0
-//        let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
-//        let alertView = SCLAlertView()
-//        alertView.showTitle(GV.language.getText(.tcChooseAction), // Title of view
-//            subTitle: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname), // String of view
-//            style: .success // Styles - see below.
-//        )
-////        _ title: String, subTitle: String? = nil, style: SCLAlertViewStyle, closeButtonTitle:String?=nil, timeout:SCLTimeoutConfiguration?=nil, colorStyle: UInt?=0x000000, colorTextButton: UInt=0xFFFFFF, circleIconImage: UIImage? = nil, animationStyle: SCLAnimationStyle = .topToBottom)
-//        alertView.addButton(GV.language.getText(.tcNewGame), textColor: (newOK ? nil : disabledColor)) {
-//            if newOK {
-//                self.startNewGame()
-//            }
-//        }
-//
-//        alertView.addButton(GV.language.getText(.tcContinue), textColor:
-////                            target:self, selector:#selector(self.firstButton))
-//        alertView.addButton("Second Button") {
-//        print("Second button tapped")
-//        }
-//        alertView.showSuccess("Button View", subTitle: "This alert view has buttons")
-//    }
 
     func showMenu() {
         getRecordCounts()
@@ -498,9 +475,77 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         present(alertController!, animated: true, completion: nil)
 
     }
-    
+
+    var cloudGameData: Results<GameData>?
+    var cloudGameDataSubscription: SyncSubscription<GameData>?
+    var cloudGameDataToken: NotificationToken?
+
     private func getCloudData() {
-        print("hier")
+        cloudGameData = realmSync!.objects(GameData.self).filter("combinedKey BEGINSWITH %@", GV.actLanguage)
+        cloudGameDataSubscription = cloudGameData!.subscribe(named: "cloudGameData:\(GV.actLanguage)")
+        cloudGameDataToken = cloudGameDataSubscription!.observe(\.state) { [weak self]  state in
+            if state == .complete {
+                if self!.cloudGameData!.count > 0 {
+                    let alertController = UIAlertController(title: GV.language.getText(.tcChooseGameToGet),
+                                                              message: "",
+                                                              preferredStyle: .alert)
+                    for game in self!.cloudGameData! {
+                        let nickName = game.owner!.nickName
+                        let gameNumber = String(game.gameNumber)
+                        let combinedKey = GV.actLanguage + gameNumber + game.owner!.name
+                        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcGameLine, values: nickName!, gameNumber), style: .default, handler: { [/*unowned*/ self]
+                            alert -> Void in
+                            self!.getGame(combinedKey: combinedKey)
+                        })
+                        alertController.addAction(chooseLanguageAction)
+                    }
+                    let cancelAction =  UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [/*unowned*/ self]
+                        alert -> Void in
+                        self!.showMenu()
+                    })
+                    alertController.addAction(cancelAction)
+                    self!.present(alertController, animated: true, completion: nil)
+                }
+            }
+        }
+    }
+        
+    @objc private func getGame(combinedKey: String) {
+        let cloudGameDataRecord = cloudGameData!.filter("combinedKey = %d", combinedKey).first!
+        let adder = 1000
+        let localGameNumber = cloudGameDataRecord.gameNumber + adder
+        let localCombinedKey = cloudGameDataRecord.language + String(localGameNumber)
+        let localRecords = realm.objects(GameDataModel.self).filter("combinedKey = %d", localCombinedKey)
+        if localRecords.count > 0 {
+            try! realm.safeWrite() {
+                realm.delete(localRecords)
+            }
+        }
+        let localGameData = GameDataModel()
+        localGameData.combinedKey = localCombinedKey
+        localGameData.language = cloudGameDataRecord.language
+        localGameData.gameNumber = localGameNumber
+        localGameData.nowPlaying = false
+        localGameData.gameStatus = cloudGameDataRecord.gameStatus
+        localGameData.mandatoryWords = cloudGameDataRecord.mandatoryWords
+        localGameData.ownWords = cloudGameDataRecord.ownWords
+        localGameData.pieces = cloudGameDataRecord.pieces
+        localGameData.words = cloudGameDataRecord.words
+        localGameData.score = cloudGameDataRecord.score
+        localGameData.time = cloudGameDataRecord.time
+        localGameData.synced = true
+        try! realm.safeWrite() {
+            realm.add(localGameData)
+            for round in cloudGameDataRecord.rounds {
+                let myRound = RoundDataModel()
+                myRound.infos = round.infos
+                myRound.activityItems = round.activityItems
+                myRound.gameArray = round.gameArray
+                myRound.roundScore = round.roundScore
+                localGameData.rounds.append(myRound)
+            }
+        }
+        showMenu()
     }
     
     private func showSettingsMenu() {

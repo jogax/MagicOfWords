@@ -114,5 +114,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcGenerateBestScore:  "Создать список лучших результатов",
     .tcComment:            "Коммент:",
     .tcUseCloudGameData:   "Получить игру из облака",
+    .tcChooseGameToGet:    "Выбери игру, чтобы получить из облака",
+    .tcGameLine:           "Уведомитель: %, Игра: %",
 ]
 

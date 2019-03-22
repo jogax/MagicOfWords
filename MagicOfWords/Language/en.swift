@@ -114,4 +114,6 @@ let enDictionary: [TextConstants: String] = [
     .tcGenerateBestScore:  "Generate BestScore List",
     .tcComment:            "Comment",
     .tcUseCloudGameData:   "Get Game from Cloud",
+    .tcChooseGameToGet:    "Choose a Game to get from Cloud",
+    .tcGameLine:           "Notifier: %, GameNumber: %",
 ]
