@@ -493,7 +493,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                         let nickName = game.owner!.nickName
                         let gameNumber = String(game.gameNumber)
                         let combinedKey = GV.actLanguage + gameNumber + game.owner!.name
-                        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcGameLine, values: nickName!, gameNumber), style: .default, handler: { [/*unowned*/ self]
+                        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcGameLine, values: nickName!, String(game.gameNumber + 1)), style: .default, handler: { [/*unowned*/ self]
                             alert -> Void in
                             self!.getGame(combinedKey: combinedKey)
                         })

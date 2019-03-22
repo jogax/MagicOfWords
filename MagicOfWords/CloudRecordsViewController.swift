@@ -506,7 +506,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             playerData.keyWord = user.keyWord == nil ? "" : user.keyWord!
             playerData.comment = user.myCommentar == nil ? "" : user.myCommentar!
             if user.lastTouched != nil {
-                playerData.isOnline = user.isOnline && getLocalDate().timeIntervalSince(user.lastTouched!) <= 60 
+                playerData.isOnline = user.isOnline && getLocalDate().timeIntervalSince(user.lastTouched!) <= 128
             } else {
                 playerData.isOnline = false
                 try! RealmService.safeWrite() {

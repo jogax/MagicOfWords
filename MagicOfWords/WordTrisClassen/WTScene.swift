@@ -677,7 +677,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 let playedGames = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: false)
                 for playedGame in playedGames {
-                    freeGameNumbers.remove(at: playedGame.gameNumber)
+                    if playedGame.gameNumber < 1000 {
+                        freeGameNumbers.remove(at: playedGame.gameNumber)
+                    }
                 }
                 createPlayingRecord(gameNumber: freeGameNumbers.first!)
             }

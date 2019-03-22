@@ -291,6 +291,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     @objc private func setLastTouched(timerX: Timer) {
+        tenMinutesTimer!.invalidate()
+        tenMinutesTimer = nil
         try! realm.safeWrite() {
             GV.basicDataRecord.onlineTime += 1
             if GV.playing {
