@@ -446,7 +446,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 
         nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
             alert -> Void in
-            if GV.connectedToInternet && playerActivity != nil {
+            if GV.connectedToInternet && playerActivity != nil && GV.myUser != nil {
                 self.chooseNickname()
             } else {
                 self.showMenu()

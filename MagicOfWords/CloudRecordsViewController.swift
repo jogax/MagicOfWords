@@ -87,7 +87,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     func getNumberOfRowsInSections(section: Int) -> Int {
         switch tableType {
         case .Players:
-            return playerActivityItems!.count
+            return playerTable.count
         case .BestScoreSync:
             return bestScoreTable.count
         case .BestScoreForGame:
@@ -421,8 +421,9 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 self!.calculateColumnWidths()
                 let origin = CGPoint(x: 0, y: 0)
                 //        let origin = CGPoint(x: 0.5 * (self.view.frame.width - (headerLine.width(font: myFont!))), y: 200)
+                self!.generatePlayerData()
                 let maxHeight = self!.view.frame.height * 0.8
-                let calculatedHeight = self!.headerLine.height(font: self!.myFont!) * (CGFloat(self!.playerActivityItems!.count + 1))
+                let calculatedHeight = self!.headerLine.height(font: self!.myFont!) * (CGFloat(self!.playerTable.count + 1))
                 let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
                 let size = CGSize(width: self!.headerLine.width(font: self!.myFont!) * 1, height:height)
                 let center = CGPoint(x: 0.5 * self!.view.frame.width, y: 0.5 * self!.view.frame.height)
@@ -433,7 +434,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                     self!.createButtons()
                 }
                 self!.modifyButtonsPosition()
-                self!.generatePlayerData()
+//                self!.generatePlayerData()
                 self!.showPlayerActivityView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
                 self!.showPlayerActivityView!.reloadData()
                 print("complete: count records: \(String(describing: self!.playerActivityItems!.count))")
@@ -505,6 +506,9 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             playerData.nickName = user.nickName!
             playerData.keyWord = user.keyWord == nil ? "" : user.keyWord!
             playerData.comment = user.myCommentar == nil ? "" : user.myCommentar!
+            if playerData.comment.beginsWith ("Apl ") {
+                continue
+            }
             if user.lastTouched != nil {
                 playerData.isOnline = user.isOnline && getLocalDate().timeIntervalSince(user.lastTouched!) <= 128
             } else {
@@ -528,7 +532,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         bestScoreItems = RealmService.objects(BestScoreSync.self).filter("language = %@ AND score > 0", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
         bestScoreSubscription = bestScoreItems!.subscribe(named: "bestScoreQuery")
         bestScoreSubscriptionToken = bestScoreSubscription.observe(\.state) { [weak self]  state in
-            print("in Subscription!")
+//            print("in Subscription!")
             switch state {
             case .creating:
                 print("creating")

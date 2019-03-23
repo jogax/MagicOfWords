@@ -406,6 +406,10 @@ extension String {
         return subString(at: 0, length: length)
     }
     
+    func beginsWith(_ with: String)->Bool {
+        return subString(at: 0, length: with.length) == with
+    }
+    
     mutating func subString(at: Int, length: Int, remove: Bool) -> String.SubSequence {
         let indexStartOfText = self.index(self.startIndex, offsetBy: at)
         let indexEndOfText = self.index(self.startIndex, offsetBy: at + length)
