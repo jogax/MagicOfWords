@@ -55,7 +55,7 @@ let ruDictionary: [TextConstants: String] = [
 //    .tcNoMoreStepsAnswer1: "Да",
     .tcNoMoreStepsAnswer2: "Следующий раунд",
     .tcNoMoreStepsAnswer3: "Указать собственные слова",
-    .tcAlphabet:           "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ", //Ъ !!!
+    .tcAlphabet:           "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ", /// Ъ!
 //    .tcFrequency:           "А°10/Б°2/В°3/Г°2/Д°3/Е°8/Ё°1/Ж°1/З°2/И°9/Й°1/К°5/Л°4/М°3/Н°7/О°10/П°3/Р°7/С°5/Т°7/У°2/Ф°1/Х°1/Ц°1/Ч°1/Ш°1/Щ°1/Ы°1/Ь°2/Э°1/Ю°0/Я°1",
     .tcNickNameLetters:    "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭ",
     .tcGameNumber:          "Игра",
@@ -116,5 +116,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcUseCloudGameData:   "Получить игру из облака",
     .tcChooseGameToGet:    "Выбери игру, чтобы получить из облака",
     .tcGameLine:           "Уведомитель: %, Игра: %",
+    .tcWelcomeText1:        "Добро пожаловать в чудесный мир слов",
+    .tcWelcomeText2:        "Желаю приятно провести время!",
+    .tcWelcomeText3:        "А теперь посмотрим, как надо играть",
 ]
 

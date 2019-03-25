@@ -651,16 +651,19 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                         generateRecord = true
                     }
                     if generateRecord {
-                        let item = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false).first!
-                        let bestScoreForGameItem = BestScoreForGame()
-                        bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
-                        bestScoreForGameItem.gameNumber = actGameNumber
-                        bestScoreForGameItem.language = item.language
-                        bestScoreForGameItem.bestScore = item.score
-                        bestScoreForGameItem.timeStamp = item.timeStamp
-                        bestScoreForGameItem.owner = item.owner!
-                        try! RealmService.safeWrite() {
-                            RealmService.add(bestScoreForGameItem)
+                        let items = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false)
+                        if items.count > 0 {
+                            let item = items.first!
+                            let bestScoreForGameItem = BestScoreForGame()
+                            bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
+                            bestScoreForGameItem.gameNumber = actGameNumber
+                            bestScoreForGameItem.language = item.language
+                            bestScoreForGameItem.bestScore = item.score
+                            bestScoreForGameItem.timeStamp = item.timeStamp
+                            bestScoreForGameItem.owner = item.owner!
+                            try! RealmService.safeWrite() {
+                                RealmService.add(bestScoreForGameItem)
+                            }
                         }
                     }
                 }

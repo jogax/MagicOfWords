@@ -19,36 +19,41 @@ public protocol WelcomeSceneDelegate: class {
 
 
 class WelcomeScene: SKScene {
-    var myDelegate: WelcomeSceneDelegate
+    let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
+    var myDelegate: WelcomeSceneDelegate?
     let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 18)
 
-    init(delegate: WelcomeSceneDelegate) {
-        self.myDelegate = delegate
-        super.init(size: CGSize(width: 1000, height: 1000))
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     override func didMove(to view: SKView) {
-        //        wtGameWordList = WTGameWordList(delegate: self)
-        //        timeIncreaseValues = [0, 0, 0, 0, 0, 0, iFiveMinutes, iFiveMinutes, iTenMinutes, iTenMinutes, iQuarterHour]
         self.name = "WelcomaAnimation"
         self.view!.isMultipleTouchEnabled = false
-//        self.view!.subviews.forEach { $0.removeFromSuperview() }
+        self.view!.subviews.forEach { $0.removeFromSuperview() }
         let size = CGSize(width: self.frame.height * 0.10, height: self.frame.height * 0.05)
-        let center = CGPoint(x:self.frame.midX, y: self.frame.midY)
-        let myButton = createMyButton(title: "Done",
-                                      size: size,
-                                      center: center,
-                                      enabled: true )
+        let buttonCenter = CGPoint(x:self.frame.midX, y: self.frame.height * 0.05)
+        let myButton = createMyButton(title: "Done", size: size, center: buttonCenter, enabled: true )
         myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(doneButtonTapped))
         myButton.zPosition = 10
+        self.backgroundColor = bgColor
         self.addChild(myButton)
-
+        getLetters()
     }
+    
+    var letterTable = [WTGameboardItem]()
+    
+    private func getLetters() {
+        let text = GV.language.getText(.tcWelcomeText1)
+        for letter in text {
+            let item = WTGameboardItem(blockSize: self.view!.frame.width * 0.08, fontSize: self.frame.width * 0.04)
+            _ = item.setLetter(letter: String(letter), status: ItemStatus.wholeWord, toColor: MyColor.myGoldColor)
+            letterTable.append(item)
+        }
+    }
+    
+    public func setDelegate(delegate: WelcomeSceneDelegate) {
+        self.myDelegate = delegate
+    }
+    
     @objc private func doneButtonTapped() {
-        myDelegate.backFromAnimation()
+        myDelegate!.backFromAnimation()
     }
     
     private func createMyButton(imageName: String = "", title: String = "", size: CGSize, center: CGPoint, enabled: Bool, newSize: CGFloat = 0)->MyButton {

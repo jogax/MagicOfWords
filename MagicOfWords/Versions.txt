@@ -10,3 +10,6 @@ Build 4, Version 1.04
 
 Build 12, Version 1.12
 - allows to save the actual state of a game to cloud --> for analyseing of errors by users
+
+Build 13, Version 1.13 (0.91)
+- fix an error that could cause a crash

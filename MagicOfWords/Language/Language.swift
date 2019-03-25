@@ -114,8 +114,10 @@ enum TextConstants: Int {
     tcComment,
     tcUseCloudGameData,
     tcChooseGameToGet,
-    tcGameLine
-
+    tcGameLine,
+    tcWelcomeText1,
+    tcWelcomeText2,
+    tcWelcomeText3
 }
 
     let LanguageEN = "en" // index 0

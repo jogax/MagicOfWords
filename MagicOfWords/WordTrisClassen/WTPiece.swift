@@ -425,7 +425,7 @@ class WTPiece: SKSpriteNode {
         self.pieceFromPosition = NoValue
     }
     
-    public func addArrayIndex(index: Int) {
+    public func setArrayIndex(index: Int) {
         arrayIndex = index
     }
     

@@ -563,6 +563,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        self.wtGameFinishedSprite = WTGameFinished()
 //        self.addChild(wtGameFinishedSprite)
         self.backgroundColor = bgColor
+//        let background = SKSpriteNode(imageNamed: "bgImage")
+//        background.position = CGPoint(x: 0, y: 0)
+//        background.size.width = self.size.width
+//        background.size.height = self.size.height
+//        background.anchorPoint = CGPoint(x: 0,y: 0)
+//        background.zPosition = zPosition - 10
+//        
+//        self.addChild(background)
+
 //        generateReadOnly()
 //        exit(0)
         if restart {
@@ -1502,8 +1511,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func createMyButton(imageName: String = "", title: String = "", size: CGSize, center: CGPoint, enabled: Bool, newSize: CGFloat = 0)->MyButton {
         var button: MyButton
         if imageName != "" {
-            let texture = SKTexture(imageNamed: imageName)
-            button = MyButton(normalTexture: texture, selectedTexture:texture, disabledTexture: texture)
+            let image = UIImage(named: imageName)!
+            let texture = SKTexture(image: image)
+            let imageSize = image.size.width * 0.9
+            let downImage = resizeImage(image: image, newWidth: imageSize)
+            let downTexture = SKTexture(image: downImage)
+            button = MyButton(normalTexture: texture, selectedTexture:downTexture, disabledTexture: texture)
         } else {
             button = MyButton(fontName: myTitleFont!.fontName, size: size)
             button.setButtonLabel(title: title, font: myTitleFont!)
@@ -2052,20 +2065,22 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     private func saveArrayOfPieces() {
-        tilesForGame.removeAll()
+//        tilesForGame.removeAll()
         let piecesToPlay = GV.playingRecord.pieces.components(separatedBy: "°")
-        for index in 0..<piecesToPlay.count {
-            let piece = piecesToPlay[index]
-            if piece.count > 0 {
-                let tile = WTPiece(from: piece, parent: self, blockSize: blockSize, arrayIndex: index)
-                tilesForGame.append(tile)
-                tilesForGame.last!.addArrayIndex(index: index)
+        for index in tilesForGame.count..<piecesToPlay.count {
+            if index >= tilesForGame.count {
+                let piece = piecesToPlay[index]
+                if piece.count > 0 {
+                    let tile = WTPiece(from: piece, parent: self, blockSize: blockSize, arrayIndex: index)
+                    tilesForGame.append(tile)
+                    tilesForGame.last!.setArrayIndex(index: index)
+                }
             }
         }
    }
     
     private func generateArrayOfWordPieces(new: Bool) {
-        if new || GV.playingRecord.pieces.count == 0 {
+       if new || GV.playingRecord.pieces.count == 0 {
             try! realm.safeWrite() {
 //                GV.playingRecord.randomCounts = 0
                 GV.playingRecord.words = ""
@@ -2332,7 +2347,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             let fixed = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row, fromBottom: true)
             if fixed {
-//                pieceArray[movedIndex].zPosition = 1
+ //                pieceArray[movedIndex].zPosition = 1
                 pieceArray[movedIndex].setPieceFromPosition(index: movedIndex)
                 let activityItem = ActivityItem(type: .FromBottom, fromBottomIndex: pieceArray[movedIndex].getArrayIndex())
                 if activityRoundItem.count == 0 {
@@ -2540,7 +2555,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     private func saveToRealmCloud() {
-        if GV.debug {
+        if GV.debug || !(GV.playingRecord.gameNumber < 1000) {
             return
         }
         if GV.connectedToInternet {
@@ -2873,6 +2888,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             
     }
     
+    private func printTileForGame(_ index: Int) {
+        let tileForGame = tilesForGame[index]
+        print(tileForGame.toString())
+    }
+    
     func restoreGameArray() {
         func addPieceAsChild(pieceIndex: Int, piece: WTPiece) {
             pieceArray[pieceIndex] = piece
@@ -2909,9 +2929,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 } else {
                     indexOfTilesForGame = index
                     break
-
                 }
             }
+        }
+        if indexOfTilesForGame == 0 {
+            indexOfTilesForGame = tilesForGame.count
+            let pieces = generateArrayOfWordPieces(first:false)
+            try! realm.safeWrite() {
+                GV.playingRecord.pieces = pieces
+            }
+            saveArrayOfPieces()
         }
         for index in 0..<pieceArray.count {
             if pieceArray[index].name == nil {
@@ -3026,7 +3053,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else {
             for word in usedWords {
                 for letter in word.uppercased() {
-                    letterCounters[String(letter)]! += 1
+                    if let _ = letterCounters[String(letter)] {
+                        letterCounters[String(letter)]! += 1
+                    }
                 }
             }
         }
@@ -3054,7 +3083,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             repeat {
                 allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[index].lowercased())
                 counter = allRecords.count
-                index += 1
+                if counter < 10 {
+                    letters.remove(at: index)
+                } else {
+                    index += 1
+                }
             } while counter < 10
             var countRepeats = 0
             var word = ""
@@ -3080,6 +3113,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         print("wordString: \(wordsString)")
         try! realm.safeWrite() {
             GV.playingRecord.words = wordsString
+        }
+        for (index, tile) in tilesForGame.enumerated() {
+            tile.setArrayIndex(index: index)
         }
         return generatedArrayInStringForm
 

@@ -17,6 +17,10 @@ import Security
 
 class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, ShowGamesSceneDelegate  {
     func backFromAnimation() {
+        if let view = self.view as! SKView? {
+            view.presentScene(nil)
+        }
+        showBackgroundPicture()
         self.showMenu()
     }
     
@@ -265,21 +269,29 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         // Get the SKScene from the loaded GKScene
         //-------------------------
         generateBasicDataRecordIfNeeded()
-//        if !GV.basicDataRecord.startAnimationShown {
-//            let animationScene = WelcomeScene(delegate: self)
-//            if let view = self.view as! SKView? {
-////                wtScene.setDelegate(delegate: self)
-////                wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
-////                wtScene.parentViewController = self
-//                view.presentScene(animationScene)
-//            }
-//        } else {
-           if countContinueGames > 0 {
+        #if DEBUG
+            if !GV.basicDataRecord.startAnimationShown {
+                let animationScene = WelcomeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+                if let view = self.view as! SKView? {
+                    animationScene.setDelegate(delegate: self)
+    //                wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
+    //                wtScene.parentViewController = self
+                    view.presentScene(animationScene)
+                }
+            } else {
+               if countContinueGames > 0 {
+                    startWTScene(new: false, next: .NoMore, gameNumber: 0)
+                } else {
+                    showMenu()
+                }
+            }
+        #else
+            if countContinueGames > 0 {
                 startWTScene(new: false, next: .NoMore, gameNumber: 0)
             } else {
                 showMenu()
             }
-//        }
+        #endif
         //------------------------
 //        startMenuScene()
     }

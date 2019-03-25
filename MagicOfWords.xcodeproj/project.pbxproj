@@ -131,6 +131,8 @@
 		208424D82236B7FD00D18A12 /* greenButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 208424D62236B7FD00D18A12 /* greenButton.png */; };
 		208424D92236B7FD00D18A12 /* bubbleGoldElite.png in Resources */ = {isa = PBXBuildFile; fileRef = 208424D72236B7FD00D18A12 /* bubbleGoldElite.png */; };
 		20842DE62031EA910078FFDA /* ruWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20842DE52031EA910078FFDA /* ruWords.txt */; };
+		20846B7622467C1300CD5060 /* bgImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 20846B7522467C1300CD5060 /* bgImage.png */; };
+		20846B782246963C00CD5060 /* GoldSprite0000.png in Resources */ = {isa = PBXBuildFile; fileRef = 20846B772246963C00CD5060 /* GoldSprite0000.png */; };
 		2084C0D62209BF73002B8F2E /* compare2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2084C0D52209BF73002B8F2E /* compare2.txt */; };
 		2084FA2D221C2523002D29D3 /* Delete.png in Resources */ = {isa = PBXBuildFile; fileRef = 2084FA2C221C2523002D29D3 /* Delete.png */; };
 		2084FA2F221C4C61002D29D3 /* ModifiedWordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2084FA2E221C4C61002D29D3 /* ModifiedWordsModel.swift */; };
@@ -317,6 +319,8 @@
 		208424D62236B7FD00D18A12 /* greenButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greenButton.png; sourceTree = "<group>"; };
 		208424D72236B7FD00D18A12 /* bubbleGoldElite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bubbleGoldElite.png; sourceTree = "<group>"; };
 		20842DE52031EA910078FFDA /* ruWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruWords.txt; sourceTree = "<group>"; };
+		20846B7522467C1300CD5060 /* bgImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bgImage.png; sourceTree = "<group>"; };
+		20846B772246963C00CD5060 /* GoldSprite0000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GoldSprite0000.png; sourceTree = "<group>"; };
 		2084C0D52209BF73002B8F2E /* compare2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = compare2.txt; sourceTree = "<group>"; };
 		2084C0D72209BF8B002B8F2E /* deRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deRestWords.txt; sourceTree = "<group>"; };
 		2084FA2C221C2523002D29D3 /* Delete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Delete.png; sourceTree = "<group>"; };
@@ -490,6 +494,7 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				20846B7522467C1300CD5060 /* bgImage.png */,
 				207B67892243C9F7001456C8 /* save.png */,
 				208424D72236B7FD00D18A12 /* bubbleGoldElite.png */,
 				208424D62236B7FD00D18A12 /* greenButton.png */,
@@ -540,6 +545,7 @@
 				2086695B222AC84D002194C8 /* GreenSprite1110.png */,
 				20866960222AC84D002194C8 /* GreenSprite1111.png */,
 				20866979222ACF2D002194C8 /* GoldSprite0001.png */,
+				20846B772246963C00CD5060 /* GoldSprite0000.png */,
 				2086697E222ACF2D002194C8 /* GoldSprite0010.png */,
 				2086697F222ACF2D002194C8 /* GoldSprite0011.png */,
 				20866984222ACF2E002194C8 /* GoldSprite0100.png */,
@@ -805,6 +811,7 @@
 				20552DC5211F1EFA00C54538 /* whiteSprite0010.png in Resources */,
 				208424D92236B7FD00D18A12 /* bubbleGoldElite.png in Resources */,
 				208424D82236B7FD00D18A12 /* greenButton.png in Resources */,
+				20846B7622467C1300CD5060 /* bgImage.png in Resources */,
 				2086698D222ACF2E002194C8 /* GoldSprite0010.png in Resources */,
 				204B6FD321CD418D00893D58 /* firstplaces.png in Resources */,
 				2084FA2D221C2523002D29D3 /* Delete.png in Resources */,
@@ -864,6 +871,7 @@
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
 				2049314C21E6496100BE66EA /* enMandatory.txt in Resources */,
 				2038F26722317AFE0028372D /* BalloonElite.png in Resources */,
+				20846B782246963C00CD5060 /* GoldSprite0000.png in Resources */,
 				208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */,
 				20395F5F21A31D4300947D7F /* search.png in Resources */,
 			);
@@ -1103,7 +1111,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUGX HELPGENX GENERATEWORDLISTX GENERATEMANDATORYX SHOWFINGERX CREATEMANDATORYX CREATEWORDLISTX";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG HELPGENX GENERATEWORDLISTX GENERATEMANDATORYX SHOWFINGERX CREATEMANDATORYX CREATEWORDLISTX";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
