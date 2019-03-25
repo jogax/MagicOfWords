@@ -13,3 +13,6 @@ Build 12, Version 1.12
 
 Build 13, Version 1.13 (0.91)
 - fix an error that could cause a crash
+- egy olyan hiba rögzítése, amely összeomlást okozhat
+- исправляет ошибку, которая может вызвать сбой
+- behebt einen Fehler, der zum Absturz führen kann
