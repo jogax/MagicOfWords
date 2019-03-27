@@ -16,3 +16,5 @@ Build 13, Version 1.13 (0.91)
 - egy olyan hiba rögzítése, amely összeomlást okozhat
 - исправляет ошибку, которая может вызвать сбой
 - behebt einen Fehler, der zum Absturz führen kann
+
+Build 14, Version 1.14 (0.92)
