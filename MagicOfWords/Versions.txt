@@ -18,3 +18,7 @@ Build 13, Version 1.13 (0.91)
 - behebt einen Fehler, der zum Absturz führen kann
 
 Build 14, Version 1.14 (0.92)
+- Fixed a bug that caused a crash in the absence of the Internet
+- Исправлена ошибка, приводившая к сбою при отсутствии интернета
+- Ein Fehler wurde behoben, der zum Absturz führte, wenn kein Internet vorhanden war
+- Kijavít egy hibát, amely az internet hiányában összeomlást okozott
