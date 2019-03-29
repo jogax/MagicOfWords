@@ -138,7 +138,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                     print("return -> realmLoadingCompleted not completed")
                     return
                 }
-                guard let showGamesInTableView = self?.showGamesInTableView else { return }
+                guard (self?.showGamesInTableView) != nil else { return }
                 switch changes {
                 case .initial:
                     // Results are now populated and can be accessed without blocking the UI
@@ -146,7 +146,8 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                     self!.initialLoadDone = true
                     self!.showGamesInTableView!.reloadData()
                     print("Initial Data displayed")
-                case .update(_, let deletions, let insertions, let modifications):
+//                case .update(_, let deletions, let insertions, let modifications):
+                case .update(_, _, _, _):
 //                    print("deletions: \(deletions), insertions: \(insertions), modifications: \(modifications)")
                     self!.gamesForShow = self!.getGamesForShow()
                     //                 if self!.initialLoadDone {

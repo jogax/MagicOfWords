@@ -115,7 +115,8 @@ let huDictionary: [TextConstants: String] = [
     .tcUseCloudGameData:   "Játék a felhőből",
     .tcChooseGameToGet:    "Válassz egy játékot a letöltéshez",
     .tcGameLine:           "Bejelentő: %, Játék: %",
-    .tcWelcomeText1:        "Üdvözöllek a szavak csodálatos világában",
-    .tcWelcomeText2:        "Érezd jól magad!",
-    .tcWelcomeText3:        "És most lássuk, hogyan kell játszani",
+    .tcWelcomeText1:        "Üdvözöllek/a szavak/csodálatos/világában!",
+    .tcWelcomeText2:        "Érezd jól/magad!",
+    .tcWelcomeText3:        "És most/lássuk hogyan/kell játszani",
+    .tcLater:               "Később",
 ]

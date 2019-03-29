@@ -1498,7 +1498,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let wordHeight = title.height(font: myTitleFont!)
         let size = CGSize(width:wordLength * 1.5, height: buttonHeight)
         ownHeaderYPos = self.frame.height * mybuttonLineCenterY// - ownHeader.frame.maxY + frame.height
-        allWordsButtonCenter = CGPoint(x:self.frame.width * 0.6, y: ownHeaderYPos) //self.frame.height * 0.20)
+        allWordsButtonCenter = CGPoint(x:self.frame.width * 0.55, y: ownHeaderYPos) //self.frame.height * 0.20)
 //        let radius = frame.height * 0.5
         let myButton = createMyButton(title: title, size: size, center: allWordsButtonCenter, enabled: true )
         myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(showAllWordsInTableView))
@@ -1587,6 +1587,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func createSaveDataButton() {
+        if GV.myUser == nil {
+            return
+        }
         if !(playerActivity![0].maySaveInfos) {
             return
         }
@@ -2128,6 +2131,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 showWordsOverPositionTableView?.removeFromSuperview()
             }
             timerIsCounting = true
+            self.hideButtons(hide: false)
         }
     }
     

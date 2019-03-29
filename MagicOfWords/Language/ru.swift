@@ -116,8 +116,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcUseCloudGameData:   "Получить игру из облака",
     .tcChooseGameToGet:    "Выбери игру, чтобы получить из облака",
     .tcGameLine:           "Уведомитель: %, Игра: %",
-    .tcWelcomeText1:        "Добро пожаловать в чудесный мир слов",
-    .tcWelcomeText2:        "Желаю приятно провести время!",
-    .tcWelcomeText3:        "А теперь посмотрим, как надо играть",
+    .tcWelcomeText1:        "Добро/пожаловать/в чудесном/мире слов!",
+    .tcWelcomeText2:        "Желаю приятно/провести время!",
+    .tcWelcomeText3:        "А теперь/давай посмотрим/как надо играть",
+    .tcLater:               "Позже",
 ]
 
