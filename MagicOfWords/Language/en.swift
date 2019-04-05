@@ -116,8 +116,9 @@ let enDictionary: [TextConstants: String] = [
     .tcUseCloudGameData:   "Get Game from Cloud",
     .tcChooseGameToGet:    "Choose a Game to get from Cloud",
     .tcGameLine:           "Notifier: %, GameNumber: %",
-    .tcWelcomeText1:        "Welcome/to the/wonderful/world/of Words!",
+    .tcWelcomeText1:        "Welcome to the wonderful/world of Words!",
     .tcWelcomeText2:        "Have a nice time!",
-    .tcWelcomeText3:        "Now let's see/how to play",
+    .tcWelcomeText3:        "And now I'll show you/how to play",
     .tcLater:               "Later",
+    .tcShowMe:              "Show me!",
 ]

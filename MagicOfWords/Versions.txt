@@ -22,3 +22,5 @@ Build 14, Version 1.14 (0.92)
 - Исправлена ошибка, приводившая к сбою при отсутствии интернета
 - Ein Fehler wurde behoben, der zum Absturz führte, wenn kein Internet vorhanden war
 - Kijavít egy hibát, amely az internet hiányában összeomlást okozott
+
+Build 15, Version 1.15 (0.93)

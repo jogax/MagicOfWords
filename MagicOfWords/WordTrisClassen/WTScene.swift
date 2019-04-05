@@ -497,6 +497,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var nextGame: StartType = .NoMore
     var newGameNumber: Int = 0
     var restart: Bool = false
+    var showHelp: Bool = false
     var startTouchedNodes = TouchedNodes()
 //    var wtGameFinishedSprite = WTGameFinished()
 
@@ -560,20 +561,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GV.mandatoryScore = 0
         GV.ownScore = 0
         GV.bonusScore = 0
-//        self.wtGameFinishedSprite = WTGameFinished()
-//        self.addChild(wtGameFinishedSprite)
         self.backgroundColor = bgColor
-//        let background = SKSpriteNode(imageNamed: "bgImage")
-//        background.position = CGPoint(x: 0, y: 0)
-//        background.size.width = self.size.width
-//        background.size.height = self.size.height
-//        background.anchorPoint = CGPoint(x: 0,y: 0)
-//        background.zPosition = zPosition - 10
-//        
-//        self.addChild(background)
-
-//        generateReadOnly()
-//        exit(0)
         if restart {
             let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, newGameNumber)
             if recordToDelete.count == 1 {
@@ -582,8 +570,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         }
+        #if HELPGEN
+            newGameNumber = 1000
+            new = true
+            nextGame = .GameNumber
+        #endif
 
-        getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber)
+        getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         createHeader()
         buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
         createUndo(enabled: false)
@@ -595,16 +588,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         play()
    }
     
-//    func setCountMandatoryWords() {
-//        let mandatoryWords = GV.playingRecord.mandatoryWords.components(separatedBy: "°")
-//        for item in mandatoryWords {
-//            if item.count > 0 {
-//                GV.allWords.append(WordToCheck(word: item.uppercased(), countFounded: 0, mandatory: true, creationIndex: 0, score: 0))
-//            }
-//        }
-//        GV.countMandatoryWords = mandatoryWords.count
-//    }
-//
     func startNewGame() {
         wtSceneDelegate!.gameFinished(start: .NewGame)
     }
@@ -644,7 +627,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
 //    }
 //
-    private func getPlayingRecord(new: Bool, next: StartType, gameNumber: Int) {
+    private func getPlayingRecord(new: Bool, next: StartType, gameNumber: Int, showHelp: Bool = false) {
         func setMandatoryWords() {
             if GV.playingRecord.mandatoryWords == "" {
                 let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", GV.playingRecord.gameNumber, GV.actLanguage).first!
@@ -662,16 +645,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@", GV.actLanguage)
-        if new {
+//        if actGames.count > 0 {
+//            try! realm.safeWrite() {
+//                for actGame in actGames {
+//                    actGame.nowPlaying = false
+//                }
+//            }
+//       }
+        let andData = true
+        var createHelpData = false
+        var dummy = false
+        #if HELPGEN
+            dummy = true
+        #endif
+        createHelpData = dummy && andData
+        if showHelp {
+            createPlayingRecord(gameNumber: gameNumber)
+        } else if createHelpData {
+            deleteGameDataRecord(gameNumber: gameNumber)
+            createPlayingRecord(gameNumber: gameNumber)
+        } else if new {
             let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusNew, GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
             /// reset all records with nowPlaying status
-            if actGames.count > 0 {
-                try! realm.safeWrite() {
-                    for actGame in actGames {
-                        actGame.nowPlaying = false
-                    }
-                }
-            }
 //            wtGameWordList = WTGameWordList(delegate: self)
             if games.count > 0 {
                 GV.playingRecord = games[0]
@@ -805,11 +800,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         wtSceneDelegate = delegate
     }
     
-    public func setGameArt(new: Bool = false, next: StartType = .NoMore, gameNumber: Int = 0, restart: Bool) {
+    public func setGameArt(new: Bool = false, next: StartType = .NoMore, gameNumber: Int = 0, restart: Bool, showHelp: Bool) {
         self.new = new
         self.nextGame = next
         self.newGameNumber = gameNumber
         self.restart = restart
+        self.showHelp = showHelp
     }
     
     let gameNumberLinePosition:CGFloat = 0.93
@@ -1587,10 +1583,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func createSaveDataButton() {
-        if GV.myUser == nil {
-            return
-        }
-        if !(playerActivity![0].maySaveInfos) {
+        if !(playerActivity != nil && playerActivity!.count > 0 && playerActivity![0].maySaveInfos) {
             return
         }
         if saveDataButton != nil {
@@ -1844,8 +1837,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         #if HELPGEN
-            if GV.playingRecord.gameNumber == 0 {
+            if GV.playingRecord.gameNumber == 1000 {
                 initiateHelpModel()
+                resetHelpInfo()
             }
         #endif
 //        modifyHeader()
@@ -1861,6 +1855,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
         countTime(timerX: Timer())
+        if showHelp {
+            showHelpDemo()
+        }
     }
     
     var bestPlayerNickname = ""
@@ -1868,63 +1865,115 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var actPlayer = ""
     var actScore = 0
     
-//    let bestOnlineRecords: Results<BestScoreSync>
-//    var notificationToken: NotificationToken?
-//    var subscriptionToken: NotificationToken?
-//    var subscription: SyncSubscription<bestOnlineRecords>!
-    
-    
-//    private func getOnlineRecords() {
-//        let gameNumber = GV.playingRecord.gameNumber % 1000 + 1
-//        bestOnlineRecords = realmSync!.objects(BestScoreSync.self).filter("CombinedPrimary BEGINSWITH %@", "\(gameNumber)\(GV.aktLanguage)").sorted(byKeyPath: "score", ascending: false)
-//        subscription = bestOnlineRecords.subscribe(named: "myBestScores")
-//        subscriptionToken = subscription.observe(\.state) { [weak self]  state in
-//            print("in Subscription!")
-//            switch state {
-//            case .creating:
-//                print("creating")
-//            // The subscription has not yet been written to the Realm
-//            case .pending:
-//                print("pending")
-//                // The subscription has been written to the Realm and is waiting
-//            // to be processed by the server
-//            case .complete:
-//                print("complete: count records: \(String(describing: self!.bestOnlineRecords.count))")
-//                // The subscription has been processed by the server and all objects
-//            // matching the query are in the local Realm
-//            case .invalidated:
-//                print("invalitdated")
-//            // The subscription has been removed
-//            case .error(let error):
-//                print("error: \(error)")
-//                // An error occurred while processing the subscription
-//            }
-//        }
-////        notificationToken = bestOnlineRecords.observe { [weak self] (changes) in
-////            switch changes {
-////            case .initial:
-////                // Results are now populated and can be accessed without blocking the UI
-////                let bestPlayer = self!.bestOnlineRecords.first!.playerName
-////                bestPlayerNickname =
-////            case .update(_, let deletions, let insertions, let modifications):
-////                // Query results have changed, so apply them to the UITableView
-////                if insertions.count > 0 {
-////                    bestOnlineRecords.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
-////                }
-////                bestOnlineRecords.beginUpdates()
-////                showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-////                                                  with: .automatic)
-////                showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-////                                                  with: .automatic)
-////                showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-////                                                  with: .automatic)
-////                showPlayerActivityView.endUpdates()
-////            case .error(let error):
-////                // An error occurred while opening the Realm file on the background worker thread
-////                fatalError("\(error)")
-////            }
-////        }
-//    }
+    private func showHelpDemo() {
+        let duration = 0.2
+        let texture = SKTexture(imageNamed: "finger")
+        let fingerSprite = SKSpriteNode(texture: texture)
+        var fingerActions = [SKAction]()
+        enum ActionType: Int {
+            case Move = 0, TouchesBegan, TouchesMoved, TouchesEnded, NoMore
+        }
+        let multiplier: CGFloat = 0.1
+        let width = self.frame.width * multiplier
+        let fingerSize = CGSize(width: width, height: width)
+        var startPosition = CGPoint(x: self.frame.midX, y: self.frame.minY)
+        fingerSprite.size = fingerSize
+        fingerSprite.position = startPosition
+        fingerSprite.zPosition = 100
+        
+        func addTouchAction(type: ActionType, position: CGPoint, duration: Double) {
+//            print("type: \(type), position: \(position)")
+            fingerActions.append(SKAction.move(to: CGPoint(x: position.x, y: position.y), duration: duration))
+            switch type {
+            case .Move:
+                break
+             case .TouchesBegan:
+                let beganAction = SKAction.run({
+                    self.myTouchesBegan(location: position)
+                })
+                fingerActions.append(beganAction)
+            case .TouchesMoved:
+                let moveAction = SKAction.run({
+                    self.myTouchesMoved(location: position)
+                })
+                fingerActions.append(moveAction)
+            case .TouchesEnded:
+                let endedAction = SKAction.run({
+                    self.myTouchesEnded(location: position)
+                })
+                fingerActions.append(endedAction)
+            default:
+                break
+            }
+            let waitAction = SKAction.wait(forDuration: duration)
+            fingerActions.append(waitAction)
+        }
+        
+        var startFromGamearray = false
+//        var fingerStartPosition = CGPoint(x: 0, y: 0)
+//        var durationCount: Double = 0
+
+        for touch in GV.helpTouches! {
+            func calculatePos(col: Int, row: Int)->CGPoint {
+                let colSprite = self.childNode(withName: "Col\(col)")
+                let rowSprite = self.childNode(withName: "Row\(row)")
+                let yAdder = (startFromGamearray ? blockSize * 2 : 0)
+                let position = CGPoint(x: colSprite!.position.x, y: rowSprite!.position.y + yAdder)
+                return position
+            }
+            switch touch.typeOfTouch {
+            case TypeOfTouch.Began.rawValue:
+
+                startFromGamearray = touch.onGameArray
+                if touch.bottomIndex >= 0 {
+                    let position = pieceArray[touch.bottomIndex].position
+//                    fingerStartPosition = position
+                    addTouchAction(type: .TouchesBegan, position: position, duration: duration)
+//                    durationCount += duration
+                } else if touch.onGameArray {
+                    let position = calculatePos(col: touch.colIndex, row: touch.rowIndex)
+//                    fingerStartPosition = position
+                    addTouchAction(type: .TouchesBegan, position: position, duration: duration)
+               } else {
+                    print("other by began")
+               }
+//               durationCount = duration
+            case TypeOfTouch.Moved.rawValue:
+                if touch.bottomIndex >= 0 {
+                    print("bottomIndex: \(touch.bottomIndex) by moved!!!")
+                } else if touch.onGameArray {
+                    let position = calculatePos(col: touch.colIndex, row: touch.rowIndex)
+//                    if abs(startPosition.x - position.x) / blockSize > 1.0 && abs(startPosition.y - position.y) / blockSize > 1.0 {
+//                        fingerActions.append(SKAction.move(to: CGPoint(x: position.x, y: position.y), duration: durationCount))
+//                        durationCount = 0
+//                        fingerStartPosition = position
+//                    }
+                    addTouchAction(type: .TouchesMoved, position: position, duration: duration)
+                } else {
+                    print("other by moved")
+                }
+                // hier move the fingersprite
+            case TypeOfTouch.Ended.rawValue:
+                var position = CGPoint(x: 0, y: 0)
+                if touch.bottomIndex >= 0 {
+                    position = pieceArray[touch.bottomIndex].position
+                    addTouchAction(type: .TouchesEnded, position: position, duration: 0)
+                } else if touch.onGameArray {
+                    position = calculatePos(col: touch.colIndex, row: touch.rowIndex)
+                    addTouchAction(type: .TouchesEnded, position: position, duration: 0)
+//                    fingerActions.append(SKAction.move(to: CGPoint(x: position.x, y: position.y), duration: durationCount))
+                } else {
+                    print("other by moved")
+                }
+            default:
+                //hier stop the fingersprite
+                continue
+            }
+        }
+        let sequence = SKAction.sequence(fingerActions)
+        fingerSprite.run(SKAction.sequence([sequence]))
+        self.addChild(fingerSprite)
+    }
     
     private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
         return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber < %d and language = %@",
@@ -1954,7 +2003,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
     }
     
-    var helpInfo: Realm?
+    var realmHelpInfo: Realm?
     
     private func initiateHelpModel() {
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -1998,18 +2047,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         },
             objectTypes: [HelpModel.self])
         
-        helpInfo = try! Realm(configuration: helpInfoConfig)
+        realmHelpInfo = try! Realm(configuration: helpInfoConfig)
 
     }
     
     private func resetHelpInfo() {
-        if GV.playingRecord.gameNumber != 0 {
+        if GV.playingRecord.gameNumber != 1000 {
             return
         }
-        let records = helpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage)
+        let records = realmHelpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage)
         if records.count > 0 {
-            try! helpInfo!.safeWrite() {
-                helpInfo!.delete(records)
+            try! realmHelpInfo!.safeWrite() {
+                realmHelpInfo!.delete(records)
             }
         }
     }
@@ -2017,10 +2066,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    var lastRowIndex = NoValue
     
     private func saveHelpInfo(touchLocation: CGPoint = CGPoint(x:CGFloat(0), y:CGFloat(0)), touchedNodes: TouchedNodes = TouchedNodes(), calledFrom: CalledFrom = .start, undoButtonTouched: Bool=false, allWordsButtonTouched: Bool=false) {
-        if GV.playingRecord.gameNumber != 0 {
+        if GV.playingRecord.gameNumber != 1000 {
             return
         }
-        let records = helpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true)
+        let records = realmHelpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true)
         var lastRecord = HelpModel()
         var counter = 0
         if records.count > 0 {
@@ -2062,8 +2111,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if undoButtonTouched || allWordsButtonTouched || calledFrom != CalledFrom.move || (calledFrom == CalledFrom.move && (lastRecord.bottomPieceTouched != helpModel.bottomPieceTouched || lastRecord.bottomIndex != helpModel.bottomIndex || lastRecord.onGameArray != helpModel.onGameArray || lastRecord.colIndex != helpModel.colIndex || lastRecord.rowIndex != helpModel.rowIndex)) {
             print("helpModel: language: \(helpModel.language), counter: \(helpModel.counter), typeOfTouch: \(helpModel.typeOfTouch), bottomPieceTouched:\(helpModel.bottomPieceTouched), onGameArray:\(onGameArray), bottomIndex: \(bottomIndex), colIndex: \(colIndex), rowIndex: \(rowIndex),  ")
 
-            try! helpInfo!.safeWrite() {
-                helpInfo!.add(helpModel)
+            try! realmHelpInfo!.safeWrite() {
+                realmHelpInfo!.add(helpModel)
             }
         }
     }
@@ -2139,6 +2188,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var firstTouchedRow = 0
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        myTouchesBegan(location: touches.first!.location(in: self))
+    }
+    
+    private func myTouchesBegan(location: CGPoint) {
         startShapeIndex = -1
         self.scene?.alpha = 1.0
         if wtSceneDelegate == nil {
@@ -2147,8 +2200,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         moved = false
         inChoosingOwnWord = false
 //        ownWordsScrolling = false
-        let firstTouch = touches.first
-        firstTouchLocation = firstTouch!.location(in: self)
+//        let firstTouch = touches.first
+        firstTouchLocation = location//firstTouch!.location(in: self)
 //        let nodes = self.nodes(at: firstTouchLocation)
 //        let nodes1 = self.nodes(at: CGPoint(x: firstTouchLocation.x, y: firstTouchLocation.y + blockSize * 0.11))
 //        let touchedNodes = analyzeNodes(nodes: nodes, nodes1: nodes1, calledFrom: .start)
@@ -2193,11 +2246,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        myTouchesMoved(location: touches.first!.location(in: self))
+    }
+    
+    private func myTouchesMoved(location: CGPoint) {
         if wtSceneDelegate == nil {
             return
         }
-        let firstTouch = touches.first
-        let touchLocation = firstTouch!.location(in: self)
+//        let firstTouch = touches.first
+        let touchLocation = location //firstTouch!.location(in: self)
         #if SHOWFINGER
         finger?.position = touchLocation + CGPoint(x: 0, y: fingerAdder)
         #endif
@@ -2297,7 +2354,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         #if HELPGEN
-        saveHelpInfo(touchLocation: touchLocation, touchedNodes: touchedNodes, calledFrom: calledFrom)
+            saveHelpInfo(touchLocation: touchLocation, touchedNodes: touchedNodes, calledFrom: calledFrom)
         #endif
         return touchedNodes
     }
@@ -2306,11 +2363,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let MyQuestionName = "MyQuestion"
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        myTouchesEnded(location: touches.first!.location(in: self))
+    }
+    
+    private func myTouchesEnded(location: CGPoint) {
         if wtSceneDelegate == nil {
             return
         }
-        let firstTouch = touches.first
-        let touchLocation = firstTouch!.location(in: self)
+//        let firstTouch = touches.first
+        let touchLocation = location //firstTouch!.location(in: self)
         #if SHOWFINGER
         finger?.removeFromParent()
         #endif
@@ -2769,6 +2830,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             self.childNode(withName: name)!.removeFromParent()
         }
     }
+    
+    private func deleteGameDataRecord(gameNumber: Int) {
+        let recordToDelete = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %d", gameNumber, GV.actLanguage)
+        if recordToDelete.count == 1 {
+            try! realm.safeWrite() {
+                realm.delete(recordToDelete)
+            }
+        }
+    }
+    
+
     var actRound = 1
     
     private func startUndo() {
@@ -2783,21 +2855,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             pieceArray[to].setPieceFromPosition(index: to)
             origSize[to] = pieceArray[to].size
         }
-        func restartGame() {
-            let gameNumber = GV.playingRecord.gameNumber
-            let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, gameNumber)
-            if recordToDelete.count == 1 {
-                try! realm.safeWrite() {
-                    realm.delete(recordToDelete)
-                }
-            }
-            tilesForGame = [WTPiece]()
-            indexOfTilesForGame = 0
-            createPlayingRecord(gameNumber: gameNumber)
-            generateArrayOfWordPieces(new: new)
-            restoreGameArray()
-            createUndo(enabled: false)
-        }
+//        func restartGame() {
+//            let gameNumber = GV.playingRecord.gameNumber
+//            deleteGameDataRecord(gameNumber: gameNumber)
+//            tilesForGame = [WTPiece]()
+//            indexOfTilesForGame = 0
+//            createPlayingRecord(gameNumber: gameNumber)
+//            generateArrayOfWordPieces(new: new)
+//            restoreGameArray()
+//            createUndo(enabled: false)
+//        }
+        
         #if HELPGEN
             saveHelpInfo(undoButtonTouched:true)
         #endif
@@ -2883,7 +2951,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 && activityRoundItem.count == 1 {
             #if HELPGEN
-            resetHelpInfo()
+                resetHelpInfo()
             #endif
             undoButton!.alpha = 0.2
             undoButton!.isEnabled = false
@@ -2968,6 +3036,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func generateArrayOfWordPieces(first: Bool)->String {
+        
         let random = MyRandom(gameNumber: GV.playingRecord.gameNumber, modifier: GV.playingRecord.words.count)
         var tileType = MyShapes.NotUsed
         var letters = [String]()
@@ -3038,7 +3107,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 pieceString += "°"
                 let newIndex = random.getRandomInt(0, max: tilesForGame.count)
-                if newIndex == tilesForGame.count || !first || usedWords.count > 6 || GV.playingRecord.gameNumber == 0 {
+                if newIndex == tilesForGame.count || !first || usedWords.count > 6 || GV.playingRecord.gameNumber == 0 || GV.playingRecord.gameNumber == 1000 {
                     tilesForGame.append(tileForGameItem)
                 } else {
                     tilesForGame.insert(tileForGameItem, at: newIndex)

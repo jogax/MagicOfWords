@@ -118,7 +118,8 @@ enum TextConstants: Int {
     tcWelcomeText1,
     tcWelcomeText2,
     tcWelcomeText3,
-    tcLater
+    tcLater,
+    tcShowMe
 }
 
     let LanguageEN = "en" // index 0

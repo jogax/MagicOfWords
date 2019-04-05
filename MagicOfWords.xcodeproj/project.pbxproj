@@ -75,6 +75,7 @@
 		20552DCA211F1EFA00C54538 /* whiteSprite0000.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBA211F1EFA00C54538 /* whiteSprite0000.png */; };
 		20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBB211F1EFA00C54538 /* whiteSprite0111.png */; };
 		20552DCC211F1EFA00C54538 /* whiteSprite0100.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBC211F1EFA00C54538 /* whiteSprite0100.png */; };
+		20553D8A225665C7001628D1 /* MyAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20553D89225665C7001628D1 /* MyAlertController.swift */; };
 		2055B489211C74A9000FD7A9 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */; };
 		2055E2AD2215B01E004E3260 /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2055E2AB2215B01E004E3260 /* Mandatory.realm */; };
 		2055E2AE2215B01E004E3260 /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2055E2AC2215B01E004E3260 /* WordList.realm */; };
@@ -172,6 +173,7 @@
 		20895DFB21FA152100E54BF3 /* enMandatoryInput.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */; };
 		208B278F21FB382C007259B6 /* enRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B278E21FB382C007259B6 /* enRestWords.txt */; };
 		208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B279021FB8ED1007259B6 /* ruRestWords.txt */; };
+		2093807A2252466B009C742F /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = 209380792252466B009C742F /* HelpInfo.realm */; };
 		20951BCE223FDD0B009F5325 /* HelpModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20951BCD223FDD0B009F5325 /* HelpModel.swift */; };
 		2098BB8E20601B0B00C3641B /* magier.png in Resources */ = {isa = PBXBuildFile; fileRef = 2098BB8D20601B0B00C3641B /* magier.png */; };
 		209A182F21ECE55600FF8AB0 /* CreateMandatorysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209A182E21ECE55600FF8AB0 /* CreateMandatorysViewController.swift */; };
@@ -262,6 +264,7 @@
 		20552DBA211F1EFA00C54538 /* whiteSprite0000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0000.png; sourceTree = "<group>"; };
 		20552DBB211F1EFA00C54538 /* whiteSprite0111.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0111.png; sourceTree = "<group>"; };
 		20552DBC211F1EFA00C54538 /* whiteSprite0100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite0100.png; sourceTree = "<group>"; };
+		20553D89225665C7001628D1 /* MyAlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAlertController.swift; sourceTree = "<group>"; };
 		2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		2055E2AB2215B01E004E3260 /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
 		2055E2AC2215B01E004E3260 /* WordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = WordList.realm; sourceTree = "<group>"; };
@@ -361,6 +364,7 @@
 		20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enMandatoryInput.txt; sourceTree = "<group>"; };
 		208B278E21FB382C007259B6 /* enRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enRestWords.txt; sourceTree = "<group>"; };
 		208B279021FB8ED1007259B6 /* ruRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruRestWords.txt; sourceTree = "<group>"; };
+		209380792252466B009C742F /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
 		20951BCD223FDD0B009F5325 /* HelpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpModel.swift; sourceTree = "<group>"; };
 		2098BB8D20601B0B00C3641B /* magier.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = magier.png; path = MagicOfWords/Pictures/magier.png; sourceTree = SOURCE_ROOT; };
 		209A182E21ECE55600FF8AB0 /* CreateMandatorysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMandatorysViewController.swift; sourceTree = "<group>"; };
@@ -422,6 +426,7 @@
 				20491F4A21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift */,
 				20858644223A89EF0097B62A /* MyButton.swift */,
 				201FB1CC20288CEA00EC9F36 /* MyFunctions.swift */,
+				20553D89225665C7001628D1 /* MyAlertController.swift */,
 				201FB1C920288CE900EC9F36 /* MyGlobals.swift */,
 				20A604B22035D93A00DC48F0 /* MyRandom.swift */,
 				201FB1B120288C2B00EC9F36 /* AppDelegate.swift */,
@@ -620,6 +625,7 @@
 		2074A64120C051780075432A /* ReadOnlyDB */ = {
 			isa = PBXGroup;
 			children = (
+				209380792252466B009C742F /* HelpInfo.realm */,
 				2055E2AF2215B02C004E3260 /* MandatoryList.realm */,
 				2055E2AB2215B01E004E3260 /* Mandatory.realm */,
 				2055E2AC2215B01E004E3260 /* WordList.realm */,
@@ -817,6 +823,7 @@
 				2084FA2D221C2523002D29D3 /* Delete.png in Resources */,
 				207B678A2243C9F8001456C8 /* save.png in Resources */,
 				206AD3EC222C2AA800B7C5B6 /* GraySprite0010.png in Resources */,
+				2093807A2252466B009C742F /* HelpInfo.realm in Resources */,
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
 				205EC425222EE2E90080D4ED /* LeftElite.png in Resources */,
 				205EC41F222EAD380080D4ED /* LightBlueSprite1000.png in Resources */,
@@ -929,6 +936,7 @@
 				208144202167B65500496AFC /* BestScoreForGame.swift in Sources */,
 				20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */,
 				201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */,
+				20553D8A225665C7001628D1 /* MyAlertController.swift in Sources */,
 				208073802242933700BE38E9 /* WelcomeScene.swift in Sources */,
 				201FB1D720288CEA00EC9F36 /* ru.swift in Sources */,
 				209A182F21ECE55600FF8AB0 /* CreateMandatorysViewController.swift in Sources */,

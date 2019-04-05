@@ -59,6 +59,16 @@ let mandatoryListConfig  = Realm.Configuration(
 // Open the Realm with the configuration
 let realmMandatoryList: Realm = try! Realm(configuration: mandatoryListConfig)
 
+let helpInfoConfig  = Realm.Configuration(
+    // Get the path to the bundled file
+    fileURL: URL(string: Bundle.main.path(forResource: "HelpInfo", ofType:"realm")!),
+    readOnly: true, schemaVersion: 4,
+    objectTypes: [HelpModel.self])
+
+// Open the Realm with the configuration
+let realmHelpInfo: Realm = try! Realm(configuration: helpInfoConfig)
+
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -162,12 +172,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func loginToRealmSync() {
         let userName = "magic-of-words-user"
         let password = "@@@" + userName + "@@@"
+        GV.myUser = nil
         let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
         SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
             if user == nil {
                 if SyncUser.current != nil {
-                    GV.myUser = SyncUser.current!
                     print("user offline")
+                    GV.myUser = SyncUser.current!
                     self.setConnection()
                 }
             } else {

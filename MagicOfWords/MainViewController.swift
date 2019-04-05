@@ -24,6 +24,18 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         self.showMenu()
     }
     
+    func showHowToPlay() {
+        if let view = self.view as! SKView? {
+            view.presentScene(nil)
+        }
+        showBackgroundPicture()
+        if GV.helpTouches!.count > 0 {
+            startWTScene(new: true, next: StartType.GameNumber, gameNumber: 1000, restart: true, showHelp: true)
+        } else {
+            self.showMenu()
+        }
+    }
+    
     
     func chooseNickname() {
         let alertController = UIAlertController(title: GV.language.getText(.tcSetNickName),
@@ -140,11 +152,11 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         return
     }
     
-    func startWTScene(new: Bool, next: StartType, gameNumber: Int, restart: Bool = false) {
+    func startWTScene(new: Bool, next: StartType, gameNumber: Int, restart: Bool = false, showHelp: Bool = false) {
         let wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
             wtScene.setDelegate(delegate: self)
-            wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
+            wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart, showHelp: showHelp)
             wtScene.parentViewController = self
             view.presentScene(wtScene)
         }

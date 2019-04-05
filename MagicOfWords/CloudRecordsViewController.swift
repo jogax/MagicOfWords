@@ -543,17 +543,17 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             // to be processed by the server
             case .complete:
                 self!.view.addSubview(self!.showPlayerActivityView!)
+                self!.generateTableData()
                 self!.calculateColumnWidths()
                 let origin = CGPoint(x: 0, y: 0)
                 let maxHeight = self!.view.frame.height * 0.8
-                let calculatedHeight = self!.headerLine.height(font: self!.myFont!) * (CGFloat(self!.bestScoreItems!.count + 1))
+                let calculatedHeight = self!.headerLine.height(font: self!.myFont!) * (CGFloat(self!.bestScoreTable.count + 1))
                 let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
                 let size = CGSize(width: self!.headerLine.width(font: self!.myFont!) * 1, height: height)
                 let center = CGPoint(x: 0.5 * self!.view.frame.width, y: 0.5 * self!.view.frame.height)
                 self!.showPlayerActivityView!.frame=CGRect(origin: origin, size: size)
                 self!.showPlayerActivityView!.center=center
                 self!.modifyButtonsPosition()
-                self!.generateTableData()
                 self!.showPlayerActivityView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
                 self!.showPlayerActivityView!.reloadData()
                 print("complete: count records: \(String(describing: self!.bestScoreItems!.count))")
@@ -613,7 +613,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         switch tableType {
         case .BestScoreSync:
             if bestScoreItems!.count > 0 {
-                let maxGameNumber = bestScoreItems!.last!.gameNumber
+                let maxGameNumber = bestScoreItems!.last!.gameNumber > 1001 ? 1000 : bestScoreItems!.last!.gameNumber
                 for actGameNumber in 1...maxGameNumber {
                     let scoreItems = bestScoreItems!.filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false)
                     for (place, item) in scoreItems.enumerated() {

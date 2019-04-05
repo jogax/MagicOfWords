@@ -36,7 +36,7 @@ struct GV {
             return GV.language.getText(.tcAktLanguage)
         }
     }
-    static let actVersion = "0.92"
+    static let actVersion = "0.92" // Build 14
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2
@@ -68,6 +68,7 @@ struct GV {
     static var playing = false
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()
+    static var helpTouches: Results<HelpModel>?
     static let frequencyString = ":freq:"
 
     static let language = Language()
@@ -95,6 +96,24 @@ struct GV {
     static var mandatoryWords = [String]()
 //    static var greenSpriteArray = [WTGameboardItem]()
     static var nextRoundAnimationFinished = true
+    
+    static var screenWidth: CGFloat {
+        if (UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait) {
+            return UIScreen.main.bounds.size.width
+        } else {
+            return UIScreen.main.bounds.size.height
+        }
+    }
+    static var screenHeight: CGFloat {
+        if (UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait) {
+            return UIScreen.main.bounds.size.height
+        } else {
+            return UIScreen.main.bounds.size.width
+        }
+    }
+    static var screenOrientation: UIInterfaceOrientation {
+        return UIApplication.shared.statusBarOrientation
+    }
 
     static var myUser: SyncUser? = nil {
         willSet(newValue) {

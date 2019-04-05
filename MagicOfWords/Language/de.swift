@@ -116,10 +116,11 @@ let deDictionary: [TextConstants: String] = [
     .tcUseCloudGameData:   "Spiel aus der Cloud",
     .tcChooseGameToGet:    "Wähle einen Spiel für einlesen vom Cloud",
     .tcGameLine:           "Notifier: %, GameNumber: %",
-    .tcWelcomeText1:        "Herzlich/Willkommen/in der/wunderbaren/Welt von Wörter!",
+    .tcWelcomeText1:        "Herzlich Willkommen in der/wunderbaren Welt von Wörter!",
     .tcWelcomeText2:        "Viel Spaß!",
-    .tcWelcomeText3:        "Nun wollen wir/mal sehen,/wie man spielt",
+    .tcWelcomeText3:        "Und jetzt zeige ich Dir/wie man spielt",
     .tcLater:               "Später",
+    .tcShowMe:              "Zeige mir!",
 ]
 
 
