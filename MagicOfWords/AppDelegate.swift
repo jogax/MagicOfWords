@@ -63,7 +63,7 @@ let helpInfoConfig  = Realm.Configuration(
     // Get the path to the bundled file
     fileURL: URL(string: Bundle.main.path(forResource: "HelpInfo", ofType:"realm")!),
     readOnly: true, schemaVersion: 0,
-    objectTypes: [HelpModel.self])
+    objectTypes: [HelpInfo.self])
 
 // Open the Realm with the configuration
 let realmHelp: Realm = try! Realm(configuration: helpInfoConfig)

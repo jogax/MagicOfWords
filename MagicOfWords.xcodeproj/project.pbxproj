@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		20009AF92260C47900D34ACD /* HelpInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20009AF82260C47900D34ACD /* HelpInfo.swift */; };
 		201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1B120288C2B00EC9F36 /* AppDelegate.swift */; };
 		201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BB20288C2B00EC9F36 /* Main.storyboard */; };
 		201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BE20288C2B00EC9F36 /* Assets.xcassets */; };
@@ -193,6 +194,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		20009AF82260C47900D34ACD /* HelpInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpInfo.swift; sourceTree = "<group>"; };
 		201FB1AE20288C2B00EC9F36 /* MagicOfWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MagicOfWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		201FB1B120288C2B00EC9F36 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		201FB1BC20288C2B00EC9F36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -481,6 +483,7 @@
 				205E601920C02BB800A5AB39 /* WordDBGenerator.swift */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
 				20951BCD223FDD0B009F5325 /* HelpModel.swift */,
+				20009AF82260C47900D34ACD /* HelpInfo.swift */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -942,6 +945,7 @@
 				201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */,
 				20553D8A225665C7001628D1 /* MyAlertController.swift in Sources */,
 				208073802242933700BE38E9 /* WelcomeScene.swift in Sources */,
+				20009AF92260C47900D34ACD /* HelpInfo.swift in Sources */,
 				201FB1D720288CEA00EC9F36 /* ru.swift in Sources */,
 				209A182F21ECE55600FF8AB0 /* CreateMandatorysViewController.swift in Sources */,
 				20491F4B21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift in Sources */,

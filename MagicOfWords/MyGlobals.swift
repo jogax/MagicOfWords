@@ -68,7 +68,7 @@ struct GV {
     static var playing = false
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()
-    static var helpTouches: Results<HelpModel>?
+    static var helpTouches: Results<HelpInfo>?
     static let frequencyString = ":freq:"
 
     static let language = Language()

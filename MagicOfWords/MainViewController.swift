@@ -29,7 +29,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             view.presentScene(nil)
         }
         showBackgroundPicture()
-        GV.helpTouches = realmHelp.objects(HelpModel.self).filter("language = %d", GV.actLanguage)
+        GV.helpTouches = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage)
         if GV.helpTouches!.count > 0 {
             startWTScene(new: true, next: StartType.GameNumber, gameNumber: 1000, restart: true, showHelp: true)
         } else {
@@ -495,7 +495,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     #if DEBUG
     @objc private func developerMenuChoosed() {
         initiateHelpModel()
-        let countContinueGames = realmHelpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage).count
+        let countContinueGames = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).count
 
         let alertController = UIAlertController(title: GV.language.getText(.tcDeveloperMenu),
                                             message: "",
@@ -1006,7 +1006,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 let oneMB = 10 * 1024 * 1024
                 return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
         },
-            objectTypes: [HelpModel.self])
+            objectTypes: [HelpInfo.self])
         do {
             // Realm is compacted on the first open if the configuration block conditions were met.
             _ = try Realm(configuration: config1)
@@ -1029,7 +1029,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                     }
                 }
         },
-            objectTypes: [HelpModel.self])
+            objectTypes: [HelpInfo.self])
         
         realmHelpInfo = try! Realm(configuration: helpInfoConfig)
         
