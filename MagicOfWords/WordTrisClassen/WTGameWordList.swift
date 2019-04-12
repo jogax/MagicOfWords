@@ -336,7 +336,7 @@ public class WTGameWordList {
 
     public func isMandatory(word: String)->Bool {
         var returnBool = false
-        if let index = allWords.index(where: {$0.word == word}) {
+        if let index = allWords.firstIndex(where: {$0.word == word}) {
             returnBool = allWords[index].mandatory
         }
         return returnBool
@@ -434,7 +434,7 @@ public class WTGameWordList {
     }
     
     private func addWordToAllWords(word: String) {
-        let index = allWords.index(where: {$0.word == word})
+        let index = allWords.firstIndex(where: {$0.word == word})
         if index == nil {
             allWords.append(WordWithCounter(word: word, counter: 1, mandatory: false))
         } else {
@@ -503,7 +503,7 @@ public class WTGameWordList {
     }
     
     private func removeWordFromAllWords(word: String) {
-        if let index = allWords.index(where: {$0.word == word}) {
+        if let index = allWords.firstIndex(where: {$0.word == word}) {
             if allWords[index].counter > 1 {
                 allWords[index].counter -= 1
             } else {

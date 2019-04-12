@@ -121,4 +121,7 @@ let enDictionary: [TextConstants: String] = [
     .tcWelcomeText3:        "And now I'll show you/how to play",
     .tcLater:               "Later",
     .tcShowMe:              "Show me!",
+    .tcHelpGenNew:          "Create new help info",
+    .tcHelpGenContinue:     "Continue generating help info",
+    .tcDeveloperMenu:       "Developers menu",
 ]

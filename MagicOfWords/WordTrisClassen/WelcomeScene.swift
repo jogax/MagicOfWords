@@ -134,7 +134,6 @@ class WelcomeScene: SKScene {
     }
     
     @objc private func ShowMeButtonTapped() {
-        GV.helpTouches = realmHelpInfo.objects(HelpModel.self).filter("language = %d", GV.actLanguage)
         myDelegate!.showHowToPlay()
     }
     

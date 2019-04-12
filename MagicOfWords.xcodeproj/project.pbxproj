@@ -52,6 +52,7 @@
 		204C30B321EF789A008B1CB3 /* ruMandatory6.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204C30B221EF789A008B1CB3 /* ruMandatory6.txt */; };
 		204D760A221B26A900DBB1B5 /* Minus.png in Resources */ = {isa = PBXBuildFile; fileRef = 204D7608221B26A800DBB1B5 /* Minus.png */; };
 		204D760B221B26A900DBB1B5 /* Plus.png in Resources */ = {isa = PBXBuildFile; fileRef = 204D7609221B26A900DBB1B5 /* Plus.png */; };
+		20506A44225772F1000BB525 /* finger1.png in Resources */ = {isa = PBXBuildFile; fileRef = 20506A43225772F1000BB525 /* finger1.png */; };
 		205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F4206150AC00E7FAF4 /* ruGameData.txt */; };
 		205184F72061525C00E7FAF4 /* huGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F62061525C00E7FAF4 /* huGameData.txt */; };
 		205184F920615B3100E7FAF4 /* deGameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205184F820615B3100E7FAF4 /* deGameData.txt */; };
@@ -240,6 +241,7 @@
 		204C30B221EF789A008B1CB3 /* ruMandatory6.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruMandatory6.txt; sourceTree = "<group>"; };
 		204D7608221B26A800DBB1B5 /* Minus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Minus.png; sourceTree = "<group>"; };
 		204D7609221B26A900DBB1B5 /* Plus.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Plus.png; sourceTree = "<group>"; };
+		20506A43225772F1000BB525 /* finger1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = finger1.png; sourceTree = "<group>"; };
 		205184F4206150AC00E7FAF4 /* ruGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruGameData.txt; sourceTree = "<group>"; };
 		205184F62061525C00E7FAF4 /* huGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huGameData.txt; sourceTree = "<group>"; };
 		205184F820615B3100E7FAF4 /* deGameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deGameData.txt; sourceTree = "<group>"; };
@@ -582,6 +584,7 @@
 				20395F5C21A2FE4E00947D7F /* retype.png */,
 				2051A54D2191E376001AD00B /* hook.png */,
 				205CF7EA2129A21000C1B89D /* finger.png */,
+				20506A43225772F1000BB525 /* finger1.png */,
 				208173E02103577800960800 /* BalloonSimple.png */,
 				2038F26622317AFE0028372D /* BalloonElite.png */,
 				20B04BB120935CC2008F99A2 /* menuBackground.png */,
@@ -713,7 +716,7 @@
 				TargetAttributes = {
 					201FB1AD20288C2B00EC9F36 = {
 						CreatedOnToolsVersion = 9.2;
-						LastSwiftMigration = 1000;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.GameCenter = {
@@ -862,6 +865,7 @@
 				20395F5D21A2FE4E00947D7F /* retype.png in Resources */,
 				20469BD021A43F4E00743EB1 /* sortdown.png in Resources */,
 				205EC421222EAD380080D4ED /* LightBlueSprite0011.png in Resources */,
+				20506A44225772F1000BB525 /* finger1.png in Resources */,
 				20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */,
 				20866986222ACF2E002194C8 /* GoldSprite1101.png in Resources */,
 				20866967222AC84E002194C8 /* GreenSprite0101.png in Resources */,
@@ -1107,7 +1111,6 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"HELPGEN=1",
 					"GENERATEWORDLIST=1",
 					"GENERATEMANDATORY=1",
 					"SHOWFINGER=1",
@@ -1119,8 +1122,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG HELPGENX GENERATEWORDLISTX GENERATEMANDATORYX SHOWFINGERX CREATEMANDATORYX CREATEWORDLISTX";
-				SWIFT_VERSION = 4.2;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG GENERATEWORDLISTX GENERATEMANDATORYX SHOWFINGERX CREATEMANDATORYX CREATEWORDLISTX";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1140,7 +1143,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

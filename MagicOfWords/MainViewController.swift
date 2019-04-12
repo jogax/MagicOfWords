@@ -29,6 +29,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             view.presentScene(nil)
         }
         showBackgroundPicture()
+        GV.helpTouches = realmHelp.objects(HelpModel.self).filter("language = %d", GV.actLanguage)
         if GV.helpTouches!.count > 0 {
             startWTScene(new: true, next: StartType.GameNumber, gameNumber: 1000, restart: true, showHelp: true)
         } else {
@@ -146,10 +147,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         print("cancel choosed")
         showMenu()
 //        startMenuScene()
-    }
-    
-    func xxx() {
-        return
     }
     
     func startWTScene(new: Bool, next: StartType, gameNumber: Int, restart: Bool = false, showHelp: Bool = false) {
@@ -480,20 +477,11 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         alertController!.addAction(nickNameAction!)
         expertUserChanged()
         #if DEBUG
-        //--------------------- showRealmCloudAction ---------------------
-            showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
+            let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
                 alert -> Void in
-                self.displayCloudRecordsViewController()
+                self.developerMenuChoosed()
             })
-            showRealmCloudAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-            alertController!.addAction(showRealmCloudAction!)
-            
-            let useGameDataAction = UIAlertAction(title: GV.language.getText(.tcUseCloudGameData), style: .default, handler: { [unowned self]
-            alert -> Void in
-                self.getCloudData()
-            })
-        alertController!.addAction(useGameDataAction)
-
+            alertController!.addAction(developerMenuAction)
         #endif
         //--------------------- Present alert ---------------------
         present(alertController!, animated: true, completion: nil)
@@ -503,6 +491,49 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     var cloudGameData: Results<GameData>?
     var cloudGameDataSubscription: SyncSubscription<GameData>?
     var cloudGameDataToken: NotificationToken?
+    var realmHelpInfo: Realm?
+    #if DEBUG
+    @objc private func developerMenuChoosed() {
+        initiateHelpModel()
+        let countContinueGames = realmHelpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage).count
+
+        let alertController = UIAlertController(title: GV.language.getText(.tcDeveloperMenu),
+                                            message: "",
+                                            preferredStyle: .alert)
+        
+        showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.displayCloudRecordsViewController()
+        })
+        showRealmCloudAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+        alertController.addAction(showRealmCloudAction!)
+        
+        let useGameDataAction = UIAlertAction(title: GV.language.getText(.tcUseCloudGameData), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.getCloudData()
+        })
+        alertController.addAction(useGameDataAction)
+        
+        let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
+            alert -> Void in
+            GV.generateHelpInfo = true
+            self.startWTScene(new: true, next: .GameNumber, gameNumber: 1000)
+
+        })
+        alertController.addAction(newGenHelpAction)
+        if countContinueGames > 0 {
+            let continueGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenContinue), style: .default, handler: { [unowned self]
+                alert -> Void in
+                GV.generateHelpInfo = true
+                self.startWTScene(new: false, next: .GameNumber, gameNumber: 1000)
+            })
+            alertController.addAction(continueGenHelpAction)
+
+        }
+        present(alertController, animated: true, completion: nil)
+
+    }
+    #endif
 
     private func getCloudData() {
         cloudGameData = realmSync!.objects(GameData.self).filter("combinedKey BEGINSWITH %@", GV.actLanguage)
@@ -896,7 +927,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 if word.subString(at: 0, length: 1) != "#" {
                     let firstCharUpper = word.subString(at: 0, length: 1).uppercased()
                     if word.subString(at: 0, length: 1) == firstCharUpper {
-                        if let idx = word.index(of: " ") {
+                        if let idx = word.firstIndex(of: " ") {
                             let newWord = word[..<idx] + "\r\n"
                             text += newWord
                        }
@@ -962,4 +993,46 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             }
         }
     }
+    private func initiateHelpModel() {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let helpInfoURL = documentsURL.appendingPathComponent("HelpInfo.realm")
+        let config1 = Realm.Configuration(
+            fileURL: helpInfoURL,
+            shouldCompactOnLaunch: { totalBytes, usedBytes in
+                // totalBytes refers to the size of the file on disk in bytes (data + free space)
+                // usedBytes refers to the number of bytes used by data in the file
+                
+                // Compact if the file is over 100MB in size and less than 50% 'used'
+                let oneMB = 10 * 1024 * 1024
+                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+        },
+            objectTypes: [HelpModel.self])
+        do {
+            // Realm is compacted on the first open if the configuration block conditions were met.
+            _ = try Realm(configuration: config1)
+        } catch {
+            print("error")
+            // handle error compacting or opening Realm
+        }
+        let helpInfoConfig = Realm.Configuration(
+            fileURL: helpInfoURL,
+            schemaVersion: 0, // new item words
+            // Set the block which will be called automatically when opening a Realm with
+            // a schema version lower than the one set above
+            migrationBlock: { migration, oldSchemaVersion in
+                switch oldSchemaVersion {
+//                case 0...3:
+//                    migration.deleteData(forType: HelpModel.className())
+//                    
+                default: migration.enumerateObjects(ofType: BasicDataModel.className())
+                { oldObject, newObject in
+                    }
+                }
+        },
+            objectTypes: [HelpModel.self])
+        
+        realmHelpInfo = try! Realm(configuration: helpInfoConfig)
+        
+    }
+
 }

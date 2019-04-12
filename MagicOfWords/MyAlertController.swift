@@ -14,9 +14,9 @@ class MyAlertController: SKSpriteNode {
     var myFont = UIFont()
     var countLines = 0
     init(mainText: String, message: String) {
-        let maxWith = GV.screenWidth * 0.8
+//        let maxWith = GV.screenWidth * 0.8
         myFont = UIFont(name: GV.actLabelFont, size: GV.onIpad ? 18 : 15)!
-        let textWidth = mainText.width(font: myFont)
+//        let textWidth = mainText.width(font: myFont)
         super.init(texture: SKTexture(), color: UIColor.white, size: CGSize(width: 0, height: 0))
     }
     public func addAction(text: String, target: AnyObject, action:Selector) {

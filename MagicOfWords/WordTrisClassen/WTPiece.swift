@@ -35,7 +35,7 @@ enum MyShapes: Int {
     }
     static func toValue(name: String)->MyShapes {
         let stringType = ["Z1", "Z2", "L1", "L2", "L3", "L4", "T1", "O1", "O2", "I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8","NotUsed"]
-        return MyShapes(rawValue: stringType.index{$0 == name}!)!
+        return MyShapes(rawValue: stringType.firstIndex{$0 == name}!)!
     }
 
 }

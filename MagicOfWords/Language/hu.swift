@@ -120,4 +120,7 @@ let huDictionary: [TextConstants: String] = [
     .tcWelcomeText3:        "És most lássuk,/hogyan kell játszani",
     .tcLater:               "Később",
     .tcShowMe:              "Mutasd meg!",
+    .tcHelpGenNew:          "Új súgóinformáció létrehozása",
+    .tcHelpGenContinue:     "Súgóinformáció folytatása",
+    .tcDeveloperMenu:       "Fejlesztői menü",
 ]

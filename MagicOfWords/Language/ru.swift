@@ -121,5 +121,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcWelcomeText3:        "А теперь - обучение...",
     .tcLater:               "Позже",
     .tcShowMe:              "Покажи!",
+    .tcHelpGenNew:          "Создать новую справочную информацию",
+    .tcHelpGenContinue:     "Продолжать генерировать справочную информацию",
+    .tcDeveloperMenu:       "Меню разработчика",
 ]
 

@@ -62,11 +62,11 @@ let realmMandatoryList: Realm = try! Realm(configuration: mandatoryListConfig)
 let helpInfoConfig  = Realm.Configuration(
     // Get the path to the bundled file
     fileURL: URL(string: Bundle.main.path(forResource: "HelpInfo", ofType:"realm")!),
-    readOnly: true, schemaVersion: 4,
+    readOnly: true, schemaVersion: 0,
     objectTypes: [HelpModel.self])
 
 // Open the Realm with the configuration
-let realmHelpInfo: Realm = try! Realm(configuration: helpInfoConfig)
+let realmHelp: Realm = try! Realm(configuration: helpInfoConfig)
 
 
 

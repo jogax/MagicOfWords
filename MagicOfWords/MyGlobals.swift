@@ -93,6 +93,7 @@ struct GV {
     static var ownScore = 0
     static var bonusScore = 0
     static var totalScore = 0
+    static var generateHelpInfo = false
     static var mandatoryWords = [String]()
 //    static var greenSpriteArray = [WTGameboardItem]()
     static var nextRoundAnimationFinished = true

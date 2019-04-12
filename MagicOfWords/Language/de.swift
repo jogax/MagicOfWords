@@ -121,6 +121,9 @@ let deDictionary: [TextConstants: String] = [
     .tcWelcomeText3:        "Und jetzt zeige ich Dir/wie man spielt",
     .tcLater:               "Später",
     .tcShowMe:              "Zeige mir!",
+    .tcHelpGenNew:          "Neue Hilfeinformationen erstellen",
+    .tcHelpGenContinue:     "Generierung Hilfeinformationen fortsetzen",
+    .tcDeveloperMenu:       "Menü für Entwickler",
 ]
 
 

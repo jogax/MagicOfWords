@@ -270,7 +270,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
             returnArray.append(item)
         }
         for bestGame in allResultsItems! {
-            if let index =  returnArray.index(where: {Int($0.gameNumber) == bestGame.gameNumber}) {
+            if let index =  returnArray.firstIndex(where: {Int($0.gameNumber) == bestGame.gameNumber}) {
                 if bestGame.owner != nil {
                     if bestGame.bestScore < Int(returnArray[index].score)! {
                         if !GV.debug {

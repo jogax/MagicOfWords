@@ -444,6 +444,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var col = NoValue
         var row = NoValue
         var shapeIndex = NoValue
+        var onGameArray = false
+        var shapeOnGameArray = false
 //        var answer1 = false
 //        var answer2 = false
 //        var ownWordsBackground = false
@@ -570,11 +572,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         }
-        #if HELPGEN
-            newGameNumber = 1000
-            new = true
-            nextGame = .GameNumber
-        #endif
+//        if GV.generateHelpInfo {
+//            newGameNumber = 1000
+////            new = true
+//            nextGame = .GameNumber
+//        }
 
         getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         createHeader()
@@ -652,16 +654,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                }
 //            }
 //       }
-        let andData = true
-        var createHelpData = false
-        var dummy = false
-        #if HELPGEN
-            dummy = true
-        #endif
-        createHelpData = dummy && andData
+//        let andData = true
+//        var createHelpData = false
+//        var dummy = false
+//        #if HELPGEN
+//            dummy = true
+//        #endif
+//        createHelpData = dummy && andData
         if showHelp {
             createPlayingRecord(gameNumber: gameNumber)
-        } else if createHelpData {
+        } else if GV.generateHelpInfo && new {
             deleteGameDataRecord(gameNumber: gameNumber)
             createPlayingRecord(gameNumber: gameNumber)
         } else if new {
@@ -1405,9 +1407,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc func showAllWordsInTableView() {
-        #if HELPGEN
+        if GV.generateHelpInfo {
             saveHelpInfo(allWordsButtonTouched:true)
-        #endif
+        }
         stopShowingTableIfNeeded()
         showOwnWordsInTableView()
         showingWordsInTable = true
@@ -1836,12 +1838,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 self.addChild(pieceArray[index])
             }
         }
-        #if HELPGEN
+        if GV.generateHelpInfo {
             if GV.playingRecord.gameNumber == 1000 {
                 initiateHelpModel()
-                resetHelpInfo()
+                if new {
+                    resetHelpInfo()
+                }
             }
-        #endif
+        }
 //        modifyHeader()
         createGoToPreviousGameButton(enabled: hasPreviousRecords(playingRecord: GV.playingRecord))
         createGoToNextGameButton(enabled: hasNextRecords(playingRecord: GV.playingRecord))
@@ -1864,10 +1868,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var bestScore = 0
     var actPlayer = ""
     var actScore = 0
-    
+    var lastPosition = CGPoint(x: 0, y: 0)
+    let convertValue: CGFloat = 1000
+
     private func showHelpDemo() {
-        let duration = 0.2
-        let texture = SKTexture(imageNamed: "finger")
+        let duration = 0.01
+        let texture = SKTexture(imageNamed: "finger1")
         let fingerSprite = SKSpriteNode(texture: texture)
         var fingerActions = [SKAction]()
         enum ActionType: Int {
@@ -1881,90 +1887,114 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         fingerSprite.position = startPosition
         fingerSprite.zPosition = 100
         
-        func addTouchAction(type: ActionType, position: CGPoint, duration: Double) {
+        func addTouchAction(type: ActionType, fingerPosition: CGPoint, touchPosition: CGPoint, duration: Double, counter: Int = 0, col: Int, row: Int, pieceIndex: Int) {
 //            print("type: \(type), position: \(position)")
-            fingerActions.append(SKAction.move(to: CGPoint(x: position.x, y: position.y), duration: duration))
+            fingerActions.append(SKAction.move(to: CGPoint(x: fingerPosition.x , y: fingerPosition.y), duration: duration))
+            func printLetters(col: Int, row: Int, pieceIndex: Int, counter: Int) {
+                if pieceIndex >= 0 {
+                    let letters = pieceArray[pieceIndex].letters
+                    print("Bottom letters: \(letters), counter: \(counter)")
+                    if counter == 52 || counter == 53 || counter == 54 {
+                        print("hier by counter: \(counter)")
+                    }
+                } else {
+//                    if row >= 0 && col >= 0 {
+//                        let letters = GV.gameArray[col][row].letter
+//                        print("gameArray letters: \(letters), counter: \(counter)")
+//                    }
+                }
+            }
             switch type {
             case .Move:
                 break
              case .TouchesBegan:
                 let beganAction = SKAction.run({
-                    self.myTouchesBegan(location: position)
+                    if counter == 537 {
+                        printLetters(col: col, row: row, pieceIndex: pieceIndex, counter: counter)
+                        print("touches Began at \(counter)")
+                    }
+                    self.myTouchesBegan(location: touchPosition)
+//                    printLetters(col: col, row: row, pieceIndex: pieceIndex, counter: counter)
                 })
                 fingerActions.append(beganAction)
             case .TouchesMoved:
                 let moveAction = SKAction.run({
-                    self.myTouchesMoved(location: position)
+                    if counter > 500 && counter < 502 {
+                        printLetters(col: col, row: row, pieceIndex: pieceIndex, counter: counter)
+                        print("touches Moved at \(counter)")
+                    }
+                    self.myTouchesMoved(location: touchPosition)
                 })
                 fingerActions.append(moveAction)
             case .TouchesEnded:
                 let endedAction = SKAction.run({
-                    self.myTouchesEnded(location: position)
+                    if counter == 534 {
+                        printLetters(col: col, row: row, pieceIndex: pieceIndex, counter: counter)
+                        print("touches Ended at 230")
+                    }
+                    if counter > 650 {
+                        print("stop")
+                    }
+                    self.myTouchesEnded(location: touchPosition)
                 })
                 fingerActions.append(endedAction)
             default:
                 break
             }
-            let waitAction = SKAction.wait(forDuration: duration)
-            fingerActions.append(waitAction)
         }
         
+        let gridStartPosition = CGPoint(x: wtGameboard!.grid!.frame.minX, y:wtGameboard!.grid!.frame.minY)
+        let gridSize = wtGameboard!.grid!.frame.width
         var startFromGamearray = false
+        var countMoves = 0
 //        var fingerStartPosition = CGPoint(x: 0, y: 0)
 //        var durationCount: Double = 0
 
         for touch in GV.helpTouches! {
-            func calculatePos(col: Int, row: Int)->CGPoint {
-                let colSprite = self.childNode(withName: "Col\(col)")
-                let rowSprite = self.childNode(withName: "Row\(row)")
-                let yAdder = (startFromGamearray ? blockSize * 2 : 0)
-                let position = CGPoint(x: colSprite!.position.x, y: rowSprite!.position.y + yAdder)
-                return position
+            func calculatePos(touch: HelpModel)->(fingerPosition: CGPoint, position: CGPoint) {
+                let fx = CGFloat(touch.fingerPositionX) / convertValue
+                let fy = CGFloat(touch.fingerPositionY) / convertValue
+                let col = Int(fx * 10)
+                let row = Int(fy * 10)
+                let x = ((CGFloat(col) + 0.5) * blockSize) / wtGameboard!.grid!.frame.width
+                let y = ((CGFloat(row) + 0.5)  * blockSize) / wtGameboard!.grid!.frame.width
+                let fingerPosition: CGPoint = gridStartPosition + CGPoint(x: fx, y: fy) * gridSize
+                let touchPosition: CGPoint = gridStartPosition + CGPoint(x: x, y: y) * gridSize
+                return (fingerPosition, touchPosition)
             }
             switch touch.typeOfTouch {
             case TypeOfTouch.Began.rawValue:
-
-                startFromGamearray = touch.onGameArray
+                startFromGamearray = touch.bottomIndex >= 0
                 if touch.bottomIndex >= 0 {
-                    let position = pieceArray[touch.bottomIndex].position
+                    let fingerPosition = pieceArray[touch.bottomIndex].position
+                    let touchPosition = fingerPosition
+                    addTouchAction(type: .TouchesBegan, fingerPosition: fingerPosition, touchPosition: touchPosition, duration: duration, counter: touch.counter, col: touch.colIndex, row: touch.rowIndex, pieceIndex: touch.bottomIndex)
+                } else {
+                    let (fingerPosition, touchPosition) = calculatePos(touch: touch)
 //                    fingerStartPosition = position
-                    addTouchAction(type: .TouchesBegan, position: position, duration: duration)
-//                    durationCount += duration
-                } else if touch.onGameArray {
-                    let position = calculatePos(col: touch.colIndex, row: touch.rowIndex)
-//                    fingerStartPosition = position
-                    addTouchAction(type: .TouchesBegan, position: position, duration: duration)
-               } else {
-                    print("other by began")
-               }
+                    addTouchAction(type: .TouchesBegan, fingerPosition: fingerPosition, touchPosition: touchPosition, duration: duration, counter: touch.counter, col: touch.colIndex, row: touch.rowIndex, pieceIndex: touch.bottomIndex)
+                }
 //               durationCount = duration
             case TypeOfTouch.Moved.rawValue:
-                if touch.bottomIndex >= 0 {
-                    print("bottomIndex: \(touch.bottomIndex) by moved!!!")
-                } else if touch.onGameArray {
-                    let position = calculatePos(col: touch.colIndex, row: touch.rowIndex)
-//                    if abs(startPosition.x - position.x) / blockSize > 1.0 && abs(startPosition.y - position.y) / blockSize > 1.0 {
-//                        fingerActions.append(SKAction.move(to: CGPoint(x: position.x, y: position.y), duration: durationCount))
-//                        durationCount = 0
-//                        fingerStartPosition = position
-//                    }
-                    addTouchAction(type: .TouchesMoved, position: position, duration: duration)
-                } else {
-                    print("other by moved")
-                }
-                // hier move the fingersprite
+                countOfMoves += 1
+                let (fingerPosition, touchPosition) = calculatePos(touch: touch)
+                addTouchAction(type: .TouchesMoved, fingerPosition: fingerPosition, touchPosition: touchPosition, duration: duration, counter: touch.counter, col: touch.colIndex, row: touch.rowIndex, pieceIndex: touch.bottomIndex)
             case TypeOfTouch.Ended.rawValue:
-                var position = CGPoint(x: 0, y: 0)
                 if touch.bottomIndex >= 0 {
-                    position = pieceArray[touch.bottomIndex].position
-                    addTouchAction(type: .TouchesEnded, position: position, duration: 0)
-                } else if touch.onGameArray {
-                    position = calculatePos(col: touch.colIndex, row: touch.rowIndex)
-                    addTouchAction(type: .TouchesEnded, position: position, duration: 0)
+                    let touchPosition = pieceArray[touch.bottomIndex].position
+                    let fingerPosition = touchPosition
+                    addTouchAction(type: .TouchesEnded, fingerPosition: fingerPosition, touchPosition: touchPosition, duration: 0, counter: touch.counter, col: touch.colIndex, row: touch.rowIndex, pieceIndex: touch.bottomIndex)
+                } else /*if touch.onGameArray*/ {
+                    let (fingerPosition, touchPosition) = calculatePos(touch: touch)
+                    addTouchAction(type: .TouchesEnded, fingerPosition: fingerPosition, touchPosition: touchPosition, duration: 0, counter: touch.counter, col: touch.colIndex, row: touch.rowIndex, pieceIndex: touch.bottomIndex)
 //                    fingerActions.append(SKAction.move(to: CGPoint(x: position.x, y: position.y), duration: durationCount))
+                } /*else  if !startFromGamearray {
+                    position = calculatePos(x: CGFloat(touch.touchPositionX), y: CGFloat(touch.touchPositionY))
+                    addTouchAction(type: .TouchesEnded, position: position, duration: 0, counter: touch.counter, col: touch.colIndex, row: touch.rowIndex, pieceIndex: touch.bottomIndex)
+
                 } else {
-                    print("other by moved")
-                }
+                    print("other by ended")
+                } */
             default:
                 //hier stop the fingersprite
                 continue
@@ -2028,23 +2058,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let helpInfoConfig = Realm.Configuration(
             fileURL: helpInfoURL,
-            schemaVersion: 4, // new item words
+            schemaVersion: 0, // new item words
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
                 switch oldSchemaVersion {
-                case 0:
-                    migration.enumerateObjects(ofType: HelpModel.className()) { oldObject, newObject in
-                        newObject!["pieces"] = oldObject!["helpString"]
-                    }
-                case 1...3:
-                    migration.deleteData(forType: HelpModel.className())
-
+//                case 0...3:
+//                    migration.deleteData(forType: HelpModel.className())
+//
                 default: migration.enumerateObjects(ofType: BasicDataModel.className())
-                { oldObject, newObject in
+                    { oldObject, newObject in
                     }
                 }
-        },
+            },
             objectTypes: [HelpModel.self])
         
         realmHelpInfo = try! Realm(configuration: helpInfoConfig)
@@ -2062,57 +2088,87 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
     }
-//    var lastColIndex = NoValue
-//    var lastRowIndex = NoValue
+    var lastCol = NoValue
+    var lastRow = NoValue
+    var countOfMoves = 0
     
-    private func saveHelpInfo(touchLocation: CGPoint = CGPoint(x:CGFloat(0), y:CGFloat(0)), touchedNodes: TouchedNodes = TouchedNodes(), calledFrom: CalledFrom = .start, undoButtonTouched: Bool=false, allWordsButtonTouched: Bool=false) {
+    private func saveHelpInfo(touchLocation: CGPoint = CGPoint(x:CGFloat(0), y:CGFloat(0)), touchedNodes: TouchedNodes = TouchedNodes(), calledFrom: CalledFrom = .Start, undoButtonTouched: Bool=false, allWordsButtonTouched: Bool=false) {
         if GV.playingRecord.gameNumber != 1000 {
             return
         }
         let records = realmHelpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true)
-        var lastRecord = HelpModel()
+//        var lastRecord = HelpModel()
         var counter = 0
+        var bottomIndex = NoValue
         if records.count > 0 {
-            lastRecord = records.last!
+//            lastRecord = records.last!
             counter = records.last!.counter
         }
-        
-        var bottomIndex = touchedNodes.shapeIndex
-        var bottomPieceTouched = bottomIndex > NoValue
-        var colIndex = touchedNodes.GCol
-        var rowIndex = touchedNodes.GRow
-        var onGameArray = true
-        
-        if bottomPieceTouched {
-            if (touchLocation - pieceArray[bottomIndex].position).length() < blockSize {
-                colIndex = NoValue
-                rowIndex = NoValue
-                onGameArray = false
-            } else {
-                colIndex = touchedNodes.col
-                rowIndex = touchedNodes.row
-                bottomPieceTouched = false
-                bottomIndex = NoValue
-            }
+        if calledFrom == .Start {
+            countOfMoves = 0
+            bottomIndex = touchedNodes.shapeIndex
+            lastCol = NoValue
+            lastRow = NoValue
         }
+        let onGameArray = touchedNodes.onGameArray
+//        let colIndex = touchedNodes.GCol
+//        let rowIndex = touchedNodes.GRow
+        let relativPosition = (touchLocation - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
+        let midPosition = relativPosition * 10
+        let col = Int(midPosition.x)
+        let row = 9 - Int(midPosition.y)
+        print("col: \(col), row: \(row)")
+        if calledFrom == .Move && lastCol == col && lastRow == row {
+            return
+        } else {
+            if calledFrom == .Move {
+                countOfMoves += 1
+                lastCol = col
+                lastRow = row
+            }
+            if calledFrom == .Stop && countOfMoves == 0 && !onGameArray {
+                bottomIndex = touchedNodes.shapeIndex
+            }
+            let helpModel = HelpModel()
+            helpModel.combinedKey = GV.actLanguage + String(counter + 1)
+            helpModel.language = GV.actLanguage
+            helpModel.counter = counter + 1
+            helpModel.typeOfTouch = calledFrom.rawValue
+    //        helpModel.bottomPieceTouched = bottomPieceTouched
+            helpModel.onGameArray = onGameArray
+            helpModel.bottomIndex = bottomIndex
+            helpModel.fingerPositionX = Int(relativPosition.x * convertValue)
+            helpModel.fingerPositionY = Int(relativPosition.y * convertValue)
 
-        let helpModel = HelpModel()
-        helpModel.combinedKey = GV.actLanguage + String(counter + 1)
-        helpModel.language = GV.actLanguage
-        helpModel.counter = counter + 1
-        helpModel.typeOfTouch = calledFrom.rawValue
-        helpModel.bottomPieceTouched = bottomPieceTouched
-        helpModel.onGameArray = onGameArray
-        helpModel.bottomIndex = bottomIndex
-        helpModel.colIndex = colIndex
-        helpModel.rowIndex = rowIndex
-        helpModel.undoButtonTouched = undoButtonTouched
-        helpModel.allWordsButtonTouched = allWordsButtonTouched
-        if undoButtonTouched || allWordsButtonTouched || calledFrom != CalledFrom.move || (calledFrom == CalledFrom.move && (lastRecord.bottomPieceTouched != helpModel.bottomPieceTouched || lastRecord.bottomIndex != helpModel.bottomIndex || lastRecord.onGameArray != helpModel.onGameArray || lastRecord.colIndex != helpModel.colIndex || lastRecord.rowIndex != helpModel.rowIndex)) {
-            print("helpModel: language: \(helpModel.language), counter: \(helpModel.counter), typeOfTouch: \(helpModel.typeOfTouch), bottomPieceTouched:\(helpModel.bottomPieceTouched), onGameArray:\(onGameArray), bottomIndex: \(bottomIndex), colIndex: \(colIndex), rowIndex: \(rowIndex),  ")
+            helpModel.colIndex = col
+            helpModel.rowIndex = row
+            helpModel.undoButtonTouched = undoButtonTouched
+            helpModel.allWordsButtonTouched = allWordsButtonTouched
+    //        if undoButtonTouched || allWordsButtonTouched || calledFrom != CalledFrom.move || (calledFrom == CalledFrom.move && (lastRecord.bottomPieceTouched != helpModel.bottomPieceTouched || lastRecord.bottomIndex != helpModel.bottomIndex || lastRecord.onGameArray != helpModel.onGameArray || lastRecord.colIndex != helpModel.colIndex || lastRecord.rowIndex != helpModel.rowIndex)) {
+    //            print("helpModel: language: \(helpModel.language), counter: \(helpModel.counter), typeOfTouch: \(helpModel.typeOfTouch), bottomPieceTouched:\(helpModel.bottomPieceTouched), onGameArray:\(onGameArray), bottomIndex: \(bottomIndex), colIndex: \(colIndex), rowIndex: \(rowIndex),  ")
+            let helpModel1 = HelpModel()
+            if calledFrom == .Stop {
+                counter += 1
+                helpModel.typeOfTouch = CalledFrom.Move.rawValue
+                helpModel1.combinedKey = GV.actLanguage + String(counter + 1)
+                helpModel1.language = GV.actLanguage
+                helpModel1.counter = counter + 1
+                helpModel1.typeOfTouch = calledFrom.rawValue
+                //        helpModel.bottomPieceTouched = bottomPieceTouched
+                helpModel1.onGameArray = onGameArray
+                helpModel1.bottomIndex = bottomIndex
+                helpModel1.fingerPositionX = Int(relativPosition.x * convertValue)
+                helpModel1.fingerPositionY = Int(relativPosition.y * convertValue)
+                
+                helpModel.colIndex = col
+                helpModel.rowIndex = row
+            }
 
             try! realmHelpInfo!.safeWrite() {
                 realmHelpInfo!.add(helpModel)
+                if calledFrom == .Stop {
+                    realmHelpInfo!.add(helpModel1)
+                }
             }
         }
     }
@@ -2214,7 +2270,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.addChild(finger!)
         #endif
         stopShowingTableIfNeeded()
-        let touchedNodes = analyzeNodes(touchLocation: firstTouchLocation, calledFrom: .start)
+        let touchedNodes = analyzeNodes(touchLocation: firstTouchLocation, calledFrom: .Start)
 //        if touchedNodes.undo {
 //            undoTouched = true
 //        }
@@ -2260,7 +2316,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         #endif
 //        let nodes = self.nodes(at: touchLocation)
 //        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
-        let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .move)
+        let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .Move)
         if inDefiningSearchingWord {
             //            let origLocation = CGPoint(x: touchLocation.x, y: touchLocation.y + wtGameboardMovedBy)
             //            touchedNodes = analyzeNodes(touchLocation: origLocation, calledFrom: .stop)
@@ -2302,7 +2358,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if touchedNodes.shapeIndex >= 0 {
                 pieceArray[touchedNodes.shapeIndex].position = touchLocation
             }
-            let yDistance = (touchLocation - firstTouchLocation).y
+            let yDistance = abs((touchLocation - firstTouchLocation).y)
             if yDistance > blockSize / 2 && touchedNodes.row >= 0 && touchedNodes.row < GV.sizeOfGrid {
                 if touchedNodes.shapeIndex >= 0 {
                     moved = wtGameboard!.startShowingSpriteOnGameboard(shape: pieceArray[touchedNodes.shapeIndex], col: touchedNodes.col, row: touchedNodes.row) //, shapePos: touchedNodes.shapeIndex)
@@ -2314,16 +2370,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     enum CalledFrom: Int {
-        case start = 0, move, stop
+        case Start = 0, Move, Stop
     }
     
     var enabled = true
     var gameboardEnabled = true
 
-//    private func analyzeNodes(nodes: [SKNode], nodes1: [SKNode], calledFrom: CalledFrom)->TouchedNodes {
     private func analyzeNodes(touchLocation: CGPoint, calledFrom: CalledFrom)->TouchedNodes {
         let nodes = self.nodes(at: touchLocation)
         var touchedNodes = TouchedNodes()
+        let gridFrame = wtGameboard!.grid!.frame
+        let myX = touchLocation.x
+        let myY = touchLocation.y // + 2 * blockSize
+        let shapeY = touchLocation.y  + 2 * blockSize
+        if myX >= gridFrame.minX && myX <= gridFrame.maxX &&
+            myY >= gridFrame.minY && myY <= gridFrame.maxY {
+            touchedNodes.onGameArray = true
+        }
+        if myX >= gridFrame.minX && myX <= gridFrame.maxX &&
+            shapeY >= gridFrame.minY && shapeY <= gridFrame.maxY {
+            touchedNodes.shapeOnGameArray = true
+        }
         for node in nodes {
             guard let name = node.name else {
                 continue
@@ -2353,9 +2420,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         }
-        #if HELPGEN
+        if GV.generateHelpInfo {
             saveHelpInfo(touchLocation: touchLocation, touchedNodes: touchedNodes, calledFrom: calledFrom)
-        #endif
+        }
         return touchedNodes
     }
     let answer1Name = "Answer1"
@@ -2376,9 +2443,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         finger?.removeFromParent()
         #endif
 //        let nodes = self.nodes(at: touchLocation)
-        let lastPosition = pieceArray.count - 1
+        let lastIndex = pieceArray.count - 1
 //        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
-        let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .stop)
+        let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .Stop)
         if inDefiningSearchingWord {
 //            let origLocation = CGPoint(x: touchLocation.x, y: touchLocation.y + wtGameboardMovedBy)
 //            touchedNodes = analyzeNodes(touchLocation: origLocation, calledFrom: .stop)
@@ -2435,24 +2502,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                undoSprite.alpha = 1.0
 //                let fixedName = "Pos\(movedIndex)"
 //                removeNodesWith(name: fixedName)
-                if movedIndex < lastPosition {
-                    for index in movedIndex..<lastPosition {
+                for index in 0...lastIndex {
+                    removeNodesWith(name: "Pos\(String(index))")
+                }
+                if movedIndex < lastIndex {
+                    for index in movedIndex..<lastIndex {
                         pieceArray[index] = pieceArray[index + 1]
-                        removeNodesWith(name: "Pos\(String(index + 1))")
                         pieceArray[index].name = "Pos\(String(index))"
                         pieceArray[index].position = origPosition[index]
                         pieceArray[index].setPieceFromPosition(index: index)
                         origSize[index] = pieceArray[index].size
-                        self.addChild(pieceArray[index])
                     }
                 }
-                pieceArray[lastPosition] = getNextPiece(horizontalPosition: lastPosition)
-                pieceArray[lastPosition].position = origPosition[lastPosition]
-                pieceArray[lastPosition].name = "Pos\(lastPosition)"
-                pieceArray[lastPosition].setPieceFromPosition(index: lastPosition)
-                removeNodesWith(name: pieceArray[lastPosition].name!)
-                self.addChild(pieceArray[lastPosition])
-                
+                pieceArray[lastIndex] = getNextPiece(horizontalPosition: lastIndex)
+                pieceArray[lastIndex].position = origPosition[lastIndex]
+                pieceArray[lastIndex].name = "Pos\(lastIndex)"
+                pieceArray[lastIndex].setPieceFromPosition(index: lastIndex)
+                for index in 0...lastIndex {
+                    self.addChild(pieceArray[index])
+                }
+               
                saveActualState()
             } else {
                 pieceArray[movedIndex].position = origPosition[movedIndex]
@@ -2866,9 +2935,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            createUndo(enabled: false)
 //        }
         
-        #if HELPGEN
+        if GV.generateHelpInfo {
             saveHelpInfo(undoButtonTouched:true)
-        #endif
+        }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
             actRound = GV.playingRecord.rounds.count - 1
             if activityRoundItem.count > 0 {
@@ -2950,9 +3019,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             saveToRealmCloud()
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 && activityRoundItem.count == 1 {
-            #if HELPGEN
+            if GV.generateHelpInfo {
                 resetHelpInfo()
-            #endif
+            }
             undoButton!.alpha = 0.2
             undoButton!.isEnabled = false
             wtGameboard!.clearGameArray()
@@ -3107,7 +3176,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 pieceString += "°"
                 let newIndex = random.getRandomInt(0, max: tilesForGame.count)
-                if newIndex == tilesForGame.count || !first || usedWords.count > 6 || GV.playingRecord.gameNumber == 0 || GV.playingRecord.gameNumber == 1000 {
+                if newIndex == tilesForGame.count || !first || usedWords.count > 6 || GV.playingRecord.gameNumber == 0 {
                     tilesForGame.append(tileForGameItem)
                 } else {
                     tilesForGame.insert(tileForGameItem, at: newIndex)
