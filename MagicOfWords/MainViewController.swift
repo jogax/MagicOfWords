@@ -29,8 +29,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             view.presentScene(nil)
         }
         showBackgroundPicture()
-        GV.helpTouches = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage)
-        if GV.helpTouches!.count > 0 {
+        GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage).sorted(byKeyPath: "counter")
+        if GV.helpInfoRecords!.count > 0 {
             startWTScene(new: true, next: StartType.GameNumber, gameNumber: 1000, restart: true, showHelp: true)
         } else {
             self.showMenu()
@@ -123,6 +123,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     
     func gameFinished(start: StartType) {
         GV.playing = false
+        GV.generateHelpInfo = false
         if let view = self.view as! SKView? {
             view.presentScene(nil)
         }

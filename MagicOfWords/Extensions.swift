@@ -277,6 +277,11 @@ extension CGFloat {
         
         return v.rounded() * divisior
     }
+    
+    func nDecimals(n: Int)->String {
+        let format = "%.\(n)f"
+        return String(format: format, self)
+    }
     /// Randomly returns either 1.0 or -1.0.
     public static var randomSign: CGFloat {
         return (arc4random_uniform(2) == 0) ? 1.0 : -1.0

@@ -548,18 +548,18 @@ class WTGameboard: SKShapeNode {
     var origChoosedWord = FoundedWord()
     var stopChoosing = false
 
-    public func moveChooseOwnWord(col: Int, row: Int)->Bool {
+    public func moveChooseOwnWord(col: Int, row: Int)->(Bool, String) {
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
         GV.gameArray[col][row].correctStatusIfNeeded()
         let status = GV.gameArray[col][row].status
         // when in the same position
         if choosedWord.usedLetters.last! == actLetter {
-            return false
+            return (false, choosedWord.word)
         }
         
         if (status == .empty) { // empty block
             if setMoveModusIfPossible(col: col, row: row) {
-                return true
+                return (true, choosedWord.word)
             }
         } else { // Not empty field
                if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters[choosedWord.usedLetters.count - 2] == actLetter {
@@ -571,7 +571,7 @@ class WTGameboard: SKShapeNode {
                         if abs(choosedWord.usedLetters.last!.col - col) == 1 && abs(choosedWord.usedLetters.last!.row - row) == 1 || !(choosedWord.usedLetters.last!.col == col || choosedWord.usedLetters.last!.row == row)
                         {
                             if setMoveModusIfPossible(col: col, row: row) {
-                                return true
+                                return (true, choosedWord.word)
                             } else {
                                 stopChoosing = true
                             }
@@ -583,7 +583,7 @@ class WTGameboard: SKShapeNode {
                     }
                 }
         }
-        return false
+        return (false, choosedWord.word)
     }
     
     private func setMoveModusIfPossible(col: Int, row: Int)->Bool {
