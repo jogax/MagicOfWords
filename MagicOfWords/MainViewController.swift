@@ -31,7 +31,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         showBackgroundPicture()
         GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage).sorted(byKeyPath: "counter")
         if GV.helpInfoRecords!.count > 0 {
-            startWTScene(new: true, next: StartType.GameNumber, gameNumber: 1000, restart: true, showHelp: true)
+            startWTScene(new: true, next: StartType.GameNumber, gameNumber: 9999, restart: true, showHelp: true)
         } else {
             self.showMenu()
         }

@@ -13,6 +13,10 @@ enum TypeOfTouch: Int {
     case FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
 }
 
+enum LettersColor: String {
+    case NoColor = "NoColor", Red = "Red", Green = "Green"
+}
+
 class HelpInfo: Object {
     @objc dynamic var combinedKey = ""
     @objc dynamic var language = ""
@@ -22,7 +26,6 @@ class HelpInfo: Object {
     @objc dynamic var movedInfo = "" // "col / row / GRow / rexPosX / relPosY"
     @objc dynamic var endedInfo = ""
     @objc dynamic var letters = ""
-
     override  class func primaryKey() -> String {
         return "combinedKey"
     }

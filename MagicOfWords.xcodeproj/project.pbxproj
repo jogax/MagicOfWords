@@ -176,7 +176,6 @@
 		208B278F21FB382C007259B6 /* enRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B278E21FB382C007259B6 /* enRestWords.txt */; };
 		208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B279021FB8ED1007259B6 /* ruRestWords.txt */; };
 		2093807A2252466B009C742F /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = 209380792252466B009C742F /* HelpInfo.realm */; };
-		20951BCE223FDD0B009F5325 /* HelpModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20951BCD223FDD0B009F5325 /* HelpModel.swift */; };
 		2098BB8E20601B0B00C3641B /* magier.png in Resources */ = {isa = PBXBuildFile; fileRef = 2098BB8D20601B0B00C3641B /* magier.png */; };
 		209A182F21ECE55600FF8AB0 /* CreateMandatorysViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209A182E21ECE55600FF8AB0 /* CreateMandatorysViewController.swift */; };
 		20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A604B22035D93A00DC48F0 /* MyRandom.swift */; };
@@ -369,7 +368,6 @@
 		208B278E21FB382C007259B6 /* enRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enRestWords.txt; sourceTree = "<group>"; };
 		208B279021FB8ED1007259B6 /* ruRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruRestWords.txt; sourceTree = "<group>"; };
 		209380792252466B009C742F /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
-		20951BCD223FDD0B009F5325 /* HelpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpModel.swift; sourceTree = "<group>"; };
 		2098BB8D20601B0B00C3641B /* magier.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = magier.png; path = MagicOfWords/Pictures/magier.png; sourceTree = SOURCE_ROOT; };
 		209A182E21ECE55600FF8AB0 /* CreateMandatorysViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMandatorysViewController.swift; sourceTree = "<group>"; };
 		20A604B22035D93A00DC48F0 /* MyRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRandom.swift; sourceTree = "<group>"; };
@@ -482,7 +480,6 @@
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
 				205E601920C02BB800A5AB39 /* WordDBGenerator.swift */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
-				20951BCD223FDD0B009F5325 /* HelpModel.swift */,
 				20009AF82260C47900D34ACD /* HelpInfo.swift */,
 			);
 			path = RealmModels;
@@ -921,7 +918,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				20951BCE223FDD0B009F5325 /* HelpModel.swift in Sources */,
 				20A6914020309B9F00AB47C0 /* WTPiece.swift in Sources */,
 				201FB1D520288CEA00EC9F36 /* MyGlobals.swift in Sources */,
 				206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */,

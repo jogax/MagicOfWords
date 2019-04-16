@@ -474,16 +474,17 @@ class WTGameboard: SKShapeNode {
 
     }
     
-    public func stopShowingSpriteOnGameboard(col: Int, row: Int, fromBottom: Bool /*, wordsToCheck: [String]*/)->Bool {
+    public func stopShowingSpriteOnGameboard(col: Int, row: Int, fromBottom: Bool /*, wordsToCheck: [String]*/)->(Bool, String) {
         showingSprite = false
         var fixed = true
+        var letters = ""
 //        self.wordsToCheck = wordsToCheck
         if row == 10 {
             if fromBottom {
                 for index in 0..<usedItems.count {
                     usedItems[index].item!.clearIfTemporary()
                 }
-                return false  // when shape not remaining on gameBoard, return false
+                return (false, "")  // when shape not remaining on gameBoard, return false
             }
          }
         var clearNeaded = false
@@ -510,7 +511,7 @@ class WTGameboard: SKShapeNode {
             } else {
                 clear()
             }
-            return false
+            return (false, "")
         } else {
             for usedItem in usedItems {
                 fixed = fixed && usedItem.item!.fixIfTemporary()
@@ -519,15 +520,16 @@ class WTGameboard: SKShapeNode {
         if fixed {
 //                checkWholeWords()
             var gameArrayPositions = [GameArrayPositions]()
-            for index in 0..<usedItems.count {
+            for (index, item) in usedItems.enumerated() {
                 gameArrayPositions.append(GameArrayPositions(col:usedItems[index].col,row: usedItems[index].row))
+                letters += item.item!.letter
             }
             shape.setGameArrayPositions(gameArrayPositions: gameArrayPositions)
             if !fromBottom {
                     delegate.setLettersMoved(fromLetters: origChoosedWord.usedLetters, toLetters: shape.usedLetters)
             }
         }
-        return fixed  // when shape remaining on gameBoard, return true
+        return (fixed, letters)  // when shape remaining on gameBoard, return true
     }
     
     var moveModusStarted = false
@@ -548,18 +550,18 @@ class WTGameboard: SKShapeNode {
     var origChoosedWord = FoundedWord()
     var stopChoosing = false
 
-    public func moveChooseOwnWord(col: Int, row: Int)->(Bool, String) {
+    public func moveChooseOwnWord(col: Int, row: Int)->Bool {
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
         GV.gameArray[col][row].correctStatusIfNeeded()
         let status = GV.gameArray[col][row].status
         // when in the same position
         if choosedWord.usedLetters.last! == actLetter {
-            return (false, choosedWord.word)
+            return false
         }
         
         if (status == .empty) { // empty block
             if setMoveModusIfPossible(col: col, row: row) {
-                return (true, choosedWord.word)
+                return true
             }
         } else { // Not empty field
                if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters[choosedWord.usedLetters.count - 2] == actLetter {
@@ -571,7 +573,7 @@ class WTGameboard: SKShapeNode {
                         if abs(choosedWord.usedLetters.last!.col - col) == 1 && abs(choosedWord.usedLetters.last!.row - row) == 1 || !(choosedWord.usedLetters.last!.col == col || choosedWord.usedLetters.last!.row == row)
                         {
                             if setMoveModusIfPossible(col: col, row: row) {
-                                return (true, choosedWord.word)
+                                return true
                             } else {
                                 stopChoosing = true
                             }
@@ -583,7 +585,7 @@ class WTGameboard: SKShapeNode {
                     }
                 }
         }
-        return (false, choosedWord.word)
+        return false
     }
     
     private func setMoveModusIfPossible(col: Int, row: Int)->Bool {

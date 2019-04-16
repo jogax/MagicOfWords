@@ -148,6 +148,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 sequence.append(showOrigAction)
                 sequence.append(waitAction)
             }
+            myNode.zPosition = 1000
             myNode.run(SKAction.sequence(sequence))
             
             
@@ -443,7 +444,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var col = NoValue
         var row = NoValue
         var shapeIndex = NoValue
-        var onGameArray = false
+//        var onGameArray = false
 //        var shapeOnGameArray = false
     }
     
@@ -1863,7 +1864,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var actPlayer = ""
     var actScore = 0
     var lastPosition = CGPoint(x: 0, y: 0)
-    let convertValue: CGFloat = 1000
+//    let convertValue: CGFloat = 1000
 
     private func showHelpDemo() {
         let duration = 0.0//1
@@ -1881,14 +1882,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         fingerSprite.position = startPosition
         fingerSprite.zPosition = 100
 
-        func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, duration: Double, counter: Int = 0) {
+        func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0) {
             fingerActions.append(SKAction.move(to: touchPosition, duration: duration))
             switch type {
              case .TouchesBegan:
                 let beganAction = SKAction.run({
-                    if counter == 165 {
-                        print("hier at \(counter)")
-                    }
+//                    if counter == 165 {
+//                        print("hier at \(counter)")
+//                    }
                     self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
                })
                 fingerActions.append(beganAction)
@@ -1899,8 +1900,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 fingerActions.append(moveAction)
             case .TouchesEnded:
                 let endedAction = SKAction.run({
-                    self.myTouchesEnded(location: touchPosition, touchedNodes: touchedNodes)
-
+                    let OK = self.myTouchesEnded(location: touchPosition, touchedNodes: touchedNodes, checkLetters: letters)
+                    if !OK {
+                        print("error by replay at: \(counter)")
+                    }
                 })
                 fingerActions.append(endedAction)
             default:
@@ -1919,7 +1922,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             func getAbsPosition(relPosX: CGFloat, relPosY: CGFloat)->CGPoint {
                 return gridStartPosition + CGPoint(x: relPosX, y: relPosY) * gridSize
             }
-            func callTouchAction(info: String, type: ActionType) {
+            func callTouchAction(info: String, type: ActionType, index: Int = 0) {
                 let data = MovedInfoData(from: info)
                 let onGameArray = data.onGameArray
                 let touchPosition = getAbsPosition(relPosX: data.relPosX, relPosY: data.relPosY)
@@ -1931,9 +1934,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: duration, counter: record.counter)
             }
-            if record.counter == 9 {
-                print("hier")
-            }
+//            if record.counter == 9 {
+//                print("hier")
+//            }
 
             switch record.typeOfTouch {
 //                FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
@@ -1955,16 +1958,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 let moves = record.movedInfo.components(separatedBy: "°")
                 var countMoves = 0
-                for move in moves {
+                for (index, move) in moves.enumerated() {
                     if move.length > 0 {
-                        callTouchAction(info: move, type: .TouchesMoved)
+                        callTouchAction(info: move, type: .TouchesMoved, index: index)
                         countMoves += 1
                     }
                 }
-                if countMoves == 0 {
+                if countMoves == 0 && record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
                     let touchPosition = pieceArray[startShapeIndex].position
                     let touchedNodes = analyzeNodes(touchLocation: touchPosition)
-                    addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
+                    addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: record.letters, duration: Double(duration), counter: record.counter)
                 } else {
                     callTouchAction(info: record.endedInfo, type: .TouchesEnded)
                 }
@@ -2382,14 +2385,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
 
         } else if inChoosingOwnWord {
-            var letters = ""
             if movingSprite {
 //                if wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 2, GRow: touchedNodes.GRow) {
 //                    _ = wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 1, GRow: touchedNodes.GRow)
 //                }
             } else if touchedNodes.GCol >= 0 && touchedNodes.GCol < GV.sizeOfGrid && touchedNodes.GRow >= 0 && touchedNodes.GRow < GV.sizeOfGrid {
 //                myTimer!.startTimeMessing()
-                (movingSprite, letters) = (wtGameboard?.moveChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow))!
+                movingSprite = (wtGameboard?.moveChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow))!
 //                myTimer!.showLastTime()
             }
             if movingSprite {
@@ -2401,16 +2403,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if GV.generateHelpInfo {
                 let movedInfoData = MovedInfoData(onGameArray: onGameArray, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString() + "°"
                 helpInfo.movedInfo += movedInfoData
-                if letters.length > 0 {
-                    helpInfo.letters = letters
-                }
             }
         } else  {
             if touchedNodes.shapeIndex >= 0 {
                 pieceArray[touchedNodes.shapeIndex].position = touchLocation
             }
             let yDistance = abs((touchLocation - firstTouchLocation).y)
-            if yDistance > blockSize / 2 && touchedNodes.row >= 0 && touchedNodes.row < GV.sizeOfGrid {
+            if yDistance > blockSize / 3 && touchedNodes.row >= 0 && touchedNodes.row < GV.sizeOfGrid {
                 if touchedNodes.shapeIndex >= 0 {
                     movedFromBottom = wtGameboard!.startShowingSpriteOnGameboard(shape: pieceArray[touchedNodes.shapeIndex], col: touchedNodes.col, row: touchedNodes.row) //, shapePos: touchedNodes.shapeIndex)
                     movedIndex = touchedNodes.shapeIndex
@@ -2436,18 +2435,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func analyzeNodes(touchLocation: CGPoint)->TouchedNodes {
         let nodes = self.nodes(at: touchLocation)
         var touchedNodes = TouchedNodes()
-//        let gridFrame = wtGameboard!.grid!.frame
-//        let myX = touchLocation.x
-//        let myY = touchLocation.y // + 2 * blockSize
-//        let shapeY = touchLocation.y  + 2 * blockSize
-//        if myX >= gridFrame.minX && myX <= gridFrame.maxX &&
-//            myY >= gridFrame.minY && myY <= gridFrame.maxY {
-//            touchedNodes.onGameArray = true
-//        }
-//        if myX >= gridFrame.minX && myX <= gridFrame.maxX &&
-//            shapeY >= gridFrame.minY && shapeY <= gridFrame.maxY {
-//            touchedNodes.shapeOnGameArray = true
-//        }
         for node in nodes {
             guard let name = node.name else {
                 continue
@@ -2486,13 +2473,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
         let touchedNodes = analyzeNodes(touchLocation: touchLocation)
-        myTouchesEnded(location: touchLocation, touchedNodes: touchedNodes)
+        _ = myTouchesEnded(location: touchLocation, touchedNodes: touchedNodes)
     }
     
-    private func myTouchesEnded(location: CGPoint, touchedNodes: TouchedNodes) {
+    
+    private func myTouchesEnded(location: CGPoint, touchedNodes: TouchedNodes, checkLetters: String = "")->Bool {
         if wtSceneDelegate == nil {
-            return
+            return false
         }
+        var returnBool = false
+        var lettersForCheck = ""
         if GV.generateHelpInfo {
             relativPosition = (location - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
         }
@@ -2516,25 +2506,36 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             firstTouchedCol = -1
             firstTouchedRow = -1
         } else if inChoosingOwnWord {
+            var letters = ""
+            var word: FoundedWord?
             if movingSprite {
                 movingSprite = false
                 let row = touchedNodes.row + 2 == 10 ? 9 : touchedNodes.row + 2
-                _ = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: row, fromBottom: false)
+                (_, letters) = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: row, fromBottom: false)
+                lettersForCheck = letters + "/" + LettersColor.Red.rawValue
             } else {
-                let word = wtGameboard!.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
+                word = wtGameboard!.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
                 if word != nil {
                     let activityItem = ActivityItem(type: .Choosing, choosedWord: word!)
                     activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
-    //                activityItems.append(activityItem)
+                    lettersForCheck = word!.word + "/" + LettersColor.Green.rawValue
+                    returnBool = checkLetters == "" || checkLetters == lettersForCheck
                     saveActualState()
                     saveToRealmCloud()
                 }
             }
+            returnBool = checkLetters == "" || checkLetters == lettersForCheck
             if GV.generateHelpInfo {
                 let endedInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
                 helpInfo.endedInfo = endedInfoData
                 if helpInfo.movedInfo.length > 0 {
                     helpInfo.movedInfo.removeLast()
+                }
+                if word != nil {
+                    helpInfo.letters = lettersForCheck
+                } else {
+
+                    helpInfo.letters = lettersForCheck
                 }
                 try! realmHelpInfo!.safeWrite() {
                     realmHelpInfo!.add(helpInfo)
@@ -2545,7 +2546,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             for piece in pieceArray {
                 piece.zPosition = 1
             }
-            let fixed = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row, fromBottom: true)
+            let (fixed, letters) = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row, fromBottom: true)
             if fixed {
  //                pieceArray[movedIndex].zPosition = 1
                 pieceArray[movedIndex].setPieceFromPosition(index: movedIndex)
@@ -2589,10 +2590,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 for index in 0...lastIndex {
                     self.addChild(pieceArray[index])
                 }
+                lettersForCheck = letters + "/" + LettersColor.Red.rawValue
+                returnBool = checkLetters == "" || checkLetters == lettersForCheck
                 if GV.generateHelpInfo {
                     let movedInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
                     helpInfo.endedInfo = movedInfoData
                     helpInfo.movedInfo.removeLast()
+                    helpInfo.letters = lettersForCheck
                     try! realmHelpInfo!.safeWrite() {
                         realmHelpInfo!.add(helpInfo)
                     }
@@ -2606,12 +2610,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             movedFromBottom = false
         } else if self.nodes(at: touchLocation).count > 0 {
             if touchedNodes.shapeIndex >= 0 && startShapeIndex == touchedNodes.shapeIndex {
+                var letters = ""
+                for letter in pieceArray[touchedNodes.shapeIndex].letters {
+                    letters += letter
+                }
+                returnBool = letters == checkLetters
                 pieceArray[touchedNodes.shapeIndex].rotate()
                 pieceArray[touchedNodes.shapeIndex].position = origPosition[touchedNodes.shapeIndex]
                 if GV.generateHelpInfo {
                     let endedInfoData = MovedInfoData(onGameArray: false, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
                     helpInfo.endedInfo += endedInfoData
                     helpInfo.movedInfo = ""
+                    helpInfo.letters = letters
                     try! realmHelpInfo!.safeWrite() {
                         realmHelpInfo!.add(helpInfo)
                     }
@@ -2628,6 +2638,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         startShapeIndex = -1
         _ = checkFreePlace(showAlert: true)
         checkIfGameFinished()
+        return returnBool
     }
     var bestScoreSync: Results<BestScoreSync>?
     var notificationToken: NotificationToken?
@@ -3187,8 +3198,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func generateArrayOfWordPieces(first: Bool)->String {
-        
-        let random = MyRandom(gameNumber: GV.playingRecord.gameNumber, modifier: GV.playingRecord.words.count)
+        let gameNumerForRandom = GV.playingRecord.gameNumber == 9999 ? 1000 : GV.playingRecord.gameNumber
+        let random = MyRandom(gameNumber: gameNumerForRandom, modifier: GV.playingRecord.words.count)
         var tileType = MyShapes.NotUsed
         var letters = [String]()
         var generateLength = 0
