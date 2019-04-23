@@ -1887,7 +1887,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             switch type {
              case .TouchesBegan:
                 let beganAction = SKAction.run({
-//                    if counter == 165 {
+//                    if counter == 89 {
 //                        print("hier at \(counter)")
 //                    }
                     self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
@@ -1900,9 +1900,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 fingerActions.append(moveAction)
             case .TouchesEnded:
                 let endedAction = SKAction.run({
+//                    if counter == 89 {
+//                        print("at \(counter)")
+//                    }
                     let OK = self.myTouchesEnded(location: touchPosition, touchedNodes: touchedNodes, checkLetters: letters)
                     if !OK {
-                        print("error by replay at: \(counter)")
+                        print("error by replay at: \(counter), letters: \(letters)")
                     }
                 })
                 fingerActions.append(endedAction)
@@ -1922,7 +1925,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             func getAbsPosition(relPosX: CGFloat, relPosY: CGFloat)->CGPoint {
                 return gridStartPosition + CGPoint(x: relPosX, y: relPosY) * gridSize
             }
-            func callTouchAction(info: String, type: ActionType, index: Int = 0) {
+            func callTouchAction(info: String, type: ActionType, index: Int = 0, letters: String = "") {
                 let data = MovedInfoData(from: info)
                 let onGameArray = data.onGameArray
                 let touchPosition = getAbsPosition(relPosX: data.relPosX, relPosY: data.relPosY)
@@ -1932,7 +1935,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     touchedNodes.row = data.row
                     touchedNodes.GRow = data.GRow
                 }
-                addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: duration, counter: record.counter)
+                addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: letters, duration: duration, counter: record.counter)
             }
 //            if record.counter == 9 {
 //                print("hier")
@@ -1943,15 +1946,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             case TypeOfTouch.FromBottom.rawValue, TypeOfTouch.FromGameArray.rawValue:
                startFromGamearray = true
             if record.beganInfo != "" {
-                if record.counter == 165 {
-                    print("stop at: \(record.counter)")
-                }
                if record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
                     let shapeIndex = Int(record.beganInfo)
                     startShapeIndex = shapeIndex!
                     let touchPosition = pieceArray[shapeIndex!].position
                     let touchedNodes = analyzeNodes(touchLocation: touchPosition)
-                addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
+                    addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
                 } else {
                     startShapeIndex = NoValue
                     callTouchAction(info: record.beganInfo, type: .TouchesBegan)
@@ -1969,7 +1969,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     let touchedNodes = analyzeNodes(touchLocation: touchPosition)
                     addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: record.letters, duration: Double(duration), counter: record.counter)
                 } else {
-                    callTouchAction(info: record.endedInfo, type: .TouchesEnded)
+                    callTouchAction(info: record.endedInfo, type: .TouchesEnded, letters: record.letters)
                 }
             }
             default:
@@ -2408,8 +2408,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if touchedNodes.shapeIndex >= 0 {
                 pieceArray[touchedNodes.shapeIndex].position = touchLocation
             }
+            let distanceMultipler = CGFloat(0.2)
             let yDistance = abs((touchLocation - firstTouchLocation).y)
-            if yDistance > blockSize / 3 && touchedNodes.row >= 0 && touchedNodes.row < GV.sizeOfGrid {
+            if yDistance > (blockSize * distanceMultipler) && touchedNodes.row >= 0 && touchedNodes.row < GV.sizeOfGrid {
                 if touchedNodes.shapeIndex >= 0 {
                     movedFromBottom = wtGameboard!.startShowingSpriteOnGameboard(shape: pieceArray[touchedNodes.shapeIndex], col: touchedNodes.col, row: touchedNodes.row) //, shapePos: touchedNodes.shapeIndex)
                     movedIndex = touchedNodes.shapeIndex
@@ -2508,11 +2509,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else if inChoosingOwnWord {
             var letters = ""
             var word: FoundedWord?
+            var saveRecord = false
             if movingSprite {
                 movingSprite = false
                 let row = touchedNodes.row + 2 == 10 ? 9 : touchedNodes.row + 2
                 (_, letters) = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: row, fromBottom: false)
-                lettersForCheck = letters + "/" + LettersColor.Red.rawValue
+                if letters != "" {
+                    lettersForCheck = letters + "/" + LettersColor.Red.rawValue
+                    saveRecord = true
+                }
             } else {
                 word = wtGameboard!.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
                 if word != nil {
@@ -2522,6 +2527,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     returnBool = checkLetters == "" || checkLetters == lettersForCheck
                     saveActualState()
                     saveToRealmCloud()
+                    saveRecord = true
                 }
             }
             returnBool = checkLetters == "" || checkLetters == lettersForCheck
@@ -2531,14 +2537,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 if helpInfo.movedInfo.length > 0 {
                     helpInfo.movedInfo.removeLast()
                 }
-                if word != nil {
-                    helpInfo.letters = lettersForCheck
-                } else {
-
-                    helpInfo.letters = lettersForCheck
-                }
-                try! realmHelpInfo!.safeWrite() {
-                    realmHelpInfo!.add(helpInfo)
+                helpInfo.letters = lettersForCheck
+                if saveRecord {
+                    try! realmHelpInfo!.safeWrite() {
+                        realmHelpInfo!.add(helpInfo)
+                    }
                 }
             }
 
@@ -2557,14 +2560,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 if activityRoundItem.last!.activityItems.count == 0 {
                     activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
                 }
-//                if activityRoundItem.count > 0 {
-//                    if activityRoundItem.last!.activityItems.count == 0 {
-//                        activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
-//                    }
-//                } else {
-//                    activityRoundItem.append(ActivityRound())
-//                    activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
-//                }
                 activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
 //                activityItems.append(activityItem)
                 createUndo(enabled: true)
