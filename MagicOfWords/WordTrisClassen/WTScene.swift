@@ -407,7 +407,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let startPosY = startPos.y
 //        let endPosY = score > 0 ? self.frame.size.height * 0.80 : self.frame.size.height * -0.04
         balloon.position = CGPoint(x: startPos.x, y: startPos.y )
-        self.addChild(balloon)
+        bgSprite!.addChild(balloon)
         let scoreLabel = SKLabelNode(fontNamed: GV.actFont)
         scoreLabel.text = String(score)
 //        scoreLabel.verticalAlignmentMode = .center
@@ -524,7 +524,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         4: [31, 22],
         5: [32, 221]
     ]
-    let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
+    let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1.0)
     let mandatoryWordsHeaderName = "°°°mandatoryWords°°°"
     let ownWordsHeaderName = "°°°ownWords°°°"
     let bonusHeaderName = "°°°bonusHeader°°°"
@@ -544,6 +544,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     var timeIncreaseValues: [Int]?
     var movingSprite: Bool = false
+    var bgSprite: SKSpriteNode?
 //    var wtGameWordList: WTGameWordList?
 
     
@@ -554,6 +555,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.view!.isMultipleTouchEnabled = false
         self.view!.subviews.forEach { $0.removeFromSuperview() }
         self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+        self.bgSprite = SKSpriteNode()
+//        bgSprite!.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+//        bgSprite!.color = bgColor
+        self.addChild(bgSprite!)
         GV.totalScore = 0
         GV.mandatoryScore = 0
         GV.ownScore = 0
@@ -567,18 +572,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         }
-//        if GV.generateHelpInfo {
-//            newGameNumber = 1000
-////            new = true
-//            nextGame = .GameNumber
-//        }
-
         getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         createHeader()
         buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
+        buttonSize = CGSize(width: buttonHeight, height: buttonHeight)
         createUndo(enabled: false)
         createGoBackButton()
-//        wtGameFinishedSprite.setDelegate(delegate: self)
         WTGameWordList.shared.clear()
         WTGameWordList.shared.setMandatoryWords()
         showWordsToCollect()
@@ -818,7 +817,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func createHeader() {
         let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
-        if self.childNode(withName: timeName) == nil {
+        if bgSprite!.childNode(withName: timeName) == nil {
             timeLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT") // Snell Roundhand")
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let xPosition = self.frame.size.width * 0.90
@@ -828,11 +827,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.time.HourMinSec)
             timeLabel.horizontalAlignmentMode = .right
             timeLabel.name = timeName
-            self.addChild(timeLabel)
+            bgSprite!.addChild(timeLabel)
         }
 
         let startPosXForHeaderMultiplier: CGFloat = 0.15
-        if self.childNode(withName: headerName) == nil {
+        if bgSprite!.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let gameNumber = GV.playingRecord.gameNumber
             let text = GV.language.getText(.tcHeader, values: String(gameNumber), String(0))
@@ -843,7 +842,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             headerLabel.position = CGPoint(x: self.frame.size.width * startPosXForHeaderMultiplier, y: YPosition)
             headerLabel.horizontalAlignmentMode = .left
             headerLabel.fontColor = SKColor.black
-            self.addChild(headerLabel)
+            bgSprite!.addChild(headerLabel)
         }
         
         let myName = GV.basicDataRecord.myNickname
@@ -851,7 +850,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let bestName = "nobody"
         let bestScore = 0
         
-        if self.childNode(withName: bestScoreName) == nil {
+        if bgSprite!.childNode(withName: bestScoreName) == nil {
             let YPosition: CGFloat = self.frame.height * bestScoreLinePosition
             //            let text = GV.language.getText(.tcBestScoreHeader, values: bestOnlineRecord!.player, bestOnlineRecord!.score)
             let text = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:15), bestName)
@@ -862,10 +861,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             bestScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * /*xPosMultiplierForScore*/ startPosXForHeaderMultiplier, y: YPosition)
             bestScoreHeaderLabel.horizontalAlignmentMode = .left
             bestScoreHeaderLabel.fontColor = SKColor.black
-            self.addChild(bestScoreHeaderLabel)
+            bgSprite!.addChild(bestScoreHeaderLabel)
         }
         
-        if self.childNode(withName: myScoreName) == nil {
+        if bgSprite!.childNode(withName: myScoreName) == nil {
             let YPosition: CGFloat = self.frame.height * myScoreLinePosition
             let text = GV.language.getText(.tcMyScoreHeader, values: String(GV.playingRecord.score).fixLength(length:15), myName)
             myScoreheaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
@@ -875,7 +874,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             myScoreheaderLabel.position = CGPoint(x: self.frame.size.width * /*xPosMultiplierForScore*/ startPosXForHeaderMultiplier, y: YPosition)
             myScoreheaderLabel.horizontalAlignmentMode = .left
             myScoreheaderLabel.fontColor = SKColor.black
-            self.addChild(myScoreheaderLabel)
+            bgSprite!.addChild(myScoreheaderLabel)
         }
    }
     
@@ -918,7 +917,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             place = self.bestPlayers!.filter("score > %@", score).count + 1
         }
         let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(place), String(score).fixLength(length:6), GV.basicDataRecord.myNickname)
-        let myScorelabel = self.childNode(withName: myScoreName) as? SKLabelNode
+        let myScorelabel = bgSprite!.childNode(withName: myScoreName) as? SKLabelNode
         if myScorelabel != nil {
             myScorelabel!.text = scoreText
         }
@@ -927,7 +926,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let bestName = bestScoreForActualGame![0].owner != nil ? bestScoreForActualGame![0].owner!.nickName : ""
             let bestScore = bestScoreForActualGame![0].bestScore
             let bestScoretext = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:6), bestName!)
-            let bestScorelabel = self.childNode(withName: bestScoreName) as? SKLabelNode
+            let bestScorelabel = bgSprite!.childNode(withName: bestScoreName) as? SKLabelNode
             bestScorelabel!.text = bestScoretext
         }
     }
@@ -952,22 +951,22 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     func showFoundedWords() {
         let myMandatoryWords = WTGameWordList.shared.getMandatoryWords()
         for actWord in myMandatoryWords {
-            let label = self.childNode(withName: actWord.word) as? SKLabelNode
+            let label = bgSprite!.childNode(withName: actWord.word) as? SKLabelNode
             if label != nil {
                 label!.text = actWord.word + " (\(actWord.counter)) "
             }
         }
         
-        if let label = self.childNode(withName: bonusHeaderName)! as? SKLabelNode {
+        if let label = bgSprite!.childNode(withName: bonusHeaderName)! as? SKLabelNode {
             label.text = GV.language.getText(.tcBonusHeader, values: String(GV.bonusScore))
         }
 
-        if let label = self.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
+        if let label = bgSprite!.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
             label.text = GV.language.getText(.tcWordsToCollect, values: String(WTGameWordList.shared.getCountWords(mandatory: true)), String(WTGameWordList.shared.getCountFoundedWords(mandatory: true, countFoundedMandatory: true)),
                 String(WTGameWordList.shared.getCountFoundedWords(mandatory: true, countAll: true)),
                 String(GV.mandatoryScore))
         }
-        if let label = self.childNode(withName: ownWordsHeaderName)! as? SKLabelNode {
+        if let label = bgSprite!.childNode(withName: ownWordsHeaderName)! as? SKLabelNode {
                 label.text = GV.language.getText(.tcOwnWords, values: String(WTGameWordList.shared.getCountWords(mandatory: false)), String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
                     String(GV.ownScore))
         }
@@ -1114,7 +1113,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        print(origMovedBy)
 //        wtGameboardMovedBy = self.frame.height - (gridPosition.y + gridSize.height / 2)
         for row in 0...10 {
-            if let child = self.childNode(withName: "Row\(row)") {
+            if let child = bgSprite!.childNode(withName: "Row\(row)") {
                 child.position.y -= hide ? wtGameboardMovedBy : -wtGameboardMovedBy
             }
         }
@@ -1414,12 +1413,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var saveDataButton: MyButton?
     var allWordsButton: MyButton?
     var finishButton: MyButton?
-
-    var goToPreviousGameButton: UIButton?
-    var goToNextGameButton: UIButton?
-    var undoButton: UIButton?
-    var goBackButton: UIButton?
+    var undoButton: MyButton?
+    var goBackButton: MyButton?
+    var goToPreviousGameButton: MyButton?
+    var goToNextGameButton: MyButton?
+    
     var buttonHeight = CGFloat(0)
+    var buttonSize = CGSize(width: CGFloat(0), height: CGFloat(0))
     
     func hideButtons(hide: Bool) {
         goToPreviousGameButton!.isEnabled = !hide
@@ -1451,41 +1451,49 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     func createGoToPreviousGameButton(enabled: Bool) {
         if goToPreviousGameButton != nil {
-            goToPreviousGameButton?.removeFromSuperview()
+            goToPreviousGameButton?.removeFromParent()
             goToPreviousGameButton = nil
         }
-        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
-        let center = CGPoint(x:self.frame.width * 0.08, y:self.frame.height * 0.92)
-        let radius = self.frame.width * 0.045
+//        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
+        let center = CGPoint(x:self.frame.width * firstButtonColumn, y:self.frame.height * lastButtonLine)
+//        let radius = self.frame.width * 0.045
         let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "LeftSimple" : "LeftElite"
-        goToPreviousGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
-        goToPreviousGameButton?.addTarget(self, action: #selector(self.goPreviousGame), for: .touchUpInside)
-        self.view?.addSubview(goToPreviousGameButton!)
-        self.view?.addSubview(goToPreviousGameButton!)
+        goToPreviousGameButton = createMyButton(imageName: imageName, size: buttonSize, center: center, enabled: enabled, newSize: buttonHeight)
+        goToPreviousGameButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.goPreviousGame))
+        goToPreviousGameButton!.name = imageName
+        goToPreviousGameButton!.zPosition = 10
+//        goToPreviousGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
+//        goToPreviousGameButton?.addTarget(self, action: #selector(self.goPreviousGame), for: .touchUpInside)
+        bgSprite!.addChild(goToPreviousGameButton!)
+//        self.view?.addSubview(goToPreviousGameButton!)
     }
     func createGoToNextGameButton(enabled: Bool) {
         if goToNextGameButton != nil {
-            goToNextGameButton?.removeFromSuperview()
+            goToNextGameButton?.removeFromParent()
             goToNextGameButton = nil
         }
-        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
-        let center = CGPoint(x:self.frame.width * 0.92, y:self.frame.height * 0.92)
-        let radius = self.frame.width * 0.045
+//        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
+        let center = CGPoint(x:self.frame.width * lastButtonColumn, y:self.frame.height * lastButtonLine)
+//        let radius = self.frame.width * 0.045
         let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "RightSimple" : "RightElite"
-        goToNextGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame )
-        goToNextGameButton?.addTarget(self, action: #selector(self.goNextGame), for: .touchUpInside)
-        self.view?.addSubview(goToNextGameButton!)
+        goToNextGameButton = createMyButton(imageName: imageName, size: buttonSize, center: center, enabled: enabled, newSize: buttonHeight)
+        goToNextGameButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.goNextGame))
+        goToNextGameButton!.name = imageName
+        goToNextGameButton!.zPosition = 10
+//        goToNextGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame )
+//        goToNextGameButton?.addTarget(self, action: #selector(self.goNextGame), for: .touchUpInside)
+        bgSprite!.addChild(goToNextGameButton!)
     }
     
-    private func createShowAllWordsButton() {
+    private func createAllWordsButton() {
         if allWordsButton != nil {
             allWordsButton?.removeFromParent()
             allWordsButton = nil
         }
         var ownHeaderYPos = CGFloat(0)
-//        let ownHeader: SKNode = (self.childNode(withName: ownWordsHeaderName) as! SKLabelNode)
+//        let ownHeader: SKNode = (bgSprite!.childNode(withName: ownWordsHeaderName) as! SKLabelNode)
         let title = GV.language.getText(.tcShowAllWords)
         let wordLength = title.width(font: myTitleFont!)
 //        let wordHeight = title.height(font: myTitleFont!)
@@ -1493,12 +1501,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         ownHeaderYPos = self.frame.height * mybuttonLineCenterY// - ownHeader.frame.maxY + frame.height
         allWordsButtonCenter = CGPoint(x:self.frame.width * 0.55, y: ownHeaderYPos) //self.frame.height * 0.20)
 //        let radius = frame.height * 0.5
-        let myButton = createMyButton(title: title, size: size, center: allWordsButtonCenter, enabled: true )
-        myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(showAllWordsInTableView))
+        allWordsButton = createMyButton(title: title, size: size, center: allWordsButtonCenter, enabled: true )
+        allWordsButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(showAllWordsInTableView))
 //        allWordsButton?.addTarget(self, action: #selector(self.showAllWordsInTableView), for: .touchUpInside)
-        myButton.zPosition = self.zPosition + 1
-        allWordsButton = myButton
-        self.addChild(allWordsButton!)
+        allWordsButton!.zPosition = 10
+        bgSprite!.addChild(allWordsButton!)
     }
     
     private func createMyButton(imageName: String = "", title: String = "", size: CGSize, center: CGPoint, enabled: Bool, newSize: CGFloat = 0)->MyButton {
@@ -1548,7 +1555,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        myButton!.addTarget(self, action: #selector(self.finishButtonTapped), for: .touchUpInside)
 //        finishButton?.layer.zPosition = -100
         finishButton = myButton
-        self.addChild(myButton)
+        bgSprite!.addChild(myButton)
     }
     
     @objc private func finishButtonTapped() {
@@ -1576,7 +1583,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         myButton.zPosition = self.zPosition + 1
         searchButton = myButton
 //        searchButton!.addTarget(self, action: #selector(self.wordListTapped), for: .touchUpInside)
-        self.addChild(searchButton!)
+        bgSprite!.addChild(searchButton!)
     }
     
     private func createSaveDataButton() {
@@ -1597,7 +1604,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         myButton.zPosition = self.zPosition + 1
         saveDataButton = myButton
         //        searchButton!.addTarget(self, action: #selector(self.wordListTapped), for: .touchUpInside)
-        self.addChild(saveDataButton!)
+        bgSprite!.addChild(saveDataButton!)
 
     }
     var savedGameData: Results<GameData>?
@@ -1651,37 +1658,45 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let buttonYPosition: CGFloat = 0.145
     private func createGoBackButton() {
         if goBackButton != nil {
-            goBackButton?.removeFromSuperview()
+            goBackButton?.removeFromParent()
             goBackButton = nil
         }
-        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
-        let center = CGPoint(x:self.frame.width * 0.10, y:self.frame.height * buttonYPosition)
-        let radius = self.frame.width * 0.04
+//        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
+        let center = CGPoint(x:self.frame.width * firstButtonColumn, y:self.frame.height * firstButtonLine)
+//        let radius = self.frame.width * 0.04
         let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "BackSimple" : "BackElite"
-        goBackButton = createButton(imageName: imageName, imageSize: 1.5, title: "", frame: frame, center: center, cornerRadius: radius, enabled: true, hasFrame: hasFrame)
-        goBackButton!.addTarget(self, action: #selector(self.goBackTapped), for: .touchUpInside)
-        self.view?.addSubview(goBackButton!)
+        goBackButton = createMyButton(imageName: imageName, size: buttonSize, center: center, enabled: true, newSize: buttonHeight)
+        goBackButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.goBackTapped))
+        goBackButton!.name = imageName
+        goBackButton!.zPosition = 10
+        bgSprite!.addChild(goBackButton!)
     }
+    
+    var firstButtonColumn: CGFloat = 0.1
+    var lastButtonColumn: CGFloat = 0.92
+    var firstButtonLine: CGFloat = 0.86
+    var lastButtonLine: CGFloat = 0.08
     
     private func createUndo(enabled: Bool) {
         if undoButton != nil {
-            undoButton?.removeFromSuperview()
+            undoButton?.removeFromParent()
             undoButton = nil
         }
         if activityRoundItem.count == 0 {
             activityRoundItem.append(ActivityRound())
             activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
         }
-        let enabled = activityRoundItem[0].activityItems.count > 0
-        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
-        let center = CGPoint(x:self.frame.width * 0.90, y:self.frame.height * buttonYPosition)
-        let radius = self.frame.width * 0.04
         let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = hasFrame ? "UndoSimple" : "UndoElite"
-        undoButton = createButton(imageName: imageName, imageSize: 1.5, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
-        undoButton?.addTarget(self, action: #selector(self.undoTapped), for: .touchUpInside)
-        self.view?.addSubview(undoButton!)
+        let center = CGPoint(x: self.frame.width * lastButtonColumn, y: self.frame.height * firstButtonLine)
+        let size = CGSize(width: buttonHeight, height: buttonHeight)
+        let newSize = buttonHeight
+        undoButton = createMyButton(imageName: imageName, size: size, center: center, enabled: true, newSize: newSize)
+        undoButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.undoTapped))
+        undoButton!.name = imageName
+        undoButton!.zPosition = 10
+        bgSprite!.addChild(undoButton!)
     }
     
     private func createButton(imageName: String, imageSize: CGFloat = 1.0, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool, color: UIColor? = nil, hasFrame: Bool = true)->UIButton {
@@ -1766,7 +1781,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         label.text = wordToShow.word + " (\(wordToShow.counter))"
         label.name = wordToShow.word
         label.zPosition = self.zPosition + 10
-        self.addChild(label)
+        bgSprite!.addChild(label)
 //        if !showWord {
 //            label.isHidden = true
 //        }
@@ -1784,27 +1799,37 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         label.fontColor = .black
         label.text = word
         label.name = name
-        self.addChild(label)
+        bgSprite!.addChild(label)
     }
     
 //    var random: MyRandom?
-
+    
+    @objc private func OKTapped() {
+        print("OK")
+    }
+    
+    @objc private func cancelTapped() {
+        print("cancel")
+    }
     private func play() {
+        let myAlert = MyAlertController(mainText: "Hier by Play", message: "testAlert")
+        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        myAlert.addAction(text: "OK", target: self, action:#selector(self.OKTapped))
+        myAlert.addAction(text: "cancel", target: self, action:#selector(self.cancelTapped))
+        myAlert.zPosition = 10
+//        myAlert.presentAlert(target: bgSprite!)
         GV.playing = true
         timerIsCounting = true
         headerCreated = false
         WTGameWordList.shared.setDelegate(delegate: self)
         timeForGame = TimeForGame(from: GV.playingRecord.time)
-//        createHeader()
         myTimer = MyTimer(time: timeForGame)
-//        addChild(myTimer!)
         wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
         }
         generateArrayOfWordPieces(new: new)
         indexOfTilesForGame = 0
-//        getOnlineRecords()
         pieceArray = Array(repeating: WTPiece(), count: 3)
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * pieceArrayCenterY)
@@ -1830,7 +1855,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 origSize[index] = pieceArray[index].size
                 pieceArray[index].position = origPosition[index]
                 pieceArray[index].name = "Pos\(index)"
-                self.addChild(pieceArray[index])
+                bgSprite!.addChild(pieceArray[index])
             }
         }
         if GV.generateHelpInfo {
@@ -1844,7 +1869,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        modifyHeader()
         createGoToPreviousGameButton(enabled: hasPreviousRecords(playingRecord: GV.playingRecord))
         createGoToNextGameButton(enabled: hasNextRecords(playingRecord: GV.playingRecord))
-        createShowAllWordsButton()
+        createAllWordsButton()
         createFinishButton()
         createSearchButton()
         createSaveDataButton()
@@ -1976,9 +2001,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 continue
             }
         }
+        let lastAction = SKAction.run({
+            let scaleSceneAction = SKAction.scale(to: 0.01, duration: 10)
+            let moveSceneAction = SKAction.move(to: CGPoint(x: self.frame.midX, y: self.frame.midY), duration: 5)
+            self.bgSprite!.run(SKAction.group([scaleSceneAction, moveSceneAction]))
+            self.wtGameboard!.run(SKAction.group([scaleSceneAction, moveSceneAction]))
+        })
         let sequence = SKAction.sequence(fingerActions)
-        fingerSprite.run(SKAction.sequence([sequence]))
-        self.addChild(fingerSprite)
+        fingerSprite.run(SKAction.sequence([sequence, lastAction]))
+        bgSprite!.addChild(fingerSprite)
     }
     
     private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
@@ -2261,7 +2292,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let sizeDivider = GV.onIpad ? CGFloat(6) : CGFloat(12)
         finger?.size = CGSize(width: (finger?.size.width)! / sizeDivider, height: (finger?.size.height)! / sizeDivider)
         finger?.position = firstTouchLocation + CGPoint(x: 0, y: fingerAdder)
-        self.addChild(finger!)
+        bgSprite!.addChild(finger!)
         #endif
         stopShowingTableIfNeeded()
         
@@ -2583,7 +2614,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 pieceArray[lastIndex].name = "Pos\(lastIndex)"
                 pieceArray[lastIndex].setPieceFromPosition(index: lastIndex)
                 for index in 0...lastIndex {
-                    self.addChild(pieceArray[index])
+                    bgSprite!.addChild(pieceArray[index])
                 }
                 lettersForCheck = letters + "/" + LettersColor.Red.rawValue
                 returnBool = checkLetters == "" || checkLetters == lettersForCheck
@@ -2856,7 +2887,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let bestName = bestScoreForActualGame![0].owner!.nickName
             let bestScore = bestScoreForActualGame![0].bestScore
             let bestScoretext = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:6), bestName!)
-            let bestScorelabel = self.childNode(withName: bestScoreName) as? SKLabelNode
+            let bestScorelabel = bgSprite!.childNode(withName: bestScoreName) as? SKLabelNode
             bestScorelabel!.text = bestScoretext
         }
         var title = ""
@@ -2983,8 +3014,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func removeNodesWith(name: String) {
-        while self.childNode(withName: name) != nil {
-            self.childNode(withName: name)!.removeFromParent()
+        while bgSprite!.childNode(withName: name) != nil {
+            bgSprite!.childNode(withName: name)!.removeFromParent()
         }
     }
     
@@ -3060,18 +3091,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         movePieceToPosition(from: tileForGame, to: 0)
                         tileForGame.alpha = 1.0
                         removeNodesWith(name: pieceArray[0].name!)
-                        self.addChild(pieceArray[0])
+                        bgSprite!.addChild(pieceArray[0])
                     case 1:
                         movePieceToPosition(from: pieceArray[1], to: 2, remove: true)
                         movePieceToPosition(from: tileForGame, to: 1)
                         tileForGame.alpha = 1.0
                         removeNodesWith(name: pieceArray[1].name!)
-                        self.addChild(pieceArray[1])
+                        bgSprite!.addChild(pieceArray[1])
                     case 2:
                         movePieceToPosition(from: tileForGame, to: 2, remove: true)
                         tileForGame.alpha = 1.0
                         removeNodesWith(name: pieceArray[2].name!)
-                        self.addChild(pieceArray[2])
+                        bgSprite!.addChild(pieceArray[2])
                     default: break
                     }
                 } else {
@@ -3129,7 +3160,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             origSize[pieceIndex] = piece.size
             pieceArray[pieceIndex].name = "Pos\(pieceIndex)"
             removeNodesWith(name: "Pos\(pieceIndex)")             // remove the piece from this position, if exists
-            self.addChild(pieceArray[pieceIndex])
+            bgSprite!.addChild(pieceArray[pieceIndex])
         }
         activityRoundItem = [ActivityRound]()
         for round in GV.playingRecord.rounds {
