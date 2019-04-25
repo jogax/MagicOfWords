@@ -1812,12 +1812,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         print("cancel")
     }
     private func play() {
-        let myAlert = MyAlertController(mainText: "Hier by Play", message: "testAlert")
-        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        let myAlert = MyAlertController(mainText: GV.language.getText(.tcChooseAction), message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname))
         myAlert.addAction(text: "OK", target: self, action:#selector(self.OKTapped))
         myAlert.addAction(text: "cancel", target: self, action:#selector(self.cancelTapped))
         myAlert.zPosition = 10
-//        myAlert.presentAlert(target: bgSprite!)
+        myAlert.presentAlert(target: bgSprite!)
+        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        bgSprite!.addChild(myAlert)
         GV.playing = true
         timerIsCounting = true
         headerCreated = false

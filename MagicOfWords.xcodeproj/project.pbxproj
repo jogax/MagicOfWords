@@ -122,6 +122,7 @@
 		206AD3F1222C2AA800B7C5B6 /* GraySprite1100.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3E3222C2AA700B7C5B6 /* GraySprite1100.png */; };
 		206AD3F4222C2AA800B7C5B6 /* GraySprite0011.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3E6222C2AA800B7C5B6 /* GraySprite0011.png */; };
 		206AD3F6222C36C700B7C5B6 /* GraySprite0000.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3F5222C36C700B7C5B6 /* GraySprite0000.png */; };
+		206EA3FB2271D31300F184B4 /* MenuBG.png in Resources */ = {isa = PBXBuildFile; fileRef = 206EA3FA2271D31200F184B4 /* MenuBG.png */; };
 		207B67862243BDBB001456C8 /* GameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207B67852243BDBB001456C8 /* GameData.swift */; };
 		207B67882243BE87001456C8 /* RoundData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207B67872243BE87001456C8 /* RoundData.swift */; };
 		207B678A2243C9F8001456C8 /* save.png in Resources */ = {isa = PBXBuildFile; fileRef = 207B67892243C9F7001456C8 /* save.png */; };
@@ -312,6 +313,7 @@
 		206AD3E3222C2AA700B7C5B6 /* GraySprite1100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite1100.png; sourceTree = "<group>"; };
 		206AD3E6222C2AA800B7C5B6 /* GraySprite0011.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0011.png; sourceTree = "<group>"; };
 		206AD3F5222C36C700B7C5B6 /* GraySprite0000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite0000.png; sourceTree = "<group>"; };
+		206EA3FA2271D31200F184B4 /* MenuBG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MenuBG.png; sourceTree = "<group>"; };
 		207B67852243BDBB001456C8 /* GameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameData.swift; sourceTree = "<group>"; };
 		207B67872243BE87001456C8 /* RoundData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundData.swift; sourceTree = "<group>"; };
 		207B67892243C9F7001456C8 /* save.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = save.png; sourceTree = "<group>"; };
@@ -582,6 +584,7 @@
 				20469BCF21A43F4E00743EB1 /* sortup.png */,
 				20395F5E21A31D4300947D7F /* search.png */,
 				20395F5C21A2FE4E00947D7F /* retype.png */,
+				206EA3FA2271D31200F184B4 /* MenuBG.png */,
 				2051A54D2191E376001AD00B /* hook.png */,
 				205CF7EA2129A21000C1B89D /* finger.png */,
 				20506A43225772F1000BB525 /* finger1.png */,
@@ -853,6 +856,7 @@
 				20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */,
 				205EC41A222EAD380080D4ED /* LightBlueSprite1100.png in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
+				206EA3FB2271D31300F184B4 /* MenuBG.png in Resources */,
 				206AD3E8222C2AA800B7C5B6 /* GraySprite1001.png in Resources */,
 				20866974222AC84E002194C8 /* GreenSprite1000.png in Resources */,
 				204C30B321EF789A008B1CB3 /* ruMandatory6.txt in Resources */,

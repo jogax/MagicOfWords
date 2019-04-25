@@ -411,14 +411,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     var createMandatoryAction: UIAlertAction?
     #endif
     
-
     func showMenu() {
         getRecordCounts()
         let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
-                                                message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname),
-                                                preferredStyle: .alert)
-
+                                            message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname),
+                                            preferredStyle: .alert)
+        
         let newOK = countMandatory - countExistingGames > 0
         let continueOK = countContinueGames > 0
         //--------------------- newGameAction ---------------------
@@ -436,13 +435,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         let continueAction = UIAlertAction(title: "\(GV.language.getText(.tcContinue))", style: .default, handler: { [unowned self]
             alert -> Void in
             if continueOK {
-//                self.showGames(all: false)
+                //                self.showGames(all: false)
                 self.startWTScene(new: false, next: .NoMore, gameNumber: 0)
             }
         })
         if !continueOK {
             continueAction.isEnabled = false
-//            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
+            //            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
         }
         alertController!.addAction(continueAction)
         //--------------------- bestScoreAction ---------------------
@@ -457,15 +456,15 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             self.showSettingsMenu()
         })
         alertController!.addAction(settingsAction)
-
-//        //--------------------- chooseLanguageAction ---------------------
-//        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.chooseLanguage()
-//        })
-//        alertController!.addAction(chooseLanguageAction)
+        
+        //        //--------------------- chooseLanguageAction ---------------------
+        //        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+        //            alert -> Void in
+        //            self.chooseLanguage()
+        //        })
+        //        alertController!.addAction(chooseLanguageAction)
         //--------------------- nickNameAction ---------------------
-
+        
         nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
             alert -> Void in
             if GV.connectedToInternet && playerActivity != nil && GV.myUser != nil {
@@ -478,16 +477,100 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         alertController!.addAction(nickNameAction!)
         expertUserChanged()
         #if DEBUG
-            let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
-                alert -> Void in
-                self.developerMenuChoosed()
-            })
-            alertController!.addAction(developerMenuAction)
+        let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.developerMenuChoosed()
+        })
+        alertController!.addAction(developerMenuAction)
         #endif
         //--------------------- Present alert ---------------------
         present(alertController!, animated: true, completion: nil)
-
+        
     }
+
+//    func showMenuX() {
+//        getRecordCounts()
+//        let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
+//        alertController = MyAlertController(mainText: GV.language.getText(.tcChooseAction), message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname))
+//        myAlert.addAction(text: "OK", target: self, action:#selector(self.OKTapped))
+//        myAlert.addAction(text: "cancel", target: self, action:#selector(self.cancelTapped))
+//        myAlert.zPosition = 10
+//        myAlert.presentAlert(target: bgSprite!)
+//        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+//
+//        alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
+//                                                message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname),
+//                                                preferredStyle: .alert)
+//
+//        let newOK = countMandatory - countExistingGames > 0
+//        let continueOK = countContinueGames > 0
+//        //--------------------- newGameAction ---------------------
+//        let newGameAction = UIAlertAction(title: "\(GV.language.getText(.tcNewGame)) ", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            if newOK {
+//                self.startNewGame()
+//            }
+//        })
+//        if !newOK {
+//            newGameAction.setValue(disabledColor, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(newGameAction)
+//        //--------------------- continueAction ---------------------
+//        let continueAction = UIAlertAction(title: "\(GV.language.getText(.tcContinue))", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            if continueOK {
+////                self.showGames(all: false)
+//                self.startWTScene(new: false, next: .NoMore, gameNumber: 0)
+//            }
+//        })
+//        if !continueOK {
+//            continueAction.isEnabled = false
+////            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(continueAction)
+//        //--------------------- bestScoreAction ---------------------
+//        let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.showGames(all: true)
+//        })
+//        alertController!.addAction(bestScoreAction)
+//        //--------------------- SettingsAction ---------------------------
+//        let settingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.showSettingsMenu()
+//        })
+//        alertController!.addAction(settingsAction)
+//
+////        //--------------------- chooseLanguageAction ---------------------
+////        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+////            alert -> Void in
+////            self.chooseLanguage()
+////        })
+////        alertController!.addAction(chooseLanguageAction)
+//        //--------------------- nickNameAction ---------------------
+//
+//        nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            if GV.connectedToInternet && playerActivity != nil && GV.myUser != nil {
+//                self.chooseNickname()
+//            } else {
+//                self.showMenu()
+//            }
+//        })
+//        nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
+//        alertController!.addAction(nickNameAction!)
+//        expertUserChanged()
+//        #if DEBUG
+//            let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                self.developerMenuChoosed()
+//            })
+//            alertController!.addAction(developerMenuAction)
+//        #endif
+//        //--------------------- Present alert ---------------------
+//        present(alertController!, animated: true, completion: nil)
+//
+//    }
 
     var cloudGameData: Results<GameData>?
     var cloudGameDataSubscription: SyncSubscription<GameData>?
