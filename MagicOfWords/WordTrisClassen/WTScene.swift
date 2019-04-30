@@ -109,28 +109,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord = SelectedWord()) {
         var longWaitAction = SKAction.wait(forDuration: 0.0)
-        let duration = 0.3
-        if newWord != foundedWord {
-            for letter in newWord.usedLetters {
-                let myNode = GV.gameArray[letter.col][letter.row]
-                let showRedAction = SKAction.run({
-                    myNode.setColors(toColor: .myRedColor, toStatus: .noChange)
-                })
-                let waitAction = SKAction.wait(forDuration: duration)
-                let showOrigAction = SKAction.run({
-                    myNode.setColorByState()
-                })
-                var sequence = [SKAction]()
-                for _ in 1...3 {
-                    sequence.append(showRedAction)
-                    sequence.append(waitAction)
-                    sequence.append(showOrigAction)
-                    sequence.append(waitAction)
-                }
-                myNode.run(SKAction.sequence(sequence))
+        let duration = 0.4
+        for letter in newWord.usedLetters {
+            let myNode = GV.gameArray[letter.col][letter.row]
+            let showRedAction = SKAction.run({
+                myNode.setColors(toColor: .myRedColor, toStatus: .noChange)
+            })
+            let waitAction = SKAction.wait(forDuration: duration)
+            let showOrigAction = SKAction.run({
+                myNode.setColorByState()
+            })
+            var sequence = [SKAction]()
+            for _ in 1...3 {
+                sequence.append(showRedAction)
+                sequence.append(waitAction)
+                sequence.append(showOrigAction)
+                sequence.append(waitAction)
             }
-            longWaitAction = SKAction.wait(forDuration: 3 * 2 * duration)
+            myNode.run(SKAction.sequence(sequence))
         }
+        longWaitAction = SKAction.wait(forDuration: 3 * 2 * duration)
         for letter in foundedWord.usedLetters {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showGreenAction = SKAction.run({
@@ -147,8 +145,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 sequence.append(waitAction)
                 sequence.append(showOrigAction)
                 sequence.append(waitAction)
+                
             }
-            myNode.zPosition = 1000
+//            myNode.zPosition = 500
             myNode.run(SKAction.sequence(sequence))
             
             
@@ -1005,19 +1004,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         startUndo()
     }
     @objc func goBackTapped() {
-        stopShowingTableIfNeeded()
-        if timer != nil {
-            timer!.invalidate()
-            timer = nil
+        if self.enabled {
+            stopShowingTableIfNeeded()
+            if timer != nil {
+                timer!.invalidate()
+                timer = nil
+            }
+            removeAllSubviews()
+            wtSceneDelegate!.gameFinished(start: .NoMore)
         }
-        removeAllSubviews()
-        wtSceneDelegate!.gameFinished(start: .NoMore)
     }
     
     var searchingWord = ""
     var wtGameboardMovedBy: CGFloat = 0
     
     @objc func wordListTapped() {
+        if !self.enabled {
+            return
+        }
         sortUp = true
         listOfFoundedWords = [LineOfFoundedWords]()
         searchingWord = ""
@@ -1381,32 +1385,38 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
 
     @objc func goPreviousGame() {
-        stopShowingTableIfNeeded()
-        if timer != nil {
-            timer!.invalidate()
-            timer = nil
+        if self.enabled {
+            stopShowingTableIfNeeded()
+            if timer != nil {
+                timer!.invalidate()
+                timer = nil
+            }
+            removeAllSubviews()
+            wtSceneDelegate!.gameFinished(start: .PreviousGame)
         }
-        removeAllSubviews()
-        wtSceneDelegate!.gameFinished(start: .PreviousGame)
     }
     
     @objc func goNextGame() {
-        stopShowingTableIfNeeded()
-        if timer != nil {
-            timer!.invalidate()
-            timer = nil
+        if self.enabled {
+            stopShowingTableIfNeeded()
+            if timer != nil {
+                timer!.invalidate()
+                timer = nil
+            }
+            removeAllSubviews()
+            wtSceneDelegate!.gameFinished(start: .NextGame)
         }
-        removeAllSubviews()
-        wtSceneDelegate!.gameFinished(start: .NextGame)
     }
     
     @objc func showAllWordsInTableView() {
-        if GV.generateHelpInfo {
-//            saveHelpInfo(allWordsButtonTouched:true)
+        if self.enabled {
+            if GV.generateHelpInfo {
+                saveHelpInfo(action: .ShowMyWordsButton)
+            }
+            stopShowingTableIfNeeded()
+            showOwnWordsInTableView()
+            showingWordsInTable = true
         }
-        stopShowingTableIfNeeded()
-        showOwnWordsInTableView()
-        showingWordsInTable = true
     }
     
     var searchButton: MyButton?
@@ -1559,7 +1569,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc private func finishButtonTapped() {
-        showGameFinished(status: .OK)
+        if self.enabled {
+            showGameFinished(status: .OK)
+            saveHelpInfo(action: .FinishButton)
+        }
     }
     
 
@@ -1812,13 +1825,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         print("cancel")
     }
     private func play() {
-        let myAlert = MyAlertController(mainText: GV.language.getText(.tcChooseAction), message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname))
-        myAlert.addAction(text: "OK", target: self, action:#selector(self.OKTapped))
-        myAlert.addAction(text: "cancel", target: self, action:#selector(self.cancelTapped))
-        myAlert.zPosition = 10
-        myAlert.presentAlert(target: bgSprite!)
-        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-        bgSprite!.addChild(myAlert)
         GV.playing = true
         timerIsCounting = true
         headerCreated = false
@@ -2102,85 +2108,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var helpInfo = HelpInfo()
 
     
-    private func saveHelpInfo(touchLocation: CGPoint = CGPoint(x:CGFloat(0), y:CGFloat(0)), touchedNodes: TouchedNodes = TouchedNodes(), calledFrom: CalledFrom = .Start, undoButtonTouched: Bool=false, allWordsButtonTouched: Bool=false) {
-//        if GV.playingRecord.gameNumber != 1000 {
-//            return
-//        }
-//        let records = realmHelpInfo!.objects(HelpModel.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true)
-////        var lastRecord = HelpModel()
-//        var counter = 0
-//        var bottomIndex = NoValue
-//        if records.count > 0 {
-////            lastRecord = records.last!
-//            counter = records.last!.counter
-//        }
-//        if calledFrom == .Start {
-//            countOfMoves = 0
-//            bottomIndex = touchedNodes.shapeIndex
-//            lastCol = NoValue
-//            lastRow = NoValue
-//        }
-//        let onGameArray = touchedNodes.onGameArray
-////        let colIndex = touchedNodes.GCol
-////        let rowIndex = touchedNodes.GRow
-//        let relativPosition = (touchLocation - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
-//        let midPosition = relativPosition * 10
-//        let col = Int(midPosition.x)
-//        let row = 9 - Int(midPosition.y)
-//        print("col: \(col), row: \(row)")
-//        if calledFrom == .Move && lastCol == col && lastRow == row {
-//            return
-//        } else {
-//            if calledFrom == .Move {
-//                countOfMoves += 1
-//                lastCol = col
-//                lastRow = row
-//            }
-//            if calledFrom == .Stop && countOfMoves == 0 && !onGameArray {
-//                bottomIndex = touchedNodes.shapeIndex
-//            }
-//            let helpModel = HelpModel()
-//            helpModel.combinedKey = GV.actLanguage + String(counter + 1)
-//            helpModel.language = GV.actLanguage
-//            helpModel.counter = counter + 1
-//            helpModel.typeOfTouch = calledFrom.rawValue
-//    //        helpModel.bottomPieceTouched = bottomPieceTouched
-//            helpModel.onGameArray = onGameArray
-//            helpModel.bottomIndex = bottomIndex
-//            helpModel.fingerPositionX = Int(relativPosition.x * convertValue)
-//            helpModel.fingerPositionY = Int(relativPosition.y * convertValue)
-//
-//            helpModel.colIndex = col
-//            helpModel.rowIndex = row
-//            helpModel.undoButtonTouched = undoButtonTouched
-//            helpModel.allWordsButtonTouched = allWordsButtonTouched
-//    //        if undoButtonTouched || allWordsButtonTouched || calledFrom != CalledFrom.move || (calledFrom == CalledFrom.move && (lastRecord.bottomPieceTouched != helpModel.bottomPieceTouched || lastRecord.bottomIndex != helpModel.bottomIndex || lastRecord.onGameArray != helpModel.onGameArray || lastRecord.colIndex != helpModel.colIndex || lastRecord.rowIndex != helpModel.rowIndex)) {
-//    //            print("helpModel: language: \(helpModel.language), counter: \(helpModel.counter), typeOfTouch: \(helpModel.typeOfTouch), bottomPieceTouched:\(helpModel.bottomPieceTouched), onGameArray:\(onGameArray), bottomIndex: \(bottomIndex), colIndex: \(colIndex), rowIndex: \(rowIndex),  ")
-//            let helpModel1 = HelpModel()
-//            if calledFrom == .Stop {
-//                counter += 1
-//                helpModel.typeOfTouch = CalledFrom.Move.rawValue
-//                helpModel1.combinedKey = GV.actLanguage + String(counter + 1)
-//                helpModel1.language = GV.actLanguage
-//                helpModel1.counter = counter + 1
-//                helpModel1.typeOfTouch = calledFrom.rawValue
-//                //        helpModel.bottomPieceTouched = bottomPieceTouched
-//                helpModel1.onGameArray = onGameArray
-//                helpModel1.bottomIndex = bottomIndex
-//                helpModel1.fingerPositionX = Int(relativPosition.x * convertValue)
-//                helpModel1.fingerPositionY = Int(relativPosition.y * convertValue)
-//
-//                helpModel.colIndex = col
-//                helpModel.rowIndex = row
-//            }
-//
-//            try! realmHelpInfo!.safeWrite() {
-//                realmHelpInfo!.add(helpModel)
-//                if calledFrom == .Stop {
-//                    realmHelpInfo!.add(helpModel1)
-//                }
-//            }
-//        }
+    private func saveHelpInfo(action: TypeOfTouch) {
+        if !GV.generateHelpInfo {
+            return
+        }
+        let helpInfo = HelpInfo()
+        helpInfo.typeOfTouch = action.rawValue
+        switch action {
+        case .UndoButton: helpInfo.letters = "UndoButton"
+        case .ShowMyWordsButton: helpInfo.letters = "ShowMyWordsButton"
+        case .FinishButton: helpInfo.letters = "FinishButton"
+        case .ContinueGame: helpInfo.letters = "ContinueGame"
+        case .FinishGame: helpInfo.letters = "FinishGame"
+        case .NoMoreStepsBack: helpInfo.letters = "NoMoreStepsBack"
+        case .NoMoreStepsNext: helpInfo.letters = "NoMoreStepsNext"
+        case .NoMoreStepsCont: helpInfo.letters = "NoMoreStepsCont"
+        default: break
+        }
+        try! realmHelpInfo!.safeWrite() {
+            realmHelpInfo!.add(helpInfo)
+        }
     }
     private func saveArrayOfPieces() {
 //        tilesForGame.removeAll()
@@ -2687,23 +2634,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.modifyHeader()
 //        let roundScore = WTGameWordList.shared.getPointsForLetters()
         self.wtGameboard!.clearGreenFieldsForNextRound()
-//        if !self.checkFreePlace(showAlert: false) {
-//            self.showGameFinished(status: .NoMoreSteps)
-//        } else {
-            actRound = GV.playingRecord.rounds.count + 1
-            createNextRound = true
-//            try! realm.safeWrite() {
-//                GV.playingRecord.rounds.last!.roundScore = roundScore
-//                let newRound = RoundDataModel()
-//                //                newRound.index = activityItems.count - 1
-//                newRound.gameArray = self.wtGameboard!.gameArrayToString()
-//                GV.playingRecord.rounds.append(newRound)
-//                self.timeForGame.incrementMaxTime(value: iHalfHour)
-//                WTGameWordList.shared.addNewRound()
-//                self.activityRoundItem.append(ActivityRound())
-//                self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
-//            }
-//         }
+        actRound = GV.playingRecord.rounds.count + 1
+        createNextRound = true
         self.enabled = true
         self.gameboardEnabled = false
         self.removeNodesWith(name: self.MyQuestionName)
@@ -2862,24 +2794,31 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let message = GV.language.getText(.tcCongratulations2)
         let continueTitle = GV.language.getText(.tcContinuePlaying)
         let finishTitle = GV.language.getText(.tcFinishGame)
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let continueAction =  UIAlertAction(title: continueTitle, style: .default, handler: {alert -> Void in
-            self.gameboardEnabled = true
-            self.goOnPlaying = true
-//            self.saveHelpInfo(touchLocation:)
-            try! realm.safeWrite() {
-                GV.playingRecord.gameStatus = GV.GameStatusContinued
-            }
-        })
-        let finishAction =  UIAlertAction(title: finishTitle, style: .default, handler: {alert -> Void in
-            self.gameboardEnabled = true
-            self.finishButtonTapped()
-            self.saveToRealmCloud()
-        })
-        alertController.addAction(continueAction)
-        alertController.addAction(finishAction)
+        let myAlert = MyAlertController(title: title, message: message, target: self)
+        myAlert.addAction(text: continueTitle, action: #selector(self.continueAction))
+        myAlert.addAction(text: finishTitle, action: #selector(self.finishAction))
+        myAlert.presentAlert(target: bgSprite!)
+        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        bgSprite!.addChild(myAlert)
+
  //        let subViewPosition = UIAlertController.subviews[0].view.frame
-        self.parentViewController!.present(alertController, animated: true, completion: nil)
+//        self.parentViewController!.present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc private func continueAction () {
+        saveHelpInfo(action: .ContinueGame)
+        self.gameboardEnabled = true
+        self.goOnPlaying = true
+        try! realm.safeWrite() {
+            GV.playingRecord.gameStatus = GV.GameStatusContinued
+        }
+    }
+    
+    @objc private func finishAction () {
+        saveHelpInfo(action: .FinishGame)
+        self.gameboardEnabled = true
+        self.finishButtonTapped()
+        self.saveToRealmCloud()
     }
     
     private func showGameFinished(status: GameFinishedStatus) {
@@ -2990,28 +2929,40 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if !placeFound {
             let greenWordsCount = WTGameWordList.shared.getCountWordsInLastRound()
             if greenWordsCount > 0 {
-                let answer1Action =  UIAlertAction(title: GV.language.getText(.tcBack), style: .default, handler: {alert -> Void in
-                    self.startUndo()
-                })
-                let answer2Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer2), style: .default, handler: {alert -> Void in
-                    self.stopShowingTableIfNeeded()
-                    self.startNextRound()
-                    self.modifyHeader()
-                })
-                let answer3Action = UIAlertAction(title: GV.language.getText(.tcNoMoreStepsAnswer3), style: .default, handler: {alert -> Void in
-                })
-                let alertController = UIAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
-                                                        message: "", //GV.language.getText(.tcNoMoreStepsQuestion2),
-                                                        preferredStyle: .alert)
-                alertController.addAction(answer1Action)
-                alertController.addAction(answer2Action)
-                alertController.addAction(answer3Action)
-                self.parentViewController!.present(alertController, animated: true, completion: nil)
+                let myAlert = MyAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
+                                                message: GV.language.getText(.tcChooseAction) , target: self)
+                myAlert.addAction(text: GV.language.getText(.tcBack), action:#selector(self.startUndoTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNoMoreStepsAnswer2), action:#selector(self.nextRoundTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNoMoreStepsAnswer3), action:#selector(self.noActionTapped))
+                myAlert.presentAlert(target: bgSprite!)
+                myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+                bgSprite!.addChild(myAlert)
+                self.enabled = false
+                self.gameboardEnabled = false
             } else {
                 showGameFinished(status: .NoMoreSteps)
             }
         }
         return placeFound
+    }
+    
+    @objc private func noActionTapped() {
+        self.enabled = true
+        saveHelpInfo(action: .NoMoreStepsBack)
+    }
+    
+    @objc private func nextRoundTapped() {
+        self.enabled = true
+        saveHelpInfo(action: .NoMoreStepsNext)
+        stopShowingTableIfNeeded()
+        startNextRound()
+        modifyHeader()
+    }
+    
+    @objc private func startUndoTapped() {
+        self.enabled = true
+        saveHelpInfo(action: .NoMoreStepsNext)
+        startUndo()
     }
     
     private func removeNodesWith(name: String) {
@@ -3033,6 +2984,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var actRound = 1
     
     private func startUndo() {
+        if !self.enabled {
+            return
+        }
         func movePieceToPosition(from: WTPiece, to: Int, remove: Bool = false) {
             if remove {
                 pieceArray[to].removeFromParent()
@@ -3044,19 +2998,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             pieceArray[to].setPieceFromPosition(index: to)
             origSize[to] = pieceArray[to].size
         }
-//        func restartGame() {
-//            let gameNumber = GV.playingRecord.gameNumber
-//            deleteGameDataRecord(gameNumber: gameNumber)
-//            tilesForGame = [WTPiece]()
-//            indexOfTilesForGame = 0
-//            createPlayingRecord(gameNumber: gameNumber)
-//            generateArrayOfWordPieces(new: new)
-//            restoreGameArray()
-//            createUndo(enabled: false)
-//        }
         
         if GV.generateHelpInfo {
-//            saveHelpInfo(undoButtonTouched:true)
+            saveHelpInfo(action: .UndoButton)
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
             actRound = GV.playingRecord.rounds.count - 1
@@ -3411,14 +3355,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     
-//    func searchLetter(letter: String) {
-//        for tile in tilesForGame {
-//            if tile.letters.contains(where: {$0 == letter}) {
-//                print("index: \(tile.arrayIndex), letters: \(tile.letters)")
-//            }
-//        }
-//    }
-//    
     var showOwnWordsTableView: WTTableView?
     struct WordsForShow {
         var words = [FoundedWordWithCounter]()

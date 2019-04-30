@@ -433,6 +433,9 @@ extension String {
         return subString(at:0, length: 1)
     }
     
+    func lastChar()->String {
+        return subString(at: length - 1, length: 1)
+    }
     func subString(at: Int, length: Int) -> String {
         if self.length > 0 {
             let indexStartOfText = self.index(self.startIndex, offsetBy: at)
@@ -517,6 +520,15 @@ extension NSAttributedString {
 extension UIColor {
     static public func greenAppleColor()->UIColor {
         return UIColor(red: 0x52/0xff, green: 0xD0/0xff, blue: 0x17/0xff, alpha: 1.0)
+    }
+    var rgba:(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        return (red, green, blue, alpha)
     }
 }
 

@@ -10,7 +10,7 @@ import UIKit
 import RealmSwift
 
 enum TypeOfTouch: Int {
-    case FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
+    case FromBottom = 0, FromGameArray, UndoButton, ShowMyWordsButton, FinishButton, ContinueGame, FinishGame, NoMoreStepsBack, NoMoreStepsNext, NoMoreStepsCont
 }
 
 enum LettersColor: String {

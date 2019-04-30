@@ -10,61 +10,101 @@ import Foundation
 import SpriteKit
 
 class MyAlertController: SKSpriteNode {
+    let separator = "°"
     var myLabels = [SKLabelNode]()
-    var myTargets = [AnyObject]()
+    var myBackgrounds = [SKSpriteNode]()
+    let myTarget: AnyObject
     var myActions = [Selector]()
     var ownWidth = CGFloat(0)
     var ownHeight = CGFloat(0)
     var myFontSize = CGFloat(0)
+    var titleFontSize = CGFloat(0)
     var countHeaderLines = 1
     var myFont = UIFont()
-    init(mainText: String, message: String) {
+    var titleFont = UIFont()
+    var lastIndex: Int?
+    let myGrayColor = UIColor(red: 230/255, green: 230/255, blue: 230/255, alpha: 1.0)
+    let myLightRedColor = UIColor(red: 251/255, green: 235/255, blue: 232/255, alpha: 1.0)
+    let fontName = "HelveticaNeue-Bold"
+    init(title: String, message: String, target: AnyObject) {
         myFontSize = GV.onIpad ? 20 : 15
+        titleFontSize = myFontSize * 1.2
+        myTarget = target
         //let fontName = "HiraMaruProN-W4"
-        let fontName = "HelveticaNeue-Bold"
         myFont = UIFont(name: fontName, size: myFontSize)!
-        super.init(texture: SKTexture(imageNamed: "MenuBG"), color: UIColor.blue, size: CGSize(width: 100, height: 100))
-        self.color = .blue
-        let label1 = createLabel(text: mainText, color: .black, fontSizeMpx: 1.3)
-        self.addChild(label1)
-        countHeaderLines += 1
-        let label2 = createLabel(text: message, color: .black, fontSizeMpx: 0.8)
-        self.addChild(label2)
-        countHeaderLines += 1
-        let mainFont = UIFont(name: fontName, size: myFontSize * 1.3)!
-        ownWidth = mainText.width(font:mainFont) * 0.8
-        let messageWidth = message.width(font: myFont)
-        ownWidth = messageWidth > ownWidth ? messageWidth : ownWidth
-        ownHeight = mainText.height(font: myFont)
-        self.size = CGSize(width: ownWidth, height: ownHeight * CGFloat(2))
+        titleFont = UIFont(name: fontName, size: titleFontSize)!
+        super.init(texture: nil /*SKTexture(imageNamed: "MenuBG")*/, color: .clear, size: CGSize(width: 1, height: 1))
+        ownHeight = title.height(font: myFont) * 1.2
+        self.color = myLightRedColor
+        let textArray1 = title.components(separatedBy: separator)
+        for text in textArray1 {
+            let textWidth = text.width(font:titleFont)
+            ownWidth = ownWidth > textWidth ? ownWidth : textWidth
+            let label = createLabel(text: text, color: .black, title: true, header: true)
+            addChild(label)
+            countHeaderLines += 1
+        }
+        let textArray2 = message.components(separatedBy: separator)
+        for text in textArray2 {
+            let textWidth = text.width(font:titleFont)
+            ownWidth = ownWidth > textWidth ? ownWidth : textWidth
+            let label = createLabel(text: text, color: .black, title: false, header: true)
+            addChild(label)
+            countHeaderLines += 1
+        }
+        self.size = CGSize(width: ownWidth * 0.8, height: ownHeight * CGFloat(2))
+        self.zPosition = 1000
     }
-    public func addAction(text: String, target: AnyObject, action:Selector) {
+    public func addAction(text: String, action:Selector) {
         let label = createLabel(text: text)
         ownWidth = text.width(font: myFont) > ownWidth ? text.width(font: myFont) : ownWidth
-        myTargets.append(target)
         myActions.append(action)
-        label.name = String(myLabels.count - 1)
+//        label.name = String(myLabels.count - 1)
         self.addChild(label)
     }
     
     public func presentAlert(target: AnyObject) {
-        self.size = CGSize(width: ownWidth, height: ownHeight * CGFloat(myLabels.count + countHeaderLines))
+        let multiplier: CGFloat = 1.5
+//        let titleMultiplier: CGFloat = 1.9
+        self.size = CGSize(width: ownWidth * 0.8, height: calculatedHeight)
         self.position = CGPoint(x: target.frame.maxX, y: target.frame.midY)
+        var actY = self.frame.maxY
         for (index, label) in myLabels.enumerated() {
-            let y = self.frame.maxY - ownHeight * CGFloat(index + 1) * 1.5//* (index > 0 ? 1.5 : 1)
-            label.position = CGPoint(x: self.frame.midX, y: y)
-            if index > 0 && index < myLabels.count - 1 {
-                createLine(atY: y)
+            var isNormalLine = false
+            switch label.name!.lastChar() {
+            case "T": actY -= ownHeight * 0.9
+            case "M": actY -= ownHeight * 0.7
+            case "L": actY -= ownHeight * 1.5
+                isNormalLine = true
+            default: break
+            }
+//            let y = self.frame.maxY - ownHeight * CGFloat(index + 1) * (multiplier + 0.04)
+            label.position = CGPoint(x: self.frame.midX, y: actY)
+            if index > countHeaderLines - 2 {
+                myBackgrounds[index].position = CGPoint(x: self.frame.midX, y: actY)
+                myBackgrounds[index].color = .clear
+                myBackgrounds[index].size = CGSize(width: self.frame.width, height:ownHeight * multiplier)
+            }
+            if isNormalLine {
+                createLine(atY: actY + ownHeight * 1.5)
             }
         }
-
     }
-    private func createLabel(text: String, color: UIColor = .blue, fontSizeMpx: CGFloat = 1)->SKLabelNode {
-        let label = SKLabelNode(fontNamed: GV.actLabelFont)
-        label.fontSize = myFontSize * fontSizeMpx
+    var calculatedHeight:CGFloat = 0
+    private func createLabel(text: String, color: UIColor = .blue, title: Bool = false, header: Bool = false)->SKLabelNode {
+        let label = SKLabelNode(fontNamed: fontName)
+        label.fontSize = title ? titleFontSize : (header ? myFontSize * 0.8 : myFontSize)
         label.text = text
         label.fontColor = color
+        label.name = String(myBackgrounds.count) + (header ? (title ? "T" : "M") : "L")
+        calculatedHeight += (header ? (title ? ownHeight : ownHeight * 0.8) : ownHeight * 1.5)
         myLabels.append(label)
+        let sprite = SKSpriteNode(texture: nil, color: .clear, size: CGSize(width: 10, height: 10))
+        if !header {
+            sprite.name = String(myBackgrounds.count)
+        }
+        myBackgrounds.append(sprite)
+        self.addChild(sprite)
         return label
     }
     
@@ -75,9 +115,57 @@ class MyAlertController: SKSpriteNode {
         pathToDraw.move(to: CGPoint(x: self.frame.minX + 10, y: toY))
         pathToDraw.addLine(to: CGPoint(x: self.frame.maxX - 10, y: toY))
         line.path = pathToDraw
-        line.strokeColor = SKColor.darkGray
+        line.strokeColor = SKColor.lightGray
         line.lineWidth = 0.05
         addChild(line)
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        let nodes = self.nodes(at: touchLocation)
+        for node in nodes {
+            guard let name = node.name else {
+                continue
+            }
+            let index: Int? = Int(name)
+            if index != nil {
+                lastIndex = index!
+                myBackgrounds[index!].color = myGrayColor
+            }
+        }
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        let nodes = self.nodes(at: touchLocation)
+        if nodes.count == 0 {
+            if lastIndex != nil {
+                myBackgrounds[lastIndex!].color = .clear
+                lastIndex = nil
+            }
+        } else {
+            for node in nodes {
+                guard let name = node.name else {
+                    continue
+                }
+                let index: Int? = Int(name)
+                if index != nil {
+                    if lastIndex == nil {
+                        myBackgrounds[index!].color = myGrayColor
+                        lastIndex = index!
+                    } else if lastIndex != index {
+                       myBackgrounds[lastIndex!].color = .clear
+                       myBackgrounds[index!].color = myGrayColor
+                       lastIndex = index!
+                    }
+                } else {
+                    if lastIndex != nil {
+                        myBackgrounds[lastIndex!].color = .clear
+                        lastIndex = nil
+                    }
+                }
+            }
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -88,10 +176,11 @@ class MyAlertController: SKSpriteNode {
                 continue
             }
             let index: Int? = Int(name)
-            if index != nil {
-                let target = myTargets[index! - countHeaderLines + 1]
+            if index == nil {
+
+            } else {
                 let action = myActions[index! - countHeaderLines + 1]
-                _ = target.perform(action)
+                _ = myTarget.perform(action)
                 self.removeFromParent()
             }
         }
