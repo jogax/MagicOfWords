@@ -19,10 +19,14 @@ class MyAlertController: SKSpriteNode {
     var ownHeight = CGFloat(0)
     var myFontSize = CGFloat(0)
     var titleFontSize = CGFloat(0)
+    var messageFontSize = CGFloat(0)
     var countHeaderLines = 1
     var myFont = UIFont()
     var titleFont = UIFont()
+    var messageFont = UIFont()
+
     var lastIndex: Int?
+    var radiusShape = SKShapeNode()
     let myGrayColor = UIColor(red: 230/255, green: 230/255, blue: 230/255, alpha: 1.0)
     let myGoldColor = UIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
 //    let myLightRedColor = UIColor(red: 251/255, green: 235/255, blue: 232/255, alpha: 1.0)
@@ -32,49 +36,63 @@ class MyAlertController: SKSpriteNode {
     init(title: String, message: String, target: AnyObject) {
         myFontSize = GV.onIpad ? 20 : 15
         titleFontSize = myFontSize * 1.1
+        messageFontSize = myFontSize * 0.8
         myTarget = target
+        ownWidth = 0
         //let fontName = "HiraMaruProN-W4"
         myFont = UIFont(name: fontName, size: myFontSize)!
-        titleFont = UIFont(name: fontName, size: titleFontSize)!
+        titleFont = UIFont(name: titleFontName, size: titleFontSize)!
+        messageFont = UIFont(name: fontName, size: messageFontSize)!
         super.init(texture: nil /*SKTexture(imageNamed: "MenuBG")*/, color: .clear, size: CGSize(width: 1, height: 1))
+
         ownHeight = title.height(font: myFont) * 1.2
         calculatedHeight = title.height(font: myFont)
-        self.color = myGoldColor
+//        self.color = myGrayColor
         let textArray1 = title.components(separatedBy: separator)
         firstTitleLine = true
         for text in textArray1 {
             let textWidth = text.width(font:titleFont)
             ownWidth = ownWidth > textWidth ? ownWidth : textWidth
-            let label = createLabel(text: text, color: .black, title: true, header: true)
-            addChild(label)
+            createLabel(text: text, color: .black, title: true, header: true)
+//            addChild(label)
             countHeaderLines += 1
             firstTitleLine = false
         }
         let textArray2 = message.components(separatedBy: separator)
         firstMessageLine = true
         for text in textArray2 {
-            let textWidth = text.width(font:titleFont)
+            let textWidth = text.width(font:messageFont)
             ownWidth = ownWidth > textWidth ? ownWidth : textWidth
-            let label = createLabel(text: text, color: .black, title: false, header: true)
-            addChild(label)
+            createLabel(text: text, color: .black, title: false, header: true)
+//            addChild(label)
             countHeaderLines += 1
             firstMessageLine = false
         }
-        self.size = CGSize(width: ownWidth * 0.8, height: ownHeight * CGFloat(2))
+//        self.size = CGSize(width: ownWidth * 0.8, height: ownHeight * CGFloat(2))
         self.zPosition = 1000
     }
     public func addAction(text: String, action:Selector) {
-        let label = createLabel(text: text)
-        ownWidth = text.width(font: myFont) > ownWidth ? text.width(font: myFont) : ownWidth
+        createLabel(text: text)
+        let textWidth = text.width(font: myFont)
+        ownWidth = textWidth > ownWidth ? textWidth : ownWidth
         myActions.append(action)
 //        label.name = String(myLabels.count - 1)
-        self.addChild(label)
+//        self.addChild(label)
     }
     
     public func presentAlert(target: AnyObject) {
         let multiplier: CGFloat = 1.5
 //        let titleMultiplier: CGFloat = 1.9
-        self.size = CGSize(width: ownWidth * 0.9, height: calculatedHeight)
+        self.size = CGSize(width: ownWidth * 1.1, height: calculatedHeight)
+        radiusShape = SKShapeNode.init(rect: CGRect.init(origin: CGPoint.zero, size: size), cornerRadius: 15)
+        radiusShape.position = CGPoint.zero
+        radiusShape.lineWidth = 2.0
+        radiusShape.fillColor = myGoldColor
+        radiusShape.strokeColor = .black
+        radiusShape.zPosition = -2
+        radiusShape.position = CGPoint(x:self.frame.minX, y: self.frame.minY)
+        self.addChild(radiusShape)
+
         self.position = CGPoint(x: target.frame.maxX, y: target.frame.midY)
         var actY = self.frame.maxY
         var firstTitleLine = true
@@ -103,7 +121,9 @@ class MyAlertController: SKSpriteNode {
             if isNormalLine {
                 createLine(atY: actY + ownHeight * 1.5)
             }
+            self.addChild(label)
         }
+        position = CGPoint(x: target.frame.midX, y: target.frame.midY)
     }
     var calculatedHeight:CGFloat = 0
     let titleMultipler1:CGFloat = 0.9
@@ -117,7 +137,7 @@ class MyAlertController: SKSpriteNode {
     let messageName = "M"
     let lineName = "L"
     
-    private func createLabel(text: String, color: UIColor = .blue, title: Bool = false, header: Bool = false)->SKLabelNode {
+    private func createLabel(text: String, color: UIColor = .blue, title: Bool = false, header: Bool = false) {
         let label = SKLabelNode(fontNamed: fontName)
         switch (header, title) {
         case (true, true):
@@ -146,7 +166,7 @@ class MyAlertController: SKSpriteNode {
         }
         myBackgrounds.append(sprite)
         self.addChild(sprite)
-        return label
+//        return label
     }
     
     func createLine(atY: CGFloat) {

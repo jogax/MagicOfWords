@@ -2800,12 +2800,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         myAlert.presentAlert(target: bgSprite!)
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         bgSprite!.addChild(myAlert)
+        self.enabled = false
+        self.gameboardEnabled = false
+
 
  //        let subViewPosition = UIAlertController.subviews[0].view.frame
 //        self.parentViewController!.present(alertController, animated: true, completion: nil)
     }
     
     @objc private func continueAction () {
+        self.enabled = true
+        self.gameboardEnabled = true
         saveHelpInfo(action: .ContinueGame)
         self.gameboardEnabled = true
         self.goOnPlaying = true
@@ -2815,14 +2820,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc private func finishAction () {
+        self.enabled = true
+        self.gameboardEnabled = true
         saveHelpInfo(action: .FinishGame)
         self.gameboardEnabled = true
         self.finishButtonTapped()
         self.saveToRealmCloud()
     }
     
+    var gameFinishedStatus: GameFinishedStatus = .OK
+    
     private func showGameFinished(status: GameFinishedStatus) {
-
+        gameFinishedStatus = status
         if bestScoreForActualGame != nil && bestScoreForActualGame!.count > 0 && bestPlayersReady {
             let bestName = bestScoreForActualGame![0].owner!.nickName
             let bestScore = bestScoreForActualGame![0].bestScore
@@ -2834,7 +2843,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var message = ""
         var action1Title = ""
         let action2Title = GV.language.getText(.tcBack)
-        if status == .OK {
+        if gameFinishedStatus == .OK {
             title = GV.language.getText(.tcGameFinished1)
             message = GV.language.getText(.tcGameFinished2)
             action1Title = GV.language.getText(.tcFinishGame)
@@ -2843,24 +2852,49 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             message = GV.language.getText(.tcWillBeRestarted)
             action1Title = GV.language.getText(.tcRestartGame)
         }
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action1 =  UIAlertAction(title: action1Title, style: .default, handler: {alert -> Void in
-            self.gameboardEnabled = true
-            if status == .OK {
-                try! realm.safeWrite() {
-                    GV.playingRecord.gameStatus = GV.GameStatusFinished
-                }
-                self.startNewGame()
-            } else {
-                self.restartThisGame()
+        let myAlert = MyAlertController(title: title, message: message, target: self)
+//        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        myAlert.addAction(text: action1Title, action: #selector(finishButtonTapped2))
+        myAlert.addAction(text: action2Title, action: #selector(goBackButtonTapped2))
+        myAlert.presentAlert(target: bgSprite!)
+        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        bgSprite!.addChild(myAlert)
+
+//        let action1 =  UIAlertAction(title: action1Title, style: .default, handler: {alert -> Void in
+//            self.gameboardEnabled = true
+//            if status == .OK {
+//                try! realm.safeWrite() {
+//                    GV.playingRecord.gameStatus = GV.GameStatusFinished
+//                }
+//                self.startNewGame()
+//            } else {
+//                self.restartThisGame()
+//            }
+//        })
+//        let action2 =  UIAlertAction(title: action2Title, style: .default, handler: {alert -> Void in
+//            self.gameboardEnabled = true
+//        })
+//        alertController.addAction(action1)
+//        alertController.addAction(action2)
+//        self.parentViewController!.present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc private func finishButtonTapped2() {
+        gameboardEnabled = true
+        enabled = true
+        if gameFinishedStatus == .OK {
+            try! realm.safeWrite() {
+                GV.playingRecord.gameStatus = GV.GameStatusFinished
             }
-        })
-        let action2 =  UIAlertAction(title: action2Title, style: .default, handler: {alert -> Void in
-            self.gameboardEnabled = true
-        })
-        alertController.addAction(action1)
-        alertController.addAction(action2)
-        self.parentViewController!.present(alertController, animated: true, completion: nil)
+            self.startNewGame()
+        } else {
+            self.restartThisGame()
+        }
+    }
+    
+    @objc private func goBackButtonTapped2() {
+        gameboardEnabled = true
+        enabled = true
     }
     
     private func saveActualState() {
