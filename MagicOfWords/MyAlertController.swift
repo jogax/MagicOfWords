@@ -24,33 +24,41 @@ class MyAlertController: SKSpriteNode {
     var titleFont = UIFont()
     var lastIndex: Int?
     let myGrayColor = UIColor(red: 230/255, green: 230/255, blue: 230/255, alpha: 1.0)
-    let myLightRedColor = UIColor(red: 251/255, green: 235/255, blue: 232/255, alpha: 1.0)
-    let fontName = "HelveticaNeue-Bold"
+    let myGoldColor = UIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
+//    let myLightRedColor = UIColor(red: 251/255, green: 235/255, blue: 232/255, alpha: 1.0)
+//    let fontName = "HelveticaNeue-Bold"
+    let fontName = "AvenirNextCondensed-Regular"
+    let titleFontName = "AvenirNextCondensed-Bold"
     init(title: String, message: String, target: AnyObject) {
         myFontSize = GV.onIpad ? 20 : 15
-        titleFontSize = myFontSize * 1.2
+        titleFontSize = myFontSize * 1.1
         myTarget = target
         //let fontName = "HiraMaruProN-W4"
         myFont = UIFont(name: fontName, size: myFontSize)!
         titleFont = UIFont(name: fontName, size: titleFontSize)!
         super.init(texture: nil /*SKTexture(imageNamed: "MenuBG")*/, color: .clear, size: CGSize(width: 1, height: 1))
         ownHeight = title.height(font: myFont) * 1.2
-        self.color = myLightRedColor
+        calculatedHeight = title.height(font: myFont)
+        self.color = myGoldColor
         let textArray1 = title.components(separatedBy: separator)
+        firstTitleLine = true
         for text in textArray1 {
             let textWidth = text.width(font:titleFont)
             ownWidth = ownWidth > textWidth ? ownWidth : textWidth
             let label = createLabel(text: text, color: .black, title: true, header: true)
             addChild(label)
             countHeaderLines += 1
+            firstTitleLine = false
         }
         let textArray2 = message.components(separatedBy: separator)
+        firstMessageLine = true
         for text in textArray2 {
             let textWidth = text.width(font:titleFont)
             ownWidth = ownWidth > textWidth ? ownWidth : textWidth
             let label = createLabel(text: text, color: .black, title: false, header: true)
             addChild(label)
             countHeaderLines += 1
+            firstMessageLine = false
         }
         self.size = CGSize(width: ownWidth * 0.8, height: ownHeight * CGFloat(2))
         self.zPosition = 1000
@@ -66,15 +74,22 @@ class MyAlertController: SKSpriteNode {
     public func presentAlert(target: AnyObject) {
         let multiplier: CGFloat = 1.5
 //        let titleMultiplier: CGFloat = 1.9
-        self.size = CGSize(width: ownWidth * 0.8, height: calculatedHeight)
+        self.size = CGSize(width: ownWidth * 0.9, height: calculatedHeight)
         self.position = CGPoint(x: target.frame.maxX, y: target.frame.midY)
         var actY = self.frame.maxY
+        var firstTitleLine = true
+        var firstMessageLine = true
         for (index, label) in myLabels.enumerated() {
             var isNormalLine = false
             switch label.name!.lastChar() {
-            case "T": actY -= ownHeight * 0.9
-            case "M": actY -= ownHeight * 0.7
-            case "L": actY -= ownHeight * 1.5
+            case titleName:
+                actY -= ownHeight * (firstTitleLine ? titleMultipler1 : titleMultipler2)
+                firstTitleLine = false
+            case messageName:
+                actY -= ownHeight * (firstMessageLine ? messageMultiplier1 : messageMultiplier2)
+                firstMessageLine = false
+            case lineName:
+                actY -= ownHeight * lineMultiplier
                 isNormalLine = true
             default: break
             }
@@ -91,13 +106,39 @@ class MyAlertController: SKSpriteNode {
         }
     }
     var calculatedHeight:CGFloat = 0
+    let titleMultipler1:CGFloat = 0.9
+    let titleMultipler2:CGFloat = 0.7
+    let messageMultiplier1:CGFloat = 0.8
+    let messageMultiplier2:CGFloat = 0.5
+    let lineMultiplier:CGFloat = 1.5
+    var firstTitleLine = true
+    var firstMessageLine = true
+    let titleName = "T"
+    let messageName = "M"
+    let lineName = "L"
+    
     private func createLabel(text: String, color: UIColor = .blue, title: Bool = false, header: Bool = false)->SKLabelNode {
         let label = SKLabelNode(fontNamed: fontName)
-        label.fontSize = title ? titleFontSize : (header ? myFontSize * 0.8 : myFontSize)
+        switch (header, title) {
+        case (true, true):
+            label.fontSize = titleFontSize
+            label.name = titleName
+            calculatedHeight += ownHeight * (firstTitleLine ? titleMultipler1 : titleMultipler2)
+        case (true, false):
+            label.fontSize = myFontSize * 0.8
+            label.name = messageName
+            calculatedHeight += ownHeight * (firstMessageLine ? messageMultiplier1 : messageMultiplier2)
+        case (false, false):
+            label.fontSize = myFontSize
+            label.name = lineName
+            calculatedHeight += ownHeight * lineMultiplier
+        default: break
+        }
+//        label.fontSize = title ? titleFontSize : (header ? myFontSize * 0.8 : myFontSize)
         label.text = text
         label.fontColor = color
-        label.name = String(myBackgrounds.count) + (header ? (title ? "T" : "M") : "L")
-        calculatedHeight += (header ? (title ? ownHeight : ownHeight * 0.8) : ownHeight * 1.5)
+//        label.name = String(myBackgrounds.count) + (header ? (title ? titleName : messageName) : lineName)
+//        calculatedHeight += ownHeight * (header ? (title ? firstTitleLine : ownHeight * 0.8) : ownHeight * 1.5)
         myLabels.append(label)
         let sprite = SKSpriteNode(texture: nil, color: .clear, size: CGSize(width: 10, height: 10))
         if !header {
