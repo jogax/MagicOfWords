@@ -328,7 +328,7 @@ public extension Float {
 
 
 extension String {
-    
+        
     func contains(strings: [String])->Bool {
         for string in strings {
             if self.range(of:string) != nil {

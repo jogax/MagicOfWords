@@ -660,7 +660,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             deleteGameDataRecord(gameNumber: gameNumber)
             createPlayingRecord(gameNumber: gameNumber)
         } else if new {
-            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@", GV.GameStatusNew, GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@ and gameNumber < 1000", GV.GameStatusNew, GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
             /// reset all records with nowPlaying status
 //            wtGameWordList = WTGameWordList(delegate: self)
             if games.count > 0 {
@@ -1558,14 +1558,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let ownHeaderYPos = self.frame.height * mybuttonLineCenterY// - ownHeader.frame.maxY + frame.height
         let finishButtonCenter = CGPoint(x:self.frame.width * 0.2, y: ownHeaderYPos) //self.frame.height * 0.20)
 //        let radius = frame.height * 0.5
-        let myButton = createMyButton(title: title, size: size, center: finishButtonCenter, enabled: true )
-        myButton.isHidden = goOnPlaying ? false : true
-        myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(finishButtonTapped))
+        finishButton = createMyButton(title: title, size: size, center: finishButtonCenter, enabled: true )
+        finishButton!.isHidden = goOnPlaying ? false : true
+        finishButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(finishButtonTapped))
 
 //        myButton!.addTarget(self, action: #selector(self.finishButtonTapped), for: .touchUpInside)
 //        finishButton?.layer.zPosition = -100
-        finishButton = myButton
-        bgSprite!.addChild(myButton)
+//        finishButton = myButton
+        finishButton!.zPosition = self.zPosition + 1
+        bgSprite!.addChild(finishButton!)
     }
     
     @objc private func finishButtonTapped() {
@@ -1903,6 +1904,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let texture = SKTexture(imageNamed: "finger1")
         let fingerSprite = SKSpriteNode(texture: texture)
         var fingerActions = [SKAction]()
+        var lastTouchedPosition = CGPoint(x: 0, y: 0)
         enum ActionType: Int {
             case TouchesBegan, TouchesMoved, TouchesEnded, NoMore
         }
@@ -1941,9 +1943,33 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     }
                 })
                 fingerActions.append(endedAction)
+                lastTouchedPosition = touchPosition
             default:
                 break
             }
+        }
+        
+        func addButtonTouchedAction(button: MyButton) {
+            let waitAction = SKAction.wait(forDuration: 0.05)
+            let zielPosition = button.position
+            let point = zielPosition - lastTouchedPosition
+//            let xDistance = point.x
+//            let yDistance = point.y
+            let distance = point.length()
+            let counter = Int(distance / 10)
+            let xAdder = point.x / CGFloat(counter)
+            let yAdder = point.y / CGFloat(counter)
+            for index in 0..<counter {
+                fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
+                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder), duration: duration))
+                fingerActions.append(waitAction)
+            }
+            let buttonAction = SKAction.run({
+                button.myTouchesEnded(touchLocation: zielPosition)
+                print("button: \(String(describing: button.name)), Position: \(zielPosition), distance: \(String(describing: distance))")
+            })
+            fingerActions.append(buttonAction)
+            fingerActions.append(waitAction)
         }
 
         let gridStartPosition = CGPoint(x: wtGameboard!.grid!.frame.minX, y:wtGameboard!.grid!.frame.minY)
@@ -1976,34 +2002,43 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             switch record.typeOfTouch {
 //                FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
             case TypeOfTouch.FromBottom.rawValue, TypeOfTouch.FromGameArray.rawValue:
-               startFromGamearray = true
-            if record.beganInfo != "" {
-               if record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
-                    let shapeIndex = Int(record.beganInfo)
-                    startShapeIndex = shapeIndex!
-                    let touchPosition = pieceArray[shapeIndex!].position
-                    let touchedNodes = analyzeNodes(touchLocation: touchPosition)
-                    addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
-                } else {
-                    startShapeIndex = NoValue
-                    callTouchAction(info: record.beganInfo, type: .TouchesBegan)
-                }
-                let moves = record.movedInfo.components(separatedBy: "°")
-                var countMoves = 0
-                for (index, move) in moves.enumerated() {
-                    if move.length > 0 {
-                        callTouchAction(info: move, type: .TouchesMoved, index: index)
-                        countMoves += 1
+                startFromGamearray = true
+                if record.beganInfo != "" {
+                   if record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
+                        let shapeIndex = Int(record.beganInfo)
+                        startShapeIndex = shapeIndex!
+                        let touchPosition = pieceArray[shapeIndex!].position
+                        let touchedNodes = analyzeNodes(touchLocation: touchPosition)
+                        addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
+                    } else {
+                        startShapeIndex = NoValue
+                        callTouchAction(info: record.beganInfo, type: .TouchesBegan)
+                    }
+                    let moves = record.movedInfo.components(separatedBy: "°")
+                    var countMoves = 0
+                    for (index, move) in moves.enumerated() {
+                        if move.length > 0 {
+                            callTouchAction(info: move, type: .TouchesMoved, index: index)
+                            countMoves += 1
+                        }
+                    }
+                    if countMoves == 0 && record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
+                        let touchPosition = pieceArray[startShapeIndex].position
+                        let touchedNodes = analyzeNodes(touchLocation: touchPosition)
+                        addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: record.letters, duration: Double(duration), counter: record.counter)
+                    } else {
+                        callTouchAction(info: record.endedInfo, type: .TouchesEnded, letters: record.letters)
                     }
                 }
-                if countMoves == 0 && record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
-                    let touchPosition = pieceArray[startShapeIndex].position
-                    let touchedNodes = analyzeNodes(touchLocation: touchPosition)
-                    addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: record.letters, duration: Double(duration), counter: record.counter)
-                } else {
-                    callTouchAction(info: record.endedInfo, type: .TouchesEnded, letters: record.letters)
-                }
-            }
+            case TypeOfTouch.UndoButton.rawValue:
+                addButtonTouchedAction(button: undoButton!)
+            case TypeOfTouch.ShowMyWordsButton.rawValue: continue
+            case TypeOfTouch.FinishButton.rawValue: continue
+            case TypeOfTouch.ContinueGame.rawValue:continue
+            case TypeOfTouch.FinishGame.rawValue: continue
+            case TypeOfTouch.NoMoreStepsBack.rawValue: continue
+            case TypeOfTouch.NoMoreStepsNext.rawValue: continue
+            case TypeOfTouch.NoMoreStepsCont.rawValue: continue
             default:
                 continue
             }
@@ -2106,23 +2141,37 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var lastRow = NoValue
     var countOfMoves = 0
     var helpInfo = HelpInfo()
+    
+    let UndoButtonHelpInfo = "UndoButton"
+    let ShowMyWordsButtonHelpInfo = "ShowMyWordsButton"
+    let FinishButtonHelpInfo = "FinishButton"
+    let ContinueGameHelpInfo = "ContinueGame"
+    let FinishGameHelpInfo = "FinishGame"
+    let NoMoreStepsBackHelpInfo = "NoMoreStepsBack"
+    let NoMoreStepsNextHelpInfo = "NoMoreStepsNext"
+    let NoMoreStepsContHelpInfo = "NoMoreStepsCont"
+
 
     
     private func saveHelpInfo(action: TypeOfTouch) {
         if !GV.generateHelpInfo {
             return
         }
+        let counter = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).count + 1
         let helpInfo = HelpInfo()
         helpInfo.typeOfTouch = action.rawValue
+        helpInfo.combinedKey = GV.actLanguage + String(counter)
+        helpInfo.language = GV.actLanguage
+        helpInfo.counter = counter
         switch action {
-        case .UndoButton: helpInfo.letters = "UndoButton"
-        case .ShowMyWordsButton: helpInfo.letters = "ShowMyWordsButton"
-        case .FinishButton: helpInfo.letters = "FinishButton"
-        case .ContinueGame: helpInfo.letters = "ContinueGame"
-        case .FinishGame: helpInfo.letters = "FinishGame"
-        case .NoMoreStepsBack: helpInfo.letters = "NoMoreStepsBack"
-        case .NoMoreStepsNext: helpInfo.letters = "NoMoreStepsNext"
-        case .NoMoreStepsCont: helpInfo.letters = "NoMoreStepsCont"
+        case .UndoButton: helpInfo.letters = UndoButtonHelpInfo
+        case .ShowMyWordsButton: helpInfo.letters = ShowMyWordsButtonHelpInfo
+        case .FinishButton: helpInfo.letters = FinishButtonHelpInfo
+        case .ContinueGame: helpInfo.letters = ContinueGameHelpInfo
+        case .FinishGame: helpInfo.letters = FinishGameHelpInfo
+        case .NoMoreStepsBack: helpInfo.letters = NoMoreStepsBackHelpInfo
+        case .NoMoreStepsNext: helpInfo.letters = NoMoreStepsNextHelpInfo
+        case .NoMoreStepsCont: helpInfo.letters = NoMoreStepsContHelpInfo
         default: break
         }
         try! realmHelpInfo!.safeWrite() {
@@ -2794,10 +2843,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let message = GV.language.getText(.tcCongratulations2)
         let continueTitle = GV.language.getText(.tcContinuePlaying)
         let finishTitle = GV.language.getText(.tcFinishGame)
-        let myAlert = MyAlertController(title: title, message: message, target: self)
+        let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
         myAlert.addAction(text: continueTitle, action: #selector(self.continueAction))
         myAlert.addAction(text: finishTitle, action: #selector(self.finishAction))
-        myAlert.presentAlert(target: bgSprite!)
+        myAlert.presentAlert()
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         bgSprite!.addChild(myAlert)
         self.enabled = false
@@ -2852,11 +2901,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             message = GV.language.getText(.tcWillBeRestarted)
             action1Title = GV.language.getText(.tcRestartGame)
         }
-        let myAlert = MyAlertController(title: title, message: message, target: self)
+        let myAlert = MyAlertController(title: title, message: message, target: self, type: .Red)
 //        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         myAlert.addAction(text: action1Title, action: #selector(finishButtonTapped2))
         myAlert.addAction(text: action2Title, action: #selector(goBackButtonTapped2))
-        myAlert.presentAlert(target: bgSprite!)
+        myAlert.presentAlert()
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         bgSprite!.addChild(myAlert)
 
@@ -2964,11 +3013,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let greenWordsCount = WTGameWordList.shared.getCountWordsInLastRound()
             if greenWordsCount > 0 {
                 let myAlert = MyAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
-                                                message: GV.language.getText(.tcChooseAction) , target: self)
+                                                message: GV.language.getText(.tcChooseAction) , target: self, type: .Gold)
                 myAlert.addAction(text: GV.language.getText(.tcBack), action:#selector(self.startUndoTapped))
                 myAlert.addAction(text: GV.language.getText(.tcNoMoreStepsAnswer2), action:#selector(self.nextRoundTapped))
                 myAlert.addAction(text: GV.language.getText(.tcNoMoreStepsAnswer3), action:#selector(self.noActionTapped))
-                myAlert.presentAlert(target: bgSprite!)
+                myAlert.presentAlert()
                 myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
                 bgSprite!.addChild(myAlert)
                 self.enabled = false
@@ -2982,7 +3031,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     @objc private func noActionTapped() {
         self.enabled = true
-        saveHelpInfo(action: .NoMoreStepsBack)
+        saveHelpInfo(action: .NoMoreStepsCont)
     }
     
     @objc private func nextRoundTapped() {
@@ -2995,7 +3044,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     @objc private func startUndoTapped() {
         self.enabled = true
-        saveHelpInfo(action: .NoMoreStepsNext)
+        saveHelpInfo(action: .NoMoreStepsBack)
         startUndo()
     }
     

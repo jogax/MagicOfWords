@@ -405,8 +405,8 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     private func showPlayerActivity() {
         deactivateSubscriptions()
         let sort = "myCommentar"
-        self.playerActivityItems = RealmService.objects(PlayerActivity.self).sorted(byKeyPath: sort, ascending: true)
-        playerSubscription = playerActivityItems!.subscribe(named: "playerActivitySortedBy:\(sort)")
+        self.playerActivityItems = RealmService.objects(PlayerActivity.self).filter("keyWord != %@", "SimJogaxKey").sorted(byKeyPath: sort, ascending: true)
+        playerSubscription = playerActivityItems!.subscribe(named: "playerActivitySortedBy1:\(sort)")
         playerSubscriptionToken = playerSubscription!.observe(\.state) { [weak self]  state in
 //                print("in Subscription!")
             switch state {

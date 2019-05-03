@@ -172,6 +172,13 @@ class MyButton: SKSpriteNode {
             UIApplication.shared.sendAction(actionTouchUp!, to: targetTouchUp, from: self, for: nil)
         }
     }
+    
+    public func myTouchesEnded(touchLocation: CGPoint) {
+        if (frame.contains(touchLocation) ) {
+            UIApplication.shared.sendAction(actionTouchUpInside!, to: targetTouchUpInside, from: self, for: nil)
+        }
+    }
+    
     private func myTexture() -> (defaultTexture: SKTexture, selectedTexture: SKTexture, disabledTexture: SKTexture?) {
 //        func drawLinearGradient(
 //            context: CGContext, rect: CGRect, startColor: CGColor, endColor: CGColor) {

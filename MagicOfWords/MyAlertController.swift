@@ -9,6 +9,9 @@
 import Foundation
 import SpriteKit
 
+enum AlertType: Int {
+    case Gold = 0, Red, Green
+}
 class MyAlertController: SKSpriteNode {
     let separator = "°"
     var myLabels = [SKLabelNode]()
@@ -24,76 +27,59 @@ class MyAlertController: SKSpriteNode {
     var myFont = UIFont()
     var titleFont = UIFont()
     var messageFont = UIFont()
+    var myTexts = [String]()
+    let myTitle: String
+    let myMessage: String
+    var myColor: UIColor
 
     var lastIndex: Int?
     var radiusShape = SKShapeNode()
     let myGrayColor = UIColor(red: 230/255, green: 230/255, blue: 230/255, alpha: 1.0)
     let myGoldColor = UIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
-//    let myLightRedColor = UIColor(red: 251/255, green: 235/255, blue: 232/255, alpha: 1.0)
-//    let fontName = "HelveticaNeue-Bold"
-    let fontName = "AvenirNextCondensed-Regular"
-    let titleFontName = "AvenirNextCondensed-Bold"
-    init(title: String, message: String, target: AnyObject) {
-        myFontSize = GV.onIpad ? 20 : 15
-        titleFontSize = myFontSize * 1.1
-        messageFontSize = myFontSize * 0.8
+    let myRedColor = UIColor(red: 250/255, green: 180/255, blue: 190/255, alpha: 1.0)
+    let myGreenColor = UIColor(red: 180/255, green: 250/255, blue: 190/255, alpha: 1.0)
+//    let fontName = "AvenirNextCondensed-Regular"
+//    let titleFontName = "AvenirNextCondensed-Bold"
+    let titleFontName = "HelveticaNeue-Bold"
+    let fontName = "HelveticaNeue-Medium"
+    
+    init(title: String, message: String, target: AnyObject, type: AlertType) {
+        myTitle = title
+        myMessage = message
         myTarget = target
-        ownWidth = 0
-        //let fontName = "HiraMaruProN-W4"
-        myFont = UIFont(name: fontName, size: myFontSize)!
-        titleFont = UIFont(name: titleFontName, size: titleFontSize)!
-        messageFont = UIFont(name: fontName, size: messageFontSize)!
+        switch type {
+        case .Gold: myColor = myGoldColor
+        case .Red: myColor = myRedColor
+        case .Green: myColor = myGreenColor
+        }
+        
         super.init(texture: nil /*SKTexture(imageNamed: "MenuBG")*/, color: .clear, size: CGSize(width: 1, height: 1))
-
-        ownHeight = title.height(font: myFont) * 1.2
-        calculatedHeight = title.height(font: myFont)
-//        self.color = myGrayColor
-        let textArray1 = title.components(separatedBy: separator)
-        firstTitleLine = true
-        for text in textArray1 {
-            let textWidth = text.width(font:titleFont)
-            ownWidth = ownWidth > textWidth ? ownWidth : textWidth
-            createLabel(text: text, color: .black, title: true, header: true)
-//            addChild(label)
-            countHeaderLines += 1
-            firstTitleLine = false
-        }
-        let textArray2 = message.components(separatedBy: separator)
-        firstMessageLine = true
-        for text in textArray2 {
-            let textWidth = text.width(font:messageFont)
-            ownWidth = ownWidth > textWidth ? ownWidth : textWidth
-            createLabel(text: text, color: .black, title: false, header: true)
-//            addChild(label)
-            countHeaderLines += 1
-            firstMessageLine = false
-        }
-//        self.size = CGSize(width: ownWidth * 0.8, height: ownHeight * CGFloat(2))
-        self.zPosition = 1000
     }
     public func addAction(text: String, action:Selector) {
-        createLabel(text: text)
-        let textWidth = text.width(font: myFont)
-        ownWidth = textWidth > ownWidth ? textWidth : ownWidth
+        myTexts.append(text)
+//        createLabel(text: text)
+//        let textWidth = text.width(font: myFont)
+//        ownWidth = textWidth > ownWidth ? textWidth : ownWidth
         myActions.append(action)
 //        label.name = String(myLabels.count - 1)
 //        self.addChild(label)
     }
     
-    public func presentAlert(target: AnyObject) {
+    public func presentAlert() {
+        generateLabels()
         let multiplier: CGFloat = 1.5
-//        let titleMultiplier: CGFloat = 1.9
+
         self.size = CGSize(width: ownWidth * 1.1, height: calculatedHeight)
         radiusShape = SKShapeNode.init(rect: CGRect.init(origin: CGPoint.zero, size: size), cornerRadius: 15)
         radiusShape.position = CGPoint.zero
         radiusShape.lineWidth = 2.0
-        radiusShape.fillColor = myGoldColor
+        radiusShape.fillColor = myColor
         radiusShape.strokeColor = .black
         radiusShape.zPosition = -2
         radiusShape.position = CGPoint(x:self.frame.minX, y: self.frame.minY)
         self.addChild(radiusShape)
 
-        self.position = CGPoint(x: target.frame.maxX, y: target.frame.midY)
+
         var actY = self.frame.maxY
         var firstTitleLine = true
         var firstMessageLine = true
@@ -114,7 +100,7 @@ class MyAlertController: SKSpriteNode {
 //            let y = self.frame.maxY - ownHeight * CGFloat(index + 1) * (multiplier + 0.04)
             label.position = CGPoint(x: self.frame.midX, y: actY)
             if index > countHeaderLines - 2 {
-                myBackgrounds[index].position = CGPoint(x: self.frame.midX, y: actY)
+                myBackgrounds[index].position = CGPoint(x: self.frame.midX, y: actY + (GV.onIpad ? 10 : 8))
                 myBackgrounds[index].color = .clear
                 myBackgrounds[index].size = CGSize(width: self.frame.width, height:ownHeight * multiplier)
             }
@@ -123,8 +109,66 @@ class MyAlertController: SKSpriteNode {
             }
             self.addChild(label)
         }
-        position = CGPoint(x: target.frame.midX, y: target.frame.midY)
+        position = CGPoint(x: myTarget.frame.midX, y: myTarget.frame.midY)
+        self.zPosition = 1000
+   }
+    
+    private func generateLabels() {
+        myFontSize = GV.onIpad ? 20 : 15
+        titleFontSize = myFontSize * 1.1
+        messageFontSize = myFontSize * 0.8
+        ownWidth = 0
+        myFont = UIFont(name: fontName, size: myFontSize)!
+        titleFont = UIFont(name: titleFontName, size: titleFontSize)!
+        messageFont = UIFont(name: fontName, size: messageFontSize)!
+        let titleLines = createFragments(text: myTitle, font:titleFont)
+        let messageLines = createFragments(text: myMessage, font: messageFont)
+        ownHeight = myTitle.height(font: titleFont) * 1.2
+        calculatedHeight = myTitle.height(font: myFont) * 0.8
+        firstTitleLine = true
+        for text in titleLines {
+            let textWidth = text.width(font:titleFont)
+            ownWidth = ownWidth > textWidth ? ownWidth : textWidth
+            createLabel(text: text, color: .black, title: true, header: true)
+            countHeaderLines += 1
+            firstTitleLine = false
+        }
+        firstMessageLine = true
+        for text in messageLines {
+            let textWidth = text.width(font:messageFont)
+            ownWidth = ownWidth > textWidth ? ownWidth : textWidth
+            createLabel(text: text, color: .black, title: false, header: true)
+            countHeaderLines += 1
+            firstMessageLine = false
+        }
+        for text in myTexts {
+            createLabel(text: text)
+            let textWidth = text.width(font: myFont)
+            ownWidth = textWidth > ownWidth ? textWidth : ownWidth
+        }
     }
+    
+    private func createFragments(text: String, font: UIFont)->[String] {
+        var returnArray = [String]()
+        let fragments = text.components(separatedBy: " ")
+        let maxLength = myTarget.frame.width * (GV.onIpad ? 0.3 : 0.6)
+        var newFragment = ""
+        for fragment in fragments {
+            let adderWidth = fragment.width(font: font)
+            let newFragmentWidth = newFragment.width(font: font)
+            if newFragmentWidth + adderWidth < maxLength {
+                newFragment += fragment + " "
+            } else {
+                newFragment.removeLast()
+                returnArray.append(newFragment)
+                newFragment = fragment + " "
+            }
+        }
+        newFragment.removeLast()
+        returnArray.append(newFragment)
+        return returnArray
+    }
+    
     var calculatedHeight:CGFloat = 0
     let titleMultipler1:CGFloat = 0.9
     let titleMultipler2:CGFloat = 0.7
