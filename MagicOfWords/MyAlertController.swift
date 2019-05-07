@@ -65,6 +65,15 @@ class MyAlertController: SKSpriteNode {
 //        self.addChild(label)
     }
     
+    public func getPositionForAction(action: Selector)->CGPoint {
+        for (index, selector) in myActions.enumerated() {
+            if action == selector {
+                return self.position + myBackgrounds[countHeaderLines - 1 + index].position
+            }
+        }
+        return self.position
+    }
+    
     public func presentAlert() {
         generateLabels()
         let multiplier: CGFloat = 1.5
@@ -110,7 +119,7 @@ class MyAlertController: SKSpriteNode {
             self.addChild(label)
         }
         position = CGPoint(x: myTarget.frame.midX, y: myTarget.frame.midY)
-        self.zPosition = 1000
+        self.zPosition = 50
    }
     
     private func generateLabels() {
@@ -227,7 +236,12 @@ class MyAlertController: SKSpriteNode {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
-        let nodes = self.nodes(at: touchLocation)
+        myTouchesBegan(touchLocation: touchLocation)
+    }
+    
+    public func myTouchesBegan(touchLocation: CGPoint, absolutLocation: Bool = false) {
+        let myLocation = absolutLocation ? touchLocation - self.position : touchLocation
+        let nodes = self.nodes(at: myLocation)
         for node in nodes {
             guard let name = node.name else {
                 continue
@@ -239,7 +253,7 @@ class MyAlertController: SKSpriteNode {
             }
         }
     }
-    
+
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
         let nodes = self.nodes(at: touchLocation)
@@ -275,14 +289,19 @@ class MyAlertController: SKSpriteNode {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
-        let nodes = self.nodes(at: touchLocation)
+        myTouchesEnded(touchLocation: touchLocation)
+    }
+    
+    public func myTouchesEnded(touchLocation: CGPoint, absolutLocation: Bool = false) {
+        let myLocation = absolutLocation ? touchLocation - self.position: touchLocation
+        let nodes = self.nodes(at: myLocation)
         for node in nodes {
             guard let name = node.name else {
                 continue
             }
             let index: Int? = Int(name)
             if index == nil {
-
+                
             } else {
                 let action = myActions[index! - countHeaderLines + 1]
                 _ = myTarget.perform(action)
@@ -290,6 +309,7 @@ class MyAlertController: SKSpriteNode {
             }
         }
     }
+    
     
     override var isUserInteractionEnabled: Bool {
         set {

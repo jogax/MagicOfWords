@@ -245,7 +245,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     private func getRecordCounts() {
         countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@", GV.actLanguage).count
         countExistingGames = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage).count
-        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and (gameStatus = %@ or gameStatus = %@)", GV.actLanguage, GV.GameStatusPlaying, GV.GameStatusContinued).count
+        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and (gameStatus = %@ or gameStatus = %@ and gameNumber < 1000)", GV.actLanguage, GV.GameStatusPlaying, GV.GameStatusContinued).count
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
@@ -609,7 +609,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             let continueGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenContinue), style: .default, handler: { [unowned self]
                 alert -> Void in
                 GV.generateHelpInfo = true
-                self.startWTScene(new: false, next: .GameNumber, gameNumber: 1000)
+                self.startWTScene(new: true, next: .GameNumber, gameNumber: 1000, restart: true, showHelp: true)
             })
             alertController.addAction(continueGenHelpAction)
 
