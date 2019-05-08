@@ -1920,15 +1920,22 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         fingerSprite.size = fingerSize
         fingerSprite.position = startPosition
         fingerSprite.zPosition = 100
+        let gridStartPosition = CGPoint(x: wtGameboard!.grid!.frame.minX, y:wtGameboard!.grid!.frame.minY)
+        let gridSize = wtGameboard!.grid!.frame.width
+        let blockSize = wtGameboard!.blockSize! * 0.5
+        let fingerPositionModifier = CGPoint(x: blockSize, y: blockSize)
+        var startFromGamearray = false
+        var countMoves = 0
+        var stopIndex = 10000
 
         func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0) {
-            fingerActions.append(SKAction.move(to: touchPosition, duration: duration))
+            fingerActions.append(SKAction.move(to: touchPosition - fingerPositionModifier, duration: duration))
             switch type {
              case .TouchesBegan:
                 let beganAction = SKAction.run({
-                    if counter == 33 {
-                        print("hier at \(counter)")
-                    }
+//                    if counter == 33 {
+//                        print("hier at \(counter)")
+//                    }
                     self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
                })
                 fingerActions.append(beganAction)
@@ -1964,7 +1971,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let yAdder = point.y / CGFloat(counter)
             for index in 0..<counter {
                 fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
-                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder), duration: duration))
+                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: duration))
                 fingerActions.append(waitAction)
             }
             let buttonAction = SKAction.run({
@@ -1995,10 +2002,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let counter = Int(distance / 10)
             let xAdder = point.x / CGFloat(counter)
             let yAdder = point.y / CGFloat(counter)
-            fingerActions.append(SKAction.wait(forDuration: 2.0))
+            fingerActions.append(SKAction.wait(forDuration: 1.0))
             for index in 0..<counter {
                 fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
-                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder), duration: duration))
+                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: duration))
                 fingerActions.append(SKAction.wait(forDuration: 0.05))
             }
             let beganAction = SKAction.run({
@@ -2027,11 +2034,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
 
-        let gridStartPosition = CGPoint(x: wtGameboard!.grid!.frame.minX, y:wtGameboard!.grid!.frame.minY)
-        let gridSize = wtGameboard!.grid!.frame.width
-        var startFromGamearray = false
-        var countMoves = 0
-        var stopIndex = 10000
 
         for (index, record) in GV.helpInfoRecords!.enumerated() {
             let countMoves = record.movedInfo.components(separatedBy: "°").count
@@ -3402,7 +3404,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 
         func splittingWord(word: String) {
-            var inputWord = word.uppercased()
+            var inputWord = ""
+            let items = word.components(separatedBy: "ß")
+            if items.count > 1 {
+                for item in items {
+                    inputWord += item.uppercased() + "ß"
+                }
+                inputWord.removeLast()
+            } else {
+                inputWord = word.uppercased()
+            }
             for letter in inputWord {
                 letterCounters[String(letter)]! += 1
             }
