@@ -123,4 +123,5 @@ let huDictionary: [TextConstants: String] = [
     .tcHelpGenNew:          "Új súgóinformáció létrehozása",
     .tcHelpGenContinue:     "Súgóinformáció folytatása",
     .tcDeveloperMenu:       "Fejlesztői menü",
+    .tcShowHelp:            "Mutasd a Demo-játékot",
 ]

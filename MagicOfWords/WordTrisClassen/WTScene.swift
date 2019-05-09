@@ -1933,9 +1933,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             switch type {
              case .TouchesBegan:
                 let beganAction = SKAction.run({
-//                    if counter == 33 {
-//                        print("hier at \(counter)")
-//                    }
+                    if counter == 261 {
+                        print("hier at \(counter)")
+                    }
                     self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
                })
                 fingerActions.append(beganAction)
@@ -2131,6 +2131,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let removeAction = SKAction.run ({
             fingerSprite.removeFromParent()
+            try! realm.safeWrite() {
+                GV.basicDataRecord.startAnimationShown = true
+            }
             GV.generateHelpInfo = generateHelpInfo
         })
         fingerActions.append(removeAction)
@@ -2521,7 +2524,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if touchedNodes.shapeIndex >= 0 {
                 pieceArray[touchedNodes.shapeIndex].position = touchLocation
             }
-            let distanceMultipler = CGFloat(0.2)
+            let distanceMultipler = CGFloat(0.1)
             let yDistance = abs((touchLocation - firstTouchLocation).y)
             if yDistance > (blockSize * distanceMultipler) && touchedNodes.row >= 0 && touchedNodes.row < GV.sizeOfGrid {
                 if touchedNodes.shapeIndex >= 0 {

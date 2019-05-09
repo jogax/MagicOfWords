@@ -122,7 +122,8 @@ enum TextConstants: Int {
     tcShowMe,
     tcHelpGenNew,
     tcHelpGenContinue,
-    tcDeveloperMenu
+    tcDeveloperMenu,
+    tcShowHelp
 }
 
     let LanguageEN = "en" // index 0

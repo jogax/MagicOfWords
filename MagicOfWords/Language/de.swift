@@ -124,6 +124,7 @@ let deDictionary: [TextConstants: String] = [
     .tcHelpGenNew:          "Neue Hilfeinformationen erstellen",
     .tcHelpGenContinue:     "Generierung Hilfeinformationen fortsetzen",
     .tcDeveloperMenu:       "Menü für Entwickler",
+    .tcShowHelp:            "Zeige Demo-Spiel",
 ]
 
 

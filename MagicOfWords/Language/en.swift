@@ -124,4 +124,5 @@ let enDictionary: [TextConstants: String] = [
     .tcHelpGenNew:          "Create new help info",
     .tcHelpGenContinue:     "Continue generating help info",
     .tcDeveloperMenu:       "Developers menu",
+    .tcShowHelp:            "Show Demo Game",
 ]

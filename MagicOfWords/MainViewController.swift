@@ -279,7 +279,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         // Get the SKScene from the loaded GKScene
         //-------------------------
         generateBasicDataRecordIfNeeded()
-        #if DEBUG
+//        #if DEBUG
             if !GV.basicDataRecord.startAnimationShown {
                 let animationScene = WelcomeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
                 if let view = self.view as! SKView? {
@@ -295,13 +295,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                     showMenu()
                 }
             }
-        #else
-            if countContinueGames > 0 {
-                startWTScene(new: false, next: .NoMore, gameNumber: 0)
-            } else {
-                showMenu()
-            }
-        #endif
+//        #else
+//            if countContinueGames > 0 {
+//                startWTScene(new: false, next: .NoMore, gameNumber: 0)
+//            } else {
+//                showMenu()
+//            }
+//        #endif
         //------------------------
 //        startMenuScene()
     }
@@ -697,7 +697,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             self.chooseLanguage()
         })
         myAlertController.addAction(chooseLanguageAction)
-        //--------------------- choose Style action -----------------------
+        //--------------------- chooseLanguageAction ---------------------
+        let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.showHowToPlay()
+        })
+        myAlertController.addAction(showHelpAction)
+       //--------------------- choose Style action -----------------------
         let chooseStyleAction =  UIAlertAction(title: GV.language.getText(.tcChooseStyle), style: .default, handler: { [unowned self]
             alert -> Void in
             self.chooseStyle()
