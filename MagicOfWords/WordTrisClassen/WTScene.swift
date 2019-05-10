@@ -466,7 +466,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var blockSize: CGFloat = 0
 //    var allWordsToShow = [AllWordsToShow]()
     var timer: Timer? = Timer()
-    var timeLabel = SKLabelNode()
+//    var timeLabel = SKLabelNode()
     var headerLabel = SKLabelNode()
     var myScoreheaderLabel = SKLabelNode()
     var bestScoreHeaderLabel = SKLabelNode()
@@ -589,7 +589,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         play()
    }
     
-    func startNewGame() {
+    @objc func startNewGame() {
         wtSceneDelegate!.gameFinished(start: .NewGame)
     }
     
@@ -825,30 +825,30 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func createHeader() {
         let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
-        if bgSprite!.childNode(withName: timeName) == nil {
-            timeLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT") // Snell Roundhand")
-            let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
-            let xPosition = self.frame.size.width * 0.90
-            timeLabel.position = CGPoint(x: xPosition, y: YPosition)
-            timeLabel.fontSize = fontSize
-            timeLabel.fontColor = .black
-            timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.time.HourMinSec)
-            timeLabel.horizontalAlignmentMode = .right
-            timeLabel.name = timeName
-            bgSprite!.addChild(timeLabel)
-        }
+//        if bgSprite!.childNode(withName: timeName) == nil {
+//            timeLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT") // Snell Roundhand")
+//            let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
+//            let xPosition = self.frame.size.width * 0.90
+//            timeLabel.position = CGPoint(x: xPosition, y: YPosition)
+//            timeLabel.fontSize = fontSize
+//            timeLabel.fontColor = .black
+//            timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.time.HourMinSec)
+//            timeLabel.horizontalAlignmentMode = .right
+//            timeLabel.name = timeName
+//            bgSprite!.addChild(timeLabel)
+//        }
 
-        let startPosXForHeaderMultiplier: CGFloat = 0.15
+//        let startPosXForHeaderMultiplier: CGFloat = 0.15
         if bgSprite!.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let gameNumber = GV.playingRecord.gameNumber == 9999 ? "DEMO" : String(GV.playingRecord.gameNumber)
-            let text = GV.language.getText(.tcHeader, values: gameNumber, String(0))
+            let text = GV.language.getText(.tcHeader, values: gameNumber, String(0), timeForGame.time.HourMinSec)
             headerLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
             headerLabel.name = String(headerName)
             headerLabel.fontSize = fontSize
-            headerLabel.position = CGPoint(x: self.frame.size.width * startPosXForHeaderMultiplier, y: YPosition)
-            headerLabel.horizontalAlignmentMode = .left
+            headerLabel.position = CGPoint(x: self.frame.size.width * 0.5 /*startPosXForHeaderMultiplier*/, y: YPosition)
+            headerLabel.horizontalAlignmentMode = .center
             headerLabel.fontColor = SKColor.black
             bgSprite!.addChild(headerLabel)
         }
@@ -866,8 +866,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             bestScoreHeaderLabel.text = text
             bestScoreHeaderLabel.name = String(bestScoreName)
             bestScoreHeaderLabel.fontSize = fontSize
-            bestScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * /*xPosMultiplierForScore*/ startPosXForHeaderMultiplier, y: YPosition)
-            bestScoreHeaderLabel.horizontalAlignmentMode = .left
+            bestScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * 0.5 /* startPosXForHeaderMultiplier*/, y: YPosition)
+            bestScoreHeaderLabel.horizontalAlignmentMode = .center
             bestScoreHeaderLabel.fontColor = SKColor.black
             bgSprite!.addChild(bestScoreHeaderLabel)
         }
@@ -879,8 +879,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             myScoreheaderLabel.text = text
             myScoreheaderLabel.name = String(myScoreName)
             myScoreheaderLabel.fontSize = fontSize
-            myScoreheaderLabel.position = CGPoint(x: self.frame.size.width * /*xPosMultiplierForScore*/ startPosXForHeaderMultiplier, y: YPosition)
-            myScoreheaderLabel.horizontalAlignmentMode = .left
+            myScoreheaderLabel.position = CGPoint(x: self.frame.size.width * 0.5 /*startPosXForHeaderMultiplier*/, y: YPosition)
+            myScoreheaderLabel.horizontalAlignmentMode = .center
             myScoreheaderLabel.fontColor = SKColor.black
             bgSprite!.addChild(myScoreheaderLabel)
         }
@@ -916,7 +916,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func modifyHeader() {
         var gameNumber = String(GV.playingRecord.gameNumber + 1)
         gameNumber = (gameNumber == "10000" ? "DEMO" : gameNumber)
-        let headerText = GV.language.getText(.tcHeader, values: gameNumber, String(actRound))
+        let headerText = GV.language.getText(.tcHeader, values: gameNumber, String(actRound), timeForGame.time.HourMinSec)
         headerLabel.text = headerText
 //        let letterScore = GV.bonusScore
 //        let normalScore = GV.mandatoryScore + GV.//WTGameWordList.shared.getScore(forAll: true)
@@ -1902,6 +1902,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    let convertValue: CGFloat = 1000
 
     private func showHelpDemo() {
+        gameFinished = false
         let generateHelpInfo = GV.generateHelpInfo
         GV.generateHelpInfo = false
         let duration = 0.0//1
@@ -2020,7 +2021,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 case .CongratulationsAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
                 case .NoMoreStepsAlert:
                     self.noMoreStepsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
-                case .FinishGameAlert: self.finishGameAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+                case .FinishGameAlert:
+                    self.finishGameAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+                    self.gameFinished = true
 
                 }
             })
@@ -2097,7 +2100,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             case TypeOfTouch.ContinueGame.rawValue:
                 addAlertTouched(alertType: .CongratulationsAlert, action: #selector(self.continueAction))
             case TypeOfTouch.FinishGame.rawValue:
-                addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.finishButtonTapped2))
+                 addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.finishButtonTapped2))
             case TypeOfTouch.NoMoreStepsBack.rawValue:
                 addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.startUndoTapped))
             case TypeOfTouch.NoMoreStepsNext.rawValue:
@@ -2120,27 +2123,39 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 break
             }
         }
-        // xxx
-        if !generateHelpInfo {
-            let lastWaitAction = SKAction.wait(forDuration: 5)
-            fingerActions.append(lastWaitAction)
-            let lastAction = SKAction.run({
-                self.goBackTapped()
-            })
-            fingerActions.append(lastAction)
-        }
         let removeAction = SKAction.run ({
-            fingerSprite.removeFromParent()
-            try! realm.safeWrite() {
-                GV.basicDataRecord.startAnimationShown = true
-            }
             GV.generateHelpInfo = generateHelpInfo
         })
         fingerActions.append(removeAction)
+        if !generateHelpInfo {
+            let lastWaitAction = SKAction.wait(forDuration: 3)
+            fingerActions.append(lastWaitAction)
+            let lastAction = SKAction.run({
+                if self.gameFinished {
+                    try! realm.safeWrite() {
+                        GV.basicDataRecord.startAnimationShown = true
+                    }
+                    let title = GV.language.getText(.tcDemoFinishedTitle)
+                    let message = GV.language.getText(.tcDemoFinishedMessage)
+                    let newGameText = GV.language.getText(.tcDemoFinishedStartNewGame)
+                    let menuText = GV.language.getText(.tcDemoFinishedGoToMenu)
+                    let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
+                    myAlert.addAction(text: newGameText, action: #selector(self.startNewGame))
+                    myAlert.addAction(text: menuText, action: #selector(self.goBackTapped))
+                    myAlert.presentAlert()
+                    myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+                    fingerSprite.removeFromParent()
+                    self.bgSprite!.addChild(myAlert)
+                }
+            })
+            fingerActions.append(lastAction)
+        }
         let sequence = SKAction.sequence(fingerActions)
         fingerSprite.run(SKAction.sequence([sequence]))
         bgSprite!.addChild(fingerSprite)
     }
+    
+    var gameFinished = false
     
     private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
         return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber < %d and language = %@",
@@ -2159,7 +2174,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else if state == .active && timerIsCounting {
             timeForGame.incrementTime()
         }
-        timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.time.HourMinSec)
+        let texts = headerLabel.text!.components(separatedBy:":")
+        var newText = ""
+        for (index, text) in texts.enumerated() {
+            if index < 3 {
+                newText += text + ":"
+            } else {
+                newText += " \(timeForGame.time.HourMinSec)"
+            }
+        }
+        headerLabel.text = newText
+        
+        
+//        timeLabel.text = GV.language.getText(.tcTime, values: timeForGame.time.HourMinSec)
         try! realm.safeWrite() {
             GV.playingRecord.time = timeForGame.toString()
         }
@@ -3040,7 +3067,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             try! realm.safeWrite() {
                 GV.playingRecord.gameStatus = GV.GameStatusFinished
             }
-            self.startNewGame()
+            if !showHelp {
+                self.startNewGame()
+            }
         } else {
             self.restartThisGame()
         }

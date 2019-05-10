@@ -32,7 +32,7 @@ enum TextConstants: Int {
     tcChooseGameType,
     tcBack,
     tcHeader,
-    tcTime,
+//    tcTime,
     tcScore,
     tcPlace,
     tcKeywordHeader,
@@ -123,7 +123,12 @@ enum TextConstants: Int {
     tcHelpGenNew,
     tcHelpGenContinue,
     tcDeveloperMenu,
-    tcShowHelp
+    tcShowHelp,
+    tcDemoFinishedTitle,
+    tcDemoFinishedMessage,
+    tcDemoFinishedStartNewGame,
+    tcDemoFinishedGoToMenu
+
 }
 
     let LanguageEN = "en" // index 0

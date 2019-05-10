@@ -29,8 +29,8 @@ let deDictionary: [TextConstants: String] = [
     .tcLoadingInProgress: "Deutsche Wörter werden gerade geladen",
     .tcChooseGameType:    "Spieltyp wählen",
     .tcBack:              "Zurück",
-    .tcHeader:             "Spiel: %, Runde: %,",
-    .tcTime:               "Zeit: %",
+    .tcHeader:             "Spiel: %, Runde: %, Zeit: %",
+//    .tcTime:               "Zeit: %",
     .tcScore:             "Punkte:",
     .tcPlace:             "Platz:",
     .tcKeywordHeader:     "Schlüssel:",
@@ -125,6 +125,10 @@ let deDictionary: [TextConstants: String] = [
     .tcHelpGenContinue:     "Generierung Hilfeinformationen fortsetzen",
     .tcDeveloperMenu:       "Menü für Entwickler",
     .tcShowHelp:            "Zeige Demo-Spiel",
+    .tcDemoFinishedTitle:   "Demo ist fertig!",
+    .tcDemoFinishedMessage: "Ich hoffe es war hilfreich für Dich! Wenn Du die Demo noch einmal sehen möchtest, kannst Du sie unter <Menü - Einstellungen - Zeige Demo-Spiel> starten. Und jetzt kannst Du weiterspielen oder zum Menü gehen",
+    .tcDemoFinishedStartNewGame: "Neues Spiel",
+    .tcDemoFinishedGoToMenu: "Gehe zum Menü",
 ]
 
 

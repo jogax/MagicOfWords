@@ -29,8 +29,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcLoadingInProgress: "Выпольнется загрузка русских слов",
     .tcChooseGameType:    "Bыбрать тип игры",
     .tcBack:              "Назад",
-    .tcHeader:            "Игра: %, Круг: %,",
-    .tcTime:              "Время: %",
+    .tcHeader:            "Игра: %, Круг: %, Время: %",
+//    .tcTime:              "Время: %",
     .tcScore:             "Очки:",
     .tcPlace:             "Место:",
     .tcKeywordHeader:     "Ключ:",
@@ -125,5 +125,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcHelpGenContinue:     "Продолжать генерировать справочную информацию",
     .tcDeveloperMenu:       "Меню разработчика",
     .tcShowHelp:            "Показать демо-игру",
+    .tcDemoFinishedTitle:   "Демо закончено!",
+    .tcDemoFinishedMessage: "Я надеюсь, что это было полезно для тебя! Если ты хочешь снова посмотреть демо, ты можешь запустить его в <Меню - Настройки - Показать демо-игру>. И теперь ты можешь начинать новую игру или перейти в меню",
+    .tcDemoFinishedStartNewGame: "Новая игра",
+    .tcDemoFinishedGoToMenu: "Перейти в меню",
 ]
 

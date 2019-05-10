@@ -50,7 +50,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         background.size = CGSize(width: self.size.height * widthMultiplier, height: self.size.height)
         addChild(background)
 //        self.backgroundColor = SKColor(red: 200/255, green: 220/255, blue: 208/255, alpha: 1)
-        self.allResultsItems = RealmService.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+        self.allResultsItems = RealmService.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@ and gameNumber < %d", GV.actLanguage, 1000).sorted(byKeyPath: "gameNumber", ascending: true)
 
         showFinishedGamesInTableView()
     }
@@ -110,7 +110,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         self.showGamesInTableView?.reloadData()
         
         self.scene?.view?.addSubview(showGamesInTableView!)
-        subscription = allResultsItems!.subscribe(named: "allResults_\(GV.actLanguage)")
+        subscription = allResultsItems!.subscribe(named: "allResultsNew_\(GV.actLanguage)")
         subscriptionToken = subscription.observe(\.state) { [weak self]  state in
             print("state: \(state)")
            if state == .complete {
