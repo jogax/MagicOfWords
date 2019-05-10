@@ -24,3 +24,7 @@ Build 14, Version 1.14 (0.92)
 - Kijavít egy hibát, amely az internet hiányában összeomlást okozott
 
 Build 15, Version 1.15 (0.93)
+- New: Playing demo-game at first launching
+- Neu: abspielt Demo-Spiel beim ersten Start
+- Новость: показывает в демо-игру при первом запуске
+- Új: lejátszik egy demo játékot az első indításkor
