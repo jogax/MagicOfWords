@@ -36,7 +36,8 @@ struct GV {
             return GV.language.getText(.tcAktLanguage)
         }
     }
-    static let actVersion = "0.92" // Build 14
+//    static let actVersion = "0.92" // Build 14
+    static let actVersion = "0.93" // Build 15
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2

@@ -28,3 +28,6 @@ Build 15, Version 1.15 (0.93)
 - Neu: abspielt Demo-Spiel beim ersten Start
 - Новость: показывает в демо-игру при первом запуске
 - Új: lejátszik egy demo játékot az első indításkor
+
+Buil 16, Version 1.16 (0.94)
+
