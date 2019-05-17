@@ -425,8 +425,8 @@ extension String {
         return returnString
     }
     
-    func char(from: Int)->String {
-        return subString(at:from, length: 1)
+    func char(at: Int)->String {
+        return subString(at:at, length: 1)
     }
     
     func firstChar()->String {

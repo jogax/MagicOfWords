@@ -129,5 +129,11 @@ let ruDictionary: [TextConstants: String] = [
     .tcDemoFinishedMessage: "Я надеюсь, что это было полезно для тебя! Если ты хочешь снова посмотреть демо, ты можешь запустить его в <Меню - Настройки - Показать демо-игру>. И теперь ты можешь начинать новую игру или перейти в меню",
     .tcDemoFinishedStartNewGame: "Новая игра",
     .tcDemoFinishedGoToMenu: "Перейти в меню",
+    .tcChooseDifficulty:    "Выбери сложность",
+    .tcCurrentDifficulty:   "Текущая сложность: %",
+    .tcSimpleGame:          "Простая",
+    .tcMediumGame:          "Средняя",
+    .tcHardGame:            "Сложная",
+    .tcVeryHardGame:        "Очень сложная",
 ]
 

@@ -534,6 +534,7 @@ class WTGameboard: SKShapeNode {
     
     var moveModusStarted = false
     var noMoreMove = false
+    
     public func startChooseOwnWord(col: Int, row: Int) {
         moveModusStarted = false
         noMoreMove = false
@@ -593,7 +594,8 @@ class WTGameboard: SKShapeNode {
         var startsWithLetters = FoundedWord()
         if !moveModusStarted {
             for letter in choosedWord.usedLetters {
-                if GV.gameArray[letter.col][letter.row].status == .wholeWord {
+                let actStatus = GV.gameArray[letter.col][letter.row].status
+                if actStatus == .wholeWord || actStatus == .fixItem {
                     onlyUsedLetters = false
                 } else if onlyUsedLetters {
                     startsWithLetters.addLetter(letter: letter)
@@ -716,6 +718,12 @@ class WTGameboard: SKShapeNode {
             _ = GV.gameArray[colFrom][rowFrom].setLetter(letter: letter, status: .used, toColor: .myUsedColor)
             GV.gameArray[colTo][rowTo].remove()
        }
+    }
+    
+    public func addGrayLettersToGamearray(grayLetters: [UsedLetter]) {
+        for grayLetter in grayLetters {
+            _ = GV.gameArray[grayLetter.col][grayLetter.row].setLetter(letter: grayLetter.letter, status: .fixItem, toColor: .myFixColor)
+        }
     }
     
     public func gameArrayToString()->String {
@@ -872,7 +880,9 @@ class WTGameboard: SKShapeNode {
     public func clearGameArray() {
         for row in 0..<countCols {
             for col in 0..<countCols {
-                GV.gameArray[col][row].remove()
+                if GV.gameArray[col][row].status != .fixItem {
+                    GV.gameArray[col][row].remove()
+                }
             }
         }
     }
@@ -880,6 +890,18 @@ class WTGameboard: SKShapeNode {
     public func getCellPosition(col: Int, row: Int)->CGPoint {
         let addPosition = grid!.position
         return grid!.gridPosition(col: col, row: row) + addPosition
+    }
+    
+    public func checkGameArrayIsEmpty()->Bool {
+        var isEmpty = true
+        for row in 0..<countCols {
+            for col in 0..<countCols {
+                if GV.gameArray[col][row].status != .empty {
+                    isEmpty = false
+                }
+            }
+        }
+        return isEmpty
     }
     
     public func printGameArray() {

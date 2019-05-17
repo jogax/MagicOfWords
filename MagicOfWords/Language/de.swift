@@ -129,6 +129,12 @@ let deDictionary: [TextConstants: String] = [
     .tcDemoFinishedMessage: "Ich hoffe es war hilfreich für Dich! Wenn Du die Demo noch einmal sehen möchtest, kannst Du sie unter <Menü - Einstellungen - Zeige Demo-Spiel> starten. Und jetzt kannst Du weiterspielen oder zum Menü gehen",
     .tcDemoFinishedStartNewGame: "Neues Spiel",
     .tcDemoFinishedGoToMenu: "Gehe zum Menü",
+    .tcChooseDifficulty:    "Wähle Schwierigkeitsgrad",
+    .tcCurrentDifficulty:   "Aktuelle Schwierigkeit: %",
+    .tcSimpleGame:          "Einfach",
+    .tcMediumGame:          "Mittel",
+    .tcHardGame:            "Hart",
+    .tcVeryHardGame:        "Sehr hart",
 ]
 
 

@@ -10,7 +10,7 @@ import Foundation
 import SpriteKit
 
 enum AlertType: Int {
-    case Gold = 0, Red, Green
+    case Gold = 0, Red, Green, White
 }
 class MyAlertController: SKSpriteNode {
     let separator = "°"
@@ -38,6 +38,7 @@ class MyAlertController: SKSpriteNode {
     let myGoldColor = UIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
     let myRedColor = UIColor(red: 250/255, green: 180/255, blue: 190/255, alpha: 1.0)
     let myGreenColor = UIColor(red: 180/255, green: 250/255, blue: 190/255, alpha: 1.0)
+    let myWhiteColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1.0)
 //    let fontName = "AvenirNextCondensed-Regular"
 //    let titleFontName = "AvenirNextCondensed-Bold"
     let titleFontName = "HelveticaNeue-Bold"
@@ -51,6 +52,7 @@ class MyAlertController: SKSpriteNode {
         case .Gold: myColor = myGoldColor
         case .Red: myColor = myRedColor
         case .Green: myColor = myGreenColor
+        case .White: myColor = myWhiteColor
         }
         
         super.init(texture: nil /*SKTexture(imageNamed: "MenuBG")*/, color: .clear, size: CGSize(width: 1, height: 1))

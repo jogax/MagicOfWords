@@ -174,6 +174,23 @@
 		20866993222ACF2E002194C8 /* GoldSprite0100.png in Resources */ = {isa = PBXBuildFile; fileRef = 20866984222ACF2E002194C8 /* GoldSprite0100.png */; };
 		2087444321FA1C74006C00C6 /* deRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2087444221FA1C74006C00C6 /* deRestWords.txt */; };
 		20895DFB21FA152100E54BF3 /* enMandatoryInput.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */; };
+		20895E6D228D951900506685 /* LilaSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E6C228D951900506685 /* LilaSprite.png */; };
+		20895E7E228DB72D00506685 /* GreenLilaSprite0001.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E6E228DB72B00506685 /* GreenLilaSprite0001.png */; };
+		20895E7F228DB72D00506685 /* GreenLilaSprite1111.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E6F228DB72B00506685 /* GreenLilaSprite1111.png */; };
+		20895E80228DB72D00506685 /* GreenLilaSprite1000.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E70228DB72B00506685 /* GreenLilaSprite1000.png */; };
+		20895E81228DB72D00506685 /* GreenLilaSprite0111.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E71228DB72B00506685 /* GreenLilaSprite0111.png */; };
+		20895E82228DB72D00506685 /* GreenLilaSprite0011.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E72228DB72B00506685 /* GreenLilaSprite0011.png */; };
+		20895E83228DB72D00506685 /* GreenLilaSprite1101.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E73228DB72B00506685 /* GreenLilaSprite1101.png */; };
+		20895E84228DB72D00506685 /* GreenLilaSprite0101.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E74228DB72B00506685 /* GreenLilaSprite0101.png */; };
+		20895E85228DB72D00506685 /* GreenLilaSprite0100.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E75228DB72C00506685 /* GreenLilaSprite0100.png */; };
+		20895E86228DB72D00506685 /* GreenLilaSprite1100.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E76228DB72C00506685 /* GreenLilaSprite1100.png */; };
+		20895E87228DB72D00506685 /* GreenLilaSprite1001.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E77228DB72C00506685 /* GreenLilaSprite1001.png */; };
+		20895E88228DB72D00506685 /* GreenLilaSprite0110.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E78228DB72C00506685 /* GreenLilaSprite0110.png */; };
+		20895E89228DB72D00506685 /* GreenLilaSprite1010.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E79228DB72C00506685 /* GreenLilaSprite1010.png */; };
+		20895E8A228DB72D00506685 /* GreenLilaSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E7A228DB72C00506685 /* GreenLilaSprite.png */; };
+		20895E8B228DB72D00506685 /* GreenLilaSprite1110.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E7B228DB72C00506685 /* GreenLilaSprite1110.png */; };
+		20895E8C228DB72D00506685 /* GreenLilaSprite0010.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E7C228DB72C00506685 /* GreenLilaSprite0010.png */; };
+		20895E8D228DB72D00506685 /* GreenLilaSprite1011.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E7D228DB72C00506685 /* GreenLilaSprite1011.png */; };
 		208B278F21FB382C007259B6 /* enRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B278E21FB382C007259B6 /* enRestWords.txt */; };
 		208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B279021FB8ED1007259B6 /* ruRestWords.txt */; };
 		2093807A2252466B009C742F /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = 209380792252466B009C742F /* HelpInfo.realm */; };
@@ -367,6 +384,23 @@
 		20866984222ACF2E002194C8 /* GoldSprite0100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GoldSprite0100.png; sourceTree = "<group>"; };
 		2087444221FA1C74006C00C6 /* deRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deRestWords.txt; sourceTree = "<group>"; };
 		20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enMandatoryInput.txt; sourceTree = "<group>"; };
+		20895E6C228D951900506685 /* LilaSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LilaSprite.png; sourceTree = "<group>"; };
+		20895E6E228DB72B00506685 /* GreenLilaSprite0001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite0001.png; sourceTree = "<group>"; };
+		20895E6F228DB72B00506685 /* GreenLilaSprite1111.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite1111.png; sourceTree = "<group>"; };
+		20895E70228DB72B00506685 /* GreenLilaSprite1000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite1000.png; sourceTree = "<group>"; };
+		20895E71228DB72B00506685 /* GreenLilaSprite0111.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite0111.png; sourceTree = "<group>"; };
+		20895E72228DB72B00506685 /* GreenLilaSprite0011.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite0011.png; sourceTree = "<group>"; };
+		20895E73228DB72B00506685 /* GreenLilaSprite1101.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite1101.png; sourceTree = "<group>"; };
+		20895E74228DB72B00506685 /* GreenLilaSprite0101.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite0101.png; sourceTree = "<group>"; };
+		20895E75228DB72C00506685 /* GreenLilaSprite0100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite0100.png; sourceTree = "<group>"; };
+		20895E76228DB72C00506685 /* GreenLilaSprite1100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite1100.png; sourceTree = "<group>"; };
+		20895E77228DB72C00506685 /* GreenLilaSprite1001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite1001.png; sourceTree = "<group>"; };
+		20895E78228DB72C00506685 /* GreenLilaSprite0110.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite0110.png; sourceTree = "<group>"; };
+		20895E79228DB72C00506685 /* GreenLilaSprite1010.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite1010.png; sourceTree = "<group>"; };
+		20895E7A228DB72C00506685 /* GreenLilaSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite.png; sourceTree = "<group>"; };
+		20895E7B228DB72C00506685 /* GreenLilaSprite1110.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite1110.png; sourceTree = "<group>"; };
+		20895E7C228DB72C00506685 /* GreenLilaSprite0010.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite0010.png; sourceTree = "<group>"; };
+		20895E7D228DB72C00506685 /* GreenLilaSprite1011.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite1011.png; sourceTree = "<group>"; };
 		208B278E21FB382C007259B6 /* enRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enRestWords.txt; sourceTree = "<group>"; };
 		208B279021FB8ED1007259B6 /* ruRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruRestWords.txt; sourceTree = "<group>"; };
 		209380792252466B009C742F /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
@@ -503,6 +537,22 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				20895E7A228DB72C00506685 /* GreenLilaSprite.png */,
+				20895E6E228DB72B00506685 /* GreenLilaSprite0001.png */,
+				20895E7C228DB72C00506685 /* GreenLilaSprite0010.png */,
+				20895E72228DB72B00506685 /* GreenLilaSprite0011.png */,
+				20895E75228DB72C00506685 /* GreenLilaSprite0100.png */,
+				20895E74228DB72B00506685 /* GreenLilaSprite0101.png */,
+				20895E78228DB72C00506685 /* GreenLilaSprite0110.png */,
+				20895E71228DB72B00506685 /* GreenLilaSprite0111.png */,
+				20895E70228DB72B00506685 /* GreenLilaSprite1000.png */,
+				20895E77228DB72C00506685 /* GreenLilaSprite1001.png */,
+				20895E79228DB72C00506685 /* GreenLilaSprite1010.png */,
+				20895E7D228DB72C00506685 /* GreenLilaSprite1011.png */,
+				20895E76228DB72C00506685 /* GreenLilaSprite1100.png */,
+				20895E73228DB72B00506685 /* GreenLilaSprite1101.png */,
+				20895E7B228DB72C00506685 /* GreenLilaSprite1110.png */,
+				20895E6F228DB72B00506685 /* GreenLilaSprite1111.png */,
 				20846B7522467C1300CD5060 /* bgImage.png */,
 				207B67892243C9F7001456C8 /* save.png */,
 				208424D72236B7FD00D18A12 /* bubbleGoldElite.png */,
@@ -609,6 +659,7 @@
 				20552DB2211F1EF900C54538 /* whiteSprite1111.png */,
 				2098BB8D20601B0B00C3641B /* magier.png */,
 				205E8E2720948E2D00314646 /* button.png */,
+				20895E6C228D951900506685 /* LilaSprite.png */,
 			);
 			path = Pictures;
 			sourceTree = "<group>";
@@ -771,18 +822,21 @@
 				20552DBF211F1EFA00C54538 /* whiteSprite1010.png in Resources */,
 				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
 				20866989222ACF2E002194C8 /* GoldSprite0111.png in Resources */,
+				20895E88228DB72D00506685 /* GreenLilaSprite0110.png in Resources */,
 				20866969222AC84E002194C8 /* GreenSprite0001.png in Resources */,
 				205EC420222EAD380080D4ED /* LightBlueSprite1010.png in Resources */,
 				2055E2B02215B02C004E3260 /* MandatoryList.realm in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
 				20552DC3211F1EFA00C54538 /* whiteSprite0011.png in Resources */,
 				2087444321FA1C74006C00C6 /* deRestWords.txt in Resources */,
+				20895E86228DB72D00506685 /* GreenLilaSprite1100.png in Resources */,
 				20552DC2211F1EFA00C54538 /* whiteSprite1111.png in Resources */,
 				20866990222ACF2E002194C8 /* GoldSprite0110.png in Resources */,
 				204AC87B2228436800A5A03D /* LightRedSprite.png in Resources */,
 				20552DCC211F1EFA00C54538 /* whiteSprite0100.png in Resources */,
 				2086696F222AC84E002194C8 /* GreenSprite1111.png in Resources */,
 				20552DC0211F1EFA00C54538 /* whiteSprite0101.png in Resources */,
+				20895E8B228DB72D00506685 /* GreenLilaSprite1110.png in Resources */,
 				205184F920615B3100E7FAF4 /* deGameData.txt in Resources */,
 				20469BD121A43F4E00743EB1 /* sortup.png in Resources */,
 				2086696B222AC84E002194C8 /* GreenSprite0100.png in Resources */,
@@ -794,12 +848,14 @@
 				205EC41E222EAD380080D4ED /* LightBlueSprite0010.png in Resources */,
 				20552DC4211F1EFA00C54538 /* whiteSprite1011.png in Resources */,
 				2086698B222ACF2E002194C8 /* GoldSprite1111.png in Resources */,
+				20895E80228DB72D00506685 /* GreenLilaSprite1000.png in Resources */,
 				2084C0D62209BF73002B8F2E /* compare2.txt in Resources */,
 				20866975222AC84E002194C8 /* GreenSprite1100.png in Resources */,
 				206AD3EB222C2AA800B7C5B6 /* GraySprite0110.png in Resources */,
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
 				204AC87722282A9400A5A03D /* RedSprite.png in Resources */,
 				2086696E222AC84E002194C8 /* GreenSprite0111.png in Resources */,
+				20895E81228DB72D00506685 /* GreenLilaSprite0111.png in Resources */,
 				2086698A222ACF2E002194C8 /* GoldSprite1100.png in Resources */,
 				20ADEE832236EC180054CC7B /* GreenSprite0000.png in Resources */,
 				205184F72061525C00E7FAF4 /* huGameData.txt in Resources */,
@@ -820,12 +876,14 @@
 				20552DCA211F1EFA00C54538 /* whiteSprite0000.png in Resources */,
 				204D760B221B26A900DBB1B5 /* Plus.png in Resources */,
 				205BF79A21E4D952006633C6 /* huMandatory.txt in Resources */,
+				20895E83228DB72D00506685 /* GreenLilaSprite1101.png in Resources */,
 				20552DC5211F1EFA00C54538 /* whiteSprite0010.png in Resources */,
 				208424D92236B7FD00D18A12 /* bubbleGoldElite.png in Resources */,
 				208424D82236B7FD00D18A12 /* greenButton.png in Resources */,
 				20846B7622467C1300CD5060 /* bgImage.png in Resources */,
 				2086698D222ACF2E002194C8 /* GoldSprite0010.png in Resources */,
 				204B6FD321CD418D00893D58 /* firstplaces.png in Resources */,
+				20895E8A228DB72D00506685 /* GreenLilaSprite.png in Resources */,
 				2084FA2D221C2523002D29D3 /* Delete.png in Resources */,
 				207B678A2243C9F8001456C8 /* save.png in Resources */,
 				206AD3EC222C2AA800B7C5B6 /* GraySprite0010.png in Resources */,
@@ -843,20 +901,24 @@
 				206AD3EA222C2AA800B7C5B6 /* GraySprite0100.png in Resources */,
 				20552DBE211F1EFA00C54538 /* whiteSprite0110.png in Resources */,
 				20866985222ACF2E002194C8 /* GoldSprite0101.png in Resources */,
+				20895E8D228DB72D00506685 /* GreenLilaSprite1011.png in Resources */,
 				205E8E2820948E2E00314646 /* button.png in Resources */,
 				205184F5206150AC00E7FAF4 /* ruGameData.txt in Resources */,
 				206AD3F6222C36C700B7C5B6 /* GraySprite0000.png in Resources */,
+				20895E87228DB72D00506685 /* GreenLilaSprite1001.png in Resources */,
 				2086698F222ACF2E002194C8 /* GoldSprite1000.png in Resources */,
 				205EC418222EAD380080D4ED /* LightBlueSprite1001.png in Resources */,
 				20866992222ACF2E002194C8 /* GoldSprite1011.png in Resources */,
 				20552DC9211F1EFA00C54538 /* whiteSprite0001.png in Resources */,
 				206AD3F1222C2AA800B7C5B6 /* GraySprite1100.png in Resources */,
+				20895E7F228DB72D00506685 /* GreenLilaSprite1111.png in Resources */,
 				20B04BB220935CC3008F99A2 /* menuBackground.png in Resources */,
 				205CF7ED2129BC9300C1B89D /* UndoElite.png in Resources */,
 				20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */,
 				205EC41A222EAD380080D4ED /* LightBlueSprite1100.png in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
 				206EA3FB2271D31300F184B4 /* MenuBG.png in Resources */,
+				20895E84228DB72D00506685 /* GreenLilaSprite0101.png in Resources */,
 				206AD3E8222C2AA800B7C5B6 /* GraySprite1001.png in Resources */,
 				20866974222AC84E002194C8 /* GreenSprite1000.png in Resources */,
 				204C30B321EF789A008B1CB3 /* ruMandatory6.txt in Resources */,
@@ -866,19 +928,25 @@
 				20866988222ACF2E002194C8 /* GoldSprite0001.png in Resources */,
 				2049314A21E6494D00BE66EA /* deMandatory.txt in Resources */,
 				20491F4D21CFCEB20060C675 /* ruMandatory.txt in Resources */,
+				20895E82228DB72D00506685 /* GreenLilaSprite0011.png in Resources */,
+				20895E85228DB72D00506685 /* GreenLilaSprite0100.png in Resources */,
 				20395F5D21A2FE4E00947D7F /* retype.png in Resources */,
 				20469BD021A43F4E00743EB1 /* sortdown.png in Resources */,
+				20895E8C228DB72D00506685 /* GreenLilaSprite0010.png in Resources */,
 				205EC421222EAD380080D4ED /* LightBlueSprite0011.png in Resources */,
 				20506A44225772F1000BB525 /* finger1.png in Resources */,
 				20552DCB211F1EFA00C54538 /* whiteSprite0111.png in Resources */,
 				20866986222ACF2E002194C8 /* GoldSprite1101.png in Resources */,
 				20866967222AC84E002194C8 /* GreenSprite0101.png in Resources */,
 				206AD3F4222C2AA800B7C5B6 /* GraySprite0011.png in Resources */,
+				20895E89228DB72D00506685 /* GreenLilaSprite1010.png in Resources */,
 				2086696A222AC84E002194C8 /* GreenSprite1110.png in Resources */,
 				204B6FD421CD418D00893D58 /* bestScores.png in Resources */,
 				20866993222ACF2E002194C8 /* GoldSprite0100.png in Resources */,
 				2048259921E8CC59000933B3 /* deWords.txt in Resources */,
+				20895E6D228D951900506685 /* LilaSprite.png in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
+				20895E7E228DB72D00506685 /* GreenLilaSprite0001.png in Resources */,
 				206AD3E9222C2AA800B7C5B6 /* GraySprite1010.png in Resources */,
 				20866973222AC84E002194C8 /* GreenSprite1101.png in Resources */,
 				20552DC1211F1EFA00C54538 /* whiteSprite1000.png in Resources */,

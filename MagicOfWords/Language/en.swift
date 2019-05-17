@@ -129,4 +129,10 @@ let enDictionary: [TextConstants: String] = [
     .tcDemoFinishedMessage: "I hope it was helpful for you! If you want to see the demo again, yout can run it in <Menu - Settings - Show Demo Game>. And now you can continue with a new game or go to the menu",
     .tcDemoFinishedStartNewGame: "New game",
     .tcDemoFinishedGoToMenu: "Go to menu",
+    .tcChooseDifficulty:    "Choose difficulty",
+    .tcCurrentDifficulty:   "Current difficulty: %",
+    .tcSimpleGame:          "Easy",
+    .tcMediumGame:          "Medium",
+    .tcHardGame:            "Hard",
+    .tcVeryHardGame:        "Very hard",
 ]

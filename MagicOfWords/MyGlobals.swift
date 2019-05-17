@@ -44,6 +44,10 @@ struct GV {
     static let GameStatusContinued = 3
     static let ButtonTypeSimple = "S"
     static let ButtonTypeElite = "E"
+    static var minGameNumber = 0
+    static var maxGameNumber = 0
+    static let SimpleGame = 0
+    static let HardGame = 1
     static var buttonType = ButtonTypeElite
     static let LabelFontElite = "CourierNewPS-BoldMT"
     static let LabelFontSimple = "CourierNewPS-BoldMT"

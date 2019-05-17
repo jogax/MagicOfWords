@@ -128,4 +128,10 @@ let huDictionary: [TextConstants: String] = [
     .tcDemoFinishedMessage: "Remélem, hasznos volt számodra! Ha újra szeretnéd látni a demót, akkor elindíthatod azt a <Menü - Beállítások - Mutasd a Demo-játékot> menüpontban. És most kezdhetsz egy új játékot, vagy elindíthatod a főmenüt",
     .tcDemoFinishedStartNewGame: "Új játék",
     .tcDemoFinishedGoToMenu: "Vissza a főmenübe",
+    .tcChooseDifficulty:    "Válassz nehézséget",
+    .tcCurrentDifficulty:   "Jelenlegi nehézség: %",
+    .tcSimpleGame:          "Könnyű",
+    .tcMediumGame:          "Közepes",
+    .tcHardGame:            "Nehéz",
+    .tcVeryHardGame:        "Nagyon nehéz",
 ]

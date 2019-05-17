@@ -171,11 +171,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     func startNewGame() {
-        startWTScene(new: true, next: .NoMore, gameNumber: 0)
+        let gameNumber = GV.basicDataRecord.difficulty * 1000
+        startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
     }
     
     func continueGame() {
-        startWTScene(new: false, next: .NoMore, gameNumber: 0)
+        let gameNumber = GV.basicDataRecord.difficulty * 1000
+        startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
     }
     
     func chooseLanguage() {
@@ -243,9 +245,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     var countContinueGames = 0
     
     private func getRecordCounts() {
-        countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@", GV.actLanguage).count
-        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@", GV.actLanguage).count
-        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and (gameStatus = %@ or gameStatus = %@ and gameNumber < 1000)", GV.actLanguage, GV.GameStatusPlaying, GV.GameStatusContinued).count
+        countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@ and gameNumber < 1000", GV.actLanguage).count
+        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).count
+        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and (gameStatus = %@ or gameStatus = %@)", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber, GV.GameStatusPlaying, GV.GameStatusContinued).count
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
@@ -687,6 +689,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         showMenu()
     }
     
+    
+    
     private func showSettingsMenu() {
         let myAlertController = UIAlertController(title: GV.language.getText(.tcSettings),
                                             message: "",
@@ -697,7 +701,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             self.chooseLanguage()
         })
         myAlertController.addAction(chooseLanguageAction)
-        //--------------------- chooseLanguageAction ---------------------
+        //--------------------- chooseDifficultyAction ---------------------
+        let chooseDifficultyAction = UIAlertAction(title: GV.language.getText(.tcChooseDifficulty), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.chooseDifficulty()
+        })
+        myAlertController.addAction(chooseDifficultyAction)
+       //--------------------- chooseLanguageAction ---------------------
         let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
             alert -> Void in
             self.showHowToPlay()
@@ -735,6 +745,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     var forGameSubscription: SyncSubscription<BestScoreForGame>!
     var bestScoreSubscriptionToken: NotificationToken?
     var forGameSubscriptionToken: NotificationToken?
+    
+    
 
     private func deactivateSubscriptions() {
         if forGameSubscription != nil {
@@ -813,6 +825,52 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 
     }
     
+    private func setDifficulty(difficulty: GameDifficulty) {
+        try! realm.safeWrite() {
+            GV.basicDataRecord.difficulty = difficulty.rawValue
+        }
+        GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
+        GV.maxGameNumber = GV.minGameNumber + 999
+        getRecordCounts()
+        self.showMenu()
+    }
+    
+    private func chooseDifficulty() {
+        var currentDifficultyString = ""
+        switch GV.basicDataRecord.difficulty {
+        case GameDifficulty.Easy.rawValue:      currentDifficultyString = GV.language.getText(.tcSimpleGame)
+        case GameDifficulty.Medium.rawValue:    currentDifficultyString = GV.language.getText(.tcMediumGame)
+        case GameDifficulty.Hard.rawValue:      currentDifficultyString = GV.language.getText(.tcHardGame)
+        case GameDifficulty.VeryHard.rawValue:  currentDifficultyString = GV.language.getText(.tcVeryHardGame)
+        default: break
+        }
+
+        let alertController = UIAlertController(title: GV.language.getText(.tcChooseDifficulty),
+                                                message: GV.language.getText(.tcCurrentDifficulty, values: currentDifficultyString),
+                                                preferredStyle: .alert)
+        let simpleGameAction = UIAlertAction(title: GV.language.getText(.tcSimpleGame), style: .default, handler: {
+            alert -> Void in
+            self.setDifficulty(difficulty: .Easy)
+        })
+        alertController.addAction(simpleGameAction)
+        
+        let hardGameAction = UIAlertAction(title: GV.language.getText(.tcMediumGame), style: .default, handler: {
+            alert -> Void in
+            self.setDifficulty(difficulty: .Medium)
+        })
+        alertController.addAction(hardGameAction)
+
+        let cancelAction =  UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.showMenu()
+        })
+        alertController.addAction(cancelAction)
+
+        present(alertController, animated: true, completion: nil)
+        
+
+    }
+    
     private func chooseStyle() {
         func setStyle(style: String) {
             try! realm.safeWrite() {
@@ -861,6 +919,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             GV.language.setLanguage(GV.basicDataRecord.actLanguage)
         }
         GV.buttonType = GV.basicDataRecord.buttonType
+        GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
+        GV.maxGameNumber = GV.minGameNumber + 999
+
 //        GV.actFont = GV.basicDataRecord.buttonType == GV.ButtonTypeElite ? GV.FontTypeElite : GV.FontTypeSimple
     }
     
