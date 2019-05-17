@@ -714,11 +714,11 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         })
         myAlertController.addAction(showHelpAction)
        //--------------------- choose Style action -----------------------
-        let chooseStyleAction =  UIAlertAction(title: GV.language.getText(.tcChooseStyle), style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.chooseStyle()
-        })
-        myAlertController.addAction(chooseStyleAction)
+//        let chooseStyleAction =  UIAlertAction(title: GV.language.getText(.tcChooseStyle), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.chooseStyle()
+//        })
+//        myAlertController.addAction(chooseStyleAction)
         //-------------------- generate BestScoreForGame ------------------
         #if DEBUG
             let generateListAction =  UIAlertAction(title: GV.language.getText(.tcGenerateBestScore), style: .default, handler: { [unowned self]

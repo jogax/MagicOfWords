@@ -299,7 +299,7 @@ class WTPiece: SKSpriteNode {
         var nameArray = [String]()
         
         for index in 0..<form.connects.count {
-            let name = "GraySprite" + form.connects[index]
+            let name = "Connection" + form.connects[index]
             nameArray.append(name)
         }
         return nameArray
@@ -318,7 +318,12 @@ class WTPiece: SKSpriteNode {
             frameForLetter.color = .white
             let name = nameArray[index]
             if GV.buttonType == GV.ButtonTypeElite {
-                frameForLetter.texture = SKTexture(imageNamed: name)
+                frameForLetter.texture = SKTexture(imageNamed: "GraySprite")
+                let connectionImage = SKSpriteNode(color: .clear, size: CGSize(width: width, height: width))
+                connectionImage.texture = SKTexture(imageNamed: name)
+                connectionImage.name = "Connection\(index)"
+                connectionImage.zPosition = frameForLetter.zPosition - 10
+                frameForLetter.addChild(connectionImage)
             }
             let label = SKLabelNode(fontNamed: GV.actPieceFont)
 //            label.position = position
@@ -383,12 +388,14 @@ class WTPiece: SKSpriteNode {
                 guard let child = self.childNode(withName: searchName) else {
                     continue
                 }
-                
                 let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
-                if GV.buttonType == GV.ButtonTypeElite {
-                    (child as! SKSpriteNode).texture = SKTexture(imageNamed: nameArray[index])
-                }
                 child.run(rotateLetterAction)
+                if GV.buttonType == GV.ButtonTypeElite {
+                    guard let child1 = child.childNode(withName: "Connection\(index)") else {
+                        continue
+                    }
+                    (child1 as! SKSpriteNode).texture = SKTexture(imageNamed: nameArray[index])
+                }
              }
         }
     }

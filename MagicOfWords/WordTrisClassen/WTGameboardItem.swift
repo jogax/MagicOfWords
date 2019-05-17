@@ -60,7 +60,7 @@ class WTGameboardItem: SKSpriteNode {
     private var connectionType = ConnectionType()
     private var countOccurencesInWords = 0
     private var fixLetter = false
-    
+
     public var letter = emptyLetter
     private var fontSize: CGFloat = 0
     init(blockSize: CGFloat, fontSize: CGFloat) {
@@ -68,7 +68,7 @@ class WTGameboardItem: SKSpriteNode {
         // Call the init        
         countWordsLabel = SKLabelNode()
         self.fontSize = fontSize
-        let texture = SKTexture(imageNamed: "whiteSprite0000.png")
+        let texture = SKTexture(imageNamed: "whiteSprite.png")
         super.init(texture: texture, color: .white, size: CGSize(width: blockSize, height: blockSize))
 //        label.fontName = "KohinoorTelugu-Regular"
 //        label.fontName = "Baskerville"
@@ -304,27 +304,28 @@ class WTGameboardItem: SKSpriteNode {
     
     private func setTexture() {
         var name = ""
+        var connectionName = "Connection"
         if GV.buttonType == GV.ButtonTypeElite {
              if self.status == .wholeWord && !(self.letter == emptyLetter || self.myColor == .myBlueColor || self.myColor == .myRedColor) {
                 name = myColor == .myGreenColor ? (self.fixLetter ? "GreenLilaSprite" : "GreenSprite") : "GoldSprite"
-                name += self.connectionType.left ? "1" : "0"
-                name += self.connectionType.top ? "1" : "0"
-                name += self.connectionType.right ? "1" : "0"
-                name += self.connectionType.bottom ? "1" : "0"
+                connectionName += self.connectionType.left ? "1" : "0"
+                connectionName += self.connectionType.top ? "1" : "0"
+                connectionName += self.connectionType.right ? "1" : "0"
+                connectionName += self.connectionType.bottom ? "1" : "0"
             } else {
     //            print ("color: \(self.myColor), status: \(self.status)")
                 if self.myColor == .myBlueColor {
-                    name = "LightBlueSprite0000"
+                    name = "LightBlueSprite"
                 } else if self.myColor == .myRedColor {
                     name = "RedSprite"
                 } else if self.myColor == .myTemporaryColor {
-                    name = "LightBlueSprite0000"
+                    name = "LightBlueSprite"
                 } else if self.status == .used {
                     name = "LightRedSprite"
                 } else if self.myColor == .myFixColor {
                     name = "LilaSprite"
                 } else {
-                    name = "whiteSprite0000"
+                    name = "whiteSprite"
                 }
             }
         } else {
@@ -339,6 +340,24 @@ class WTGameboardItem: SKSpriteNode {
             }
         }
         self.texture = SKTexture(imageNamed: name)
+        if connectionName != "Connection" {
+            let child = self.childNode(withName: "Connection")
+            if child == nil {
+                let child = SKSpriteNode(imageNamed: connectionName)
+                child.size = self.size
+                child.zPosition = self.zPosition - 1
+                child.name = "Connection"
+                self.addChild(child)
+            } else {
+                (child! as! SKSpriteNode).texture = SKTexture(imageNamed: connectionName)
+            }
+        } else {
+            let child = self.childNode(withName: "Connection")
+            if child != nil {
+                child!.removeFromParent()
+            }
+
+        }
     }
     public func changeColor(toColor: MyColor = .myNoColor) {
         if toColor == .myNoColor {
