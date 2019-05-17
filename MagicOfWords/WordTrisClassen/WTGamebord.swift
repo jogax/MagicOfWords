@@ -374,7 +374,7 @@ class WTGameboard: SKShapeNode {
             let calculatedCol = myCol + itemCol //- colAdder
             let calculatedRow = myRow - itemRow //- rowAdder
             if calculatedRow < 0 {return false}
-            _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
+            _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
             usedItems.append(usedItem)
         }
@@ -419,7 +419,7 @@ class WTGameboard: SKShapeNode {
                     if calculatedRow > countCols - 1 {
                         calculatedRow = countCols - 1
                     }
-                  _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
+                  _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary)
                     let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
                     usedItems.append(usedItem)
                 }
@@ -436,7 +436,7 @@ class WTGameboard: SKShapeNode {
                 let itemRow = formOfShape[index] / 10
                 let calculatedCol = myCol + itemCol // - adder
                 let calculatedRow = myRow - itemRow < 0 ? 0 : myRow - itemRow > countCols - 1 ? countCols - 1 : myRow - itemRow
-                _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary, toColor: .myTemporaryColor)
+                _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, status: .temporary)
                 let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
                 usedItems.append(usedItem)
             }
@@ -504,7 +504,7 @@ class WTGameboard: SKShapeNode {
                         let letter = origChoosedWord.usedLetters[index].letter
                         let actCol = usedItems[index].col
                         let actRow = usedItems[index].row
-                        _ = GV.gameArray[origCol][origRow].setLetter(letter: letter, status: .used, toColor: .myUsedColor)
+                        _ = GV.gameArray[origCol][origRow].setLetter(letter: letter, status: .used)
                         _ = GV.gameArray[actCol][actRow].clearIfTemporary()
                     }
                 }
@@ -715,14 +715,14 @@ class WTGameboard: SKShapeNode {
             let colTo = movedItem.toLetters[index].col
             let rowTo = movedItem.toLetters[index].row
             let letter = movedItem.fromLetters[index].letter
-            _ = GV.gameArray[colFrom][rowFrom].setLetter(letter: letter, status: .used, toColor: .myUsedColor)
+            _ = GV.gameArray[colFrom][rowFrom].setLetter(letter: letter, status: .used)
             GV.gameArray[colTo][rowTo].remove()
        }
     }
     
-    public func addGrayLettersToGamearray(grayLetters: [UsedLetter]) {
-        for grayLetter in grayLetters {
-            _ = GV.gameArray[grayLetter.col][grayLetter.row].setLetter(letter: grayLetter.letter, status: .fixItem, toColor: .myFixColor)
+    public func addFixLettersToGamearray(fixLetters: [UsedLetter]) {
+        for fixLetter in fixLetters {
+            _ = GV.gameArray[fixLetter.col][fixLetter.row].setLetter(letter: fixLetter.letter, status: .fixItem)
         }
     }
     

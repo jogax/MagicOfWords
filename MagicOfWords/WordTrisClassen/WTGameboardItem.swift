@@ -110,7 +110,11 @@ class WTGameboardItem: SKSpriteNode {
         return copyed
     }
     
-    public func setLetter(letter: String, status: ItemStatus, toColor: MyColor)->Bool {
+    public func setLetter(letter: String, status: ItemStatus)->Bool {
+        
+        switch self.status {
+            default: break
+        }
         
         if self.status == .used || self.status == .wholeWord || (self.status == .fixItem && status == .temporary){
             self.origColor = self.myColor
@@ -126,7 +130,7 @@ class WTGameboardItem: SKSpriteNode {
             label.text = letter
             self.letter = letter
 //            self.status = status
-            setColors(toColor: toColor, toStatus: status)
+            setColors(toStatus: status)
             return true
         }
     }
@@ -263,7 +267,7 @@ class WTGameboardItem: SKSpriteNode {
         setTexture()
     }
     
-    public func setColors(toColor: MyColor, toStatus: ItemStatus, connectionType: ConnectionType = ConnectionType(), incrWords: Bool = false, decrWords: Bool = false) {
+    public func setColors(toColor: MyColor = .myWhiteColor, toStatus: ItemStatus, connectionType: ConnectionType = ConnectionType(), incrWords: Bool = false, decrWords: Bool = false) {
         var color: MyColor
         if self.status == .wholeWord && self.fixLetter && toColor == .myUsedColor {
             color = .myFixColor
@@ -305,39 +309,25 @@ class WTGameboardItem: SKSpriteNode {
     private func setTexture() {
         var name = ""
         var connectionName = "Connection"
-        if GV.buttonType == GV.ButtonTypeElite {
-             if self.status == .wholeWord && !(self.letter == emptyLetter || self.myColor == .myBlueColor || self.myColor == .myRedColor) {
-                name = myColor == .myGreenColor ? (self.fixLetter ? "GreenLilaSprite" : "GreenSprite") : "GoldSprite"
-                connectionName += self.connectionType.left ? "1" : "0"
-                connectionName += self.connectionType.top ? "1" : "0"
-                connectionName += self.connectionType.right ? "1" : "0"
-                connectionName += self.connectionType.bottom ? "1" : "0"
-            } else {
-    //            print ("color: \(self.myColor), status: \(self.status)")
-                if self.myColor == .myBlueColor {
-                    name = "LightBlueSprite"
-                } else if self.myColor == .myRedColor {
-                    name = "RedSprite"
-                } else if self.myColor == .myTemporaryColor {
-                    name = "LightBlueSprite"
-                } else if self.status == .used {
-                    name = "LightRedSprite"
-                } else if self.myColor == .myFixColor {
-                    name = "LilaSprite"
-                } else {
-                    name = "whiteSprite"
-                }
-            }
-        } else {
+        connectionName += self.connectionType.left ? "1" : "0"
+        connectionName += self.connectionType.top ? "1" : "0"
+        connectionName += self.connectionType.right ? "1" : "0"
+        connectionName += self.connectionType.bottom ? "1" : "0"
+        switch status {
+        case .wholeWord:
+            name = "GreenSprite"
+        case .fixInWord:
+            name = "GreenLilaSprite"
+        case .temporary:
+            name = "LightBlueSprite"
+        case .noChange:
+            name = "RedSprite"
+        case .used:
+            name = "LightRedSprite"
+        case .fixItem:
+            name = "LilaSprite"
+        default:
             name = "whiteSprite"
-            if !(self.letter == emptyLetter || self.status == .used || self.myColor == .myBlueColor) {
-                name += self.connectionType.left ? "1" : "0"
-                name += self.connectionType.top ? "1" : "0"
-                name += self.connectionType.right ? "1" : "0"
-                name += self.connectionType.bottom ? "1" : "0"
-            } else {
-                name += "0000"
-            }
         }
         self.texture = SKTexture(imageNamed: name)
         if connectionName != "Connection" {
@@ -375,23 +365,23 @@ class WTGameboardItem: SKSpriteNode {
     }
     
     public func restore(from: String) {
-        var color: MyColor = .myWhiteColor
+//        var color: MyColor = .myWhiteColor
         var status: ItemStatus = .empty
         var letter = emptyLetter
         remove()
         if let rawStatus = Int(from.subString(at: 0, length: 1)) {
             if let itemStatus = ItemStatus(rawValue: rawStatus) {
                 status = itemStatus
-                if let toColor = colorToStatus[status] {
-                    color = toColor
-                }
+//                if let toColor = colorToStatus[status] {
+//                    color = toColor
+//                }
             }
         }
         letter = from.subString(at: 1, length: 1)
-        if letter == emptyLetter {
-            color = .myWhiteColor
-        }
-        _ = setLetter(letter: letter, status: status, toColor: color)
+//        if letter == emptyLetter {
+//            color = .myWhiteColor
+//        }
+        _ = setLetter(letter: letter, status: status)
         origLetter = emptyLetter
         origColor = .myWhiteColor
         doubleUsed = false

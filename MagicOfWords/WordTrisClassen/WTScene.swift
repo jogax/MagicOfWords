@@ -1891,7 +1891,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.playingRecord.gameNumber == demoGameNumber - 1 {
             return
         }
-        var grayLetters = [UsedLetter]()
+        var fixLetters = [UsedLetter]()
         let gameNumber = GV.playingRecord.gameNumber % 1000
         let random = MyRandom(gameNumber: gameNumber, modifier: 0)
         let countOfLetters = 12 + 4 * Int(gameNumber / 100)
@@ -1936,19 +1936,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 col = random.getRandomInt(0, max: 4)
                 row = random.getRandomInt(0, max: 4)
                 positionExists = false
-                for usedLetter in grayLetters {
+                for usedLetter in fixLetters {
                     if usedLetter.col == col && usedLetter.row == row {
                         positionExists = true
                     }
                 }
             } while positionExists
-            grayLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
-            grayLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
-            grayLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
-            grayLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
+            fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
+            fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
+            fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
+            fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
             letterIndex += 4
         }
-        wtGameboard!.addGrayLettersToGamearray(grayLetters: grayLetters)
+        wtGameboard!.addFixLettersToGamearray(fixLetters: fixLetters)
     }
 
     private func showHelpDemo() {
