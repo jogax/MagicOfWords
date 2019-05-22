@@ -62,7 +62,6 @@
 		2051A54E2191E376001AD00B /* hook.png in Resources */ = {isa = PBXBuildFile; fileRef = 2051A54D2191E376001AD00B /* hook.png */; };
 		205211342221B37A00B25072 /* UnDelete.png in Resources */ = {isa = PBXBuildFile; fileRef = 205211332221B37A00B25072 /* UnDelete.png */; };
 		20531C6820B6EA5400E060E2 /* ShowGamesScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20531C6720B6EA5400E060E2 /* ShowGamesScene.swift */; };
-		20552DCA211F1EFA00C54538 /* whiteSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 20552DBA211F1EFA00C54538 /* whiteSprite.png */; };
 		20553D8A225665C7001628D1 /* MyAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20553D89225665C7001628D1 /* MyAlertController.swift */; };
 		2055B489211C74A9000FD7A9 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */; };
 		2055E2AD2215B01E004E3260 /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2055E2AB2215B01E004E3260 /* Mandatory.realm */; };
@@ -207,7 +206,6 @@
 		205211332221B37A00B25072 /* UnDelete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = UnDelete.png; sourceTree = "<group>"; };
 		205234E22187902900B9935F /* deWordsOld1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deWordsOld1.txt; sourceTree = "<group>"; };
 		20531C6720B6EA5400E060E2 /* ShowGamesScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowGamesScene.swift; sourceTree = "<group>"; };
-		20552DBA211F1EFA00C54538 /* whiteSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteSprite.png; sourceTree = "<group>"; };
 		20553D89225665C7001628D1 /* MyAlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAlertController.swift; sourceTree = "<group>"; };
 		2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		2055E2AB2215B01E004E3260 /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
@@ -467,7 +465,6 @@
 				208173E02103577800960800 /* BalloonSimple.png */,
 				2038F26622317AFE0028372D /* BalloonElite.png */,
 				20B04BB120935CC2008F99A2 /* menuBackground.png */,
-				20552DBA211F1EFA00C54538 /* whiteSprite.png */,
 				2098BB8D20601B0B00C3641B /* magier.png */,
 				205E8E2720948E2D00314646 /* button.png */,
 				20895E6C228D951900506685 /* LilaSprite.png */,
@@ -648,7 +645,6 @@
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
 				2086F3EE228ED63200D845B7 /* Connection0010.png in Resources */,
 				2055E2AD2215B01E004E3260 /* Mandatory.realm in Resources */,
-				20552DCA211F1EFA00C54538 /* whiteSprite.png in Resources */,
 				204D760B221B26A900DBB1B5 /* Plus.png in Resources */,
 				205BF79A21E4D952006633C6 /* huMandatory.txt in Resources */,
 				208424D92236B7FD00D18A12 /* bubbleGoldElite.png in Resources */,
