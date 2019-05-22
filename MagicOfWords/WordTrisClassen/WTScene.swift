@@ -113,11 +113,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for letter in newWord.usedLetters {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showRedAction = SKAction.run({
-                myNode.setColors(toColor: .myRedColor, toStatus: .noChange)
+                myNode.setStatus(toStatus: .Error, calledFrom: "blinkWords - 1", col:letter.col, row: letter.row)
             })
             let waitAction = SKAction.wait(forDuration: duration)
             let showOrigAction = SKAction.run({
-                myNode.setColorByState()
+//                myNode.setColorByState()
+                myNode.setStatus(toStatus: .Used, calledFrom: "blinkWords - 2", col:letter.col, row: letter.row)
             })
             var sequence = [SKAction]()
             for _ in 1...3 {
@@ -132,11 +133,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for letter in foundedWord.usedLetters {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showGreenAction = SKAction.run({
-                myNode.setColors(toColor: .myDarkGreenColor, toStatus: .noChange)
+                myNode.setStatus(toStatus: .DarkGreenStatus, calledFrom: "blinkWords - 3", col:letter.col, row: letter.row)
             })
             let waitAction = SKAction.wait(forDuration: duration)
             let showOrigAction = SKAction.run({
-                myNode.setColorByState()
+//                myNode.setColorByState()
+                myNode.setStatus(toStatus: .Used, calledFrom: "blinkWords - 4", col:letter.col, row: letter.row)
             })
             var sequence = [SKAction]()
             sequence.append(longWaitAction)
@@ -2721,6 +2723,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     saveActualState()
                     saveToRealmCloud()
                     saveRecord = true
+                } else {
+                    
                 }
             }
             returnBool = checkLetters == "" || checkLetters == lettersForCheck
@@ -3756,7 +3760,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             for col in 0..<10 {
                 let char = GV.gameArray[col][row].letter
                 var greenMark = emptyLetter
-                if GV.gameArray[col][row].status == .wholeWord {
+                if GV.gameArray[col][row].status == .WholeWord {
                     greenMark = "*"
                 }
                 if GV.gameArray[col][row].doubleUsed {

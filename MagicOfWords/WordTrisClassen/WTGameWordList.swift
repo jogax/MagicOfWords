@@ -395,7 +395,7 @@ public class WTGameWordList {
 //            for letter in selectedWord.usedLetters {
                 let letter = selectedWord.usedLetters[index]
                 let connectionType = selectedWord.connectionTypes[index]
-                GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType, incrWords: true)
+                GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, incrWords: true, calledFrom: "addWord", col: letter.col, row: letter.row)
             }
             addWordToAllWords(word: selectedWord.word)
             var scoreOfWord = modifyScores(selectedWord: selectedWord, plus: true)
@@ -463,10 +463,10 @@ public class WTGameWordList {
             }
             for (index, letter) in selectedWord.usedLetters.enumerated() {
                 if isThisPositionFree(letter: letter) {
-                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myUsedColor, toStatus: .used, decrWords: true)
+                    GV.gameArray[letter.col][letter.row].setStatus(toStatus: .Used, decrWords: true, calledFrom: "removeLastWord - 1", col: letter.col, row: letter.row)
                 } else {
                     let connectionType = selectedWord.connectionTypes[index]
-                    GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord, connectionType: connectionType, decrWords: true)
+                    GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, decrWords: true, calledFrom: "removeLastWord - 2", col: letter.col, row: letter.row)
                 }
             }
             var scoreOfWord = modifyBonus(selectedWord: selectedWord, plus: false)
@@ -595,7 +595,7 @@ public class WTGameWordList {
             for item in wordsInRound {
                 for selectedWord in item.wordsInGame {
                     for letter in selectedWord.usedLetters {
-                        GV.gameArray[letter.col][letter.row].setColors(toColor: .myUsedColor, toStatus: .used)
+                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .Used, calledFrom: "clearWordsInGame", col: letter.col, row: letter.row)
                     }
                 }
             }
@@ -614,9 +614,9 @@ public class WTGameWordList {
             for selectedWord in lastItem.wordsInGame {
                 if selectedWord.usedLetters.contains(where: {$0.col == choosedWord.usedLetters[0].col && $0.row == choosedWord.usedLetters[0].row}) {
                     for letter in selectedWord.usedLetters {
-                        GV.gameArray[letter.col][letter.row].setColors(toColor: .myGoldColor, toStatus: .noChange)
+                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .GoldStatus, calledFrom: "showWordsContainingThisLetter - 1", col: letter.col, row: letter.row)
                     }
-                    GV.gameArray[choosedWord.usedLetters[0].col][choosedWord.usedLetters[0].row].setColors(toColor: .myDarkGoldColor, toStatus: .noChange)
+                    GV.gameArray[choosedWord.usedLetters[0].col][choosedWord.usedLetters[0].row].setStatus(toStatus: .DarkGoldStatus, calledFrom: "showWordsContainingThisLetter- 2", col: choosedWord.usedLetters[0].col, row: choosedWord.usedLetters[0].row)
                     showedWords.append(selectedWord)
     //                wordsToShow.append(selectedWord.word)
                 }
@@ -631,7 +631,7 @@ public class WTGameWordList {
     public func stopShowingWords() {
         for selectedWord in showedWords {
             for letter in selectedWord.usedLetters {
-                GV.gameArray[letter.col][letter.row].setColors(toColor: .myGreenColor, toStatus: .wholeWord)
+                GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, calledFrom: "stopShowingWords", col: letter.col, row: letter.row)
             }
         }
         showedWords = [SelectedWord]()
