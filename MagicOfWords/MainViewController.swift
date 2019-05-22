@@ -603,7 +603,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
             alert -> Void in
             GV.generateHelpInfo = true
-            self.startWTScene(new: true, next: .GameNumber, gameNumber: 1000)
+            let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? 10000 : 11000
+            self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber)
 
         })
         alertController.addAction(newGenHelpAction)
@@ -611,7 +612,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             let continueGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenContinue), style: .default, handler: { [unowned self]
                 alert -> Void in
                 GV.generateHelpInfo = true
-                self.startWTScene(new: true, next: .GameNumber, gameNumber: 1000, restart: true, showHelp: true)
+                let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? 10000 : 11000
+                self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
             })
             alertController.addAction(continueGenHelpAction)
 

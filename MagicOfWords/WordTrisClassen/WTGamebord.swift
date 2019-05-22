@@ -108,7 +108,7 @@ public struct FoundedWord {
     
     private mutating func checkContinuity(letter:UsedLetter) {
         func saveLetter(col: Int, row: Int) {
-            GV.gameArray[col][row].setStatus(toStatus: .Temporary, calledFrom: "checkContinuity", col: col, row: row)
+            GV.gameArray[col][row].setStatus(toStatus: .Temporary, calledFrom: "checkContinuity")
             let actLetter = GV.gameArray[col][row].letter
             let newLetter = UsedLetter(col: col, row: row, letter: actLetter)
             word.append(newLetter.letter)
@@ -374,7 +374,7 @@ class WTGameboard: SKShapeNode {
             let calculatedCol = myCol + itemCol //- colAdder
             let calculatedRow = myRow - itemRow //- rowAdder
             if calculatedRow < 0 {return false}
-        _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary, calledFrom: "startShowingSpriteOnGameboard", col: calculatedCol, row: calculatedRow)
+        _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary, calledFrom: "startShowingSpriteOnGameboard")
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
             usedItems.append(usedItem)
         }
@@ -419,7 +419,7 @@ class WTGameboard: SKShapeNode {
                     if calculatedRow > countCols - 1 {
                         calculatedRow = countCols - 1
                     }
-                    _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary, calledFrom: "moveSpriteOnGameboard - 1", col: calculatedCol, row: calculatedRow)
+                    _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary, calledFrom: "moveSpriteOnGameboard - 1")
                     let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
                     usedItems.append(usedItem)
                 }
@@ -436,7 +436,7 @@ class WTGameboard: SKShapeNode {
                 let itemRow = formOfShape[index] / 10
                 let calculatedCol = myCol + itemCol // - adder
                 let calculatedRow = myRow - itemRow < 0 ? 0 : myRow - itemRow > countCols - 1 ? countCols - 1 : myRow - itemRow
-                _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary, calledFrom: "moveSpriteOnGameboard - 2", col: calculatedCol, row: calculatedRow)
+                _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary, calledFrom: "moveSpriteOnGameboard - 2")
                 let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
                 usedItems.append(usedItem)
             }
@@ -490,7 +490,7 @@ class WTGameboard: SKShapeNode {
         var clearNeaded = false
         for usedItem in usedItems {
             let actItemStatus = usedItem.item!.status
-            if actItemStatus == .Used || actItemStatus == .WholeWord {
+            if actItemStatus == .Used || actItemStatus == .WholeWord || actItemStatus == .Error {
                 clearNeaded = true
                 break
             }
@@ -504,7 +504,7 @@ class WTGameboard: SKShapeNode {
                         let letter = origChoosedWord.usedLetters[index].letter
                         let actCol = usedItems[index].col
                         let actRow = usedItems[index].row
-                        _ = GV.gameArray[origCol][origRow].setLetter(letter: letter, toStatus: .Used, calledFrom: "stopShowingSpriteOnGameboard", col: origCol, row: origRow)
+                        _ = GV.gameArray[origCol][origRow].setLetter(letter: letter, toStatus: .Used, calledFrom: "stopShowingSpriteOnGameboard")
                         _ = GV.gameArray[actCol][actRow].clearIfTemporary(col: actCol, row: actRow)
                     }
                 }
@@ -545,7 +545,7 @@ class WTGameboard: SKShapeNode {
         }
         choosedWord = FoundedWord()
         choosedWord.addLetter(letter: UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter))
-        GV.gameArray[col][row].setStatus(toStatus: .Temporary, calledFrom: "startChooseOwnWord", col: col, row: row)
+        GV.gameArray[col][row].setStatus(toStatus: .Temporary, calledFrom: "startChooseOwnWord")
     }
     
     var origChoosedWord = FoundedWord()
@@ -567,7 +567,7 @@ class WTGameboard: SKShapeNode {
         } else { // Not empty field
                if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters[choosedWord.usedLetters.count - 2] == actLetter {
                     let last = choosedWord.usedLetters.last!
-                    GV.gameArray[last.col][last.row].setStatus(toStatus: .NoChange, calledFrom: "moveChooseOwnWord - 1", col: col, row: row)
+                    GV.gameArray[last.col][last.row].setStatus(toStatus: .OrigStatus, calledFrom: "moveChooseOwnWord - 1")
                     choosedWord.removeLast()
                 } else {
                     if choosedWord.usedLetters.count > 0 {
@@ -581,7 +581,7 @@ class WTGameboard: SKShapeNode {
                         }
                     }
                     if !stopChoosing {
-                        GV.gameArray[col][row].setStatus(toStatus: .Temporary, calledFrom: "moveChooseOwnWord - 2", col: col, row: row)
+                        GV.gameArray[col][row].setStatus(toStatus: .Temporary, calledFrom: "moveChooseOwnWord - 2")
                         choosedWord.addLetter(letter: actLetter)
                     }
                 }
@@ -594,8 +594,7 @@ class WTGameboard: SKShapeNode {
         var startsWithLetters = FoundedWord()
         if !moveModusStarted {
             for letter in choosedWord.usedLetters {
-                let actStatus = GV.gameArray[letter.col][letter.row].status
-                if actStatus == .WholeWord {
+                if !GV.gameArray[letter.col][letter.row].moveable {
                     onlyUsedLetters = false
                 } else if onlyUsedLetters {
                     startsWithLetters.addLetter(letter: letter)
@@ -626,7 +625,7 @@ class WTGameboard: SKShapeNode {
                 }
                 if sameCol || sameRow {
                     for letter in choosedWord.usedLetters {
-                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .NoChange, calledFrom: "setMoveModusIfPossible", col: letter.col, row: letter.row)
+                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .OrigStatus, calledFrom: "setMoveModusIfPossible")
                     }
                     myPiece = WTPiece(fromChoosedWord: startsWithLetters, parent: parentScene, blockSize: blockSize!)
                     if myPiece.myType != .NotUsed {
@@ -652,7 +651,7 @@ class WTGameboard: SKShapeNode {
         for col in 0..<countCols {
             for row in 0..<countCols {
                 if GV.gameArray[col][row].status == .Temporary {
-                    GV.gameArray[col][row].setStatus(toStatus: .NoChange, calledFrom: "endChooseOwnWord", col: col, row: row)
+                    GV.gameArray[col][row].setStatus(toStatus: .OrigStatus, calledFrom: "endChooseOwnWord")
                 }
             }
         }
@@ -715,14 +714,14 @@ class WTGameboard: SKShapeNode {
             let colTo = movedItem.toLetters[index].col
             let rowTo = movedItem.toLetters[index].row
             let letter = movedItem.fromLetters[index].letter
-            _ = GV.gameArray[colFrom][rowFrom].setLetter(letter: letter, toStatus: .Used, calledFrom: "moveItemToOrigPlace", col: colFrom, row: rowFrom)
+            _ = GV.gameArray[colFrom][rowFrom].setLetter(letter: letter, toStatus: .Used, calledFrom: "moveItemToOrigPlace")
             GV.gameArray[colTo][rowTo].remove()
        }
     }
     
     public func addFixLettersToGamearray(fixLetters: [UsedLetter]) {
         for fixLetter in fixLetters {
-            _ = GV.gameArray[fixLetter.col][fixLetter.row].setLetter(letter: fixLetter.letter, toStatus: .FixItem, calledFrom: "addFixLettersToGamearray", col: fixLetter.col, row: fixLetter.row)
+            _ = GV.gameArray[fixLetter.col][fixLetter.row].setLetter(letter: fixLetter.letter, toStatus: .FixItem, calledFrom: "addFixLettersToGamearray")
         }
     }
     
@@ -880,9 +879,7 @@ class WTGameboard: SKShapeNode {
     public func clearGameArray() {
         for row in 0..<countCols {
             for col in 0..<countCols {
-                if GV.gameArray[col][row].status != .FixItem {
-                    GV.gameArray[col][row].remove()
-                }
+                GV.gameArray[col][row].remove()
             }
         }
     }

@@ -20,6 +20,7 @@ enum LettersColor: String {
 class HelpInfo: Object {
     @objc dynamic var combinedKey = ""
     @objc dynamic var language = ""
+    @objc dynamic var difficulty = 0
     @objc dynamic var counter = 0
     @objc dynamic var typeOfTouch = TypeOfTouch.FromBottom.rawValue
     @objc dynamic var beganInfo = "" // FromBottom: "shapeIndex", FromGameArray: "col / row / GRow / relPosX / relPosY"

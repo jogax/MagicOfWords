@@ -113,12 +113,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for letter in newWord.usedLetters {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showRedAction = SKAction.run({
-                myNode.setStatus(toStatus: .Error, calledFrom: "blinkWords - 1", col:letter.col, row: letter.row)
+                myNode.setStatus(toStatus: .Error, calledFrom: "blinkWords - 1")
             })
             let waitAction = SKAction.wait(forDuration: duration)
             let showOrigAction = SKAction.run({
 //                myNode.setColorByState()
-                myNode.setStatus(toStatus: .Used, calledFrom: "blinkWords - 2", col:letter.col, row: letter.row)
+                myNode.setStatus(toStatus: .OrigStatus, calledFrom: "blinkWords - 2")
             })
             var sequence = [SKAction]()
             for _ in 1...3 {
@@ -133,12 +133,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for letter in foundedWord.usedLetters {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showGreenAction = SKAction.run({
-                myNode.setStatus(toStatus: .DarkGreenStatus, calledFrom: "blinkWords - 3", col:letter.col, row: letter.row)
+                myNode.setStatus(toStatus: .DarkGreenStatus, calledFrom: "blinkWords - 3")
             })
             let waitAction = SKAction.wait(forDuration: duration)
             let showOrigAction = SKAction.run({
 //                myNode.setColorByState()
-                myNode.setStatus(toStatus: .Used, calledFrom: "blinkWords - 4", col:letter.col, row: letter.row)
+                myNode.setStatus(toStatus: .OrigStatus, calledFrom: "blinkWords - 4")
             })
             var sequence = [SKAction]()
             sequence.append(longWaitAction)
@@ -564,7 +564,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GV.mandatoryScore = 0
         GV.ownScore = 0
         GV.bonusScore = 0
-        if GV.generateHelpInfo{
+        if GV.generateHelpInfo {
             initiateHelpModel()
             if !showHelp {
                 resetHelpInfo()
@@ -766,7 +766,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func createPlayingRecord(gameNumber: Int) {
-        let gameNumberForMandatoryRecord = gameNumber - GV.basicDataRecord.difficulty * 1000
+        var gameNumberForMandatoryRecord = 0
+        if GV.generateHelpInfo {
+            gameNumberForMandatoryRecord = gameNumberForGenerating
+        } else {
+            gameNumberForMandatoryRecord = gameNumber - GV.basicDataRecord.difficulty * 1000
+        }
         let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumberForMandatoryRecord, GV.actLanguage).first!
         if mandatoryRecord != nil {
             try! realm.safeWrite() {
@@ -817,7 +822,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
         if bgSprite!.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
-            let gameNumber = GV.playingRecord.gameNumber == 9999 ? "DEMO" : String(GV.playingRecord.gameNumber % 1000)
+            let gameNumber = GV.playingRecord.gameNumber >= gameNumberForGenerating ? "DEMO" : String(GV.playingRecord.gameNumber % 1000)
             let text = GV.language.getText(.tcHeader, values: gameNumber, String(0), timeForGame.time.HourMinSec)
             headerLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
@@ -891,11 +896,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    let demoGameNumber = 10000
-    
     private func modifyHeader() {
-        var gameNumber = String(GV.playingRecord.gameNumber % 1000 + 1)
-        gameNumber = (gameNumber == String(demoGameNumber) ? "DEMO" : gameNumber)
+//        var gameNumber = String(GV.playingRecord.gameNumber % 1000 + 1)
+        let gameNumber = (GV.playingRecord.gameNumber >= gameNumberForGenerating ? "DEMO" : String(GV.playingRecord.gameNumber % 1000 + 1))
         let headerText = GV.language.getText(.tcHeader, values: gameNumber, String(actRound), timeForGame.time.HourMinSec)
         headerLabel.text = headerText
 //        let letterScore = GV.bonusScore
@@ -1823,6 +1826,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         timeForGame = TimeForGame(from: GV.playingRecord.time)
         myTimer = MyTimer(time: timeForGame)
         wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
+        createFixLetters()
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
         }
@@ -1857,9 +1861,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 bgSprite!.addChild(pieceArray[index])
             }
         }
-        if wtGameboard!.checkGameArrayIsEmpty() {
-            createFixLetters()
-        }
 
         createGoToPreviousGameButton(enabled: hasPreviousRecords(playingRecord: GV.playingRecord))
         createGoToNextGameButton(enabled: hasNextRecords(playingRecord: GV.playingRecord))
@@ -1890,9 +1891,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
             return
         }
-        if GV.playingRecord.gameNumber == demoGameNumber - 1 {
-            return
-        }
+//        if GV.playingRecord.gameNumber == demoGameNumber - 1 {
+//            return
+//        }
         var fixLetters = [UsedLetter]()
         let gameNumber = GV.playingRecord.gameNumber % 1000
         let random = MyRandom(gameNumber: gameNumber, modifier: 0)
@@ -2326,6 +2327,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let counter = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).count + 1
         let helpInfo = HelpInfo()
+        helpInfo.difficulty = GV.basicDataRecord.difficulty
         helpInfo.typeOfTouch = action.rawValue
         helpInfo.combinedKey = GV.actLanguage + String(counter)
         helpInfo.language = GV.actLanguage
@@ -3250,6 +3252,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
+    let gameNumberForGenerating = 10000
+    
     private func deleteGameDataRecord(gameNumber: Int) {
         let recordToDelete = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %d", gameNumber, GV.actLanguage)
         if recordToDelete.count == 1 {
@@ -3448,8 +3452,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func generateArrayOfWordPieces(first: Bool)->String {
-        let originalGameNumber = GV.playingRecord.gameNumber % 1000
-        let gameNumberForRandom = originalGameNumber == 9999 ? 10000 : originalGameNumber
+        let gameNumberForRandom = GV.generateHelpInfo ? gameNumberForGenerating : GV.playingRecord.gameNumber % 1000
+        let originalGameNumber = GV.generateHelpInfo ? gameNumberForGenerating : GV.playingRecord.gameNumber
         let random = MyRandom(gameNumber: gameNumberForRandom, modifier: GV.playingRecord.words.count)
         var tileType = MyShapes.NotUsed
         var letters = [String]()
@@ -3529,7 +3533,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 pieceString += "°"
                 let newIndex = random.getRandomInt(0, max: tilesForGame.count)
-                if newIndex == tilesForGame.count || !first || usedWords.count > 6 || GV.playingRecord.gameNumber % 1000 == 0 {
+                if newIndex == tilesForGame.count || !first || usedWords.count > 6 /*|| GV.playingRecord.gameNumber % 1000 == 0 */{
                     tilesForGame.append(tileForGameItem)
                 } else {
                     tilesForGame.insert(tileForGameItem, at: newIndex)
@@ -3538,7 +3542,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } while inputWord.length > 0
         }
         if first {
-            let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(originalGameNumber))[0]
+            let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(gameNumberForRandom))[0]
             let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
             for word in words {
 //                print(word)
