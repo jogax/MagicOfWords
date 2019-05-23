@@ -30,7 +30,7 @@ class WTGameboardItem: SKSpriteNode {
     private var countWordsLabel: SKLabelNode
     private var connectionType = ConnectionType()
     private var countOccurencesInWords = 0
-    private var fixItem = false
+    public var fixItem = false
     struct StatusType: Hashable {
         var itemStatus: ItemStatus = .Empty
         var fixItem: Bool = false
@@ -94,12 +94,11 @@ class WTGameboardItem: SKSpriteNode {
             return true
         }
     }
-    public func copyMe(imageNamed: String)->WTGameboardItem {
+    public func copyMe()->WTGameboardItem {
         let copyed = WTGameboardItem(blockSize: self.size.height, fontSize: self.fontSize)
-        copyed.texture = SKTexture(imageNamed: imageNamed)
+        copyed.texture = self.texture
         copyed.position = self.position
         copyed.status = self.status
-//        copyed.myColor = self.myColor
         copyed.origLetter = self.origLetter
         copyed.origStatus = self.origStatus
         copyed.blockSize = self.blockSize
@@ -294,7 +293,7 @@ class WTGameboardItem: SKSpriteNode {
             self.countOccurencesInWords -= 1
         }
         
-        if newStatus == .WholeWord || newStatus == .GoldStatus || newStatus == .DarkGoldStatus {
+        if newStatus == .WholeWord || newStatus == .GoldStatus || newStatus == .DarkGoldStatus || newStatus == .Error || newStatus == .DarkGreenStatus {
             if countOccurencesInWords > 0 {
                 self.countWordsLabel.text = String(countOccurencesInWords)
                 self.countWordsLabel.fontSize = self.fontSize * (countOccurencesInWords < 10 ? 0.7 : 0.6)

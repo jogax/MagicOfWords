@@ -650,8 +650,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
         if showHelp {
-            if gameNumber == 1000 {
-                GV.helpInfoRecords = realmHelpInfo!.objects(HelpInfo.self).filter("language = %d", GV.actLanguage).sorted(byKeyPath: "counter")
+            if gameNumber >= gameNumberForGenerating {
+                let difficulty = GV.basicDataRecord.difficulty
+                GV.helpInfoRecords = realmHelpInfo!.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
             }
             createPlayingRecord(gameNumber: gameNumber)
         } else if GV.generateHelpInfo && new {
@@ -2042,7 +2043,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             var zielPosition: CGPoint?
             switch alertType {
             case .CongratulationsAlert:
-                createCongratulationsAlert()
+                createCongratulationsAlert(congratulationStatus: .NoCongratulation)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
             case .NoMoreStepsAlert:
                 createNoMoreStepsAlert()
@@ -2202,6 +2203,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             })
             fingerActions.append(lastAction)
+        } else {
+            let lastAction = SKAction.run({
+                fingerSprite.removeFromParent()
+            })
+            fingerActions.append(lastAction)
         }
         let sequence = SKAction.sequence(fingerActions)
         fingerSprite.run(SKAction.sequence([sequence]))
@@ -2295,10 +2301,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func resetHelpInfo() {
-//        if GV.playingRecord.gameNumber != 1000 {
-//            return
-//        }
-        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage)
+        let difficulty = GV.basicDataRecord.difficulty
+        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, difficulty)
         if records.count > 0 {
             try! realmHelpInfo!.safeWrite() {
                 realmHelpInfo!.delete(records)
@@ -2326,10 +2330,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             return
         }
         let counter = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).count + 1
+        let sDifficulty = String(GV.basicDataRecord.difficulty)
         let helpInfo = HelpInfo()
         helpInfo.difficulty = GV.basicDataRecord.difficulty
         helpInfo.typeOfTouch = action.rawValue
-        helpInfo.combinedKey = GV.actLanguage + String(counter)
+        helpInfo.combinedKey = GV.actLanguage + "°" + String(counter) + "°" + sDifficulty
         helpInfo.language = GV.actLanguage
         helpInfo.counter = counter
         switch action {
@@ -2443,13 +2448,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             var counter = 0
             let info = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true)
             if info.count > 0 {
-                counter = info.last!.counter
+                counter = info.last!.counter + 1
             }
 //            let counter =  realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true).last!.counter + 1
             
-            helpInfo.combinedKey = GV.actLanguage + String(counter + 1)
+            let sDifficulty = String(GV.basicDataRecord.difficulty)
+            helpInfo.difficulty = GV.basicDataRecord.difficulty
+            helpInfo.combinedKey = GV.actLanguage + "°" + String(counter) + "°" + sDifficulty
             helpInfo.language = GV.actLanguage
-            helpInfo.counter = counter + 1
+            helpInfo.counter = counter
         }
 //      ----------------------------------
         #if SHOWFINGER
@@ -2991,21 +2998,56 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
     }
+    
+    enum CongratulationStatus: Int {
+        case SolvedOnlyFixLetters = 0, SolvedOnlyMandatoryWords, GameFinished, NoCongratulation
+    }
+    
     private func checkIfGameFinished() {
-//        if GV.allMandatoryWordsFounded() {
-        if WTGameWordList.shared.gameFinished() {
-            if !goOnPlaying {
-                congratulations()
-                saveToRealmCloud()
-            }
-        } else {
+        let allFixLettersUsed: Bool = wtGameboard!.checkFixLetters()
+        let allMandatoryWordsSolved: Bool = WTGameWordList.shared.gameFinished()
+        switch (allMandatoryWordsSolved, allFixLettersUsed) {
+        case (false, false): // nothing is solved
             if goOnPlaying {
                 self.saveToRealmCloud()
                 finishButton!.isHidden = true
                 goOnPlaying = false
                 try! realm.safeWrite() {
                     GV.playingRecord.gameStatus = GV.GameStatusPlaying
+                    GV.playingRecord.allFixIndicated = false
+                    GV.playingRecord.allMandatoryIndicated = false
                 }
+            }
+        case (false, true): // all Fixletters used
+            goOnPlaying = false
+            if !GV.playingRecord.allFixIndicated {
+                congratulations(congratulationStatus: .SolvedOnlyFixLetters)
+            }
+            try! realm.safeWrite() {
+                GV.playingRecord.allFixIndicated = true
+                GV.playingRecord.allMandatoryIndicated = false
+            }
+            finishButton!.isHidden = true
+            saveToRealmCloud()
+        case (true, false): // all mandatory words solved
+            goOnPlaying = false
+            if !GV.playingRecord.allMandatoryIndicated {
+                congratulations(congratulationStatus: .SolvedOnlyMandatoryWords)
+            }
+            try! realm.safeWrite() {
+                GV.playingRecord.allFixIndicated = false
+                GV.playingRecord.allMandatoryIndicated = true
+            }
+            finishButton!.isHidden = true
+            saveToRealmCloud()
+        case (true, true): // game finished
+            if !goOnPlaying {
+                congratulations(congratulationStatus: .GameFinished)
+                saveToRealmCloud()
+            }
+            try! realm.safeWrite() {
+                GV.playingRecord.allFixIndicated = true
+                GV.playingRecord.allMandatoryIndicated = true
             }
         }
     }
@@ -3014,9 +3056,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var congratulationsAlert: MyAlertController?
     var finishGameAlert: MyAlertController?
     
-    private func congratulations() {
+    private func congratulations(congratulationStatus: CongratulationStatus) {
         finishButton!.isHidden = false
-        createCongratulationsAlert()
+        createCongratulationsAlert(congratulationStatus: congratulationStatus)
         bgSprite!.addChild(congratulationsAlert!)
         self.enabled = false
         self.gameboardEnabled = false
@@ -3026,14 +3068,37 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        self.parentViewController!.present(alertController, animated: true, completion: nil)
     }
     
-    private func createCongratulationsAlert() {
-        let title = GV.language.getText(.tcCongratulations1)
-        let message = GV.language.getText(.tcCongratulations2)
+    private func createCongratulationsAlert(congratulationStatus: CongratulationStatus) {
+        var title = ""
+        var message = ""
+        var finishTitle = ""
+
+        switch congratulationStatus {
+        case .SolvedOnlyFixLetters:
+            title = GV.language.getText(.tcCongratulationsFix1)
+            message = GV.language.getText(.tcCongratulationsFix2)
+        case .SolvedOnlyMandatoryWords:
+            title = GV.language.getText(.tcCongratulationsMandatory1)
+            message = GV.language.getText(.tcCongratulationsMandatory2)
+        case .GameFinished:
+            title = GV.language.getText(.tcCongratulations1)
+            message = GV.language.getText(.tcCongratulations2)
+            finishTitle = GV.language.getText(.tcFinishGame)
+        case .NoCongratulation:
+            title = "itt még dolgozni kell"
+            title = "itt még dolgozni kell"
+        }
         let continueTitle = GV.language.getText(.tcContinuePlaying)
-        let finishTitle = GV.language.getText(.tcFinishGame)
+        let OKTitle =  GV.language.getText(.tcOK)
         let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
-        myAlert.addAction(text: continueTitle, action: #selector(self.continueAction))
-        myAlert.addAction(text: finishTitle, action: #selector(self.finishAction))
+        if congratulationStatus == .GameFinished {
+            myAlert.addAction(text: continueTitle, action: #selector(self.continueAction))
+        } else {
+            myAlert.addAction(text: OKTitle, action: #selector(self.OKAction))
+        }
+        if finishTitle != "" {
+            myAlert.addAction(text: finishTitle, action: #selector(self.finishAction))
+        }
         myAlert.presentAlert()
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         congratulationsAlert = myAlert
@@ -3047,6 +3112,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.goOnPlaying = true
         try! realm.safeWrite() {
             GV.playingRecord.gameStatus = GV.GameStatusContinued
+        }
+    }
+    
+    @objc private func OKAction () {
+        self.enabled = true
+        self.gameboardEnabled = true
+        saveHelpInfo(action: .OKGame)
+        self.gameboardEnabled = true
+        try! realm.safeWrite() {
+            GV.playingRecord.gameStatus = GV.GameStatusPlaying
         }
     }
     

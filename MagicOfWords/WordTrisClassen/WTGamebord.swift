@@ -766,6 +766,18 @@ class WTGameboard: SKShapeNode {
         }
         return infoString
     }
+    
+    public func checkFixLetters()->Bool {
+        var returnBool = true
+        for col in 0..<countCols {
+            for row in 0..<countCols {
+                if GV.gameArray[col][row].fixItem && GV.gameArray[col][row].status != .WholeWord {
+                    returnBool = false
+                }
+            }
+        }
+        return returnBool
+    }
 
     public func checkFreePlaceForPiece(piece: WTPiece, rotateIndex: Int)->Bool {
         let form = myForms[piece.myType]![rotateIndex]
@@ -821,13 +833,13 @@ class WTGameboard: SKShapeNode {
             return
         }
         countOfAnimations += 1
-        let greenSprite = (GV.gameArray[col][row]).copyMe(imageNamed: "GreenSprite0000")
-        greenSprite.zPosition = self.zPosition + 10
+        let sprite = (GV.gameArray[col][row]).copyMe()
+        sprite.zPosition = self.zPosition + 10
         let xPos = grid!.frame.minX + grid!.blockSize * (CGFloat(col) + 0.5)
         let yPos = grid!.frame.maxY - grid!.blockSize * (CGFloat(row) + 0.5)
-        greenSprite.position = CGPoint(x: xPos, y: yPos)
+        sprite.position = CGPoint(x: xPos, y: yPos)
 //        grid!.addChild(greenSprite)
-        self.addChild(greenSprite)
+        self.addChild(sprite)
         var actions = Array<SKAction>()
         let waitAction = SKAction.wait(forDuration: waiting)
         waiting += 0.05
@@ -852,7 +864,7 @@ class WTGameboard: SKShapeNode {
 //        GV.greenSpriteArray.append(greenSprite)
 //        GV.gameArray[col][row].clearIfUsed()
 //        GV.gameArray[col][row].resetCountOccurencesInWords()
-        greenSprite.run(group, completion: {
+        sprite.run(group, completion: {
             self.countReadyAnimations += 1
             if self.countReadyAnimations == self.countOfAnimations {
 //                for sprite in GV.greenSpriteArray {
