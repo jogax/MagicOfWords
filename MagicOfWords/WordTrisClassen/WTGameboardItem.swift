@@ -36,8 +36,8 @@ class WTGameboardItem: SKSpriteNode {
         var fixItem: Bool = false
     }
     private var textureName: [StatusType : String] =
-        [StatusType(itemStatus: .Empty, fixItem: false) : "WhiteSprite",
-         StatusType(itemStatus: .Empty, fixItem: true) : "WhiteSprite",
+        [StatusType(itemStatus: .Empty, fixItem: false) : "whiteSprite",
+         StatusType(itemStatus: .Empty, fixItem: true) : "whiteSprite",
          StatusType(itemStatus: .Temporary, fixItem: false) : "LightBlueSprite",
          StatusType(itemStatus: .Temporary, fixItem: true) : "LightBlueSprite",
          StatusType(itemStatus: .Used, fixItem: false) : "LightRedSprite",
@@ -60,7 +60,7 @@ class WTGameboardItem: SKSpriteNode {
         // Call the init        
         countWordsLabel = SKLabelNode()
         self.fontSize = fontSize
-        let texture = SKTexture(imageNamed: "WhiteSprite.png")
+        let texture = SKTexture(imageNamed: "whiteSprite")
         super.init(texture: texture, color: .white, size: CGSize(width: blockSize, height: blockSize))
 //        label.fontName = "KohinoorTelugu-Regular"
 //        label.fontName = "Baskerville"
