@@ -101,6 +101,7 @@ enum TextConstants: Int {
     tcCongratulationsMandatory1,
     tcCongratulationsMandatory2,
     tcCongratulations1,
+    tcCongratulationsEasy1,
     tcCongratulations2,
     tcContinuePlaying,
     tcFinishGame,

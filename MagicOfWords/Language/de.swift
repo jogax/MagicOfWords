@@ -102,6 +102,7 @@ let deDictionary: [TextConstants: String] = [
     .tcCongratulationsMandatory1:    "Herzliche Glückwunsch! Du hast alle Pflichtwörter zusammengestellt! Du muss aber auch alle Feste Buchstaben verwenden!",
     .tcCongratulationsMandatory2:     "Verwende auch die restliche feste Buchstaben!",
     .tcCongratulations1:    "Herzlichen Glückwunsch!  Du hast alle Pflichtwörter zusammengestellt und auch alle Feste Buchstaben verwendet!",
+    .tcCongratulationsEasy1:"Congratulations! You have all the mandatory words!",
     .tcCongratulations2:    "Du kannst das Spiel beenden (berühre den Knopf <Beenden>) oder weiterspielen um mehr Punkte zu sammeln (berühre den Knopf <Weiterspielen>)",
     .tcContinuePlaying:     "Weiterspielen",
     .tcFinishGame:          "Beenden",

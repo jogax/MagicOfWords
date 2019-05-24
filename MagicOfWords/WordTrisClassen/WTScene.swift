@@ -1982,7 +1982,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var startFromGamearray = false
         var countMoves = 0
         var stopIndex = 10000
-
+//----------------------------------------------------------------------------
         func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0) {
             fingerActions.append(SKAction.move(to: touchPosition - fingerPositionModifier, duration: duration))
             switch type {
@@ -2015,7 +2015,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 break
             }
         }
-        
+//----------------------------------------------------------------------------
         func addButtonTouchedAction(button: MyButton) {
             let waitAction = SKAction.wait(forDuration: 0.025)
             let zielPosition = button.position
@@ -2035,15 +2035,31 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             fingerActions.append(buttonAction)
             fingerActions.append(waitAction)
         }
-        
+//----------------------------------------------------------------------------
         enum AlertType: Int {
-            case CongratulationsAlert = 0, NoMoreStepsAlert, FinishGameAlert
+            case ContinueGameEasyAlert = 0, ContinueGameMediumAlert, FinishGameEasyAlert, FinishGameMediumAlert, OKFixLettersSolvedAlert, OKMandatorySolvedAlert, NoMoreStepsAlert, FinishGameAlert
         }
+//----------------------------------------------------------------------------
         func addAlertTouched(alertType: AlertType, action: Selector) {
             var zielPosition: CGPoint?
             switch alertType {
-            case .CongratulationsAlert:
-                createCongratulationsAlert(congratulationStatus: .NoCongratulation)
+            case .ContinueGameEasyAlert:
+                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
+                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+            case .ContinueGameMediumAlert:
+                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
+                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+            case .FinishGameEasyAlert:
+                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
+                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+            case .FinishGameMediumAlert:
+                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
+                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+            case .OKFixLettersSolvedAlert:
+                createCongratulationsAlert(congratulationType: .SolvedOnlyFixLetters, easy: false)
+                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+            case .OKMandatorySolvedAlert:
+                createCongratulationsAlert(congratulationType: .SolvedOnlyMandatoryWords, easy: false)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
             case .NoMoreStepsAlert:
                 createNoMoreStepsAlert()
@@ -2065,14 +2081,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             let beganAction = SKAction.run({
                 switch alertType {
-                case .CongratulationsAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+                case .ContinueGameEasyAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+                case .ContinueGameMediumAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+                case .FinishGameEasyAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+                case .FinishGameMediumAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+                case .OKFixLettersSolvedAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+                case .OKMandatorySolvedAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
                 case .NoMoreStepsAlert: self.noMoreStepsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
                 case .FinishGameAlert: self.finishGameAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
                 }
             })
             let endedAction = SKAction.run({
                 switch alertType {
-                case .CongratulationsAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+                case .ContinueGameEasyAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+                case .ContinueGameMediumAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+                case .FinishGameEasyAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+                case .FinishGameMediumAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+                case .OKFixLettersSolvedAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+                case .OKMandatorySolvedAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
                 case .NoMoreStepsAlert:
                     self.noMoreStepsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
                 case .FinishGameAlert:
@@ -2090,6 +2116,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 fingerActions.append(SKAction.wait(forDuration: 0.5))
             }
         }
+//----------------------------------------------------------------------------
 
 
         for (index, record) in GV.helpInfoRecords!.enumerated() {
@@ -2151,16 +2178,30 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 addButtonTouchedAction(button: allWordsButton!)
             case TypeOfTouch.FinishButton.rawValue:
                 addButtonTouchedAction(button: finishButton!)
-            case TypeOfTouch.ContinueGame.rawValue:
-                addAlertTouched(alertType: .CongratulationsAlert, action: #selector(self.continueAction))
-            case TypeOfTouch.FinishGame.rawValue:
-                 addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.finishButtonTapped2))
+            case TypeOfTouch.ContinueGameEasy.rawValue:
+                addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
+            case TypeOfTouch.ContinueGameMedium.rawValue:
+                addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
+            case TypeOfTouch.ContinueGameEasy.rawValue:
+                addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
+            case TypeOfTouch.ContinueGameMedium.rawValue:
+                addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
+            case TypeOfTouch.FinishGameEasy.rawValue:
+                 addAlertTouched(alertType: .FinishGameEasyAlert, action: #selector(self.finishButtonTapped2))
+            case TypeOfTouch.FinishGameMedium.rawValue:
+                addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishButtonTapped2))
+            case TypeOfTouch.OKFixLettersSolved.rawValue:
+                addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
+            case TypeOfTouch.OKMandatorySolved.rawValue:
+                addAlertTouched(alertType: .OKMandatorySolvedAlert, action: #selector(self.mandatoryOKAction))
             case TypeOfTouch.NoMoreStepsBack.rawValue:
                 addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.startUndoTapped))
             case TypeOfTouch.NoMoreStepsNext.rawValue:
                 addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.nextRoundTapped))
             case TypeOfTouch.NoMoreStepsCont.rawValue:
                 addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.noActionTapped))
+//            case TypeOfTouch.OKGame.rawValue:
+//                addAlertTouched(alertType: .OKGameAlert, action: #selector(self.noActionTapped))
             default:
                 continue
             }
@@ -2317,8 +2358,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let UndoButtonHelpInfo = "UndoButton"
     let ShowMyWordsButtonHelpInfo = "ShowMyWordsButton"
     let FinishButtonHelpInfo = "FinishButton"
-    let ContinueGameHelpInfo = "ContinueGame"
-    let FinishGameHelpInfo = "FinishGame"
+    let finishGameHelpInfo = "FinishGame"
+    let ContinueGameEasyHelpInfo = "ContinueGameEasy"
+    let ContinueGameMediumHelpInfo = "ContinueGameMedium"
+    let FinishGameEasyHelpInfo = "FinishGameEasy"
+    let FinishGameMediumHelpInfo = "FinishGameMedium"
+    let OKMandatorySolvedHelpInfo = "OKMandatorySolved"
+    let OKFixLettersEasyHelpInfo = "OKFixLettersEasy"
     let NoMoreStepsBackHelpInfo = "NoMoreStepsBack"
     let NoMoreStepsNextHelpInfo = "NoMoreStepsNext"
     let NoMoreStepsContHelpInfo = "NoMoreStepsCont"
@@ -2329,7 +2375,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if !GV.generateHelpInfo {
             return
         }
-        let counter = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).count + 1
+        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, GV.basicDataRecord.difficulty)
+        let counter = records.count > 0 ? records.last!.counter + 1 : 1
         let sDifficulty = String(GV.basicDataRecord.difficulty)
         let helpInfo = HelpInfo()
         helpInfo.difficulty = GV.basicDataRecord.difficulty
@@ -2341,8 +2388,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         case .UndoButton: helpInfo.letters = UndoButtonHelpInfo
         case .ShowMyWordsButton: helpInfo.letters = ShowMyWordsButtonHelpInfo
         case .FinishButton: helpInfo.letters = FinishButtonHelpInfo
-        case .ContinueGame: helpInfo.letters = ContinueGameHelpInfo
-        case .FinishGame: helpInfo.letters = FinishGameHelpInfo
+        case .ContinueGameEasy: helpInfo.letters = ContinueGameEasyHelpInfo
+        case .ContinueGameMedium: helpInfo.letters = ContinueGameMediumHelpInfo
+        case .FinishGameEasy: helpInfo.letters = FinishGameEasyHelpInfo
+        case .FinishGameMedium: helpInfo.letters = FinishGameMediumHelpInfo
+        case .OKFixLettersSolved: helpInfo.letters = OKFixLettersEasyHelpInfo
+        case .OKMandatorySolved: helpInfo.letters = OKMandatorySolvedHelpInfo
         case .NoMoreStepsBack: helpInfo.letters = NoMoreStepsBackHelpInfo
         case .NoMoreStepsNext: helpInfo.letters = NoMoreStepsNextHelpInfo
         case .NoMoreStepsCont: helpInfo.letters = NoMoreStepsContHelpInfo
@@ -2999,8 +3050,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    enum CongratulationStatus: Int {
-        case SolvedOnlyFixLetters = 0, SolvedOnlyMandatoryWords, GameFinished, NoCongratulation
+    enum CongratulationType: Int {
+        case SolvedOnlyFixLetters = 0, SolvedOnlyMandatoryWords, GameFinished
     }
     
     private func checkIfGameFinished() {
@@ -3019,20 +3070,22 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         case (false, true): // all Fixletters used
-            goOnPlaying = false
-            if !GV.playingRecord.allFixIndicated {
-                congratulations(congratulationStatus: .SolvedOnlyFixLetters)
+            if GV.basicDataRecord.difficulty != GameDifficulty.Easy.rawValue {
+                goOnPlaying = false
+                if !GV.playingRecord.allFixIndicated {
+                    congratulations(congratulationType: .SolvedOnlyFixLetters)
+                }
+                try! realm.safeWrite() {
+                    GV.playingRecord.allFixIndicated = true
+                    GV.playingRecord.allMandatoryIndicated = false
+                }
+                finishButton!.isHidden = true
+                saveToRealmCloud()
             }
-            try! realm.safeWrite() {
-                GV.playingRecord.allFixIndicated = true
-                GV.playingRecord.allMandatoryIndicated = false
-            }
-            finishButton!.isHidden = true
-            saveToRealmCloud()
         case (true, false): // all mandatory words solved
             goOnPlaying = false
             if !GV.playingRecord.allMandatoryIndicated {
-                congratulations(congratulationStatus: .SolvedOnlyMandatoryWords)
+                congratulations(congratulationType: .SolvedOnlyMandatoryWords)
             }
             try! realm.safeWrite() {
                 GV.playingRecord.allFixIndicated = false
@@ -3042,7 +3095,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             saveToRealmCloud()
         case (true, true): // game finished
             if !goOnPlaying {
-                congratulations(congratulationStatus: .GameFinished)
+                congratulations(congratulationType: .GameFinished)
                 saveToRealmCloud()
             }
             try! realm.safeWrite() {
@@ -3056,9 +3109,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var congratulationsAlert: MyAlertController?
     var finishGameAlert: MyAlertController?
     
-    private func congratulations(congratulationStatus: CongratulationStatus) {
+    private func congratulations(congratulationType: CongratulationType) {
         finishButton!.isHidden = false
-        createCongratulationsAlert(congratulationStatus: congratulationStatus)
+        createCongratulationsAlert(congratulationType: congratulationType, easy: GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue)
         bgSprite!.addChild(congratulationsAlert!)
         self.enabled = false
         self.gameboardEnabled = false
@@ -3068,46 +3121,58 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        self.parentViewController!.present(alertController, animated: true, completion: nil)
     }
     
-    private func createCongratulationsAlert(congratulationStatus: CongratulationStatus) {
+    private func createCongratulationsAlert(congratulationType: CongratulationType, easy: Bool) {
         var title = ""
         var message = ""
         var finishTitle = ""
-
-        switch congratulationStatus {
+        var showMessage = true
+ 
+        switch congratulationType {
         case .SolvedOnlyFixLetters:
-            title = GV.language.getText(.tcCongratulationsFix1)
-            message = GV.language.getText(.tcCongratulationsFix2)
+                title = GV.language.getText(.tcCongratulationsFix1)
+                message = GV.language.getText(.tcCongratulationsFix2)
+                showMessage = GV.basicDataRecord.difficulty == GameDifficulty.Medium.rawValue ? true : false
         case .SolvedOnlyMandatoryWords:
             title = GV.language.getText(.tcCongratulationsMandatory1)
             message = GV.language.getText(.tcCongratulationsMandatory2)
         case .GameFinished:
-            title = GV.language.getText(.tcCongratulations1)
+            if easy {
+                title = GV.language.getText(.tcCongratulationsEasy1)
+            } else {
+                title = GV.language.getText(.tcCongratulations1)
+            }
             message = GV.language.getText(.tcCongratulations2)
             finishTitle = GV.language.getText(.tcFinishGame)
-        case .NoCongratulation:
-            title = "itt még dolgozni kell"
-            title = "itt még dolgozni kell"
         }
-        let continueTitle = GV.language.getText(.tcContinuePlaying)
-        let OKTitle =  GV.language.getText(.tcOK)
-        let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
-        if congratulationStatus == .GameFinished {
-            myAlert.addAction(text: continueTitle, action: #selector(self.continueAction))
-        } else {
-            myAlert.addAction(text: OKTitle, action: #selector(self.OKAction))
+        if showMessage {
+            let continueTitle = GV.language.getText(.tcContinuePlaying)
+            let OKTitle =  GV.language.getText(.tcOK)
+            let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
+            if congratulationType == .GameFinished {
+                if easy {
+                    myAlert.addAction(text: continueTitle, action: #selector(self.continueEasyAction))
+                    myAlert.addAction(text: finishTitle, action: #selector(self.finishEasyAction))
+                } else {
+                    myAlert.addAction(text: continueTitle, action: #selector(self.continueMediumAction))
+                    myAlert.addAction(text: finishTitle, action: #selector(self.finishMediumAction))
+                }
+            } else {
+                if congratulationType == .SolvedOnlyFixLetters {
+                    myAlert.addAction(text: OKTitle, action: #selector(self.fixLettersOKAction))
+                } else {
+                    myAlert.addAction(text: OKTitle, action: #selector(self.mandatoryOKAction))
+                }
+            }
+            myAlert.presentAlert()
+            myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+            congratulationsAlert = myAlert
         }
-        if finishTitle != "" {
-            myAlert.addAction(text: finishTitle, action: #selector(self.finishAction))
-        }
-        myAlert.presentAlert()
-        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-        congratulationsAlert = myAlert
     }
     
-    @objc private func continueAction () {
+    @objc private func continueEasyAction () {
         self.enabled = true
         self.gameboardEnabled = true
-        saveHelpInfo(action: .ContinueGame)
+        saveHelpInfo(action: .ContinueGameEasy)
         self.gameboardEnabled = true
         self.goOnPlaying = true
         try! realm.safeWrite() {
@@ -3115,25 +3180,53 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    @objc private func OKAction () {
+    @objc private func continueMediumAction () {
         self.enabled = true
         self.gameboardEnabled = true
-        saveHelpInfo(action: .OKGame)
+        saveHelpInfo(action: .ContinueGameMedium)
+        self.gameboardEnabled = true
+        self.goOnPlaying = true
+        try! realm.safeWrite() {
+            GV.playingRecord.gameStatus = GV.GameStatusContinued
+        }
+    }
+    @objc private func fixLettersOKAction () {
+        self.enabled = true
+        self.gameboardEnabled = true
+        saveHelpInfo(action: .OKFixLettersSolved)
         self.gameboardEnabled = true
         try! realm.safeWrite() {
             GV.playingRecord.gameStatus = GV.GameStatusPlaying
         }
     }
     
-    @objc private func finishAction () {
+    @objc private func mandatoryOKAction () {
         self.enabled = true
         self.gameboardEnabled = true
-        saveHelpInfo(action: .FinishGame)
+        saveHelpInfo(action: .OKMandatorySolved)
+        self.gameboardEnabled = true
+        try! realm.safeWrite() {
+            GV.playingRecord.gameStatus = GV.GameStatusPlaying
+        }
+    }
+        
+    @objc private func finishEasyAction () {
+        self.enabled = true
+        self.gameboardEnabled = true
+        saveHelpInfo(action: .FinishGameEasy)
         self.gameboardEnabled = true
         self.finishButtonTapped()
         self.saveToRealmCloud()
     }
     
+    @objc private func finishMediumAction () {
+        self.enabled = true
+        self.gameboardEnabled = true
+        saveHelpInfo(action: .FinishGameMedium)
+        self.gameboardEnabled = true
+        self.finishButtonTapped()
+        self.saveToRealmCloud()
+    }
     var gameFinishedStatus: GameFinishedStatus = .OK
     
     private func showGameFinished(status: GameFinishedStatus) {
@@ -3194,7 +3287,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         gameboardEnabled = true
         enabled = true
         if gameFinishedStatus == .OK {
-            saveHelpInfo(action: .FinishGame)
+            saveHelpInfo(action: .FinishGameEasy)
             try! realm.safeWrite() {
                 GV.playingRecord.gameStatus = GV.GameStatusFinished
             }
@@ -3207,7 +3300,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc private func goBackButtonTapped2() {
-        saveHelpInfo(action: .ContinueGame)
+        saveHelpInfo(action: .ContinueGameEasy)
         gameboardEnabled = true
         enabled = true
     }
