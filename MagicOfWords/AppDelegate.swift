@@ -82,8 +82,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // usedBytes refers to the number of bytes used by data in the file
 
             // Compact if the file is over 100MB in size and less than 50% 'used'
-            let tenMB = 10 * 1024 * 1024
-            return (totalBytes > tenMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+            let oneMB = 1024 * 1024
+            return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
         })
         do {
             // Realm is compacted on the first open if the configuration block conditions were met.

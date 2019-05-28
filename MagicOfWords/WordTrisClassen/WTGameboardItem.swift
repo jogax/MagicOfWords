@@ -138,6 +138,10 @@ class WTGameboardItem: SKSpriteNode {
         }
     }
     
+    public func clearFixLetter() {
+        fixItem = false
+    }
+    
     public func resetCountOccurencesInWords() {
         countOccurencesInWords = 0
     }
@@ -321,7 +325,7 @@ class WTGameboardItem: SKSpriteNode {
             if child == nil {
                 let child = SKSpriteNode(imageNamed: connectionName)
                 child.size = self.size
-                child.zPosition = self.zPosition - 1
+                child.zPosition = self.zPosition - 10
                 child.name = "Connection"
                 self.addChild(child)
             } else {

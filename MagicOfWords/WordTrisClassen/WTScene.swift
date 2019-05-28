@@ -183,17 +183,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let text2 = showCount ? "\(GV.language.getText(.tcCount)) " : ""
         let text3 = "\(GV.language.getText(.tcLength)) "
         let text4 = "\(GV.language.getText(.tcScore)) "
-        let text5 = showCount ? "\(GV.language.getText(.tcMinutes)) " : ""
+//        let text5 = showCount ? "\(GV.language.getText(.tcMinutes)) " : ""
         title += text1
         title += text2
         title += text3
         title += text4
-        title += text5
+//        title += text5
 //        lengthOfWord = maxLength
         lengthOfCnt = text2.length
         lengthOfLength = text3.length
         lengthOfScore = text4.length
-        lengthOfMin = text5.length
+//        lengthOfMin = text5.length
     }
     
     let myLightBlue = UIColor(red: 204/255, green: 255/255, blue: 255/255, alpha: 1.0)
@@ -302,21 +302,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 cell.addColumn(text: String(wordForShow.counter).fixLength(length: lengthOfCnt), color: color) // Counter column
                 cell.addColumn(text: String(wordForShow.word.length).fixLength(length: lengthOfLength))
                 cell.addColumn(text: String(wordForShow.score).fixLength(length: lengthOfScore), color: color) // Score column
-                cell.addColumn(text: "+\(wordForShow.minutes)".fixLength(length: lengthOfMin))
+//                cell.addColumn(text: "+\(wordForShow.minutes)".fixLength(length: lengthOfMin))
             } else {
                 let wordForShow = ownWordsForShow!.words[indexPath.row]
                 cell.addColumn(text: "  " + wordForShow.word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
                 cell.addColumn(text: String(wordForShow.counter).fixLength(length: lengthOfCnt), color: color) // Counter column
                 cell.addColumn(text: String(wordForShow.word.length).fixLength(length: lengthOfLength))
                 cell.addColumn(text: String(wordForShow.score).fixLength(length: lengthOfScore), color: color) // Score column
-                cell.addColumn(text: "+\(wordForShow.minutes)".fixLength(length: lengthOfMin))
+//                cell.addColumn(text: "+\(wordForShow.minutes)".fixLength(length: lengthOfMin))
              }
         case .ShowWordsOverPosition:
             cell.addColumn(text: "  " + wordList[indexPath.row].word.fixLength(length: lengthOfWord + 2, leadingBlanks: false)) // WordColumn
             cell.addColumn(text: String(1).fixLength(length: lengthOfCnt - 1), color: color)
             cell.addColumn(text: String(wordList[indexPath.row].word.length).fixLength(length: lengthOfLength - 1))
             cell.addColumn(text: String(wordList[indexPath.row].score).fixLength(length: lengthOfScore + 1), color: color)
-            cell.addColumn(text: "+\(WTGameWordList.shared.getMinutesForWord(word: wordList[indexPath.row].word))".fixLength(length: lengthOfMin - 1))
+//            cell.addColumn(text: "+\(WTGameWordList.shared.getMinutesForWord(word: wordList[indexPath.row].word))".fixLength(length: lengthOfMin - 1))
         case .ShowFoundedWords:
             cell.addColumn(text: "  " + listOfFoundedWords[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false), color: myLightBlue)
             cell.addColumn(text: String(listOfFoundedWords[indexPath.row].length).fixLength(length: lengthOfLength), color: myLightBlue)
@@ -892,6 +892,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 self.activityRoundItem.append(ActivityRound())
                 self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
             }
+            createFixLetters()
+            saveActualState()
             createNextRound = false
             GV.nextRoundAnimationFinished = false
         }
@@ -955,12 +957,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 
         if let label = bgSprite!.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
-            label.text = GV.language.getText(.tcWordsToCollect, values: String(WTGameWordList.shared.getCountWords(mandatory: true)), String(WTGameWordList.shared.getCountFoundedWords(mandatory: true, countFoundedMandatory: true)),
-                String(WTGameWordList.shared.getCountFoundedWords(mandatory: true, countAll: true)),
+            label.text = GV.language.getText(.tcWordsToCollect, values: String(GV.mandatoryWords.count), String(WTGameWordList.shared.getCountMandatoryWords(founded: true)),
+                String(WTGameWordList.shared.getCountMandatoryWords(founded: false)),
                 String(GV.mandatoryScore))
         }
         if let label = bgSprite!.childNode(withName: ownWordsHeaderName)! as? SKLabelNode {
-                label.text = GV.language.getText(.tcOwnWords, values: String(WTGameWordList.shared.getCountWords(mandatory: false)), String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
+            label.text = GV.language.getText(.tcOwnWords, values: String(WTGameWordList.shared.getCountOwnWords(founded: true)), String(WTGameWordList.shared.getCountOwnWords(founded: false)),
                     String(GV.ownScore))
         }
         modifyHeader()
@@ -1748,13 +1750,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         
         createLabel(word: GV.language.getText(.tcBonusHeader, values:
             String(WTGameWordList.shared.getCountWords(mandatory: false)),
-                                              String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
+                                              String(WTGameWordList.shared.getCountOwnWords(founded: false)),
                                               //                    String(WTGameWordList.shared.getScore(mandatory: false))), first: false, name: ownWordsHeaderName)
             String(0)),
                     linePosition: bonusPointsLinePosition, name: bonusHeaderName)
         createLabel(word: GV.language.getText(.tcOwnWords, values:
-            String(WTGameWordList.shared.getCountWords(mandatory: false)),
-            String(WTGameWordList.shared.getCountFoundedWords(mandatory: false, countAll: true)),
+            String(WTGameWordList.shared.getCountOwnWords(founded:true)),
+            String(WTGameWordList.shared.getCountOwnWords(founded: false)),
 //                    String(WTGameWordList.shared.getScore(mandatory: false))), first: false, name: ownWordsHeaderName)
             String(0)),
                     linePosition: ownWordsLinePosition, name: ownWordsHeaderName)
@@ -1897,15 +1899,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
         var fixLetters = [UsedLetter]()
         let gameNumber = GV.playingRecord.gameNumber % 1000
-        let random = MyRandom(gameNumber: gameNumber, modifier: 0)
-        let countOfLetters = 12 + 4 * Int(gameNumber / 100)
+        let roundCount = GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count
+        let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
+        let countOfFixLetters = 8 + roundCount * 4
+        let countOfLetters = countOfFixLetters + 4 * Int(gameNumber / 100)
         var remainigLength = countOfLetters
         var myLengths = [Int]()
         repeat {
             if remainigLength > 15 {
-                let newLength = random.getRandomInt(5, max: 10)
+                let newLength = random.getRandomInt(5, max: 6)
                 myLengths.append(newLength)
                 remainigLength -= newLength
+            } else if remainigLength < 10 {
+                myLengths.append(remainigLength)
+                break
             } else {
                 myLengths.append(5)
                 myLengths.append(remainigLength - 5)
@@ -1945,6 +1952,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         positionExists = true
                     }
                 }
+                if GV.gameArray[col][row].status != .Empty {
+                    positionExists = true
+                }
             } while positionExists
             fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
             fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
@@ -1982,13 +1992,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var startFromGamearray = false
         var countMoves = 0
         var stopIndex = 10000
+        let stopCounter = 1000
 //----------------------------------------------------------------------------
-        func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0) {
+        func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0, index: Int = 0) {
             fingerActions.append(SKAction.move(to: touchPosition - fingerPositionModifier, duration: duration))
             switch type {
              case .TouchesBegan:
                 let beganAction = SKAction.run({
-                    if counter == 261 {
+                    if counter == stopCounter {
                         print("hier at \(counter)")
                     }
                     self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
@@ -1996,7 +2007,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 fingerActions.append(beganAction)
             case .TouchesMoved:
                 let moveAction = SKAction.run({
+                    if counter == stopCounter && index > 14 {
+                        print("hier at counter: \(counter), index: \(index), touchedNodes: \(touchedNodes)")
+                    }
                     self.myTouchesMoved(location: touchPosition, touchedNodes: touchedNodes)
+                    
                 })
                 fingerActions.append(moveAction)
             case .TouchesEnded:
@@ -2135,7 +2150,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     touchedNodes.row = data.row
                     touchedNodes.GRow = data.GRow
                 }
-                addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: letters, duration: duration, counter: record.counter)
+                addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: letters, duration: duration, counter: record.counter, index: index)
             }
 //            if record.counter == 9 {
 //                print("hier")
@@ -3876,7 +3891,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
         showOwnWordsTableView?.frame=CGRect(origin: origin, size: size)
         self.showOwnWordsTableView?.reloadData()
-        self.scene?.alpha = 0.2
+//        self.scene?.alpha = 0.2
         self.scene?.view?.addSubview(showOwnWordsTableView!)
         self.hideButtons(hide: true)
     }
