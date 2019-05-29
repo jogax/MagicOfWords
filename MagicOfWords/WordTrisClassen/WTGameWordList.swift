@@ -261,14 +261,11 @@ public class WTGameWordList {
     
     public func gameFinished()->Bool {
         var counter = 0
-        var countMandatoryWords = 0
-        for word in allWords {
-            if word.mandatory {
-                counter += word.counter > 0 ? 1 : 0
-                countMandatoryWords += 1
-            }
+        let myMandatoryWords = allWords.filter({$0.mandatory == true && $0.counter > 0})
+        for mandatoryWord in GV.mandatoryWords {
+            counter += myMandatoryWords.filter({$0.word == mandatoryWord}).count > 0 ? 1 : 0
         }
-        return counter == countMandatoryWords
+        return counter == GV.mandatoryWords.count
     }
     
     public func getCountWords(mandatory: Bool)->Int {
