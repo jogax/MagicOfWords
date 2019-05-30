@@ -553,6 +553,9 @@ public class WTGameWordList {
     }
     
     public func getCountWordsInLastRound()->Int {
+        if wordsInRound.count == 0 {
+            return 0
+        }
         return wordsInRound.last!.wordsInGame.count
     }
     

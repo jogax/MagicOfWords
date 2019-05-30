@@ -584,7 +584,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         createHeader()
         buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
         buttonSize = CGSize(width: buttonHeight, height: buttonHeight)
-        createUndo(enabled: false)
+        createUndo()
         createGoBackButton()
         WTGameWordList.shared.clear()
         WTGameWordList.shared.setMandatoryWords()
@@ -1141,9 +1141,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         allWordsButton!.isHidden = hide
         goBackButton!.isHidden = hide
         searchButton!.isHidden = hide
-        if undoButton != nil {
-            undoButton!.isHidden = hide
-        }
+//        if undoButton != nil {
+//            undoButton!.isHidden = hide
+//        }
    }
     
     private func addLetterToSearchingWord(letter: String) {
@@ -1430,7 +1430,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     func hideButtons(hide: Bool) {
         goToPreviousGameButton!.isEnabled = !hide
         goToNextGameButton!.isEnabled = !hide
-        undoButton!.isEnabled = !hide
+//        undoButton!.isEnabled = !hide
         allWordsButton!.isEnabled = !hide
         finishButton!.isEnabled = !hide
         goBackButton!.isEnabled = !hide
@@ -1438,7 +1438,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if hide {
             goToPreviousGameButton!.alpha = 0.2
             goToNextGameButton!.alpha = 0.2
-            undoButton!.alpha = 0.2
+//            undoButton!.alpha = 0.2
             allWordsButton!.alpha = 0.2
             finishButton!.alpha = 0.2
             goBackButton!.alpha = 0.2
@@ -1446,7 +1446,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else {
             goToPreviousGameButton!.alpha = 1.0
             goToNextGameButton!.alpha = 1.0
-            undoButton!.alpha = 1.0
+//            undoButton!.alpha = 1.0
             allWordsButton!.alpha = 1.0
             finishButton!.alpha = 1.0
             goBackButton!.alpha = 1.0
@@ -1688,7 +1688,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var firstButtonLine: CGFloat = 0.86
     var lastButtonLine: CGFloat = 0.08
     
-    private func createUndo(enabled: Bool) {
+    private func createUndo() {
         if undoButton != nil {
             undoButton?.removeFromParent()
             undoButton = nil
@@ -1702,11 +1702,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let center = CGPoint(x: self.frame.width * lastButtonColumn, y: self.frame.height * firstButtonLine)
         let size = CGSize(width: buttonHeight, height: buttonHeight)
         let newSize = buttonHeight
-        undoButton = createMyButton(imageName: imageName, size: size, center: center, enabled: true, newSize: newSize)
+        undoButton = createMyButton(imageName: imageName, size: size, center: center, enabled: false, newSize: newSize)
         undoButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.undoTapped))
         undoButton!.name = imageName
         undoButton!.zPosition = 10
         bgSprite!.addChild(undoButton!)
+    }
+    
+    private func setUndoButton(enabled: Bool) {
+        undoButton!.alpha = enabled ? 1.0 : 0.2
+        undoButton!.isEnabled = enabled
     }
     
     private func createButton(imageName: String, imageSize: CGFloat = 1.0, title: String, frame: CGRect, center: CGPoint, cornerRadius: CGFloat, enabled: Bool, color: UIColor? = nil, hasFrame: Bool = true)->UIButton {
@@ -1966,6 +1971,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     private func showHelpDemo() {
+        hideButtons(hide: true)
         gameFinished = false
         let generateHelpInfo = GV.generateHelpInfo
         GV.generateHelpInfo = false
@@ -1992,7 +1998,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var startFromGamearray = false
         var countMoves = 0
         var stopIndex = 10000
-        let stopCounter = 1000
+        let stopCounter = 50
 //----------------------------------------------------------------------------
         func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0, index: Int = 0) {
             fingerActions.append(SKAction.move(to: touchPosition - fingerPositionModifier, duration: duration))
@@ -2007,7 +2013,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 fingerActions.append(beganAction)
             case .TouchesMoved:
                 let moveAction = SKAction.run({
-                    if counter == stopCounter && index > 14 {
+                    if counter == stopCounter && index > 1400 {
                         print("hier at counter: \(counter), index: \(index), touchedNodes: \(touchedNodes)")
                     }
                     self.myTouchesMoved(location: touchPosition, touchedNodes: touchedNodes)
@@ -2040,12 +2046,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let xAdder = point.x / CGFloat(counter)
             let yAdder = point.y / CGFloat(counter)
             for index in 0..<counter {
+                if button == undoButton {
+                    let enableAction = SKAction.run({
+                        self.setUndoButton(enabled: true)
+                    })
+                    fingerActions.append(enableAction)
+                }
                 fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
                                                                y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: duration))
                 fingerActions.append(waitAction)
             }
             let buttonAction = SKAction.run({
                 button.myTouchesEnded(touchLocation: zielPosition)
+                if button == self.undoButton {
+                    self.setUndoButton(enabled: false)
+                }
             })
             fingerActions.append(buttonAction)
             fingerActions.append(waitAction)
@@ -2132,11 +2147,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
 //----------------------------------------------------------------------------
-
-
+        var slow = true
+        var lastActionWasMarkingWord = false
+//        let firstAction = SKAction.run({
+//            self.undoButton!.isEnabled = false
+//            self.undoButton!.alpha = 0.2
+//        })
+//        fingerActions.append(firstAction)
+        setUndoButton(enabled: false)
         for (index, record) in GV.helpInfoRecords!.enumerated() {
             let countMoves = record.movedInfo.components(separatedBy: "°").count
-            let duration: Double = 0.5 / Double(countMoves)
+            var duration: Double = (slow ? 0.5 : 0.1) / Double(countMoves)
             func getAbsPosition(relPosX: CGFloat, relPosY: CGFloat)->CGPoint {
                 return gridStartPosition + CGPoint(x: relPosX, y: relPosY) * gridSize
             }
@@ -2160,6 +2181,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
             case TypeOfTouch.FromBottom.rawValue, TypeOfTouch.FromGameArray.rawValue:
                 startFromGamearray = true
+                if slow {
+                    lastActionWasMarkingWord = record.letters.endsWith(LettersColor.Green.rawValue) ? true : lastActionWasMarkingWord
+                    slow = lastActionWasMarkingWord ? false : slow
+                }
                 if record.beganInfo != "" {
                    if record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
                         let shapeIndex = Int(record.beganInfo)
@@ -2262,6 +2287,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else {
             let lastAction = SKAction.run({
                 fingerSprite.removeFromParent()
+                self.hideButtons(hide: false)
+                self.setUndoButton(enabled: true)
             })
             fingerActions.append(lastAction)
         }
@@ -2834,7 +2861,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
 //                activityItems.append(activityItem)
-                createUndo(enabled: true)
+//                setUndoButton(enabled: true)
 //                undoSprite.alpha = 1.0
 //                let fixedName = "Pos\(movedIndex)"
 //                removeNodesWith(name: fixedName)
@@ -3552,8 +3579,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if GV.generateHelpInfo {
                 resetHelpInfo()
             }
-            undoButton!.alpha = 0.2
-            undoButton!.isEnabled = false
+            setUndoButton(enabled: false)
             wtGameboard!.clearGameArray()
         }
             
@@ -3626,9 +3652,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             activityRoundItem.append(ActivityRound())
             activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
         }
-        if activityRoundItem[0].activityItems.count > 0 {
-//            undoSprite.alpha = 1.0
-            createUndo(enabled: true)
+        if activityRoundItem[0].activityItems.count > 0 && !showHelp {
+            setUndoButton(enabled: true)
         }
         timeForGame = TimeForGame(from: GV.playingRecord.time)
 //        wtGameboard!.checkWholeWords()
