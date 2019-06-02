@@ -48,6 +48,8 @@ struct GV {
     static var maxGameNumber = 0
     static let SimpleGame = 0
     static let HardGame = 1
+    static let DemoEasyGameNumber = 10000
+    static let DemoMediumGameNumber = 11000
     static var buttonType = ButtonTypeElite
     static let LabelFontElite = "CourierNewPS-BoldMT"
     static let LabelFontSimple = "CourierNewPS-BoldMT"

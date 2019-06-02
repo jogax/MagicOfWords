@@ -569,6 +569,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if !showHelp {
                 resetHelpInfo()
             }
+        } else if showHelp {
+            
         }
         self.backgroundColor = bgColor
         if restart {
@@ -652,7 +654,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if showHelp {
             if gameNumber >= gameNumberForGenerating {
                 let difficulty = GV.basicDataRecord.difficulty
-                GV.helpInfoRecords = realmHelpInfo!.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
+                GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
             }
             createPlayingRecord(gameNumber: gameNumber)
         } else if GV.generateHelpInfo && new {
@@ -1830,6 +1832,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GV.playing = true
         timerIsCounting = true
         headerCreated = false
+        gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
         WTGameWordList.shared.setDelegate(delegate: self)
         timeForGame = TimeForGame(from: GV.playingRecord.time)
         myTimer = MyTimer(time: timeForGame)
@@ -1957,7 +1960,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         positionExists = true
                     }
                 }
-                if GV.gameArray[col][row].status != .Empty {
+                if GV.gameArray[col][row].status != .Empty ||
+                   GV.gameArray[9 - col][row].status != .Empty ||
+                   GV.gameArray[col][9 - row].status != .Empty ||
+                   GV.gameArray[9 - col][9 - row].status != .Empty
+                {
                     positionExists = true
                 }
             } while positionExists
@@ -2157,7 +2164,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         setUndoButton(enabled: false)
         for (index, record) in GV.helpInfoRecords!.enumerated() {
             let countMoves = record.movedInfo.components(separatedBy: "°").count
-            var duration: Double = (slow ? 0.5 : 0.1) / Double(countMoves)
+            var duration: Double = (slow ? 0.25 : 0.05) / Double(countMoves)
             func getAbsPosition(relPosX: CGFloat, relPosY: CGFloat)->CGPoint {
                 return gridStartPosition + CGPoint(x: relPosX, y: relPosY) * gridSize
             }
@@ -2240,8 +2247,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.nextRoundTapped))
             case TypeOfTouch.NoMoreStepsCont.rawValue:
                 addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.noActionTapped))
-//            case TypeOfTouch.OKGame.rawValue:
-//                addAlertTouched(alertType: .OKGameAlert, action: #selector(self.noActionTapped))
+            case TypeOfTouch.FinishGame.rawValue:
+                addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.finishButtonTapped2))
             default:
                 continue
             }
@@ -2400,7 +2407,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let UndoButtonHelpInfo = "UndoButton"
     let ShowMyWordsButtonHelpInfo = "ShowMyWordsButton"
     let FinishButtonHelpInfo = "FinishButton"
-    let finishGameHelpInfo = "FinishGame"
+    let FinishGameHelpInfo = "FinishGame"
     let ContinueGameEasyHelpInfo = "ContinueGameEasy"
     let ContinueGameMediumHelpInfo = "ContinueGameMedium"
     let FinishGameEasyHelpInfo = "FinishGameEasy"
@@ -2439,6 +2446,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         case .NoMoreStepsBack: helpInfo.letters = NoMoreStepsBackHelpInfo
         case .NoMoreStepsNext: helpInfo.letters = NoMoreStepsNextHelpInfo
         case .NoMoreStepsCont: helpInfo.letters = NoMoreStepsContHelpInfo
+        case .FinishGame: helpInfo.letters = FinishGameHelpInfo
         default: break
         }
         try! realmHelpInfo!.safeWrite() {
@@ -2461,18 +2469,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
    }
     
     private func generateArrayOfWordPieces(new: Bool) {
-       if new || GV.playingRecord.pieces.count == 0 {
+        if new || GV.playingRecord.pieces.count == 0 {
             try! realm.safeWrite() {
-//                GV.playingRecord.randomCounts = 0
+            //                GV.playingRecord.randomCounts = 0
                 GV.playingRecord.words = ""
-//                random = MyRandom()
+            //                random = MyRandom()
             }
+            // ----------------------
+//            _ = generateArrayOfWordPieces(first: true)
+//            for _ in 0...9 {
+//                _ = generateArrayOfWordPieces(first: false)
+//            }
+//            try! realm.safeWrite() {
+//                GV.playingRecord.words = ""
+//            }
             let pieces = generateArrayOfWordPieces(first: true)
-             try! realm.safeWrite() {
+            try! realm.safeWrite() {
                 GV.playingRecord.pieces = pieces
             }
-       }
-       saveArrayOfPieces()
+        }
+        saveArrayOfPieces()
     }
     
     private func getNextPiece(/*horizontalPosition: Int*/)->WTPiece {
@@ -3329,7 +3345,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         gameboardEnabled = true
         enabled = true
         if gameFinishedStatus == .OK {
-            saveHelpInfo(action: .FinishGameEasy)
+            saveHelpInfo(action: .FinishGame)
             try! realm.safeWrite() {
                 GV.playingRecord.gameStatus = GV.GameStatusFinished
             }
@@ -3462,7 +3478,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    let gameNumberForGenerating = 10000
+    var gameNumberForGenerating = 10000
     
     private func deleteGameDataRecord(gameNumber: Int) {
         let recordToDelete = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %d", gameNumber, GV.actLanguage)
@@ -3660,8 +3676,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func generateArrayOfWordPieces(first: Bool)->String {
-        let gameNumberForRandom = GV.generateHelpInfo ? gameNumberForGenerating : GV.playingRecord.gameNumber % 1000
-        let originalGameNumber = GV.generateHelpInfo ? gameNumberForGenerating : GV.playingRecord.gameNumber
+        let gameNumberForRandom = (GV.generateHelpInfo || showHelp) ? gameNumberForGenerating : GV.playingRecord.gameNumber % 1000
+        let originalGameNumber = GV.generateHelpInfo || showHelp ? gameNumberForGenerating : GV.playingRecord.gameNumber
         let random = MyRandom(gameNumber: gameNumberForRandom, modifier: GV.playingRecord.words.count)
         var tileType = MyShapes.NotUsed
         var letters = [String]()

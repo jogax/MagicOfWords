@@ -30,8 +30,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         }
         showBackgroundPicture()
         GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage).sorted(byKeyPath: "counter")
+        let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
         if GV.helpInfoRecords!.count > 0 {
-            startWTScene(new: true, next: StartType.GameNumber, gameNumber: 9999, restart: true, showHelp: true)
+            startWTScene(new: true, next: StartType.GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
         } else {
             self.showMenu()
         }
@@ -603,7 +604,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
             alert -> Void in
             GV.generateHelpInfo = true
-            let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? 10000 : 11000
+            let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
             self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber)
 
         })
@@ -612,7 +613,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             let continueGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenContinue), style: .default, handler: { [unowned self]
                 alert -> Void in
                 GV.generateHelpInfo = true
-                let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? 10000 : 11000
+                let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
                 self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
             })
             alertController.addAction(continueGenHelpAction)
