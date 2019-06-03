@@ -654,7 +654,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if showHelp {
             if gameNumber >= gameNumberForGenerating {
                 let difficulty = GV.basicDataRecord.difficulty
-                GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
+                if GV.generateHelpInfo {
+                    GV.helpInfoRecords = realmHelpInfo!.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
+                } else {
+                    GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
+                }
             }
             createPlayingRecord(gameNumber: gameNumber)
         } else if GV.generateHelpInfo && new {
@@ -2005,15 +2009,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var startFromGamearray = false
         var countMoves = 0
         var stopIndex = 10000
-        let stopCounter = 50
+        let stopCounter = 10000
 //----------------------------------------------------------------------------
         func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0, index: Int = 0) {
             fingerActions.append(SKAction.move(to: touchPosition - fingerPositionModifier, duration: duration))
             switch type {
              case .TouchesBegan:
                 let beganAction = SKAction.run({
-                    if counter == stopCounter {
-                        print("hier at \(counter)")
+                    if counter >= stopCounter {
+                        print("hier at \(counter), letters: \(letters)")
                     }
                     self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
                })
@@ -2201,7 +2205,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
                     } else {
                         startShapeIndex = NoValue
-                        callTouchAction(info: record.beganInfo, type: .TouchesBegan)
+                    callTouchAction(info: record.beganInfo, type: .TouchesBegan, letters: record.letters)
                     }
                     let moves = record.movedInfo.components(separatedBy: "°")
                     var countMoves = 0
@@ -2234,9 +2238,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             case TypeOfTouch.ContinueGameMedium.rawValue:
                 addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
             case TypeOfTouch.FinishGameEasy.rawValue:
-                 addAlertTouched(alertType: .FinishGameEasyAlert, action: #selector(self.finishButtonTapped2))
+                 addAlertTouched(alertType: .FinishGameEasyAlert, action: #selector(self.finishEasyAction))
             case TypeOfTouch.FinishGameMedium.rawValue:
-                addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishButtonTapped2))
+                addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishMediumAction))
             case TypeOfTouch.OKFixLettersSolved.rawValue:
                 addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
             case TypeOfTouch.OKMandatorySolved.rawValue:
@@ -2424,7 +2428,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if !GV.generateHelpInfo {
             return
         }
-        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, GV.basicDataRecord.difficulty)
+        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, GV.basicDataRecord.difficulty).sorted(byKeyPath: "counter")
         let counter = records.count > 0 ? records.last!.counter + 1 : 1
         let sDifficulty = String(GV.basicDataRecord.difficulty)
         let helpInfo = HelpInfo()
@@ -2533,6 +2537,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var firstTouchedRow = 0
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if showHelp && !GV.generateHelpInfo {
+            return
+        }
         startShapeIndex = -1
         let touchLocation = touches.first!.location(in: self)
         let touchedNodes = analyzeNodes(touchLocation: touchLocation)
@@ -2555,7 +2562,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             relativPosition = (firstTouchLocation - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
             helpInfo = HelpInfo()
             var counter = 0
-            let info = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true)
+            let info = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, GV.basicDataRecord.difficulty).sorted(byKeyPath: "counter", ascending: true)
             if info.count > 0 {
                 counter = info.last!.counter + 1
             }
@@ -2647,6 +2654,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if showHelp && !GV.generateHelpInfo {
+            return
+        }
         let touchLocation = touches.first!.location(in: self)
         let touchedNodes = analyzeNodes(touchLocation: touchLocation)
         myTouchesMoved(location: touchLocation, touchedNodes: touchedNodes)
@@ -2785,6 +2795,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let MyQuestionName = "MyQuestion"
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if showHelp && !GV.generateHelpInfo {
+            return
+        }
         let touchLocation = touches.first!.location(in: self)
         let touchedNodes = analyzeNodes(touchLocation: touchLocation)
         _ = myTouchesEnded(location: touchLocation, touchedNodes: touchedNodes)
