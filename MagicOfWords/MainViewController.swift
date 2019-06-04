@@ -284,13 +284,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         generateBasicDataRecordIfNeeded()
 //        #if DEBUG
             if !GV.basicDataRecord.startAnimationShown {
-                let animationScene = WelcomeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-                if let view = self.view as! SKView? {
-                    animationScene.setDelegate(delegate: self)
-    //                wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
-    //                wtScene.parentViewController = self
-                    view.presentScene(animationScene)
-                }
+                startWelcomeScene()
             } else {
                if countContinueGames > 0 {
                     startWTScene(new: false, next: .NoMore, gameNumber: 0)
@@ -307,6 +301,16 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        #endif
         //------------------------
 //        startMenuScene()
+    }
+    
+    @objc private func startWelcomeScene(){
+        let animationScene = WelcomeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        if let view = self.view as! SKView? {
+            animationScene.setDelegate(delegate: self)
+            //                wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
+            //                wtScene.parentViewController = self
+            view.presentScene(animationScene)
+        }
     }
     
     @objc private func firstButton () {
@@ -416,9 +420,10 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     
     func showMenu() {
         getRecordCounts()
+        let gameDifficulty = GameDifficulty(rawValue: GV.basicDataRecord.difficulty)
         let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
-                                            message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname),
+                                            message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname, gameDifficulty!.description()),
                                             preferredStyle: .alert)
         
         let newOK = countMandatory - countExistingGames > 0
@@ -713,7 +718,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
        //--------------------- chooseLanguageAction ---------------------
         let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
             alert -> Void in
-            self.showHowToPlay()
+//            self.showHowToPlay()
+            self.startWelcomeScene()
         })
         myAlertController.addAction(showHelpAction)
        //--------------------- choose Style action -----------------------
@@ -764,7 +770,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 
     private func generateBestScoreList() {
         deactivateSubscriptions()
-        bestScoreItems = RealmService.objects(BestScoreSync.self).filter("language = %@ AND score > 0", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+        bestScoreItems = RealmService.objects(
+            .self).filter("language = %@ AND score > 0", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
         bestScoreSubscription = bestScoreItems!.subscribe(named: "\(GV.actLanguage)bestScoreQuery")
         bestScoreSubscriptionToken = bestScoreSubscription.observe(\.state) { [weak self]  state in
             print("in Subscription!")

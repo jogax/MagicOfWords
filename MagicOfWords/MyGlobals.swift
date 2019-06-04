@@ -23,6 +23,14 @@ enum GameType: Int {
 
 enum GameDifficulty: Int {
     case Easy = 0, Medium, Hard, VeryHard
+    public func description()->String {
+        switch self {
+        case .Easy: return GV.language.getText(.tcSimpleGame)
+        case .Medium: return GV.language.getText(.tcMediumGame)
+        case .Hard: return GV.language.getText(.tcHardGame)
+        case .VeryHard: return GV.language.getText(.tcVeryHardGame)
+        }
+    }
 }
 
 let NoValue = -1

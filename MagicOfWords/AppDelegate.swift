@@ -205,7 +205,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     playerActivity![0].countOnlines += 1
                     playerActivity![0].isOnline = false
 //                    playerActivity![0].onlineTime += Int(getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!))
-                    playerActivity![0].onlineSince = nil
+//                    playerActivity![0].onlineSince = nil
                 }
             }
         }

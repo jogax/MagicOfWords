@@ -52,7 +52,7 @@ class WelcomeScene: SKScene {
         myButton2.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(laterButtonTapped))
         myButton2.zPosition = self.zPosition + 1
         self.addChild(myButton2)
-        blockSize = self.frame.width * (GV.onIpad ? 0.02 : 0.02)
+        blockSize = self.frame.width * (GV.onIpad ? 0.025 : 0.02)
         animateTexts()
     }
     
@@ -87,7 +87,7 @@ class WelcomeScene: SKScene {
             for (index, item) in lineTable.enumerated() {
                 if item.text != " " {
                     let toPositionX = startPosX + CGFloat(index + 1) * blockSize * 1.1
-                    let toPositionY = firstLinePosY - 1.4 * (CGFloat(lineIndex) * blockSize)
+                    let toPositionY = firstLinePosY - 1.4 * (CGFloat(lineIndex) * blockSize * 1.1)
                     lastPosY = toPositionY
                     let waitAction = SKAction.wait(forDuration: TimeInterval(waiting))
                     waiting += 0.05

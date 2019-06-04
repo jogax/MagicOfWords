@@ -15,6 +15,7 @@ class BestScoreSync: Object {
     @objc dynamic var combinedPrimary: String = ""
     @objc dynamic var gameNumber: Int = 0
     @objc dynamic var language: String = ""
+    @objc dynamic var difficulty: String = ""
     @objc dynamic var playerName: String = ""
     @objc dynamic var score: Int = 0
     @objc dynamic var finished: Bool = false

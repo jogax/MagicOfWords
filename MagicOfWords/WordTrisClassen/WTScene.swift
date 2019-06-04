@@ -1891,8 +1891,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
         countTime(timerX: Timer())
         if showHelp {
-            showHelpDemo()
+            _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(startShowHelpDemo(timerX: )), userInfo: nil, repeats: false)
         }
+    }
+    
+    var startHelpDemoTimer = Timer()
+    
+    @objc private func startShowHelpDemo(timerX: Timer) {
+        showHelpDemo()
     }
     
     var bestPlayerNickname = ""
@@ -2274,13 +2280,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         })
         fingerActions.append(removeAction)
         if !generateHelpInfo {
-            let lastWaitAction = SKAction.wait(forDuration: 3)
+            let lastWaitAction = SKAction.wait(forDuration: 1)
             fingerActions.append(lastWaitAction)
             let lastAction = SKAction.run({
                 if self.gameFinished {
                     try! realm.safeWrite() {
                         GV.basicDataRecord.startAnimationShown = true
                     }
+                    self.timerIsCounting = false
                     let title = GV.language.getText(.tcDemoFinishedTitle)
                     let message = GV.language.getText(.tcDemoFinishedMessage)
                     let newGameText = GV.language.getText(.tcDemoFinishedStartNewGame)
