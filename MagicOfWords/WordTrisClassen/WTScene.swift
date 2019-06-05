@@ -3004,11 +3004,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     private func getSyncedRecords() {
         if realmSync != nil {
+//            let subscriptions = realmSync!.subscriptions()
+//            for subscription in subscriptions {
+//                if subscription.name!.begins(with: "BestList") ||
+//                    subscription.name!.begins(with: "MyScoreRecord") ||
+//                    subscription.name!.begins(with: "allResultsNew") ||
+//                    subscription.name!.begins(with: "ForGameRecord") ||
+//                    subscription.name!.begins(with: "All") {
+//                    subscription.unsubscribe()
+//                } else {
+//                }
+//            }
+//            print(subscriptions.count)
             let gameNumber = GV.playingRecord.gameNumber % 10000 + 1
             let language = GV.language.getText(.tcAktLanguage)
             let myName = GV.basicDataRecord.myName
-            let combinedPrimarySync = String(gameNumber) + language + myName
-            let combinedPrimaryForGame = String(gameNumber) + language
+            let difficultyKey = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? "" : "°" + String(GV.basicDataRecord.difficulty)
+            let combinedPrimarySync = String(gameNumber) + language + myName + difficultyKey
+            let combinedPrimaryForGame = String(gameNumber) + language  + difficultyKey
             
             bestPlayers = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary BEGINSWITH %@", combinedPrimaryForGame).sorted(byKeyPath: "score", ascending: false)
             bestPlayersSubscription = bestPlayers!.subscribe(named: "BestList:\(combinedPrimaryForGame)")
@@ -3031,6 +3044,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                             let bestScoreSyncRecord = BestScoreSync()
                             bestScoreSyncRecord.gameNumber = gameNumber
                             bestScoreSyncRecord.language = language
+                            bestScoreSyncRecord.difficulty = difficultyKey
                             bestScoreSyncRecord.playerName = myName
                             bestScoreSyncRecord.combinedPrimary = combinedPrimarySync
                             bestScoreSyncRecord.finished = false
@@ -3043,7 +3057,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         }
                     }
                 } else {
-//                    print("state: \(state)")
+                    print("state: \(state)")
                 }
                 
             }
@@ -3059,6 +3073,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                                 let bestScoreForActualGameRecord = BestScoreForGame()
                                 bestScoreForActualGameRecord.gameNumber = gameNumber
                                 bestScoreForActualGameRecord.language = language
+                                bestScoreForActualGameRecord.difficulty = difficultyKey
                                 bestScoreForActualGameRecord.combinedPrimary = combinedPrimaryForGame
                                 bestScoreForActualGameRecord.bestScore = 0
                                 bestScoreForActualGameRecord.owner = playerActivity?[0]

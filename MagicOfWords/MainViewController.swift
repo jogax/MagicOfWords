@@ -770,8 +770,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 
     private func generateBestScoreList() {
         deactivateSubscriptions()
-        bestScoreItems = RealmService.objects(
-            .self).filter("language = %@ AND score > 0", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+        bestScoreItems = RealmService.objects(BestScoreSync.self).filter("language = %@ AND score > 0", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
         bestScoreSubscription = bestScoreItems!.subscribe(named: "\(GV.actLanguage)bestScoreQuery")
         bestScoreSubscriptionToken = bestScoreSubscription.observe(\.state) { [weak self]  state in
             print("in Subscription!")

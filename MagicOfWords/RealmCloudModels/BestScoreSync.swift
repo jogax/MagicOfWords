@@ -11,6 +11,8 @@ import RealmSwift
 
 class BestScoreSync: Object {
     
+// 1 record pro gameNumber and player
+    
 // Specify properties to ignore (Realm won't persist these)
     @objc dynamic var combinedPrimary: String = ""
     @objc dynamic var gameNumber: Int = 0

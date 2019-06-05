@@ -9,6 +9,7 @@
 import Foundation
 import RealmSwift
 
+// 1 record per gamenumber
 class BestScoreForGame: Object {
     
     // Specify properties to ignore (Realm won't persist these)
