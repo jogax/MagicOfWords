@@ -3113,6 +3113,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     //        GV.playingRecord.roundGameArrays = wtGameboard!.gameArrayToString()
             
             
+            
             var activityItemsString = ""
             let actCount = activityRoundItem[activityRoundItem.count - 1].activityItems.count
             if actCount > 0 {
