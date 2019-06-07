@@ -16,8 +16,6 @@ class BestScoreForGame: Object {
     @objc dynamic var combinedPrimary: String = ""
     @objc dynamic var gameNumber: Int = 0
     @objc dynamic var language: String = ""
-    @objc dynamic var difficulty: String = ""
-//    @objc dynamic var bestPlayerName: String = ""
     @objc dynamic var bestScore: Int = 0
     @objc dynamic var timeStamp: Date = Date()
     @objc dynamic var owner: PlayerActivity? // to-one relationships must be optional

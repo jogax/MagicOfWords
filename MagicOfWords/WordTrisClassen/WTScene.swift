@@ -773,12 +773,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func createPlayingRecord(gameNumber: Int) {
-        var gameNumberForMandatoryRecord = 0
-        if GV.generateHelpInfo {
-            gameNumberForMandatoryRecord = gameNumberForGenerating
-        } else {
-            gameNumberForMandatoryRecord = gameNumber - GV.basicDataRecord.difficulty * 1000
-        }
+        let gameNumberForMandatoryRecord = gameNumber >= gameNumberForGenerating ? gameNumber : gameNumber % 1000
+//        let difficulty = showHelp ? GameDifficulty.Medium.rawValue : GV.basicDataRecord.difficulty
+//        if GV.generateHelpInfo {
+//            gameNumberForMandatoryRecord = gameNumberForGenerating
+//        } else {
+//            gameNumberForMandatoryRecord = gameNumber - difficulty * 1000
+//        }
         let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumberForMandatoryRecord, GV.actLanguage).first!
         if mandatoryRecord != nil {
             try! realm.safeWrite() {
@@ -829,7 +830,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
         if bgSprite!.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
-            let gameNumber = GV.playingRecord.gameNumber >= gameNumberForGenerating ? "DEMO" : String(GV.playingRecord.gameNumber % 1000)
+            let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(GV.playingRecord.gameNumber % 1000)
             let text = GV.language.getText(.tcHeader, values: gameNumber, String(0), timeForGame.time.HourMinSec)
             headerLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
@@ -907,7 +908,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func modifyHeader() {
 //        var gameNumber = String(GV.playingRecord.gameNumber % 1000 + 1)
-        let gameNumber = (GV.playingRecord.gameNumber >= gameNumberForGenerating ? "DEMO" : String(GV.playingRecord.gameNumber % 1000 + 1))
+        let gameNumber = (GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(GV.playingRecord.gameNumber % 1000 + 1))
         let headerText = GV.language.getText(.tcHeader, values: gameNumber, String(actRound), timeForGame.time.HourMinSec)
         headerLabel.text = headerText
 //        let letterScore = GV.bonusScore
@@ -1836,7 +1837,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GV.playing = true
         timerIsCounting = true
         headerCreated = false
-        gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
+//        gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
+        gameNumberForGenerating = newGameNumber
         WTGameWordList.shared.setDelegate(delegate: self)
         timeForGame = TimeForGame(from: GV.playingRecord.time)
         myTimer = MyTimer(time: timeForGame)
@@ -1942,7 +1944,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let likeValue = String(repeating: "?", count: length)
             let words = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %@ and word LIKE %d", GV.actLanguage, likeValue)
             myLetters += words[random.getRandomInt(0, max: words.count)].word
-            print("createFixLetters: \(myLetters)")
+//            print("createFixLetters: \(myLetters)")
         }
         var inputWord = ""
         let items = myLetters.components(separatedBy: "ß")
@@ -2277,6 +2279,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let removeAction = SKAction.run ({
             GV.generateHelpInfo = generateHelpInfo
+            try! realm.safeWrite() {
+                GV.basicDataRecord.difficulty = GV.origDifficulty
+            }
         })
         fingerActions.append(removeAction)
         if !generateHelpInfo {
@@ -2318,13 +2323,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var gameFinished = false
     
     private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
-        return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber < %d and language = %@",
-            GV.GameStatusPlaying, GV.GameStatusContinued, playingRecord.gameNumber, GV.actLanguage).count > 0
+        return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber >= %d and gameNumber < %d and language = %@",
+            GV.GameStatusPlaying, GV.GameStatusContinued, GV.minGameNumber, playingRecord.gameNumber, GV.actLanguage).count > 0
     }
     
     private func hasNextRecords(playingRecord: GameDataModel)->Bool {
-        return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber > %d and language = %@",
-            GV.GameStatusPlaying, GV.GameStatusContinued, playingRecord.gameNumber, GV.actLanguage).count > 0
+        return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber > %d and gameNumber <= %d and language = %@",
+            GV.GameStatusPlaying, GV.GameStatusContinued, playingRecord.gameNumber, GV.maxGameNumber, GV.actLanguage).count > 0
     }
     
     @objc private func countTime(timerX: Timer) {
@@ -3004,47 +3009,36 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     private func getSyncedRecords() {
         if realmSync != nil {
-//            let subscriptions = realmSync!.subscriptions()
-//            for subscription in subscriptions {
-//                if subscription.name!.begins(with: "BestList") ||
-//                    subscription.name!.begins(with: "MyScoreRecord") ||
-//                    subscription.name!.begins(with: "allResultsNew") ||
-//                    subscription.name!.begins(with: "ForGameRecord") ||
-//                    subscription.name!.begins(with: "All") {
-//                    subscription.unsubscribe()
-//                } else {
-//                }
-//            }
-//            print(subscriptions.count)
             let gameNumber = GV.playingRecord.gameNumber % 10000 + 1
             let language = GV.language.getText(.tcAktLanguage)
             let myName = GV.basicDataRecord.myName
-            let difficultyKey = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? "" : "°" + String(GV.basicDataRecord.difficulty)
-            let combinedPrimarySync = String(gameNumber) + language + myName + difficultyKey
-            let combinedPrimaryForGame = String(gameNumber) + language  + difficultyKey
+//            let difficultyKey = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? "" : "°" + String(GV.basicDataRecord.difficulty)
+            let combinedPrimarySync = String(gameNumber) + language + myName// + difficultyKey
+            let combinedPrimaryForGame = String(gameNumber) + language//  + difficultyKey
             
             bestPlayers = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary BEGINSWITH %@", combinedPrimaryForGame).sorted(byKeyPath: "score", ascending: false)
             bestPlayersSubscription = bestPlayers!.subscribe(named: "BestList:\(combinedPrimaryForGame)")
             bestPlayersSubscriptionToken = bestPlayersSubscription!.observe(\.state) { [weak self]  state in
+//                print("in WTScene at getSyncedRecords at bestPlayer -> state: \(state)")
                 if state == .complete {
                     self!.bestPlayersReady = true
                     self!.modifyHeader()
                 } else {
-                    print("state: \(state)")
+//                    print("state: \(state)")
                 }
             }
             
             bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimarySync)
             bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "MyScoreRecord:\(combinedPrimarySync)")
             bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
-                //                    print("in Subscription!")
+//                print("in WTScene at getSyncedRecords at bestScoreSync -> state: \(state)")
                 if state == .complete {
                     if self!.bestScoreSync!.count == 0 && !GV.debug {
                         try! realmSync!.write {
                             let bestScoreSyncRecord = BestScoreSync()
                             bestScoreSyncRecord.gameNumber = gameNumber
                             bestScoreSyncRecord.language = language
-                            bestScoreSyncRecord.difficulty = difficultyKey
+//                            bestScoreSyncRecord.difficulty = difficultyKey
                             bestScoreSyncRecord.playerName = myName
                             bestScoreSyncRecord.combinedPrimary = combinedPrimarySync
                             bestScoreSyncRecord.finished = false
@@ -3057,7 +3051,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         }
                     }
                 } else {
-                    print("state: \(state)")
                 }
                 
             }
@@ -3073,7 +3066,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                                 let bestScoreForActualGameRecord = BestScoreForGame()
                                 bestScoreForActualGameRecord.gameNumber = gameNumber
                                 bestScoreForActualGameRecord.language = language
-                                bestScoreForActualGameRecord.difficulty = difficultyKey
+//                                bestScoreForActualGameRecord.difficulty = difficultyKey
                                 bestScoreForActualGameRecord.combinedPrimary = combinedPrimaryForGame
                                 bestScoreForActualGameRecord.bestScore = 0
                                 bestScoreForActualGameRecord.owner = playerActivity?[0]
@@ -3109,7 +3102,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     }
                     
                 } else {
-                    print("state: \(state)")
+//                    print("state: \(state)")
                 }
             }
         }

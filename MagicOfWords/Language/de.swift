@@ -123,9 +123,10 @@ let deDictionary: [TextConstants: String] = [
     .tcGameLine:           "Notifier: %, GameNumber: %",
     .tcWelcomeText1:        "Herzlich Willkommen in der/wunderbaren Welt von Wörter!",
     .tcWelcomeText2:        "Viel Spaß!",
-    .tcWelcomeText3:        "Und jetzt zeige ich Dir/wie man spielt/in mittlere Schwierigkeit",
+    .tcWelcomeText3:        "Und jetzt zeige ich Dir/wie man spielt...",
     .tcLater:               "Später",
-    .tcShowMe:              "Zeige mir!",
+    .tcShowEasyGame:        "Einfaches Spiel",
+    .tcShowMediumGame:      "Mittleres Spiel",
     .tcHelpGenNew:          "Demo erstellen",
     .tcHelpGenContinue:     "Demo fortsetzen",
     .tcDeveloperMenu:       "Menü für Entwickler",
@@ -140,6 +141,8 @@ let deDictionary: [TextConstants: String] = [
     .tcMediumGame:          "Mittel",
     .tcHardGame:            "Hart",
     .tcVeryHardGame:        "Sehr hart",
+    .tcAreYouSureForNewDemo: "Möchten Sie wirklich eine neue Demo erstellen??",
+    .tcAreYouSureMessage:   "Die alte Demo-Informationen werden gelöscht!",
 ]
 
 

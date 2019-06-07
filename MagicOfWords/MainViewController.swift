@@ -24,13 +24,17 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         self.showMenu()
     }
     
-    func showHowToPlay() {
+    func showHowToPlay(difficulty: Int) {
         if let view = self.view as! SKView? {
             view.presentScene(nil)
         }
         showBackgroundPicture()
+        GV.origDifficulty = GV.basicDataRecord.difficulty
+        try! realm.safeWrite() {
+            GV.basicDataRecord.difficulty = difficulty
+        }
         GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage).sorted(byKeyPath: "counter")
-        let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
+        let gameNumber = GV.DemoMediumGameNumber
         if GV.helpInfoRecords!.count > 0 {
             startWTScene(new: true, next: StartType.GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
         } else {
@@ -282,6 +286,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         // Get the SKScene from the loaded GKScene
         //-------------------------
         generateBasicDataRecordIfNeeded()
+        getRecordCounts()
 //        #if DEBUG
             if !GV.basicDataRecord.startAnimationShown {
                 startWelcomeScene()
@@ -608,10 +613,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         
         let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
             alert -> Void in
-            GV.generateHelpInfo = true
-            let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
-            self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber)
-
+            self.areYouSure()
         })
         alertController.addAction(newGenHelpAction)
         if countContinueGames > 0 {
@@ -624,9 +626,37 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             alertController.addAction(continueGenHelpAction)
 
         }
+        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.showMenu()
+        })
+        alertController.addAction(cancelAction)
+
         present(alertController, animated: true, completion: nil)
 
     }
+    
+    private func areYouSure() {
+        let alertController = UIAlertController(title: GV.language.getText(.tcAreYouSureForNewDemo),
+                                                message: GV.language.getText(.tcAreYouSureMessage),
+                                                preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.showMenu()
+        })
+        alertController.addAction(cancelAction)
+
+        let OKAction = UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: { [unowned self]
+            alert -> Void in
+            GV.generateHelpInfo = true
+            let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
+            self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber)
+        })
+        alertController.addAction(OKAction)
+        present(alertController, animated: true, completion: nil)
+    }
+    
     #endif
 
     private func getCloudData() {
@@ -1044,7 +1074,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                     self!.playerActivityByNickNameSubscription!.unsubscribe()
                     self!.playerActivityByNickNameToken!.invalidate()
                 } else {
-                    print("state: \(state)")
+//                    print("in MainViewController -> state: \(state)")
                 }
             }
         } else {

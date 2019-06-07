@@ -14,7 +14,7 @@ public protocol WelcomeSceneDelegate: class {
     
     /// Method called when Game finished
     func backFromAnimation()
-    func showHowToPlay()
+    func showHowToPlay(difficulty: Int)
     
 }
 
@@ -37,21 +37,28 @@ class WelcomeScene: SKScene {
         self.view!.isMultipleTouchEnabled = false
         self.view!.subviews.forEach { $0.removeFromSuperview() }
         var size = CGSize(width: self.frame.height * 0.10, height: self.frame.height * 0.05)
-        let text1 = GV.language.getText(.tcShowMe)
+        let text1 = GV.language.getText(.tcShowEasyGame)
         size.width = text1.width(font: myTitleFont!) * 1.4
         self.backgroundColor = bgColor
-        let buttonCenter1 = CGPoint(x:self.frame.midX * 0.5, y: self.frame.height * 0.05)
+        let buttonCenter1 = CGPoint(x:self.frame.maxX * 0.25, y: self.frame.height * 0.05)
         let myButton1 = createMyButton(title: text1, size: size, center: buttonCenter1, enabled: true)
-        myButton1.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(ShowMeButtonTapped))
+        myButton1.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(EasyButtonTapped))
         myButton1.zPosition = self.zPosition + 1
         self.addChild(myButton1)
-        let buttonCenter2 = CGPoint(x:self.frame.midX * 1.5, y: self.frame.height * 0.05)
-        let text2 = GV.language.getText(.tcLater)
+        let buttonCenter2 = CGPoint(x:self.frame.maxX * 0.5, y: self.frame.height * 0.05)
+        let text2 = GV.language.getText(.tcShowMediumGame)
         size.width = text2.width(font: myTitleFont!) * 1.4
         let myButton2 = createMyButton(title: text2, size: size, center: buttonCenter2, enabled: true)
-        myButton2.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(laterButtonTapped))
+        myButton2.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(MediumButtonTapped))
         myButton2.zPosition = self.zPosition + 1
         self.addChild(myButton2)
+        let buttonCenter3 = CGPoint(x:self.frame.maxX * 0.75, y: self.frame.height * 0.05)
+        let text3 = GV.language.getText(.tcLater)
+        size.width = text3.width(font: myTitleFont!) * 1.4
+        let myButton3 = createMyButton(title: text3, size: size, center: buttonCenter3, enabled: true)
+        myButton3.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(laterButtonTapped))
+        myButton3.zPosition = self.zPosition + 1
+        self.addChild(myButton3)
         blockSize = self.frame.width * (GV.onIpad ? 0.025 : 0.02)
         animateTexts()
     }
@@ -126,18 +133,22 @@ class WelcomeScene: SKScene {
         }
     }
     
-    public func showHowToPlay() {
-    }
-    
+//    public func showHowToPlay() {
+//    }
+//
     public func setDelegate(delegate: WelcomeSceneDelegate) {
         self.myDelegate = delegate
     }
     
-    @objc private func ShowMeButtonTapped() {
-        myDelegate!.showHowToPlay()
+    @objc private func EasyButtonTapped() {
+        myDelegate!.showHowToPlay(difficulty: GameDifficulty.Easy.rawValue)
     }
     
-    @objc private func laterButtonTapped() {
+    @objc private func MediumButtonTapped() {
+        myDelegate!.showHowToPlay(difficulty: GameDifficulty.Medium.rawValue)
+    }
+    
+   @objc private func laterButtonTapped() {
         myDelegate!.backFromAnimation()
     }
     

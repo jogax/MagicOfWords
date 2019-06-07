@@ -112,7 +112,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         self.scene?.view?.addSubview(showGamesInTableView!)
         subscription = allResultsItems!.subscribe(named: "allResultsNew_\(GV.actLanguage)")
         subscriptionToken = subscription.observe(\.state) { [weak self]  state in
-            print("state: \(state)")
+//            print("is ShowGamesScene at showFinishedGame -> state: \(state)")
            if state == .complete {
             #if DEBUG
                 self!.checkContinuity()
@@ -231,6 +231,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         }
         bestPlayersSubscription = bestPlayers!.subscribe(named: "BestListCorrection:\(combinedPrimary)")
         bestPlayersSubscriptionToken = bestPlayersSubscription!.observe(\.state) { [weak self]  state in
+//            print("in ShowGamesScene at setBestPlayerFor -> state: \(state)")
             if state == .complete {
                 let bestPlayer = BestScoreForGame()
                 bestPlayer.combinedPrimary = combinedPrimary
@@ -245,7 +246,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 self!.goOn = true
                 print("GameNumber : \(gameNumber) corrected")
              } else {
-                print("state: \(state)")
+//                print("state: \(state)")
             }
         }
 

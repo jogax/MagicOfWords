@@ -368,18 +368,28 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     
     @objc func playersButtonTapped() {
+        unsubscribeSubscriptions()
         setNewTableView(tableType: .Players)
         showPlayerActivity()
     }
     
     @objc func scoreButtonTapped() {
+        unsubscribeSubscriptions()
         setNewTableView(tableType: .BestScoreSync)
         showBestScoreSync()
     }
     
     @objc func bestButtonTapped() {
+        unsubscribeSubscriptions()
         setNewTableView(tableType: .BestScoreForGame)
         showBestScoreForGame()
+    }
+    
+    private func unsubscribeSubscriptions() {
+        let subscriptions = realmSync!.subscriptions()
+        for subscription in subscriptions {
+            subscription.unsubscribe()
+        }
     }
     
     @objc func sortButtonTapped() {
@@ -405,7 +415,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     private func showPlayerActivity() {
         deactivateSubscriptions()
         let sort = "myCommentar"
-        self.playerActivityItems = RealmService.objects(PlayerActivity.self).filter("keyWord != %@", "SimJogaxKey").sorted(byKeyPath: sort, ascending: true)
+        self.playerActivityItems = RealmService.objects(PlayerActivity.self).filter("keyWord != %@ AND !(nickName BEGINSWITH %d)", "SimJogaxKey", "Sim").sorted(byKeyPath: sort, ascending: true)
         playerSubscription = playerActivityItems!.subscribe(named: "playerActivitySortedBy1:\(sort)")
         playerSubscriptionToken = playerSubscription!.observe(\.state) { [weak self]  state in
 //                print("in Subscription!")
@@ -529,7 +539,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     
     private func showBestScoreSync() {
         deactivateSubscriptions()
-        bestScoreItems = RealmService.objects(BestScoreSync.self).filter("language = %@ AND score > 0", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+        bestScoreItems = RealmService.objects(BestScoreSync.self).filter("language = %@ AND gameNumber >= %d AND gameNumber <= %d AND score > 0", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
         bestScoreSubscription = bestScoreItems!.subscribe(named: "bestScoreQuery")
         bestScoreSubscriptionToken = bestScoreSubscription.observe(\.state) { [weak self]  state in
 //            print("in Subscription!")
@@ -613,8 +623,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         switch tableType {
         case .BestScoreSync:
             if bestScoreItems!.count > 0 {
-                let maxGameNumber = bestScoreItems!.last!.gameNumber > 1001 ? 1000 : bestScoreItems!.last!.gameNumber
-                for actGameNumber in 1...maxGameNumber {
+                for actGameNumber in GV.minGameNumber...GV.maxGameNumber {
                     let scoreItems = bestScoreItems!.filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false)
                     for (place, item) in scoreItems.enumerated() {
                         var bestScoreData = BestScoreData()
@@ -630,9 +639,8 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             }
         case .BestScoreForGame:
             if forGameItems!.count > 0 {
-                let maxGameNumber = forGameItems!.last!.gameNumber
                 var generateRecord = false
-                for actGameNumber in 1...maxGameNumber {
+                for actGameNumber in GV.minGameNumber...GV.maxGameNumber {
                     if forGameItems!.filter("gameNumber = %d", actGameNumber).count > 0 {
                         let item = forGameItems!.filter("gameNumber = %d", actGameNumber).first!
                         var bestScoreData = BestScoreData()
@@ -674,14 +682,14 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     
     private func deactivateSubscriptions() {
-        if playerSubscription != nil {
-            playerSubscriptionToken!.invalidate()
-            playerSubscription!.unsubscribe()
-        }
-        if bestScoreSubscription != nil {
-            bestScoreSubscriptionToken!.invalidate()
-            bestScoreSubscription!.unsubscribe()
-        }
+//        if playerSubscription != nil {
+//            playerSubscriptionToken!.invalidate()
+//            playerSubscription!.unsubscribe()
+//        }
+//        if bestScoreSubscription != nil {
+//            bestScoreSubscriptionToken!.invalidate()
+//            bestScoreSubscription!.unsubscribe()
+//        }
     }
     
     private func setTableviewSize() {
@@ -698,7 +706,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     
     private func showBestScoreForGame() {
         deactivateSubscriptions()
-        forGameItems = RealmService.objects(BestScoreForGame.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
+        forGameItems = RealmService.objects(BestScoreForGame.self).filter("language = %@ AND gameNumber >= %d AND gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
         forGameSubscription = forGameItems!.subscribe(named: "\(GV.actLanguage)bestForGameQuery")
         forGameSubscriptionToken = forGameSubscription.observe(\.state) { [weak self]  state in
             switch state {

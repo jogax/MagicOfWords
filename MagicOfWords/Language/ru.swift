@@ -123,9 +123,10 @@ let ruDictionary: [TextConstants: String] = [
     .tcGameLine:           "Уведомитель: %, Игра: %",
     .tcWelcomeText1:        "Добро пожаловать/в чудесный мир слов!",
     .tcWelcomeText2:        "Желаю приятно/провести время!",
-    .tcWelcomeText3:        "А теперь посмотрим/как играть игру/средней сложности",
+    .tcWelcomeText3:        "А теперь посмотрим/как играть...",
     .tcLater:               "Позже",
-    .tcShowMe:              "Покажи!",
+    .tcShowEasyGame:        "Легкая игра",
+    .tcShowMediumGame:      "Средняя игра",
     .tcHelpGenNew:          "Создать демо",
     .tcHelpGenContinue:     "Продолжать демо",
     .tcDeveloperMenu:       "Меню разработчика",
@@ -140,5 +141,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcMediumGame:          "Средняя",
     .tcHardGame:            "Сложная",
     .tcVeryHardGame:        "Очень сложная",
+    .tcAreYouSureForNewDemo: "Действительно хочешь создать новую демоверсию?",
+    .tcAreYouSureMessage:   "Старая демо-информация будет удалена!",
 ]
 

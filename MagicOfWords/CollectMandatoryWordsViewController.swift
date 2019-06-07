@@ -377,13 +377,14 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //        mandatoryItems = RealmService.objects(Mandatory.self).sorted(byKeyPath: "language",ascending: true)
         readMandatorySubscription = readMandatoryItems!.subscribe(named: "mandatoryQuery3")
         mandatorySubscriptionToken = readMandatorySubscription!.observe(\.state) { [weak self]  state in
+//            print("in CollectMandatoryWords at updateCommonString -> state: \(state)")
             switch state {
             case .creating:
-                print("creating")
+                break
             // The subscription has not yet been written to the Realm
             case .pending:
-                print("pending")
-                // The subscription has been written to the Realm and is waiting
+                break
+            // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
                 for mandatoryLine in self!.readMandatoryItems! {
@@ -401,7 +402,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
             
 //                exit(0)
             default:
-                print("state: \(state)")
+                break
             }
         }
     }
@@ -701,13 +702,14 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
             modifiedItems = RealmService.objects(ModifiedWordsModel.self).filter("combinedKey CONTAINS %@", searchKey).sorted(byKeyPath: "word", ascending: true)
             modifiedSubscription = modifiedItems!.subscribe(named: "\(GV.actLanguage)ModifiedWordsQueryNew")
             modifiedSubscriptionToken = modifiedSubscription!.observe(\.state) { [weak self]  state in
+//                print("in CollectMandatoryWords at fillAllWordsTable -> state: \(state)")
                 switch state {
                 case .creating:
-                    print("creating")
+                    break
                 // The subscription has not yet been written to the Realm
                 case .pending:
-                    print("pending")
-                    // The subscription has been written to the Realm and is waiting
+                    break
+                // The subscription has been written to the Realm and is waiting
                 // to be processed by the server
                 case .complete:
                     let name = playerActivity![0].name
@@ -750,7 +752,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
                     self!.scrollToActualPositionAndReload()
 
                 default:
-                    print("state: \(state)")
+                    break
                 }
             }
  
@@ -841,12 +843,13 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
         mandatoryItems = RealmService.objects(CommonString.self).filter("word BEGINSWITH %@", GV.actLanguage).sorted(byKeyPath: "word", ascending: true)
         mandatorySubscription = mandatoryItems!.subscribe(named: "\(GV.actLanguage)mandatoryQuery")
         mandatorySubscriptionToken = mandatorySubscription!.observe(\.state) { [weak self]  state in
+//            print("in CollectMandatoryWords at getSavedMandatoryWords -> state: \(state)")
             switch state {
             case .creating:
-                print("creating")
+                break
             // The subscription has not yet been written to the Realm
             case .pending:
-                print("pending")
+                break
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -869,7 +872,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //                print("wordLengths: \(self!.wordLengths)")
 //                self!.readTextFile()
             default:
-                print("state: \(state)")
+                break
             }
         }
     }

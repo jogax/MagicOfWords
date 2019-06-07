@@ -55,12 +55,16 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
         mandatoryItems = RealmService.objects(CommonString.self).filter("word BEGINSWITH %@", GV.actLanguage).sorted(byKeyPath: "word", ascending: true)
         mandatorySubscription = mandatoryItems!.subscribe(named: "\(GV.actLanguage)mandatoryQuery")
         mandatorySubscriptionToken = mandatorySubscription!.observe(\.state) { [weak self]  state in
+//            print("in CreateMandatorys at getSavedMandatoryWords -> state: \(state)")
+
             switch state {
             case .creating:
-                print("creating")
+//                print("creating")
+                break
             // The subscription has not yet been written to the Realm
             case .pending:
-                print("pending")
+                break
+//                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -85,7 +89,8 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
                 }
                 self!.generateMandatoryWords()
             default:
-                print("state: \(state)")
+                break
+//                print("state: \(state)")
             }
         }
     }
@@ -156,12 +161,14 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
 //        generatedSubscription!.unsubscribe()
 //        generatedItems = RealmService.objects(Mandatory.self).filter("combinedKey BEGINSWITH %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
         generatedSubscriptionToken = generatedSubscription!.observe(\.state) { [weak self]  state in
+//            print("in CreateMandatorys at generateMandatoryWords -> state: \(state)")
+
             switch state {
             case .creating:
-                print("creating")
+                break
             // The subscription has not yet been written to the Realm
             case .pending:
-                print("pending")
+                break
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -182,7 +189,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
 //                }
                 self!.generateNewItems()
             default:
-                print("state: \(state)")
+                break
             }
         }
     }

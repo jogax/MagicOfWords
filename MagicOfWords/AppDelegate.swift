@@ -218,18 +218,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if GV.myUser == nil {
             return
         }
+        realmSync = RealmService
+        let subscriptions = realmSync!.subscriptions()
+        for subscription in subscriptions {
+                subscription.unsubscribe()
+        }
+
         //        let myObjects = RealmService.objects(PlayerActivity.self)
         //
         //        let syncConfig: SyncConfiguration = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL)
         //        //        let syncConfig = SyncUser.current!.configuration(realmURL: GV.REALM_URL, user: GV.myUser!)
         //        //        let config = SyncUser.current!.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true, urlPrefix: nil)
         //        let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
-        realmSync = RealmService
         if playerActivity == nil {
             playerActivity = realmSync!.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
             playerActivitySubscription = playerActivity!.subscribe(named: "PlayerActivity:\(GV.basicDataRecord.myName)")
             playerActivityToken = playerActivitySubscription!.observe(\.state) { /*[weak self]*/  state in
-                //                    print("in Subscription!")
+//                print("in AppDelegate setConnection -> state: \(state)")
                 if state == .complete {
                     if playerActivity?.count == 0 {
                         try! realmSync!.safeWrite() {
@@ -278,7 +283,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
 
                 } else {
-                    print("state: \(state)")
                 }
             }
         }
@@ -357,7 +361,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary ENDSWITH %@", combinedPrimarySync)
                     bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "AllMyScoreRecords:\(combinedPrimarySync)")
                     bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
-                        //                    print("in Subscription!")
+//                        print("in AppDelegate checkSyncedDB -> state: \(state)")
                         if state == .complete {
                             for record in myGameRecords {
                                 let actGameNumber = record.gameNumber + 1
@@ -388,9 +392,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             }
                         } else if state == .invalidated {
                             self!.bestScoreSubscriptionToken = nil
-                            print ("state: \(state)")
+//                            print ("state: \(state)")
                         } else {
-                            print("state: \(state)")
+//                            print("state: \(state)")
                         }
                     }
                     bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@", combinedPrimaryForGame)
@@ -424,7 +428,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 
                             }
                         } else {
-                            print("state: \(state)")
+//                            print("state: \(state)")
                         }
                     }
                 }

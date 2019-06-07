@@ -54,6 +54,7 @@ struct GV {
     static let ButtonTypeElite = "E"
     static var minGameNumber = 0
     static var maxGameNumber = 0
+    static var origDifficulty = 0
     static let SimpleGame = 0
     static let HardGame = 1
     static let DemoEasyGameNumber = 10000

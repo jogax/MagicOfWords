@@ -124,7 +124,8 @@ enum TextConstants: Int {
     tcWelcomeText2,
     tcWelcomeText3,
     tcLater,
-    tcShowMe,
+    tcShowEasyGame,
+    tcShowMediumGame,
     tcHelpGenNew,
     tcHelpGenContinue,
     tcDeveloperMenu,
@@ -138,7 +139,9 @@ enum TextConstants: Int {
     tcSimpleGame,
     tcMediumGame,
     tcHardGame,
-    tcVeryHardGame
+    tcVeryHardGame,
+    tcAreYouSureForNewDemo,
+    tcAreYouSureMessage
 }
 
     let LanguageEN = "en" // index 0
