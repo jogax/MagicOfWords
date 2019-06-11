@@ -769,6 +769,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
         }
+        let activRecords = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+        for activRecord in activRecords {
+            if activRecord.gameNumber != GV.playingRecord.gameNumber {
+                try! realm.safeWrite() {
+                    activRecord.nowPlaying = false
+                }
+            }
+        }
         setMandatoryWords()
     }
     

@@ -34,7 +34,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             GV.basicDataRecord.difficulty = difficulty
         }
         GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage).sorted(byKeyPath: "counter")
-        let gameNumber = GV.DemoMediumGameNumber
+        let gameNumber = difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
         if GV.helpInfoRecords!.count > 0 {
             startWTScene(new: true, next: StartType.GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
         } else {

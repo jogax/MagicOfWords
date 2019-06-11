@@ -30,7 +30,7 @@ class WelcomeScene: SKScene {
     
     let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
     var myDelegate: WelcomeSceneDelegate?
-    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 18)
+    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 25 : 14)
 
     override func didMove(to view: SKView) {
         self.name = "WelcomaAnimation"
@@ -40,19 +40,19 @@ class WelcomeScene: SKScene {
         let text1 = GV.language.getText(.tcShowEasyGame)
         size.width = text1.width(font: myTitleFont!) * 1.4
         self.backgroundColor = bgColor
-        let buttonCenter1 = CGPoint(x:self.frame.maxX * 0.25, y: self.frame.height * 0.05)
+        let buttonCenter1 = CGPoint(x:self.frame.maxX * 0.20, y: self.frame.height * 0.05)
         let myButton1 = createMyButton(title: text1, size: size, center: buttonCenter1, enabled: true)
         myButton1.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(EasyButtonTapped))
         myButton1.zPosition = self.zPosition + 1
         self.addChild(myButton1)
-        let buttonCenter2 = CGPoint(x:self.frame.maxX * 0.5, y: self.frame.height * 0.05)
+        let buttonCenter2 = CGPoint(x:self.frame.maxX * 0.55, y: self.frame.height * 0.05)
         let text2 = GV.language.getText(.tcShowMediumGame)
         size.width = text2.width(font: myTitleFont!) * 1.4
         let myButton2 = createMyButton(title: text2, size: size, center: buttonCenter2, enabled: true)
         myButton2.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(MediumButtonTapped))
         myButton2.zPosition = self.zPosition + 1
         self.addChild(myButton2)
-        let buttonCenter3 = CGPoint(x:self.frame.maxX * 0.75, y: self.frame.height * 0.05)
+        let buttonCenter3 = CGPoint(x:self.frame.maxX * 0.85, y: self.frame.height * 0.05)
         let text3 = GV.language.getText(.tcLater)
         size.width = text3.width(font: myTitleFont!) * 1.4
         let myButton3 = createMyButton(title: text3, size: size, center: buttonCenter3, enabled: true)
