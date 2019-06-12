@@ -223,7 +223,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         for subscription in subscriptions {
                 subscription.unsubscribe()
         }
-
+ 
         //        let myObjects = RealmService.objects(PlayerActivity.self)
         //
         //        let syncConfig: SyncConfiguration = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL)
@@ -232,7 +232,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //        let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
         if playerActivity == nil {
             playerActivity = realmSync!.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
-            playerActivitySubscription = playerActivity!.subscribe(named: "PlayerActivity:\(GV.basicDataRecord.myName)")
+            playerActivitySubscription = playerActivity!.subscribe(named: "PlayerActivity1:\(GV.basicDataRecord.myName)")
             playerActivityToken = playerActivitySubscription!.observe(\.state) { /*[weak self]*/  state in
 //                print("in AppDelegate setConnection -> state: \(state)")
                 if state == .complete {
