@@ -1229,15 +1229,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if actString != "" {
             searchingParts.append(actString)
         }
-//        print("searchingParts:")
         if searchingParts.count == 0 {
             return nil
         }
-//        var index = 0
-//        for part in searchingParts {
-//            print("index: \(index):\(part)")
-//            index += 1
-//        }
         if searchingParts.first!.firstChar() != star && searchingParts.first!.firstChar() != questionMark {
             beginswith += searchingParts.first!
         }
@@ -1249,8 +1243,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 containsParts.append(part)
             }
         }
-//        print("beginswith:\(beginswith)")
-//        print("endswith:\(endswith)")
         var results: Results<WordListModel>?
         if searchingWord.length > 1 {
             if containsParts.count > 0 {
