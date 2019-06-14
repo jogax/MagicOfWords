@@ -33,6 +33,28 @@ class PlayerActivity: Object {
     override static func primaryKey() -> String? {
         return "name"
     }
+    
+    public func copy()->PlayerActivity {
+        let new = PlayerActivity()
+        new.name = self.name
+        new.nickName = self.nickName
+        new.keyWord = self.keyWord
+        new.isOnline = self.isOnline
+        new.onlineSince = self.onlineSince
+        new.onlineTime = self.onlineTime
+        new.playingTime = self.playingTime
+        new.countOnlines = self.countOnlines
+        new.creationTime = self.creationTime
+        new.territory = self.territory
+        new.country = self.country
+        new.deviceType = self.deviceType
+        new.expertUser = self.expertUser
+        new.maySaveInfos = self.maySaveInfos
+        new.lastTouched = self.lastTouched
+        new.myCommentar = self.myCommentar
+        new.version = self.version
+        return new
+    }
 
     //  override static func ignoredProperties() -> [String] {
     //    return []

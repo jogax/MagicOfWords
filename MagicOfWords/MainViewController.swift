@@ -258,6 +258,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         super.viewDidLoad()
         #if DEBUG
             GV.debug = true
+//            CopyRealm.shared.copyRealms()
         #endif
         showBackgroundPicture()
 //        printDEWordsSorted()

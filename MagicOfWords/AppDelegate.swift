@@ -31,6 +31,8 @@ var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfigur
 #endif
 var playerActivity: Results<PlayerActivity>? // = realmSync.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
 var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
+//var realmSync: Realm? = RealmService
+
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,
@@ -69,7 +71,6 @@ let helpInfoConfig  = Realm.Configuration(
 let realmHelp: Realm = try! Realm(configuration: helpInfoConfig)
 
 
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
@@ -89,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Realm is compacted on the first open if the configuration block conditions were met.
             _ = try Realm(configuration: config1)
         } catch {
-            print("error")
+//            print("error")
             // handle error compacting or opening Realm
         }
         let config = Realm.Configuration(
@@ -139,7 +140,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Unable to start notifier")
         }
-        
+        realmSync = RealmService
+
         return true
         
     }
@@ -208,6 +210,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //                    playerActivity![0].onlineSince = nil
                 }
             }
+            let subscriptions = realmSync!.subscriptions()
+            for subscription in subscriptions {
+                subscription.unsubscribe()
+            }
         }
     }
     var playerActivitySubscription: SyncSubscription<PlayerActivity>?
@@ -218,7 +224,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if GV.myUser == nil {
             return
         }
-        realmSync = RealmService
 //        let subscriptions = realmSync!.subscriptions()
 //        for subscription in subscriptions {
 //                subscription.unsubscribe()

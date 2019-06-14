@@ -22,6 +22,7 @@
 		201FB1DE20288CEA00EC9F36 /* en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D220288CEA00EC9F36 /* en.swift */; };
 		201FB1DF20288CEA00EC9F36 /* de.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D320288CEA00EC9F36 /* de.swift */; };
 		201FB1E020288CEA00EC9F36 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1D420288CEA00EC9F36 /* Language.swift */; };
+		2020D8E522B29A03005A026C /* CopyRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2020D8E422B29A03005A026C /* CopyRealm.swift */; };
 		202EF6C621CA9DAD000E4DA4 /* online.png in Resources */ = {isa = PBXBuildFile; fileRef = 202EF6C521CA9DAD000E4DA4 /* online.png */; };
 		202EF6C821CAA21A000E4DA4 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = 202EF6C721CAA21A000E4DA4 /* offline.png */; };
 		2038F26422316CF40028372D /* BackSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = 2038F26222316CF20028372D /* BackSimple.png */; };
@@ -168,6 +169,7 @@
 		201FB1D220288CEA00EC9F36 /* en.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = en.swift; sourceTree = "<group>"; };
 		201FB1D320288CEA00EC9F36 /* de.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = de.swift; sourceTree = "<group>"; };
 		201FB1D420288CEA00EC9F36 /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
+		2020D8E422B29A03005A026C /* CopyRealm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyRealm.swift; sourceTree = "<group>"; };
 		202EF6C521CA9DAD000E4DA4 /* online.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = online.png; sourceTree = "<group>"; };
 		202EF6C721CAA21A000E4DA4 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = offline.png; sourceTree = "<group>"; };
 		2038F26222316CF20028372D /* BackSimple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BackSimple.png; sourceTree = "<group>"; };
@@ -349,6 +351,7 @@
 				20A604B22035D93A00DC48F0 /* MyRandom.swift */,
 				201FB1B120288C2B00EC9F36 /* AppDelegate.swift */,
 				205850F32170D2C900D89B9A /* RealmManager.swift */,
+				2020D8E422B29A03005A026C /* CopyRealm.swift */,
 				201FB1BB20288C2B00EC9F36 /* Main.storyboard */,
 				201FB1BE20288C2B00EC9F36 /* Assets.xcassets */,
 				201FB1C020288C2B00EC9F36 /* LaunchScreen.storyboard */,
@@ -764,6 +767,7 @@
 				201FB1DE20288CEA00EC9F36 /* en.swift in Sources */,
 				20491F4921CFC88B0060C675 /* CommonString.swift in Sources */,
 				201FB1DA20288CEA00EC9F36 /* hu.swift in Sources */,
+				2020D8E522B29A03005A026C /* CopyRealm.swift in Sources */,
 				2065252620FD212C00F0BC46 /* WTGameWordList.swift in Sources */,
 				205627ED214AA716006B9357 /* BestScoreSync.swift in Sources */,
 				2060036E20347FF400023E10 /* WTGameboardItem.swift in Sources */,
