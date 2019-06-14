@@ -14,12 +14,15 @@ import RealmSwift
 class CopyRealm {
     static let shared = CopyRealm()
     private var oldPlayerActivity: Results<PlayerActivity>?
+    private var oldPlayerNotificationToken: NotificationToken?
     private var oldPlayerActivitySubscription: SyncSubscription<PlayerActivity>?
     private var oldPlayerActivityToken: NotificationToken?
     private var oldBestScoreForGame: Results<BestScoreForGame>?
+    private var oldBestScoreForGameNotificationToken: NotificationToken?
     private var oldBestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
     private var oldBestScoreForGameToken:  NotificationToken?
     private var oldBestScoreSync: Results<BestScoreSync>?
+    private var oldBestScoreSyncNotificationToken: NotificationToken?
     private var oldBestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
     private var oldBestScoreSyncToken:  NotificationToken?
     private var newPlayerActivity: Results<PlayerActivity>?
@@ -57,65 +60,164 @@ class CopyRealm {
                                     new_realm.add(oldRecord.copy())
                                 }
                             } else {
-                                var newRecord1 = newRecord[0]
-                                if oldRecord.lastTouched != nil && newRecord1.lastTouched != nil && oldRecord.lastTouched! > newRecord1.lastTouched! {
+                                var newRecord0 = newRecord[0]
+                                if oldRecord.lastTouched != nil && newRecord0.lastTouched != nil && oldRecord.lastTouched! > newRecord0.lastTouched! {
                                     try! new_realm.safeWrite() {
-                                        newRecord1 = oldRecord.copy()
+                                        newRecord0 = oldRecord.copy()
                                     }
                                 }
                             }
                         }
-                    }
-                }
-                print("PlayerActivity count records: \(new_realm.objects(PlayerActivity.self).count)")
-                self.oldPlayerActivitySubscription!.unsubscribe()
-                self.oldBestScoreForGame = old_realm.objects(BestScoreForGame.self)
-                self.oldBestScoreForGameSubscription = self.oldBestScoreForGame!.subscribe(named: "CopyBestScoreForGame")
-                self.oldBestScoreForGameToken = self.oldBestScoreForGameSubscription!.observe(\.state) {state in
-                    if state == .complete {
-                        print("BestScoreForGame count records: \(self.oldBestScoreForGame!.count)")
-                        for record in self.oldBestScoreForGame! {
-                            if record.owner != nil {
-                                let newRecord = new_realm.objects(BestScoreForGame.self).filter("combinedPrimary = %@", record.combinedPrimary)
-                                if newRecord.count == 0 {
-                                    try! new_realm.safeWrite() {
-                                        let newOwner = new_realm.objects(PlayerActivity.self).filter("name = %@", record.owner!.name).first
-                                        if newOwner != nil {
-                                            let new_Record: BestScoreForGame  = record.copy(newOwner: newOwner!)
-                                            new_realm.add(new_Record)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        print("BestScoreForGame count records: \(new_realm.objects(BestScoreForGame.self).count)")
-                        self.oldBestScoreForGameSubscription!.unsubscribe()
-                        self.oldBestScoreSync = old_realm.objects(BestScoreSync.self)
-                        self.oldBestScoreSyncSubscription = self.oldBestScoreSync!.subscribe(named: "CopyBestScoreSync")
-                        self.oldBestScoreForGameToken = self.oldBestScoreSyncSubscription!.observe(\.state) {state in
+                        self.oldBestScoreForGame = old_realm.objects(BestScoreForGame.self)
+                        self.oldBestScoreForGameSubscription = self.oldBestScoreForGame!.subscribe(named: "CopyBestScoreForGame")
+                        self.oldBestScoreForGameToken = self.oldBestScoreForGameSubscription!.observe(\.state) {state in
                             if state == .complete {
-                                print("BestScoreSync count records: \(self.oldBestScoreSync!.count)")
-                                for record in self.oldBestScoreSync! {
-                                    if record.owner != nil {
-                                        let newRecord = new_realm.objects(BestScoreSync.self).filter("combinedPrimary = %@", record.combinedPrimary)
-                                        if newRecord.count == 0 {
-                                            try! new_realm.safeWrite() {
-                                                let newOwners = new_realm.objects(PlayerActivity.self).filter("name = %@", record.owner!.name)
-                                                if newOwners.count == 1 {
-                                                    let new_Record: BestScoreSync  = record.copy(newOwner: newOwners.first!)
-                                                    new_realm.add(new_Record)
+                                print("OldBestScoreForGame count records: \(self.oldBestScoreForGame!.count)")
+                                self.newBestScoreForGame = new_realm.objects(BestScoreForGame.self)
+                                self.newBestScoreForGameSubscription = self.newBestScoreForGame!.subscribe(named: "NewBestScoreForGame")
+                                self.newBestScoreForGameToken = self.newBestScoreForGameSubscription!.observe(\.state) {state in
+                                    if state == .complete {
+                                        for oldRecord in self.oldBestScoreForGame! {
+                                            if oldRecord.owner != nil {
+                                                let newOwner = self.newPlayerActivity!.filter("name = %@", oldRecord.owner!.name).first
+                                                if newOwner != nil {
+                                                    let newRecord = self.newBestScoreForGame!.filter("combinedPrimary = %@", oldRecord.combinedPrimary)
+                                                    if newRecord.count == 0 {
+                                                        try! new_realm.safeWrite() {
+                                                            let new_Record: BestScoreForGame  = oldRecord.copy(newOwner: newOwner!)
+                                                            new_realm.add(new_Record)
+                                                        }
+                                                    } else  {
+                                                        var newRecord0 = newRecord[0]
+                                                        if newRecord0.bestScore < oldRecord.bestScore {
+                                                            try! new_realm.safeWrite() {
+                                                                newRecord0 = oldRecord.copy(newOwner: newOwner!)
+                                                            }
+                                                        }
+                                                    }
                                                 }
+                                            }
+                                        }
+                                        print("BestScoreForGame count records: \(self.newBestScoreForGame!.count)")
+                                        self.oldBestScoreForGameNotificationToken = self.oldBestScoreForGame!.observe {changes in
+                                            switch changes {
+                                            case .initial:
+                                                break
+                                            case .update:
+                                                for oldRecord in self.oldBestScoreForGame! {
+                                                    if oldRecord.owner != nil {
+                                                        let newOwner = self.newPlayerActivity!.filter("name = %@", oldRecord.owner!.name).first
+                                                        if newOwner != nil {
+                                                            let newRecord = self.newBestScoreForGame!.filter("combinedPrimary = %@", oldRecord.combinedPrimary)
+                                                            if newRecord.count == 0 {
+                                                                try! new_realm.safeWrite() {
+                                                                    let new_Record: BestScoreForGame  = oldRecord.copy(newOwner: newOwner!)
+                                                                    new_realm.add(new_Record)
+                                                                }
+                                                            } else  {
+                                                                var newRecord0 = newRecord[0]
+                                                                if newRecord0.bestScore < oldRecord.bestScore {
+                                                                    try! new_realm.safeWrite() {
+                                                                        newRecord0 = oldRecord.copy(newOwner: newOwner!)
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                            case .error(let error):
+                                                // An error occurred while opening the Realm file on the background worker thread
+                                                fatalError("\(error)")
+                                            }
+                                        }
+                                        
+
+                                    }
+                                }
+                                self.oldBestScoreSync = old_realm.objects(BestScoreSync.self)
+                                self.oldBestScoreSyncSubscription = self.oldBestScoreSync!.subscribe(named: "CopyBestScoreSync")
+                                self.oldBestScoreForGameToken = self.oldBestScoreSyncSubscription!.observe(\.state) {state in
+                                    if state == .complete {
+                                        print("oldBestScoreSync count records: \(self.oldBestScoreSync!.count)")
+                                        self.newBestScoreSync = new_realm.objects(BestScoreSync.self)
+                                        self.newBestScoreSyncSubscription = self.newBestScoreSync!.subscribe(named: "NewBestScoreSync")
+                                        self.newBestScoreSyncToken = self.newBestScoreSyncSubscription!.observe(\.state) {state in
+                                            if state == .complete {
+                                                for oldRecord in self.oldBestScoreSync! {
+                                                    if oldRecord.owner != nil {
+                                                        let newOwner = self.newPlayerActivity!.filter("name = %@", oldRecord.owner!.name).first
+                                                        if newOwner != nil {
+                                                            let newRecords = self.newBestScoreSync!.filter("combinedPrimary = %@", oldRecord.combinedPrimary)
+                                                            let newRecord: BestScoreSync = oldRecord.copy(newOwner: newOwner!)
+                                                            if newRecords.count == 0 {
+                                                                try! new_realm.safeWrite() {
+                                                                    new_realm.add(newRecord)
+                                                                }
+                                                            } else {
+                                                                var newRecord0 = newRecords[0]
+                                                                if newRecord0.score < oldRecord.score {
+                                                                    try! new_realm.safeWrite() {
+                                                                        newRecord0 = newRecord
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                print("NewBestScoreSync count records: \(self.newBestScoreSync!.count)")
+                                            }
+                                        }
+                                        self.oldBestScoreSyncNotificationToken = self.oldBestScoreSync!.observe {changes in
+                                            switch changes {
+                                            case .initial:
+                                                break
+                                            case .update:
+                                                for oldRecord in self.oldBestScoreSync! {
+                                                    if oldRecord.owner != nil {
+                                                        let newOwner = self.newPlayerActivity!.filter("name = %@", oldRecord.owner!.name).first
+                                                        if newOwner != nil {
+                                                            let newRecords = self.newBestScoreSync!.filter("combinedPrimary = %@", oldRecord.combinedPrimary)
+                                                            let newRecord: BestScoreSync = oldRecord.copy(newOwner: newOwner!)
+                                                            if newRecords.count == 0 {
+                                                                try! new_realm.safeWrite() {
+                                                                    new_realm.add(newRecord)
+                                                                }
+                                                            } else {
+                                                                var newRecord0 = newRecords[0]
+                                                                if newRecord0.score < oldRecord.score {
+                                                                    try! new_realm.safeWrite() {
+                                                                        newRecord0 = newRecord
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            case .error(let error):
+                                                // An error occurred while opening the Realm file on the background worker thread
+                                                fatalError("\(error)")
                                             }
                                         }
                                     }
                                 }
-                                print("BestScoreSync count records: \(new_realm.objects(BestScoreSync.self).count)")
-                                self.oldBestScoreSyncSubscription!.unsubscribe()
                             }
                         }
+                        
+                        self.oldPlayerNotificationToken = self.oldPlayerActivity!.observe {changes in
+                            switch changes {
+                            case .initial:
+                                break
+                            case .update:
+                                break
+                            case .error(let error):
+                                // An error occurred while opening the Realm file on the background worker thread
+                                fatalError("\(error)")
+                            }
+                        }
+
                     }
                 }
-                
             }
         }
     }
