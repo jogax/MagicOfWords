@@ -22,7 +22,16 @@ class CopyRealm {
     private var oldBestScoreSync: Results<BestScoreSync>?
     private var oldBestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
     private var oldBestScoreSyncToken:  NotificationToken?
-    public func copyRealms() {
+    private var newPlayerActivity: Results<PlayerActivity>?
+    private var newPlayerActivitySubscription: SyncSubscription<PlayerActivity>?
+    private var newPlayerActivityToken: NotificationToken?
+    private var newBestScoreForGame: Results<BestScoreForGame>?
+    private var newBestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
+    private var newBestScoreForGameToken:  NotificationToken?
+    private var newBestScoreSync: Results<BestScoreSync>?
+    private var newBestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
+    private var newBestScoreSyncToken:  NotificationToken?
+   public func copyRealms() {
         var new_syncUserConfig = SyncUser.current?.configuration(realmURL: GV.NEW_REALM_URL, fullSynchronization: false, enableSSLValidation: true)
         new_syncUserConfig!.objectTypes = [PlayerActivity.self, BestScoreSync.self, BestScoreForGame.self]
         let new_realm = try! Realm(configuration: new_syncUserConfig!)
@@ -35,12 +44,26 @@ class CopyRealm {
         oldPlayerActivityToken = oldPlayerActivitySubscription!.observe(\.state) {state in
             print("in copyRealms playerActivity state: \(state)")
             if state == .complete {
-                print("PlayerActivity count records: \(self.oldPlayerActivity!.count)")
-                for record in self.oldPlayerActivity! {
-                    let newRecord = new_realm.objects(PlayerActivity.self).filter("name = %@", record.name)
-                    if newRecord.count == 0 {
-                        try! new_realm.safeWrite() {
-                            new_realm.add(record.copy())
+                print("OldPlayerActivity count records: \(self.oldPlayerActivity!.count)")
+                self.newPlayerActivity = new_realm.objects(PlayerActivity.self)
+                self.newPlayerActivitySubscription = self.newPlayerActivity!.subscribe(named: "NewPlayerActivity")
+                self.newPlayerActivityToken = self.newPlayerActivitySubscription!.observe(\.state) {state in
+                    if state == .complete {
+                        print("NewPlayerActivity count records: \(self.newPlayerActivity!.count)")
+                        for oldRecord in self.oldPlayerActivity! {
+                            let newRecord = self.newPlayerActivity!.filter("name = %@", oldRecord.name)
+                            if newRecord.count == 0 {
+                                try! new_realm.safeWrite() {
+                                    new_realm.add(oldRecord.copy())
+                                }
+                            } else {
+                                var newRecord1 = newRecord[0]
+                                if oldRecord.lastTouched != nil && newRecord1.lastTouched != nil && oldRecord.lastTouched! > newRecord1.lastTouched! {
+                                    try! new_realm.safeWrite() {
+                                        newRecord1 = oldRecord.copy()
+                                    }
+                                }
+                            }
                         }
                     }
                 }
