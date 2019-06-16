@@ -573,7 +573,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                     switch changes {
                     case .initial:
                         self!.initialLoadDone = true
-                    case .update(_, let deletions, let insertions, let modifications):
+                    case .update(_, let deletions, let insertions, _ /*let modifications*/):
                         if self!.initialLoadDone && self!.tableType == .BestScoreSync {
                             // Query results have changed, so apply them to the UITableView
                             if insertions.count > 0 {
@@ -582,14 +582,16 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                             if deletions.count > 0 {
                                 showPlayerActivityView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
                             }
-                            showPlayerActivityView.beginUpdates()
-                            showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-                                                              with: .automatic)
-                            showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-                                                              with: .automatic)
-                            showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-                                                              with: .automatic)
-                            showPlayerActivityView.endUpdates()
+                            self!.generateTableData()
+                            self!.showPlayerActivityView!.reloadData()
+//                            showPlayerActivityView.beginUpdates()
+//                            showPlayerActivityView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+//                                                              with: .automatic)
+//                            showPlayerActivityView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
+//                                                              with: .automatic)
+//                            showPlayerActivityView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+//                                                              with: .automatic)
+//                            showPlayerActivityView.endUpdates()
                         }
                     case .error(let error):
                         // An error occurred while opening the Realm file on the background worker thread
@@ -619,6 +621,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     var bestScoreTable = [BestScoreData]()
     
     private func generateTableData() {
+//        xxx
         bestScoreTable.removeAll()
         switch tableType {
         case .BestScoreSync:

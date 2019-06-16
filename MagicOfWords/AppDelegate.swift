@@ -140,7 +140,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Unable to start notifier")
         }
-        realmSync = RealmService
+//        realmSync = RealmService
 
         return true
         

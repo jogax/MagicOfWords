@@ -34,26 +34,26 @@ class PlayerActivity: Object {
         return "name"
     }
     
-    public func copy()->PlayerActivity {
-        let new = PlayerActivity()
-        new.name = self.name
-        new.nickName = self.nickName
-        new.keyWord = self.keyWord
-        new.isOnline = self.isOnline
-        new.onlineSince = self.onlineSince
-        new.onlineTime = self.onlineTime
-        new.playingTime = self.playingTime
-        new.countOnlines = self.countOnlines
-        new.creationTime = self.creationTime
-        new.territory = self.territory
-        new.country = self.country
-        new.deviceType = self.deviceType
-        new.expertUser = self.expertUser
-        new.maySaveInfos = self.maySaveInfos
-        new.lastTouched = self.lastTouched
-        new.myCommentar = self.myCommentar
-        new.version = self.version
-        return new
+    public func update(from: PlayerActivity) {
+        if self.name != from.name {
+            self.name = from.name
+        }
+        self.nickName = from.nickName
+        self.keyWord = from.keyWord
+        self.isOnline = from.isOnline
+        self.onlineSince = from.onlineSince
+        self.onlineTime = from.onlineTime
+        self.playingTime = from.playingTime
+        self.countOnlines = from.countOnlines
+        self.creationTime = from.creationTime
+        self.territory = from.territory
+        self.country = from.country
+        self.deviceType = from.deviceType
+        self.expertUser = from.expertUser
+        self.maySaveInfos = from.maySaveInfos
+        self.lastTouched = from.lastTouched
+        self.myCommentar = from.myCommentar
+        self.version = from.version
     }
 
     //  override static func ignoredProperties() -> [String] {

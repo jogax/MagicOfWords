@@ -30,19 +30,19 @@ class BestScoreSync: Object {
         return "combinedPrimary"
     }
 
-    public func copy(newOwner: PlayerActivity)->BestScoreSync {
-        let new = BestScoreSync()
-        new.combinedPrimary = self.combinedPrimary
-        new.gameNumber = self.gameNumber
-        new.language = self.language
-        new.playerName = self.playerName
-        new.score = self.score
-        new.finished = self.finished
-        new.usedTime = self.usedTime
-        new.owner = newOwner
-        new.creationTime = self.creationTime
-        new.timeStamp = self.timeStamp
-        return new
+    public func update(from: BestScoreSync, newOwner: PlayerActivity) {
+        if self.combinedPrimary == "" {
+            self.combinedPrimary = from.combinedPrimary
+        }
+        self.gameNumber = from.gameNumber
+        self.language = from.language
+        self.playerName = from.playerName
+        self.score = from.score
+        self.finished = from.finished
+        self.usedTime = from.usedTime
+        self.owner = newOwner
+        self.creationTime = from.creationTime
+        self.timeStamp = from.timeStamp
     }
 
 //  override static func ignoredProperties() -> [String] {

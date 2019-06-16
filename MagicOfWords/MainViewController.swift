@@ -256,6 +256,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
+        realmSync = RealmService
         #if DEBUG
             GV.debug = true
             CopyRealm.shared.copyRealms()

@@ -24,15 +24,15 @@ class BestScoreForGame: Object {
         return "combinedPrimary"
     }
     
-    public func copy(newOwner: PlayerActivity)->BestScoreForGame {
-        let new = BestScoreForGame()
-        new.combinedPrimary = self.combinedPrimary
-        new.gameNumber = self.gameNumber
-        new.language = self.language
-        new.bestScore = self.bestScore
-        new.timeStamp = self.timeStamp
-        new.owner = newOwner
-        return new
+    public func update(from: BestScoreForGame, newOwner: PlayerActivity) {
+        if self.combinedPrimary == "" {
+            self.combinedPrimary = from.combinedPrimary
+        }
+        self.gameNumber = from.gameNumber
+        self.language = from.language
+        self.bestScore = from.bestScore
+        self.timeStamp = from.timeStamp
+        self.owner = newOwner
     }
     
     //  override static func ignoredProperties() -> [String] {
