@@ -268,6 +268,7 @@ class CopyRealm {
                                                 }
                                             case .error(let error):
                                                 // An error occurred while opening the Realm file on the background worker thread
+                                                print(error)
                                                 fatalError("\(error)")
                                             }
                                         }
