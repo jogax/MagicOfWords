@@ -73,6 +73,8 @@ enum TextConstants: Int {
     tcIsOnline,
     tcOnlineSince,
     tcOnlineTime,
+    tcLastOnline,
+    tcLastOnlineTime,
     tcSetNickName,
     tcSave,
     tcAddCodeRecommended,
@@ -116,7 +118,8 @@ enum TextConstants: Int {
     tcSimpleStyle,
     tcEliteStyle,
     tcGenerateBestScore,
-    tcComment,
+    tcDevice,
+    tcLand,
     tcUseCloudGameData,
     tcChooseGameToGet,
     tcGameLine,
@@ -141,7 +144,8 @@ enum TextConstants: Int {
     tcHardGame,
     tcVeryHardGame,
     tcAreYouSureForNewDemo,
-    tcAreYouSureMessage
+    tcAreYouSureMessage,
+    tcVersion
 }
 
     let LanguageEN = "en" // index 0

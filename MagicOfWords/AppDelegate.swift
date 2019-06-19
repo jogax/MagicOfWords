@@ -210,10 +210,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //                    playerActivity![0].onlineSince = nil
                 }
             }
-            let subscriptions = realmSync!.subscriptions()
-            for subscription in subscriptions {
-                subscription.unsubscribe()
-            }
+//            let subscriptions = realmSync!.subscriptions()
+//            for subscription in subscriptions {
+//                subscription.unsubscribe()
+//            }
         }
     }
     var playerActivitySubscription: SyncSubscription<PlayerActivity>?
@@ -224,6 +224,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if GV.myUser == nil {
             return
         }
+        realmSync = RealmService
+        #if DEBUG
+        if GV.onIpad {
+            CopyRealm.shared.copyRealms()
+        }
+        #endif
 //        let subscriptions = realmSync!.subscriptions()
 //        for subscription in subscriptions {
 //                subscription.unsubscribe()

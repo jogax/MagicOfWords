@@ -73,7 +73,9 @@ let deDictionary: [TextConstants: String] = [
     .tcNickName:            "Spitzname",
     .tcIsOnline:            "ist online",
     .tcOnlineSince:         "Online_seit",
-    .tcOnlineTime:          "Onlinezeit  ",
+    .tcOnlineTime:          "Onlinezeit",
+    .tcLastOnline:          "Zuletzt        ",
+    .tcLastOnlineTime:      "Dauer",
     .tcSetNickName:         "Spitzname ändern",
     .tcSave:                "Speichern",
     .tcAddCodeRecommended:  "Wenn Du ein Keyword hinfügst, kannst Du auf allen Deien Geräten denselben Benutzernamen verwenden",
@@ -117,7 +119,8 @@ let deDictionary: [TextConstants: String] = [
     .tcSimpleStyle:        "Einfach",
     .tcEliteStyle:         "Elite",
     .tcGenerateBestScore:  "BestScore-Liste generieren",
-    .tcComment:            "Kommentar",
+    .tcDevice:             "Gerät",
+    .tcLand:               " Land",
     .tcUseCloudGameData:   "Spiel aus der Cloud",
     .tcChooseGameToGet:    "Wähle einen Spiel für einlesen vom Cloud",
     .tcGameLine:           "Notifier: %, GameNumber: %",
@@ -143,6 +146,7 @@ let deDictionary: [TextConstants: String] = [
     .tcVeryHardGame:        "Sehr hart",
     .tcAreYouSureForNewDemo: "Möchten Sie wirklich eine neue Demo erstellen??",
     .tcAreYouSureMessage:   "Die alte Demo-Informationen werden gelöscht!",
+    .tcVersion:             "Version",
 ]
 
 

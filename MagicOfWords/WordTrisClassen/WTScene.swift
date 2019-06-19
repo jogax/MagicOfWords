@@ -1440,7 +1440,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        undoButton!.isEnabled = !hide
         allWordsButton!.isEnabled = !hide
         finishButton!.isEnabled = !hide
-        goBackButton!.isEnabled = !hide
+        goBackButton!.isEnabled = showHelp ? true : !hide
         searchButton!.isEnabled = !hide
         if hide {
             goToPreviousGameButton!.alpha = 0.2
@@ -1448,7 +1448,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            undoButton!.alpha = 0.2
             allWordsButton!.alpha = 0.2
             finishButton!.alpha = 0.2
-            goBackButton!.alpha = 0.2
+            goBackButton!.alpha = showHelp ? 1.0 : 0.2
             searchButton!.alpha = 0.2
         } else {
             goToPreviousGameButton!.alpha = 1.0
@@ -1919,10 +1919,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
         var fixLetters = [UsedLetter]()
         let gameNumber = GV.playingRecord.gameNumber % 1000
+        let constant1 = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? 8 : 4 // Starts with constant1 fixLetters
+        let constant2 = 4
         let roundCount = GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count
         let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
-        let countOfFixLetters = 8 + roundCount * 4
-        let countOfLetters = countOfFixLetters + 4 * Int(gameNumber / 100)
+        let countOfLetters = constant1 + roundCount * constant2
         var remainigLength = countOfLetters
         var myLengths = [Int]()
         repeat {
@@ -1982,8 +1983,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } while positionExists
             fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
             fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
-            fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
-            fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
+            if showHelp || roundCount % 2 == 0 || countOfLetters - letterIndex > 4 {
+                fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
+                fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
+            }
             letterIndex += 4
         }
         wtGameboard!.addFixLettersToGamearray(fixLetters: fixLetters)

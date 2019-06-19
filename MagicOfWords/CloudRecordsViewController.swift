@@ -15,12 +15,16 @@ import GameplayKit
 class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     var showPlayerActivityView: WTTableView? = WTTableView()
     var headerLine = ""
-    let color = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
+    let color = UIColor(red: 230/255, green: 230/255, blue: 240/255, alpha: 1.0)
     var lengthOfNickName = 16
     var lengthOfKeyWord = 9
-    var lengthOfComment = 9
+    var lengthOfDevice = 18
+    var lengthOfLand = 7
     var lengthOfIsOnline = 0
     var lengthOfOnlineTime = 9
+    var lengthOfLastOnline = 18
+    var lengthOfOnlineDuration = 8
+    var lengthOfVersion = 10
     var lengthOfGameNumber = 6
     var lengthOfScore = 5
     var lengthOfPlace = 5
@@ -107,7 +111,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: cellWidth, height: cellHeight))
 //        cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.010)))
-        cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
+        cell.setBGColor(color: actColor) //showWordsBackgroundColor)
         switch tableType {
         case .Players:
             let isOnline = playerTable[indexPath.row].isOnline
@@ -115,10 +119,14 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
             let image = origImage.resizeImage(newWidth: cellHeight * 0.6)
             cell.addButton(image: image, xPos: cellHeight * 0.5, callBack: buttonTapped)
             cell.addColumn(text: " " + (playerTable[indexPath.row].nickName.fixLength(length: lengthOfNickName - 4, leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
-            cell.addColumn(text: (playerTable[indexPath.row].keyWord.fixLength(length: lengthOfKeyWord, leadingBlanks: false)), color: actColor)
-//            cell.addColumn(text: String(playerTable[indexPath.row].isOnline).fixLength(length: lengthOfIsOnline, leadingBlanks: false), color: actColor)
-            cell.addColumn(text: (playerTable[indexPath.row].comment.fixLength(length: 10, leadingBlanks: false)), color: actColor)
-            cell.addColumn(text: String(playerTable[indexPath.row].onlineTime.HourMinSec).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
+            cell.addColumn(text: (playerTable[indexPath.row].device.fixLength(length: lengthOfDevice, leadingBlanks: false)), color: actColor)
+            cell.addColumn(text: (playerTable[indexPath.row].land.fixLength(length: lengthOfLand, leadingBlanks: false)), color: actColor)
+            cell.addColumn(text: String(playerTable[indexPath.row].onlineTimeAll.HourMin).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
+            if GV.onIpad {
+                cell.addColumn(text: String(playerTable[indexPath.row].lastOnlineStart.toString()).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: String(playerTable[indexPath.row].lastOnlineTime.HourMin).fixLength(length: lengthOfOnlineDuration, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: playerTable[indexPath.row].version.fixLength(length: lengthOfVersion, leadingBlanks: false), color: actColor)
+            }
         case .BestScoreSync:
             let actColor = (bestScoreTable[indexPath.row].gameNumber % 2 == 0 ? UIColor.white : color)
            cell.addColumn(text: "  " + String(bestScoreTable[indexPath.row].gameNumber).fixLength(length: lengthOfGameNumber, leadingBlanks: false), color: actColor)
@@ -168,12 +176,20 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         var text2 = ""
         var text3 = ""
         var text4 = ""
+        var text5 = ""
+        var text6 = ""
+        var text7 = ""
         switch tableType {
         case .Players:
             text1 = "\(GV.language.getText(.tcNickName)) ".fixLength(length: lengthOfNickName, center: true)
-            text2 = "\(GV.language.getText(.tcKeywordHeader)) ".fixLength(length: lengthOfKeyWord, center: true)
-            text3 = "\(GV.language.getText(.tcComment)) ".fixLength(length: lengthOfComment, center: true)
+            text2 = "\(GV.language.getText(.tcDevice)) ".fixLength(length: lengthOfDevice, center: true)
+            text3 = "\(GV.language.getText(.tcLand)) ".fixLength(length: lengthOfLand, center: true)
             text4 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengthOfOnlineTime, center: true)
+            if GV.onIpad {
+                text5 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengthOfLastOnline, center: true)
+                text6 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengthOfOnlineDuration, center: true)
+                text7 = "\(GV.language.getText(.tcVersion))".fixLength(length: lengthOfVersion, center: true)
+            }
         case .BestScoreSync:
             text1 = "\(GV.language.getText(.tcGameNumber))".fixLength(length: lengthOfGameNumber, center: true)
             text2 = "\(GV.language.getText(.tcPlace)) ".fixLength(length: lengthOfPlace, center: true)
@@ -189,6 +205,9 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         headerLine += text2
         headerLine += text3
         headerLine += text4
+        headerLine += text5
+        headerLine += text6
+        headerLine += text7
         lengthOfIsOnline = text2.length
     }
     
@@ -258,7 +277,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     let playersTitle = "Player"
     let allTitle = "All"
     let bestTitle = "Best"
-    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 18)
+    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 10)
     var sortUp = true
     var buttonsCreated = false
     enum TableType: Int {
@@ -414,8 +433,8 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     
     private func showPlayerActivity() {
         deactivateSubscriptions()
-        let sort = "myCommentar"
-        self.playerActivityItems = RealmService.objects(PlayerActivity.self).filter("keyWord != %@ AND !(nickName BEGINSWITH %d)", "SimJogaxKey", "Sim").sorted(byKeyPath: sort, ascending: true)
+        let sort = "lastTouched"
+        self.playerActivityItems = RealmService.objects(PlayerActivity.self).filter("keyWord != %@ AND !(nickName BEGINSWITH %d) AND lastTouched != nil", "SimJogaxKey", "Sim").sorted(byKeyPath: sort, ascending: false)
         playerSubscription = playerActivityItems!.subscribe(named: "playerActivitySortedBy1:\(sort)")
         playerSubscriptionToken = playerSubscription!.observe(\.state) { [weak self]  state in
 //                print("in Subscription!")
@@ -457,7 +476,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                         showPlayerActivityView.reloadData()
                         self!.initialLoadDone = true
                     //                print("Initial Data displayed")
-                    case .update(_, let deletions, let insertions, _):
+                    case .update(_, let deletions, let insertions, let modifications):
                         if self!.initialLoadDone && self!.tableType == .Players {
                             // Query results have changed, so apply them to the UITableView
                             if insertions.count > 0 {
@@ -468,6 +487,8 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                                 showPlayerActivityView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
                                 self!.modifyButtonsPosition()
                            }
+                            if modifications.count > 0 {
+                            }
                             self!.generatePlayerData()
                             self!.showPlayerActivityView!.reloadData()
 
@@ -499,10 +520,13 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     }
     struct PlayerData {
         var nickName = ""
-        var keyWord = ""
-        var comment = ""
+        var device = ""
+        var land = ""
         var isOnline = false
-        var onlineTime = 0
+        var onlineTimeAll = 0
+        var lastOnlineStart = Date()
+        var lastOnlineTime = 0
+        var version = ""
     }
     var playerTable = [PlayerData]()
     
@@ -510,24 +534,31 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
     private func generatePlayerData() {
         var countOnlineUser = 0
         playerTable.removeAll()
-        let users = playerActivityItems!.sorted(byKeyPath: "myCommentar")
+        let users = playerActivityItems!.sorted(byKeyPath: "lastTouched", ascending: false)
         for user in users {
+//            if user.nickName == "JogaxPhX" {
+//                print("stop at me")
+//            }
             var playerData = PlayerData()
             playerData.nickName = user.nickName!
-            playerData.keyWord = user.keyWord == nil ? "" : user.keyWord!
-            playerData.comment = user.myCommentar == nil ? "" : user.myCommentar!
-            if playerData.comment.beginsWith ("Apl ") {
-                continue
-            }
-            if user.lastTouched != nil {
-                playerData.isOnline = user.isOnline && getLocalDate().timeIntervalSince(user.lastTouched!) <= 128
-            } else {
-                playerData.isOnline = false
+            playerData.device = user.deviceType!.subString(at: 0, length: 20)
+            playerData.land = user.country!.lowercased() + "/" + user.territory!
+            playerData.isOnline = user.isOnline
+            playerData.version = user.version
+            if getLocalDate().timeIntervalSince(user.lastTouched!) > 61 && user.isOnline {
                 try! RealmService.safeWrite() {
                     user.isOnline = false
                 }
+                playerData.isOnline = false
             }
-            playerData.onlineTime = user.onlineTime
+            playerData.onlineTimeAll = user.onlineTime
+            if user.onlineSince != nil {
+                playerData.lastOnlineStart = user.onlineSince!
+                playerData.lastOnlineTime = Int(user.lastTouched!.timeIntervalSince(user.onlineSince!))
+            } else {
+                playerData.lastOnlineStart = user.lastTouched!.addingTimeInterval(-600)
+                playerData.lastOnlineTime = 600
+            }
             if playerData.isOnline {
                 playerTable.insert(playerData, at:countOnlineUser)
                 countOnlineUser += 1

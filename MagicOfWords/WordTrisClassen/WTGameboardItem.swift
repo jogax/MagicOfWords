@@ -112,8 +112,9 @@ class WTGameboardItem: SKSpriteNode {
         return copyed
     }
     public func setLetter(letter: String, toStatus: ItemStatus, calledFrom: String)->Bool {
-        
-//        print("In SetLetter: caller: \(calledFrom), oldLetter: \(self.letter), letter: \(letter), fromStatus: \(status), toStatus: \(toStatus)")
+        if letter != emptyLetter && toStatus == .Empty {
+            print("hier at problem")
+        }
         if self.status == .Used || self.status == .WholeWord {
             self.origStatus = self.status
             setStatus(toStatus: .Error, calledFrom: "setLetter - 1")
@@ -288,7 +289,15 @@ class WTGameboardItem: SKSpriteNode {
             origStatus = status
             origLetter = letter
             status = .Temporary
-        default:
+        case (.WholeWord, .DarkGreenStatus):
+            origStatus = status
+            origLetter = letter
+            status = toStatus
+        case (.WholeWord, .Error):
+            origStatus = status
+            origLetter = letter
+            status = toStatus
+       default:
             self.status = newStatus
         }
         self.status = letter == emptyLetter ? .Empty : self.status
@@ -343,7 +352,8 @@ class WTGameboardItem: SKSpriteNode {
 //    }
     
     public func toString()->String {
-        return status.description + letter
+        let actLetter = status == .Empty || status == .Temporary ? emptyLetter : letter
+        return status.description + actLetter
     }
     
     public func restore(from: String) {

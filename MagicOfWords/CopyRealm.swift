@@ -8,6 +8,7 @@
 // For copying of
 //
 
+#if DEBUG
 import Foundation
 import RealmSwift
 
@@ -282,3 +283,4 @@ class CopyRealm {
         }
     }
 }
+#endif

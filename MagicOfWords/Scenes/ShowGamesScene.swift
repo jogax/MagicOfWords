@@ -50,7 +50,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         background.size = CGSize(width: self.size.height * widthMultiplier, height: self.size.height)
         addChild(background)
 //        self.backgroundColor = SKColor(red: 200/255, green: 220/255, blue: 208/255, alpha: 1)
-        self.allResultsItems = RealmService.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@ and gameNumber < %d", GV.actLanguage, 1000).sorted(byKeyPath: "gameNumber", ascending: true)
+        self.allResultsItems = RealmService.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
 
         showFinishedGamesInTableView()
     }
@@ -65,6 +65,10 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
 //    }
 //    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let subscribes = RealmService.subscriptions()
+        for subscribe in subscribes {
+            subscribe.unsubscribe()
+        }
         goBack(gameNumberSelected: false, gameNumber: 0)
     }
     
@@ -112,7 +116,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         self.scene?.view?.addSubview(showGamesInTableView!)
         subscription = allResultsItems!.subscribe(named: "allResultsNew_\(GV.actLanguage)")
         subscriptionToken = subscription.observe(\.state) { [weak self]  state in
-//            print("is ShowGamesScene at showFinishedGame -> state: \(state)")
+            print("is ShowGamesScene at showFinishedGame -> state: \(state)")
            if state == .complete {
             #if DEBUG
                 self!.checkContinuity()
@@ -150,25 +154,6 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 case .update(_, _, _, _):
 //                    print("deletions: \(deletions), insertions: \(insertions), modifications: \(modifications)")
                     self!.gamesForShow = self!.getGamesForShow()
-                    //                 if self!.initialLoadDone {
-                    // Query results have changed, so apply them to the UITableView
-//                    if insertions.count > 0 {
-//                        if self!.frame.height * 0.8 > showGamesInTableView.frame.size.height + CGFloat(insertions.count) * self!.lineHeight {
-//                            showGamesInTableView.frame.size.height += CGFloat(insertions.count) * self!.lineHeight
-//                        }
-//                    }
-//                    if deletions.count > 0 {
-//                        showGamesInTableView.frame.size.height -= CGFloat(deletions.count) * self!.lineHeight //self!.title.height(font: self!.myFont!)
-//                    }
-//                    showGamesInTableView.beginUpdates()
-//                    showGamesInTableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-//                                                    with: .automatic)
-//                    showGamesInTableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-//                                                    with: .automatic)
-//                    showGamesInTableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-//                                                    with: .automatic)
-//                    showGamesInTableView.endUpdates()
-                //                }
                 case .error(let error):
                     // An error occurred while opening the Realm file on the background worker thread
                     fatalError("\(error)")
@@ -255,13 +240,13 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         let notExists:String = "---"
         var returnArray = [FinishedGameData]()
         var games: Results<GameDataModel>
-        games = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber < %d", GV.language.getText(.tcAktLanguage), 1000).sorted(byKeyPath: "gameNumber", ascending: true)
+        games = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.language.getText(.tcAktLanguage), GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
         for game in games {
             if game.gameStatus == GV.GameStatusNew {
                 continue
             }
             var item = FinishedGameData()
-            item.gameNumber = String((game.gameNumber % 1000) + 1)
+            item.gameNumber = String((game.gameNumber % GV.maxGameNumber) + 1)
             let combinedKey = item.gameNumber + game.language
             item.score = String(game.score)
             item.bestPlayer = notExists

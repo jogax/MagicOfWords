@@ -29,5 +29,9 @@ Build 15, Version 1.15 (0.93)
 - Новость: показывает в демо-игру при первом запуске
 - Új: lejátszik egy demo játékot az első indításkor
 
-Buil 16, Version 1.16 (0.94)
+Build 16, Version 1.16 (0.94)
+- New: a new difficulty with fix letters
+- Neu: eine neu Schwierigkeitsgrad with fixed Buchstaben
+- Новость: новый уровень сложности с фиксированными буквами
+- Új: új nehézségi fokozat bevezetése fix betükkel
 

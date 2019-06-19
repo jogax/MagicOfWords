@@ -65,24 +65,24 @@ public extension UIDevice {
         case "iPad4,4", "iPad4,5", "iPad4,6":           return "iPad Mini 2"
         case "iPad4,7", "iPad4,8", "iPad4,9":           return "iPad Mini 3"
         case "iPad5,1", "iPad5,2":                      return "iPad Mini 4"
-        case "iPad6,3", "iPad6,4":                      return "iPad Pro 9.7 Inch"
-        case "iPad6,11", "iPad6,12":                    return "iPad 9.7 5th Gen"
-        case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5 Inch"
-        case "iPad7,5", "iPad7,6":                      return "iPad 9.7 6th Gen"
-        case "iPad8,1", "iPad8,2", "iPad8,3", "iPad8,4":return "iPad Pro 11 Inch"
-        case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9 Inch"
-        case "iPad7,1", "iPad7,2":                      return "iPad Pro 12.9 Inch 2. Generation"
-        case "iPad8,5", "iPad8,6", "iPad8,7", "iPad8,8":return "iPad Pro 12.9 Inch 3. Generation"
+        case "iPad6,3", "iPad6,4":                      return "iPad Pro 9.7"
+        case "iPad6,11", "iPad6,12":                    return "iPad 9.7 5th"
+        case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5"
+        case "iPad7,5", "iPad7,6":                      return "iPad 9.7 6th"
+        case "iPad8,1", "iPad8,2", "iPad8,3", "iPad8,4":return "iPad Pro 11"
+        case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9"
+        case "iPad7,1", "iPad7,2":                      return "iPad Pro 12.9 2th"
+        case "iPad8,5", "iPad8,6", "iPad8,7", "iPad8,8":return "iPad Pro 12.9 3th"
         case "AppleTV5,3":                              return "Apple TV"
         case "i386", "x86_64":
             switch (width, height) {
-            case (320, 480):                            return "iPhone 4s Simulator"
-            case (320, 568):                            return "iPhone 5s Simulator"
-            case (375, 667):                            return "iPhone 6  Simulator"
-            case (414, 736):                            return "iPhone 6 Plus Simulator"
-            case (768, 1024):                           return "iPad Air Simulator"
-            case (1024, 1366):                          return "iPad Pro Simulator"
-            case (375, 812):                            return "iPhone_X Simulator"
+            case (320, 480):                            return "iPhone 4s Sim"
+            case (320, 568):                            return "iPhone 5s Sim"
+            case (375, 667):                            return "iPhone 6  Sim"
+            case (414, 736):                            return "iPhone 6 Plus Sim"
+            case (768, 1024):                           return "iPad Air Sim"
+            case (1024, 1366):                          return "iPad Pro Sim"
+            case (375, 812):                            return "iPhone_X Sim"
             default:                                    return identifier
             }
         default:                                        return identifier
@@ -149,10 +149,10 @@ extension Int {
             hours = minutes / 60
             minutes = minutes % 60
         }
-        let hoursString = hours > 0 ? String(hours) + "h " : ""
+        let hoursString = String(hours) + "h "
         let minutesString = (minutes < 10 ? "0" : "") + String(minutes) + "m "
-        let secondsString = hours > 0 ? (seconds < 10 ? "0" : "") : String(seconds) + "s"
-        return hoursString + minutesString + secondsString
+//        let secondsString = hours > 0 ? (seconds < 10 ? "0" : "") : String(seconds) + "s"
+        return hoursString + minutesString// + secondsString
     }
     func isMemberOf(_ values: Int...)->Bool {
         for index in 0..<values.count {
@@ -446,7 +446,11 @@ extension String {
     func subString(at: Int, length: Int) -> String {
         if self.length > 0 {
             let indexStartOfText = self.index(self.startIndex, offsetBy: at)
-            let indexEndOfText = self.index(self.startIndex, offsetBy: at + length)
+            var lastPosition = at + length
+            if lastPosition >= self.length {
+                lastPosition = self.length
+            }
+            let indexEndOfText = self.index(self.startIndex, offsetBy: lastPosition)
             let returnString = self[indexStartOfText..<indexEndOfText]
             return String(returnString)
         } else {
@@ -615,6 +619,18 @@ extension Data {
         
     }
     
+    
+}
+
+extension Date {
+    func toString()->String {
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd HH:mm"
+        df.timeZone = TimeZone(abbreviation: "UTC")
+        let returnValue = df.string(from: self)
+
+        return returnValue
+    }
 }
 
 extension UIViewController {

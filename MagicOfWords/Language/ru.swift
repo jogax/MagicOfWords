@@ -73,7 +73,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcNickName:            "Псевдоним",
     .tcIsOnline:            "В_сети",
     .tcOnlineSince:         "В_сети_с",
-    .tcOnlineTime:          "Время_в_сети  ",
+    .tcOnlineTime:          "   В сети  ",
+    .tcLastOnline:          "Играл",
+    .tcLastOnlineTime:      "Время",
     .tcSetNickName:         "Выбери псевдоним",
     .tcSave:                "Сохранить",
     .tcAddCodeRecommended:  "Если ты добавишь ключевое слово, ты можешь использовать один и тот же псевдоним на всех твоих устройствах",
@@ -117,7 +119,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcSimpleStyle:        "Простой",
     .tcEliteStyle:         "Изящный",
     .tcGenerateBestScore:  "Создать список лучших результатов",
-    .tcComment:            "Коммент:",
+    .tcDevice:             "Устройство",
+    .tcLand:               " Страна",
     .tcUseCloudGameData:   "Получить игру из облака",
     .tcChooseGameToGet:    "Выбери игру, чтобы получить из облака",
     .tcGameLine:           "Уведомитель: %, Игра: %",
@@ -143,5 +146,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcVeryHardGame:        "Очень сложная",
     .tcAreYouSureForNewDemo: "Действительно хочешь создать новую демоверсию?",
     .tcAreYouSureMessage:   "Старая демо-информация будет удалена!",
+    .tcVersion:             "Версия",
 ]
 
