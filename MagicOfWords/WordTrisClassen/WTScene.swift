@@ -106,7 +106,6 @@ let iFiveMinutes = 300
 
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableViewDelegate {
-    
     func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord = SelectedWord()) {
         var longWaitAction = SKAction.wait(forDuration: 0.0)
         let duration = 0.4
@@ -127,6 +126,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 sequence.append(showOrigAction)
                 sequence.append(waitAction)
             }
+            GV.blinkingNodes.append(myNode)
+            GV.countBlinkingNodes += 1
             myNode.run(SKAction.sequence(sequence))
         }
         longWaitAction = SKAction.wait(forDuration: 3 * 2 * duration)
@@ -147,12 +148,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 sequence.append(waitAction)
                 sequence.append(showOrigAction)
                 sequence.append(waitAction)
-                
             }
-//            myNode.zPosition = 500
             myNode.run(SKAction.sequence(sequence))
-            
-            
         }
 
     }
@@ -448,6 +445,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        var onGameArray = false
 //        var shapeOnGameArray = false
     }
+    
     
     var wtSceneDelegate: WTSceneDelegate?
     var wtGameboard: WTGameboard?
@@ -1435,8 +1433,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var buttonSize = CGSize(width: CGFloat(0), height: CGFloat(0))
     
     func hideButtons(hide: Bool) {
-        goToPreviousGameButton!.isEnabled = !hide
-        goToNextGameButton!.isEnabled = !hide
+        goToPreviousGameButton!.isEnabled = hide ? false : hasPreviousRecords()
+        goToNextGameButton!.isEnabled = hide ? false : hasNextRecords()
 //        undoButton!.isEnabled = !hide
         allWordsButton!.isEnabled = !hide
         finishButton!.isEnabled = !hide
@@ -1451,8 +1449,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             goBackButton!.alpha = showHelp ? 1.0 : 0.2
             searchButton!.alpha = 0.2
         } else {
-            goToPreviousGameButton!.alpha = 1.0
-            goToNextGameButton!.alpha = 1.0
+            goToPreviousGameButton!.alpha = hasPreviousRecords() ? 1.0 : 0.2
+            goToNextGameButton!.alpha = hasNextRecords() ? 1.0 : 0.2
 //            undoButton!.alpha = 1.0
             allWordsButton!.alpha = 1.0
             finishButton!.alpha = 1.0
@@ -1843,7 +1841,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         timeForGame = TimeForGame(from: GV.playingRecord.time)
         myTimer = MyTimer(time: timeForGame)
         wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
-        createFixLetters()
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
         }
@@ -1855,8 +1852,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if !new {
             wtGameboard!.setRoundInfos()
-            WTGameWordList.shared.restoreFromPlayingRecord()
             restoreGameArray()
+            WTGameWordList.shared.restoreFromPlayingRecord()
             showFoundedWords()
         } else {
             if GV.playingRecord.rounds.count == 0 {
@@ -1866,7 +1863,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     GV.playingRecord.rounds.append(rounds)
                 }
             }
-
+            createFixLetters()
             pieceArray = Array(repeating: WTPiece(), count: 3)
 //            roundIndexes.append(0)
             for index in 0..<3 {
@@ -1878,9 +1875,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 bgSprite!.addChild(pieceArray[index])
             }
         }
-
-        createGoToPreviousGameButton(enabled: hasPreviousRecords(playingRecord: GV.playingRecord))
-        createGoToNextGameButton(enabled: hasNextRecords(playingRecord: GV.playingRecord))
+        createGoToPreviousGameButton(enabled: hasPreviousRecords())
+        createGoToNextGameButton(enabled: hasNextRecords())
         createAllWordsButton()
         createFinishButton()
         createSearchButton()
@@ -1914,16 +1910,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
             return
         }
-//        if GV.playingRecord.gameNumber == demoGameNumber - 1 {
-//            return
-//        }
+        let isDemo = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber
         var fixLetters = [UsedLetter]()
         let gameNumber = GV.playingRecord.gameNumber % 1000
-        let constant1 = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? 8 : 4 // Starts with constant1 fixLetters
-        let constant2 = 4
+        let startValue = isDemo ? 8 : 6 // Starts with startValue fixLetters
+        let adderValue = isDemo ? 4 : 2
         let roundCount = GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count
         let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
-        let countOfLetters = constant1 + roundCount * constant2
+        let countLettersOnGameboard = wtGameboard!.getCountLetters()
+        let maxLetterCount = 30
+        let calculatedFixLetterCount = startValue + roundCount * adderValue
+        var countOfLetters = calculatedFixLetterCount
+        if !isDemo {
+            let remainingFreePlaces = maxLetterCount - countLettersOnGameboard
+            countOfLetters = remainingFreePlaces > calculatedFixLetterCount ? calculatedFixLetterCount : remainingFreePlaces
+        }
         var remainigLength = countOfLetters
         var myLengths = [Int]()
         repeat {
@@ -1960,34 +1961,89 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         myLetters = inputWord
 
         var letterIndex = 0
-        for _ in 1...countOfLetters / 4 {
-            var col = 0
-            var row = 0
-            var positionExists = false
-            repeat {
-                col = random.getRandomInt(0, max: 4)
-                row = random.getRandomInt(0, max: 4)
-                positionExists = false
-                for usedLetter in fixLetters {
-                    if usedLetter.col == col && usedLetter.row == row {
+        if isDemo {
+            for _ in 1...(countOfLetters + 2) / 4 {
+                var col = 0
+                var row = 0
+                var positionExists = false
+                repeat {
+                    col = random.getRandomInt(0, max: 4)
+                    row = random.getRandomInt(0, max: 4)
+                    positionExists = false
+                    for usedLetter in fixLetters {
+                        if usedLetter.col == col && usedLetter.row == row {
+                            positionExists = true
+                        }
+                    }
+                    if GV.gameArray[col][row].status != .Empty ||
+                       GV.gameArray[9 - col][row].status != .Empty ||
+                       GV.gameArray[col][9 - row].status != .Empty ||
+                       GV.gameArray[9 - col][9 - row].status != .Empty
+                    {
                         positionExists = true
                     }
+                } while positionExists
+                fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
+                fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
+                if showHelp || roundCount % 2 == 0 || countOfLetters - letterIndex > 4 {
+                    fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
+                    fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
                 }
-                if GV.gameArray[col][row].status != .Empty ||
-                   GV.gameArray[9 - col][row].status != .Empty ||
-                   GV.gameArray[col][9 - row].status != .Empty ||
-                   GV.gameArray[9 - col][9 - row].status != .Empty
-                {
-                    positionExists = true
-                }
-            } while positionExists
-            fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
-            fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
-            if showHelp || roundCount % 2 == 0 || countOfLetters - letterIndex > 4 {
-                fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
-                fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
+                letterIndex += 4
             }
-            letterIndex += 4
+        } else {
+            let Q1: Int8 = 1
+            let Q2: Int8 = 2
+            let Q3: Int8 = 4
+            let Q4: Int8 = 8
+            var OKPositions = [(col: Int, row: Int, quoters: Int8)]()
+            var countFreePlaces = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+//            Analyse gameArray for free places
+            for col in 0...4 {
+                for row in 0...4 {
+                    var quoters: Int8 = 0
+                    quoters |= GV.gameArray[col][row].status == .Empty ? Q1 : 0
+                    quoters |= GV.gameArray[9 - col][row].status == .Empty ? Q2 : 0
+                    quoters |= GV.gameArray[col][9 - row].status == .Empty ? Q3 : 0
+                    quoters |= GV.gameArray[9 - col][9 - row].status == .Empty ? Q4 : 0
+                    OKPositions.append((col, row, quoters))
+                    countFreePlaces[Int(quoters)] += 1
+                }
+            }
+            var OKPositionsSorted = OKPositions.sorted(by: {$0.quoters > $1.quoters})
+            repeat {
+                var counter = 0
+                var countFreePlacesIndex = 16
+                repeat {
+                    countFreePlacesIndex -= 1
+                    counter = countFreePlaces[countFreePlacesIndex] - 1
+                } while counter < 0 && countFreePlacesIndex > 0
+                if counter < 0 {
+                    break
+                }
+                let positionIndex = random.getRandomInt(0, max: counter)
+                let col = OKPositionsSorted[positionIndex].col
+                let row = OKPositionsSorted[positionIndex].row
+                let actQouterInfo = OKPositionsSorted[positionIndex].quoters
+                countFreePlaces[countFreePlacesIndex] -= 1
+                OKPositionsSorted.remove(at:positionIndex)
+                if actQouterInfo & Q1 != 0 {
+                    fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
+                    letterIndex += 1
+                }
+                if letterIndex < countOfLetters && actQouterInfo & Q2 != 0 {
+                    fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex)))
+                    letterIndex += 1
+                }
+                if letterIndex < countOfLetters && actQouterInfo & Q3 != 0 {
+                    fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at: letterIndex)))
+                    letterIndex += 1
+                }
+                if letterIndex < countOfLetters  && actQouterInfo & Q4 != 0 {
+                    fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex)))
+                    letterIndex += 1
+                }
+            } while letterIndex < countOfLetters
         }
         wtGameboard!.addFixLettersToGamearray(fixLetters: fixLetters)
     }
@@ -2325,14 +2381,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var gameFinished = false
     
-    private func hasPreviousRecords(playingRecord: GameDataModel)->Bool {
+    private func hasPreviousRecords()->Bool {
         return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber >= %d and gameNumber < %d and language = %@",
-            GV.GameStatusPlaying, GV.GameStatusContinued, GV.minGameNumber, playingRecord.gameNumber, GV.actLanguage).count > 0
+            GV.GameStatusPlaying, GV.GameStatusContinued, GV.minGameNumber, GV.playingRecord.gameNumber, GV.actLanguage).count > 0
     }
     
-    private func hasNextRecords(playingRecord: GameDataModel)->Bool {
+    private func hasNextRecords()->Bool {
         return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber > %d and gameNumber <= %d and language = %@",
-            GV.GameStatusPlaying, GV.GameStatusContinued, playingRecord.gameNumber, GV.maxGameNumber, GV.actLanguage).count > 0
+            GV.GameStatusPlaying, GV.GameStatusContinued, GV.playingRecord.gameNumber, GV.maxGameNumber, GV.actLanguage).count > 0
     }
     
     @objc private func countTime(timerX: Timer) {
@@ -2557,6 +2613,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         startShapeIndex = -1
         let touchLocation = touches.first!.location(in: self)
+        if GV.countBlinkingNodes > 0 {
+            for myNode in GV.blinkingNodes {
+                if myNode.hasActions() {
+                    myNode.removeAllActions()
+                    let showOrigAction = SKAction.run({
+                        myNode.setStatus(toStatus: .OrigStatus, calledFrom: "blinkWords - 4")
+                    })
+                    myNode.run(showOrigAction)
+                }
+            }
+            GV.blinkingNodes.removeAll()
+            GV.countBlinkingNodes = 0
+        }
         let touchedNodes = analyzeNodes(touchLocation: touchLocation)
         myTouchesBegan(location: touchLocation, touchedNodes: touchedNodes)
     }
@@ -2904,6 +2973,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
                 }
                 activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
+                setUndoButton(enabled: true)
 //                activityItems.append(activityItem)
 //                setUndoButton(enabled: true)
 //                undoSprite.alpha = 1.0
@@ -2976,10 +3046,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else {
             print("hier")
         }
+//        xxx goToPreviousGameButton
 
         startShapeIndex = -1
-        _ = checkFreePlace(showAlert: true)
-        checkIfGameFinished()
+        if checkFreePlace(showAlert: true) {
+            checkIfGameFinished()
+        }
         return returnBool
     }
     var bestScoreSync: Results<BestScoreSync>?
@@ -3646,6 +3718,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             removeNodesWith(name: "Pos\(pieceIndex)")             // remove the piece from this position, if exists
             bgSprite!.addChild(pieceArray[pieceIndex])
         }
+        wtGameboard!.clearGameArray(all: true)
         activityRoundItem = [ActivityRound]()
         for round in GV.playingRecord.rounds {
             activityRoundItem.append(ActivityRound())
@@ -3658,6 +3731,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         }
+//        createFixLetters()
         if GV.playingRecord.rounds.count > 0 {
             actRound = GV.playingRecord.rounds.count
             if GV.playingRecord.rounds.last!.gameArray.count > 0 {

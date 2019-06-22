@@ -771,7 +771,8 @@ class WTGameboard: SKShapeNode {
         var returnBool = true
         for col in 0..<countCols {
             for row in 0..<countCols {
-                if GV.gameArray[col][row].fixItem && GV.gameArray[col][row].status != .WholeWord {
+                let item = GV.gameArray[col][row]
+                if item.fixItem && item.status == .Used {
                     returnBool = false
                 }
             }
@@ -889,10 +890,21 @@ class WTGameboard: SKShapeNode {
         }
     }
     
-    public func clearGameArray() {
+    public func getCountLetters()->Int {
+        var returnValue = 0
         for row in 0..<countCols {
             for col in 0..<countCols {
-                GV.gameArray[col][row].remove()
+                returnValue += GV.gameArray[col][row].status != .Empty ? 1 : 0
+            }
+        }
+        return returnValue
+    }
+
+    
+    public func clearGameArray(all: Bool = false) {
+        for row in 0..<countCols {
+            for col in 0..<countCols {
+                GV.gameArray[col][row].remove(all: all)
             }
         }
     }

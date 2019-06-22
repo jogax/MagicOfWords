@@ -54,7 +54,8 @@ public struct SelectedWord {
 //    var mandatory = false
     var score: Int {
         get {
-            let score = (word.length > 25 ? maxScore : pointsForWord[word.length]!) * (countFixLetters + 1)
+            let multiplier = countFixLetters > 0 ? countFixLetters + GV.playingRecord.rounds.count : 1
+            let score = (word.length > 25 ? maxScore : pointsForWord[word.length]!) * multiplier //(countFixLetters + 1)
             return score
         }
     }

@@ -111,6 +111,9 @@ struct GV {
     static var totalScore = 0
     static var generateHelpInfo = false
     static var mandatoryWords = [String]()
+    static var blinkingNodes = [WTGameboardItem]()
+    static var countBlinkingNodes = 0
+    
 //    static var greenSpriteArray = [WTGameboardItem]()
     static var nextRoundAnimationFinished = true
     

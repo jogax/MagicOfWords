@@ -10,7 +10,7 @@ import Foundation
 import GameplayKit
 
 enum ItemStatus: Int {
-    case Empty = 0, Temporary, Used, WholeWord, FixItem, Error, DarkGreenStatus, GoldStatus, DarkGoldStatus, OrigStatus
+    case Empty = 0, Temporary, Used, WholeWord, FixUsed, FixWholeWord, FixItem, Error, DarkGreenStatus, GoldStatus, DarkGoldStatus, OrigStatus
     var description: String {
         return String(self.rawValue)
     }
@@ -247,9 +247,8 @@ class WTGameboardItem: SKSpriteNode {
             status = .Empty
         }
     }
-    public func remove() {
-//        self.status = .empty
-        if !fixItem {
+    public func remove(all:Bool = false) {
+        if all || !fixItem {
             label.text = emptyLetter
             self.letter = emptyLetter
             setStatus(toStatus: .Empty, calledFrom: "remove")
@@ -352,22 +351,42 @@ class WTGameboardItem: SKSpriteNode {
 //    }
     
     public func toString()->String {
+        
+        var modifiedStatus = status
+        if fixItem {
+            switch status {
+            case .Used:
+                modifiedStatus = .FixUsed
+            case .WholeWord:
+                modifiedStatus = .FixWholeWord
+            default: break
+            }
+        }
         let actLetter = status == .Empty || status == .Temporary ? emptyLetter : letter
-        return status.description + actLetter
+        return modifiedStatus.description + actLetter
     }
     
     public func restore(from: String) {
 //        var color: MyColor = .myWhiteColor
         var status: ItemStatus = .Empty
         var letter = emptyLetter
-        remove()
-        if fixItem {
-            self.status = .Empty
-            self.letter = emptyLetter
-        }
-        if let rawStatus = Int(from.subString(at: 0, length: 1)) {
+        remove(all: true)
+//        if fixItem {
+//            self.status = .Empty
+//            self.letter = emptyLetter
+//        }
+        if let rawStatus = Int(from.firstChar()) {
             if let itemStatus = ItemStatus(rawValue: rawStatus) {
-                status = itemStatus
+                switch itemStatus {
+                case .FixUsed:
+                    fixItem = true
+                    status = .Used
+                case .FixWholeWord:
+                    fixItem = true
+                    status = .WholeWord
+                default:
+                    status = itemStatus
+                }
             }
         }
         letter = from.subString(at: 1, length: 1)
