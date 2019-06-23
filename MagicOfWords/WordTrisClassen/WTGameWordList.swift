@@ -357,10 +357,11 @@ public class WTGameWordList {
             cleanGameArray()
             resetOccurencesInWords()
             wordsInRound.append(WordInRound())
+            wtGameboard!.stringToGameArray(string: round.gameArray)
             initFromString(from: round.infos)
         }
     }
-    
+     
     private func resetOccurencesInWords() {
         for col in 0..<GV.size {
             for row in 0..<GV.size {

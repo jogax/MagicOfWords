@@ -102,6 +102,8 @@ let iHalfHour = 1800
 let iQuarterHour = 900
 let iTenMinutes = 600
 let iFiveMinutes = 300
+var wtGameboard: WTGameboard?
+
 
 
 
@@ -448,7 +450,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     
     var wtSceneDelegate: WTSceneDelegate?
-    var wtGameboard: WTGameboard?
 //    var wordsToPlay = Array<GameDataModel>()
 //    var allWords = String()
     var workingLetters = String()
@@ -898,7 +899,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 let roundScore = WTGameWordList.shared.getPointsForLetters()
                 GV.playingRecord.rounds.last!.roundScore = roundScore
                 let newRound = RoundDataModel()
-                newRound.gameArray = self.wtGameboard!.gameArrayToString()
+                newRound.gameArray = wtGameboard!.gameArrayToString()
                 GV.playingRecord.rounds.append(newRound)
                 self.timeForGame.incrementMaxTime(value: iHalfHour)
                 WTGameWordList.shared.addNewRound()
@@ -906,6 +907,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
             }
             createFixLetters()
+            checkIfGameFinished()
             saveActualState()
             createNextRound = false
             GV.nextRoundAnimationFinished = false
@@ -1850,11 +1852,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * pieceArrayCenterY)
         }
+        createGoToPreviousGameButton(enabled: hasPreviousRecords())
+        createGoToNextGameButton(enabled: hasNextRecords())
+        createAllWordsButton()
+        createFinishButton()
+        createSearchButton()
+        createSaveDataButton()
         if !new {
             wtGameboard!.setRoundInfos()
-            restoreGameArray()
             WTGameWordList.shared.restoreFromPlayingRecord()
+            restoreGameArray()
             showFoundedWords()
+            checkIfGameFinished()
         } else {
             if GV.playingRecord.rounds.count == 0 {
                 actRound = 1
@@ -1875,12 +1884,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 bgSprite!.addChild(pieceArray[index])
             }
         }
-        createGoToPreviousGameButton(enabled: hasPreviousRecords())
-        createGoToNextGameButton(enabled: hasNextRecords())
-        createAllWordsButton()
-        createFinishButton()
-        createSearchButton()
-        createSaveDataButton()
 //        saveActualState()
         
         if timer != nil {
@@ -3049,7 +3052,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        xxx goToPreviousGameButton
 
         startShapeIndex = -1
-        if checkFreePlace(showAlert: true) {
+        if checkFreePlace() {
             checkIfGameFinished()
         }
         return returnBool
@@ -3073,7 +3076,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     @objc private func startNextRound() {
         self.modifyHeader()
 //        let roundScore = WTGameWordList.shared.getPointsForLetters()
-        self.wtGameboard!.clearGreenFieldsForNextRound()
+        wtGameboard!.clearGreenFieldsForNextRound()
         actRound = GV.playingRecord.rounds.count + 1
         createNextRound = true
         self.enabled = true
@@ -3215,7 +3218,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         case SolvedOnlyFixLetters = 0, SolvedOnlyMandatoryWords, GameFinished
     }
     
-    private func checkIfGameFinished() {
+    private func checkIfGameFinished(showAlert: Bool = true) {
         let allFixLettersUsed: Bool = wtGameboard!.checkFixLetters()
         let allMandatoryWordsSolved: Bool = WTGameWordList.shared.gameFinished()
         switch (allMandatoryWordsSolved, allFixLettersUsed) {
@@ -3255,7 +3258,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             finishButton!.isHidden = true
             saveToRealmCloud()
         case (true, true): // game finished
-            if !goOnPlaying {
+            goOnPlaying = true
+            finishButton!.isHidden = false
+//            if !goOnPlaying && showAlert {
+            if !(GV.playingRecord.allMandatoryIndicated && GV.playingRecord.allFixIndicated) && showAlert {
                 congratulations(congratulationType: .GameFinished)
                 saveToRealmCloud()
             }
@@ -3520,7 +3526,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    private func checkFreePlace(showAlert: Bool)->Bool {
+    private func checkFreePlace()->Bool {
         var placeFound = true
         for piece in pieceArray {
             for rotateIndex in 0..<4 {
@@ -3631,6 +3637,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 WTGameWordList.shared.restoreFromPlayingRecord()
                 restoreGameArray()
                 modifyHeader()
+                checkIfGameFinished(showAlert: false)
             }
         } else {
             switch activityRoundItem[activityRoundItem.count - 1].activityItems.last!.type {
