@@ -252,6 +252,7 @@ class WTGameboardItem: SKSpriteNode {
             label.text = emptyLetter
             self.letter = emptyLetter
             setStatus(toStatus: .Empty, calledFrom: "remove")
+            fixItem = false
         }
     }
     

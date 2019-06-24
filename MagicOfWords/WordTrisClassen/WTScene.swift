@@ -377,13 +377,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var parentViewController: UIViewController?
     
 
-    func showScore(newWord: SelectedWord, totalScore: Int, doAnimate: Bool, changeTime: Int) {
+    func showScore(newWord: SelectedWord, minus: Bool = false, doAnimate: Bool) {
         if doAnimate {
-            showWordAndScore(word: newWord, score: totalScore)
+            showWordAndScore(word: newWord, minus: minus)
         }
-        if changeTime != 0 {
-            timeForGame.incrementMaxTime(value: changeTime * 60)
-        }
+//        if changeTime != 0 {
+//            timeForGame.incrementMaxTime(value: changeTime * 60)
+//        }
 //        if changeTime < 0 {
 //            timeForGame.decrementMaxTime(value: changeTime * 60)
 //        }
@@ -392,9 +392,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         return
     }
     
-    private func showWordAndScore(word: SelectedWord, score: Int) {
+    private func showWordAndScore(word: SelectedWord, minus: Bool) {
         let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.04
-        let textOnBalloon = word.word + " (" + String(score) + ")"
+        let textOnBalloon = word.word + " (" + (minus ? "-" : "") + String(word.score) + ")"
         let elite = GV.buttonType == GV.ButtonTypeElite
         let balloon = SKSpriteNode(imageNamed: elite ? "bubbleGoldElite" : "BalloonSimple")
         let width = textOnBalloon.width(font: myFont!) * (GV.onIpad ? 2.0 : 1.5)
@@ -409,7 +409,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         balloon.position = CGPoint(x: startPos.x, y: startPos.y )
         bgSprite!.addChild(balloon)
         let scoreLabel = SKLabelNode(fontNamed: GV.actFont)
-        scoreLabel.text = String(score)
+        scoreLabel.text = String(word.score)
 //        scoreLabel.verticalAlignmentMode = .center
         scoreLabel.position = CGPoint(x: balloon.size.width * 0, y: -balloon.size.width * 0.40)
         scoreLabel.horizontalAlignmentMode = .center
@@ -527,7 +527,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1.0)
     let mandatoryWordsHeaderName = "°°°mandatoryWords°°°"
     let ownWordsHeaderName = "°°°ownWords°°°"
-    let bonusHeaderName = "°°°bonusHeader°°°"
+//    let bonusHeaderName = "°°°bonusHeader°°°"
     let undoName = "°°°undo°°°"
     let goBackName = "°°°goBack°°°"
     let headerName = "°°°header°°°"
@@ -562,7 +562,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GV.totalScore = 0
         GV.mandatoryScore = 0
         GV.ownScore = 0
-        GV.bonusScore = 0
+//        GV.bonusScore = 0
         if GV.generateHelpInfo {
             initiateHelpModel()
             if !showHelp {
@@ -824,7 +824,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let gameNumberLinePosition:CGFloat = 0.93
     let bestScoreLinePosition:CGFloat = 0.91
     let myScoreLinePosition:CGFloat = 0.89
-    let bonusPointsLinePosition:CGFloat = 0.86
+//    let bonusPointsLinePosition:CGFloat = 0.86
     let ownWordsLinePosition:CGFloat = 0.84
     let mandatoryWordsLinePosition:CGFloat = 0.82
     let buttonLineCenterY:CGFloat = 0.265
@@ -967,10 +967,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         
-        if let label = bgSprite!.childNode(withName: bonusHeaderName)! as? SKLabelNode {
-            label.text = GV.language.getText(.tcBonusHeader, values: String(GV.bonusScore))
-        }
-
+//        if let label = bgSprite!.childNode(withName: bonusHeaderName)! as? SKLabelNode {
+//            label.text = GV.language.getText(.tcBonusHeader, values: String(GV.bonusScore))
+//        }
+//
         if let label = bgSprite!.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
             label.text = GV.language.getText(.tcWordsToCollect, values: String(GV.mandatoryWords.count), String(WTGameWordList.shared.getCountMandatoryWords(founded: true)),
                 String(WTGameWordList.shared.getCountMandatoryWords(founded: false)),
@@ -1760,12 +1760,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        var counter = 1
 //        let wordList = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: "°")
         
-        createLabel(word: GV.language.getText(.tcBonusHeader, values:
-            String(WTGameWordList.shared.getCountWords(mandatory: false)),
-                                              String(WTGameWordList.shared.getCountOwnWords(founded: false)),
-                                              //                    String(WTGameWordList.shared.getScore(mandatory: false))), first: false, name: ownWordsHeaderName)
-            String(0)),
-                    linePosition: bonusPointsLinePosition, name: bonusHeaderName)
+//        createLabel(word: GV.language.getText(.tcBonusHeader, values:
+//            String(WTGameWordList.shared.getCountWords(mandatory: false)),
+//                                              String(WTGameWordList.shared.getCountOwnWords(founded: false)),
+//                                              //                    String(WTGameWordList.shared.getScore(mandatory: false))), first: false, name: ownWordsHeaderName)
+//            String(0)),
+//                    linePosition: bonusPointsLinePosition, name: bonusHeaderName)
         createLabel(word: GV.language.getText(.tcOwnWords, values:
             String(WTGameWordList.shared.getCountOwnWords(founded:true)),
             String(WTGameWordList.shared.getCountOwnWords(founded: false)),
@@ -3631,7 +3631,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 GV.totalScore = 0
                 GV.mandatoryScore = 0
                 GV.ownScore = 0
-                GV.bonusScore = 0
+//                GV.bonusScore = 0
                 wtGameboard!.setRoundInfos()
                 WTGameWordList.shared.reset()
                 WTGameWordList.shared.restoreFromPlayingRecord()
@@ -3706,6 +3706,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 resetHelpInfo()
             }
             setUndoButton(enabled: false)
+            GV.totalScore = 0
             wtGameboard!.clearGameArray()
         }
             

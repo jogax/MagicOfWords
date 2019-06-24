@@ -107,7 +107,7 @@ struct GV {
     static let sizeOfGrid = 10
     static var mandatoryScore = 0
     static var ownScore = 0
-    static var bonusScore = 0
+//    static var bonusScore = 0
     static var totalScore = 0
     static var generateHelpInfo = false
     static var mandatoryWords = [String]()
