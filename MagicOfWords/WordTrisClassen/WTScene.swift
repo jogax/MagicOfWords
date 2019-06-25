@@ -2336,8 +2336,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 fingerActions.append(deleteAction)
                 break
             }
-//            let sequence = SKAction.sequence(fingerActions)
-//            fingerSprite.run(SKAction.sequence([sequence]))
         }
         let removeAction = SKAction.run ({
             GV.generateHelpInfo = generateHelpInfo
