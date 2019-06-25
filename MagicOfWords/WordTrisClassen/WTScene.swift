@@ -988,7 +988,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var returnBool = false
         if realmWordList.objects(WordListModel.self).filter("word = %@", GV.actLanguage + word.lowercased()).count == 1 {
             let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
-            let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord)
+            let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord, round: GV.playingRecord.rounds.count)
             returnBool = boolValue
         }
 //        else {
@@ -2236,6 +2236,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        })
 //        fingerActions.append(firstAction)
         setUndoButton(enabled: false)
+        bgSprite!.addChild(fingerSprite)
         for (index, record) in GV.helpInfoRecords!.enumerated() {
             let countMoves = record.movedInfo.components(separatedBy: "°").count
             var duration: Double = (slow ? 0.25 : 0.05) / Double(countMoves)
@@ -2254,9 +2255,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: letters, duration: duration, counter: record.counter, index: index)
             }
-//            if record.counter == 9 {
-//                print("hier")
-//            }
 
             switch record.typeOfTouch {
 //                FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
@@ -2338,6 +2336,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 fingerActions.append(deleteAction)
                 break
             }
+//            let sequence = SKAction.sequence(fingerActions)
+//            fingerSprite.run(SKAction.sequence([sequence]))
         }
         let removeAction = SKAction.run ({
             GV.generateHelpInfo = generateHelpInfo
@@ -2379,7 +2379,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let sequence = SKAction.sequence(fingerActions)
         fingerSprite.run(SKAction.sequence([sequence]))
-        bgSprite!.addChild(fingerSprite)
     }
     
     var gameFinished = false

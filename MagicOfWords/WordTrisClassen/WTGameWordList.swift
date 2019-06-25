@@ -377,10 +377,10 @@ public class WTGameWordList {
         if from.length > 0 {
             let selectedWords = from.components(separatedBy: itemSeparator)
             for selectedWordString in selectedWords {
-                var selectedWord = SelectedWord(from: selectedWordString)
-                selectedWord.setScore(round: round)
+                let selectedWord = SelectedWord(from: selectedWordString)
+//                selectedWord.setScore(round: round)
                 if selectedWord.word.length > 0 {
-                    _ = addWord(selectedWord: selectedWord, doAnimate: false)
+                    _ = addWord(selectedWord: selectedWord, doAnimate: false, round: round)
                 }
             }
         }
@@ -398,7 +398,7 @@ public class WTGameWordList {
         return returnBool
     }
     
-    public func addWord(selectedWord: SelectedWord, doAnimate: Bool = true)->Bool {
+    public func addWord(selectedWord: SelectedWord, doAnimate: Bool = true, round: Int)->Bool {
         var mySelectedWord = selectedWord
         var noCommonLetter = true
         var noDiagonal = true
@@ -453,7 +453,7 @@ public class WTGameWordList {
                 let connectionType = mySelectedWord.connectionTypes[index]
                 GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, incrWords: true, calledFrom: "addWord")
             }
-            mySelectedWord.setScore(round: GV.playingRecord.rounds.count)
+            mySelectedWord.setScore(round: round)
             wordsInRound[wordsInRound.count - 1].wordsInGame.append(mySelectedWord)
             addWordToAllWords(selectedWord: mySelectedWord)
 
