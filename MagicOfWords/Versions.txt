@@ -35,3 +35,6 @@ Build 16, Version 1.16 (0.94)
 - Новость: новый уровень сложности с фиксированными буквами
 - Új: új nehézségi fokozat bevezetése fix betükkel
 
+
+Build 17, Version 1.17 (0.95)
+

@@ -324,26 +324,7 @@ public class WTGameWordList {
         }
         return returnValue
     }
-//    public func getCountFoundedWords(mandatory: Bool, countFoundedMandatory: Bool = false, countAll: Bool = false)->Int {
-//        var counter = 0
-//        var countAllWords = 0
-//        var countFoundedMandatoryWords = 0
-//        for word in allWords {
-//            if word.mandatory == mandatory {
-//                for item in wordsInRound {
-//                    for myWord in item.wordsInGame {
-//                        if myWord.word == word.word {
-//                            countAllWords += 1
-//                        }
-//                    }
-//                }
-//                countFoundedMandatoryWords += word.counter > 0 ? 1 : 0
-//                counter += 1
-//            }
-//        }
-//        return countFoundedMandatory ? countFoundedMandatoryWords : countAll ? countAllWords : counter
-//    }
-    
+
     public func restoreFromPlayingRecord() {
         clearWordsInGame()
         for (index, round) in GV.playingRecord.rounds.enumerated() {
@@ -367,13 +348,11 @@ public class WTGameWordList {
         for col in 0..<GV.size {
             for row in 0..<GV.size {
                 GV.gameArray[col][row].clearConnectionType()
-//                GV.gameArray[col][row].remove(all: true)
             }
         }
     }
     
     private func initFromString(from: String, round: Int) {
-        
         if from.length > 0 {
             let selectedWords = from.components(separatedBy: itemSeparator)
             for selectedWordString in selectedWords {

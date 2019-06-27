@@ -1921,12 +1921,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let roundCount = GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count
         let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
         let countLettersOnGameboard = wtGameboard!.getCountLetters()
-        let maxLetterCount = 30
+        let maxLetterCount = 50
+        let maxFixLetterCount = 32
         let calculatedFixLetterCount = startValue + roundCount * adderValue
         var countOfLetters = calculatedFixLetterCount
         if !isDemo {
             let remainingFreePlaces = maxLetterCount - countLettersOnGameboard
             countOfLetters = remainingFreePlaces > calculatedFixLetterCount ? calculatedFixLetterCount : remainingFreePlaces
+            countOfLetters = countOfLetters < maxFixLetterCount ? countOfLetters : maxFixLetterCount
         }
         var remainigLength = countOfLetters
         var myLengths = [Int]()
