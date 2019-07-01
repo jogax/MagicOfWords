@@ -65,9 +65,6 @@
 		20531C6820B6EA5400E060E2 /* ShowGamesScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20531C6720B6EA5400E060E2 /* ShowGamesScene.swift */; };
 		20553D8A225665C7001628D1 /* MyAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20553D89225665C7001628D1 /* MyAlertController.swift */; };
 		2055B489211C74A9000FD7A9 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */; };
-		2055E2AD2215B01E004E3260 /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2055E2AB2215B01E004E3260 /* Mandatory.realm */; };
-		2055E2AE2215B01E004E3260 /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2055E2AC2215B01E004E3260 /* WordList.realm */; };
-		2055E2B02215B02C004E3260 /* MandatoryList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2055E2AF2215B02C004E3260 /* MandatoryList.realm */; };
 		205627ED214AA716006B9357 /* BestScoreSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205627EC214AA716006B9357 /* BestScoreSync.swift */; };
 		205627EF214AA9E9006B9357 /* PlayerActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205627EE214AA9E9006B9357 /* PlayerActivity.swift */; };
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
@@ -89,6 +86,10 @@
 		206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206664A720A45A3000C6C5E4 /* RoundDataModel.swift */; };
 		206AD3F6222C36C700B7C5B6 /* GraySprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 206AD3F5222C36C700B7C5B6 /* GraySprite.png */; };
 		206EA3FB2271D31300F184B4 /* MenuBG.png in Resources */ = {isa = PBXBuildFile; fileRef = 206EA3FA2271D31200F184B4 /* MenuBG.png */; };
+		2078EE6522CA340000502C7C /* MandatoryList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6122CA33FF00502C7C /* MandatoryList.realm */; };
+		2078EE6622CA340000502C7C /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6222CA33FF00502C7C /* WordList.realm */; };
+		2078EE6722CA340000502C7C /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6322CA340000502C7C /* Mandatory.realm */; };
+		2078EE6822CA340000502C7C /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6422CA340000502C7C /* HelpInfo.realm */; };
 		207B67862243BDBB001456C8 /* GameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207B67852243BDBB001456C8 /* GameData.swift */; };
 		207B67882243BE87001456C8 /* RoundData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207B67872243BE87001456C8 /* RoundData.swift */; };
 		207B678A2243C9F8001456C8 /* save.png in Resources */ = {isa = PBXBuildFile; fileRef = 207B67892243C9F7001456C8 /* save.png */; };
@@ -129,7 +130,6 @@
 		20895E8A228DB72D00506685 /* GreenLilaSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E7A228DB72C00506685 /* GreenLilaSprite.png */; };
 		208B278F21FB382C007259B6 /* enRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B278E21FB382C007259B6 /* enRestWords.txt */; };
 		208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B279021FB8ED1007259B6 /* ruRestWords.txt */; };
-		2093807A2252466B009C742F /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = 209380792252466B009C742F /* HelpInfo.realm */; };
 		2093C4B922B116EE00B16649 /* DarkGreenSprite1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2093C49122B116EB00B16649 /* DarkGreenSprite1.png */; };
 		2093C4BA22B116EE00B16649 /* DarkGoldSprite1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2093C49222B116EB00B16649 /* DarkGoldSprite1.png */; };
 		209739182295779A00360819 /* GoldSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 209739172295779900360819 /* GoldSprite.png */; };
@@ -214,9 +214,6 @@
 		20531C6720B6EA5400E060E2 /* ShowGamesScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowGamesScene.swift; sourceTree = "<group>"; };
 		20553D89225665C7001628D1 /* MyAlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAlertController.swift; sourceTree = "<group>"; };
 		2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
-		2055E2AB2215B01E004E3260 /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
-		2055E2AC2215B01E004E3260 /* WordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = WordList.realm; sourceTree = "<group>"; };
-		2055E2AF2215B02C004E3260 /* MandatoryList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = MandatoryList.realm; sourceTree = "<group>"; };
 		205627EC214AA716006B9357 /* BestScoreSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestScoreSync.swift; sourceTree = "<group>"; };
 		205627EE214AA9E9006B9357 /* PlayerActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerActivity.swift; sourceTree = "<group>"; };
 		2057BA272029F57B000DF337 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -238,6 +235,10 @@
 		206664A720A45A3000C6C5E4 /* RoundDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundDataModel.swift; sourceTree = "<group>"; };
 		206AD3F5222C36C700B7C5B6 /* GraySprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraySprite.png; sourceTree = "<group>"; };
 		206EA3FA2271D31200F184B4 /* MenuBG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MenuBG.png; sourceTree = "<group>"; };
+		2078EE6122CA33FF00502C7C /* MandatoryList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = MandatoryList.realm; sourceTree = "<group>"; };
+		2078EE6222CA33FF00502C7C /* WordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = WordList.realm; sourceTree = "<group>"; };
+		2078EE6322CA340000502C7C /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
+		2078EE6422CA340000502C7C /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
 		207B67852243BDBB001456C8 /* GameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameData.swift; sourceTree = "<group>"; };
 		207B67872243BE87001456C8 /* RoundData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundData.swift; sourceTree = "<group>"; };
 		207B67892243C9F7001456C8 /* save.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = save.png; sourceTree = "<group>"; };
@@ -280,7 +281,6 @@
 		20895E7A228DB72C00506685 /* GreenLilaSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite.png; sourceTree = "<group>"; };
 		208B278E21FB382C007259B6 /* enRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enRestWords.txt; sourceTree = "<group>"; };
 		208B279021FB8ED1007259B6 /* ruRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruRestWords.txt; sourceTree = "<group>"; };
-		209380792252466B009C742F /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
 		2093C49122B116EB00B16649 /* DarkGreenSprite1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DarkGreenSprite1.png; sourceTree = "<group>"; };
 		2093C49222B116EB00B16649 /* DarkGoldSprite1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DarkGoldSprite1.png; sourceTree = "<group>"; };
 		209739172295779900360819 /* GoldSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GoldSprite.png; sourceTree = "<group>"; };
@@ -505,10 +505,10 @@
 		2074A64120C051780075432A /* ReadOnlyDB */ = {
 			isa = PBXGroup;
 			children = (
-				209380792252466B009C742F /* HelpInfo.realm */,
-				2055E2AF2215B02C004E3260 /* MandatoryList.realm */,
-				2055E2AB2215B01E004E3260 /* Mandatory.realm */,
-				2055E2AC2215B01E004E3260 /* WordList.realm */,
+				2078EE6422CA340000502C7C /* HelpInfo.realm */,
+				2078EE6322CA340000502C7C /* Mandatory.realm */,
+				2078EE6122CA33FF00502C7C /* MandatoryList.realm */,
+				2078EE6222CA33FF00502C7C /* WordList.realm */,
 			);
 			path = ReadOnlyDB;
 			sourceTree = "<group>";
@@ -634,17 +634,16 @@
 				2086F3FD228EEE8A00D845B7 /* Connection1010.png in Resources */,
 				204D760A221B26A900DBB1B5 /* Minus.png in Resources */,
 				205EC41C222EAD380080D4ED /* LightBlueSprite.png in Resources */,
+				2078EE6522CA340000502C7C /* MandatoryList.realm in Resources */,
 				202EF6C621CA9DAD000E4DA4 /* online.png in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
-				2055E2B02215B02C004E3260 /* MandatoryList.realm in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
 				2087444321FA1C74006C00C6 /* deRestWords.txt in Resources */,
 				204AC87B2228436800A5A03D /* LightRedSprite.png in Resources */,
 				205184F920615B3100E7FAF4 /* deGameData.txt in Resources */,
 				20469BD121A43F4E00743EB1 /* sortup.png in Resources */,
 				2038F26422316CF40028372D /* BackSimple.png in Resources */,
-				2055E2AE2215B01E004E3260 /* WordList.realm in Resources */,
 				20842DE62031EA910078FFDA /* ruWords.txt in Resources */,
 				2084C0D62209BF73002B8F2E /* compare2.txt in Resources */,
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
@@ -659,7 +658,6 @@
 				208B278F21FB382C007259B6 /* enRestWords.txt in Resources */,
 				201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */,
 				2086F3EE228ED63200D845B7 /* Connection0010.png in Resources */,
-				2055E2AD2215B01E004E3260 /* Mandatory.realm in Resources */,
 				204D760B221B26A900DBB1B5 /* Plus.png in Resources */,
 				205BF79A21E4D952006633C6 /* huMandatory.txt in Resources */,
 				2093C4B922B116EE00B16649 /* DarkGreenSprite1.png in Resources */,
@@ -674,10 +672,11 @@
 				207B678A2243C9F8001456C8 /* save.png in Resources */,
 				2086F3FE228EEE8A00D845B7 /* Connection1110.png in Resources */,
 				2097391A2295796F00360819 /* DarkGoldSprite.png in Resources */,
-				2093807A2252466B009C742F /* HelpInfo.realm in Resources */,
 				2086F3ED228ED63200D845B7 /* Connection0100.png in Resources */,
+				2078EE6622CA340000502C7C /* WordList.realm in Resources */,
 				2086F404228EEE8B00D845B7 /* Connection1111.png in Resources */,
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
+				2078EE6722CA340000502C7C /* Mandatory.realm in Resources */,
 				205EC425222EE2E90080D4ED /* LeftElite.png in Resources */,
 				2086F3F0228ED63200D845B7 /* Connection1000.png in Resources */,
 				2086F402228EEE8A00D845B7 /* Connection0110.png in Resources */,
@@ -710,6 +709,7 @@
 				2086F406228EEE8B00D845B7 /* Connection1101.png in Resources */,
 				2048259921E8CC59000933B3 /* deWords.txt in Resources */,
 				20895E6D228D951900506685 /* LilaSprite.png in Resources */,
+				2078EE6822CA340000502C7C /* HelpInfo.realm in Resources */,
 				2086F400228EEE8A00D845B7 /* Connection1011.png in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
