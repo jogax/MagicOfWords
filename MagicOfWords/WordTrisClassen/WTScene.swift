@@ -534,6 +534,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let gameNumberName = "°°°gameNumber°°°"
     let previousName = "°°°previousGame°°°"
     let nextName = "°°°nextGame°°°"
+    let myAlertName = "°°°myAlertName°°°"
 //    let ownWordsBackgroundName = "°°°ownWordsBackgroundName°°°"
 //    let ownWordsButtonName = "°°°ownWordsButtonName°°°"
 
@@ -894,7 +895,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-        if showHelp {
+        if showHelpDemoActive && lastHelpDemoStepReady {
             showHelpStepByStep()
         }
     }
@@ -916,10 +917,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         saveActualState()
         createNextRound = false
         GV.nextRoundAnimationFinished = false
-    }
-    
-    private func showHelpStepByStep() {
-        
     }
     
     private func modifyHeader() {
@@ -1900,16 +1897,60 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
         countTime(timerX: Timer())
         if showHelp {
-            _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(startShowHelpDemo(timerX: )), userInfo: nil, repeats: false)
+            startShowHelpDemo()
+//            _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(startShowHelpDemo(timerX: )), userInfo: nil, repeats: false)
         }
     }
     
-    var startHelpDemoTimer = Timer()
+    private var helpRecordIndex = 0
+    private var helpDemoSpeedSlow = false
+    private var showHelpDemoActive = false
+    private var lastHelpDemoStepReady = false
+    private var generateHelpInfoActive = false
+    private var helpDemoDuration = 0.0
+    private var fingerActions = [SKAction]()
+    private var lastTouchedPosition = CGPoint(x: 0, y: 0)
+    private var fingerSprite: SKSpriteNode?
+    private var startPosition = CGPoint(x: 0, y: 0)
+    private var fingerPositionModifier = CGPoint(x: 0, y: 0)
+    private var gridStartPosition = CGPoint(x: 0, y: 0)
+    private var gridSize: CGFloat = 0.0
     
-    @objc private func startShowHelpDemo(timerX: Timer) {
-        showHelpDemoStep()
+    enum ActionType: Int {
+        case TouchesBegan, TouchesMoved, TouchesEnded, NoMore
     }
     
+    private func startShowHelpDemo() {
+        helpRecordIndex = 0
+        hideButtons(hide: true)
+        gameFinished = false
+        helpDemoSpeedSlow = true
+        generateHelpInfoActive = GV.generateHelpInfo
+        GV.generateHelpInfo = false
+        helpDemoDuration = 0.0//1
+        let texture = SKTexture(imageNamed: "finger1")
+        fingerSprite = SKSpriteNode(texture: texture)
+        fingerSprite!.zPosition = 1001
+        let multiplier: CGFloat = 0.1
+        let width = self.frame.width * multiplier
+        let fingerSize = CGSize(width: width, height: width)
+        startPosition = CGPoint(x: self.frame.midX, y: self.frame.minY)
+        fingerSprite!.size = fingerSize
+        fingerSprite!.position = startPosition
+        fingerSprite!.zPosition = 100
+        gridStartPosition = CGPoint(x: wtGameboard!.grid!.frame.minX, y:wtGameboard!.grid!.frame.minY)
+        gridSize = wtGameboard!.grid!.frame.width
+        fingerPositionModifier = CGPoint(x: wtGameboard!.blockSize! * 0.5, y: wtGameboard!.blockSize! * 0.5)
+//        var startFromGamearray = false
+//        var countMoves = 0
+
+        lastHelpDemoStepReady = true
+        showHelpDemoActive = true
+//        helpDemoTimer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(startShowHelpDemo), userInfo: nil, repeats: false)
+    }
+//    var helpDemoTimer = Timer()
+    
+
     var bestPlayerNickname = ""
     var bestScore = 0
     var actPlayer = ""
@@ -2061,61 +2102,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         wtGameboard!.addFixLettersToGamearray(fixLetters: fixLetters)
     }
     
-    private func showHelpDemoStep() {
-        hideButtons(hide: true)
-        gameFinished = false
-        let generateHelpInfo = GV.generateHelpInfo
-        GV.generateHelpInfo = false
-        let duration = 0.0//1
-        let texture = SKTexture(imageNamed: "finger1")
-        let fingerSprite = SKSpriteNode(texture: texture)
-        var fingerActions = [SKAction]()
-        fingerSprite.zPosition = 1001
-        var lastTouchedPosition = CGPoint(x: 0, y: 0)
-        enum ActionType: Int {
-            case TouchesBegan, TouchesMoved, TouchesEnded, NoMore
-        }
-        let multiplier: CGFloat = 0.1
-        let width = self.frame.width * multiplier
-        let fingerSize = CGSize(width: width, height: width)
-        var startPosition = CGPoint(x: self.frame.midX, y: self.frame.minY)
-        fingerSprite.size = fingerSize
-        fingerSprite.position = startPosition
-        fingerSprite.zPosition = 100
-        let gridStartPosition = CGPoint(x: wtGameboard!.grid!.frame.minX, y:wtGameboard!.grid!.frame.minY)
-        let gridSize = wtGameboard!.grid!.frame.width
-        let blockSize = wtGameboard!.blockSize! * 0.5
-        let fingerPositionModifier = CGPoint(x: blockSize, y: blockSize)
-        var startFromGamearray = false
-        var countMoves = 0
-        var stopIndex = 10000
-        let stopCounter = 10000
-//----------------------------------------------------------------------------
+    private func showHelpStepByStep() {
+        //----------------------------------------------------------------------------
         func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0, index: Int = 0) {
             fingerActions.append(SKAction.move(to: touchPosition - fingerPositionModifier, duration: duration))
             switch type {
-             case .TouchesBegan:
+            case .TouchesBegan:
                 let beganAction = SKAction.run({
-                    if counter >= stopCounter {
-                        print("hier at \(counter), letters: \(letters)")
-                    }
                     self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
-               })
+                })
                 fingerActions.append(beganAction)
             case .TouchesMoved:
                 let moveAction = SKAction.run({
-                    if counter == stopCounter && index > 1400 {
-                        print("hier at counter: \(counter), index: \(index), touchedNodes: \(touchedNodes)")
-                    }
                     self.myTouchesMoved(location: touchPosition, touchedNodes: touchedNodes)
                     
                 })
                 fingerActions.append(moveAction)
             case .TouchesEnded:
                 let endedAction = SKAction.run({
-//                    if counter == 89 {
-//                        print("at \(counter)")
-//                    }
+                    //                    if counter == 89 {
+                    //                        print("at \(counter)")
+                    //                    }
                     let OK = self.myTouchesEnded(location: touchPosition, touchedNodes: touchedNodes, checkLetters: letters)
                     if !OK {
                         print("error by replay at: \(counter), letters: \(letters)")
@@ -2127,7 +2134,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 break
             }
         }
-//----------------------------------------------------------------------------
+        //----------------------------------------------------------------------------
         func addButtonTouchedAction(button: MyButton) {
             let waitAction = SKAction.wait(forDuration: 0.025)
             let zielPosition = button.position
@@ -2144,7 +2151,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     fingerActions.append(enableAction)
                 }
                 fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
-                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: duration))
+                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: helpDemoDuration))
                 fingerActions.append(waitAction)
             }
             let buttonAction = SKAction.run({
@@ -2156,11 +2163,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             fingerActions.append(buttonAction)
             fingerActions.append(waitAction)
         }
-//----------------------------------------------------------------------------
+        //----------------------------------------------------------------------------
         enum AlertType: Int {
             case ContinueGameEasyAlert = 0, ContinueGameMediumAlert, FinishGameEasyAlert, FinishGameMediumAlert, OKFixLettersSolvedAlert, OKMandatorySolvedAlert, NoMoreStepsAlert, FinishGameAlert
         }
-//----------------------------------------------------------------------------
+        //----------------------------------------------------------------------------
         func addAlertTouched(alertType: AlertType, action: Selector) {
             var zielPosition: CGPoint?
             switch alertType {
@@ -2197,7 +2204,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             fingerActions.append(SKAction.wait(forDuration: 1.0))
             for index in 0..<counter {
                 fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
-                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: duration))
+                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: helpDemoDuration))
                 fingerActions.append(SKAction.wait(forDuration: 0.05))
             }
             let beganAction = SKAction.run({
@@ -2225,169 +2232,507 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 case .FinishGameAlert:
                     self.finishGameAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
                     self.gameFinished = true
-
+                    
                 }
             })
             fingerActions.append(beganAction)
             fingerActions.append(SKAction.wait(forDuration: 0.5))
             fingerActions.append(endedAction)
+            let removeAlertAction = SKAction.run ({
+                self.removeNodesWith(name: self.myAlertName)
+                if self.congratulationsAlert != nil {
+                    self.congratulationsAlert = nil
+                }
+            })
+            fingerActions.append(removeAlertAction)
             if alertType == .NoMoreStepsAlert && action == #selector(self.nextRoundTapped) {
                 fingerActions.append(SKAction.wait(forDuration: 8.0))
             } else {
                 fingerActions.append(SKAction.wait(forDuration: 0.5))
             }
         }
-//----------------------------------------------------------------------------
-        var slow = true
+        //----------------------------------------------------------------------------
+        var startFromGamearray = false
         var lastActionWasMarkingWord = false
-//        let firstAction = SKAction.run({
-//            self.undoButton!.isEnabled = false
-//            self.undoButton!.alpha = 0.2
-//        })
-//        fingerActions.append(firstAction)
+        fingerActions.removeAll()
+        lastHelpDemoStepReady = false
         setUndoButton(enabled: false)
-        bgSprite!.addChild(fingerSprite)
-        for (index, record) in GV.helpInfoRecords!.enumerated() {
-            let countMoves = record.movedInfo.components(separatedBy: "°").count
-            var duration: Double = (slow ? 0.25 : 0.05) / Double(countMoves)
-            func getAbsPosition(relPosX: CGFloat, relPosY: CGFloat)->CGPoint {
-                return gridStartPosition + CGPoint(x: relPosX, y: relPosY) * gridSize
+        if helpRecordIndex == 0 {
+            bgSprite!.addChild(fingerSprite!)
+        }
+        let record = GV.helpInfoRecords![helpRecordIndex]
+//        for (index, record) in GV.helpInfoRecords!.enumerated() {
+        let countMoves = record.movedInfo.components(separatedBy: "°").count
+        var duration: Double = (helpDemoSpeedSlow ? 0.25 : 0.05) / Double(countMoves)
+        func getAbsPosition(relPosX: CGFloat, relPosY: CGFloat)->CGPoint {
+            return gridStartPosition + CGPoint(x: relPosX, y: relPosY) * gridSize
+        }
+        func callTouchAction(info: String, type: ActionType, index: Int = 0, letters: String = "") {
+            let data = MovedInfoData(from: info)
+            let onGameArray = data.onGameArray
+            let touchPosition = getAbsPosition(relPosX: data.relPosX, relPosY: data.relPosY)
+            var touchedNodes = analyzeNodes(touchLocation: touchPosition)
+            if onGameArray {
+                touchedNodes.col = data.col
+                touchedNodes.row = data.row
+                touchedNodes.GRow = data.GRow
             }
-            func callTouchAction(info: String, type: ActionType, index: Int = 0, letters: String = "") {
-                let data = MovedInfoData(from: info)
-                let onGameArray = data.onGameArray
-                let touchPosition = getAbsPosition(relPosX: data.relPosX, relPosY: data.relPosY)
-                var touchedNodes = analyzeNodes(touchLocation: touchPosition)
-                if onGameArray {
-                    touchedNodes.col = data.col
-                    touchedNodes.row = data.row
-                    touchedNodes.GRow = data.GRow
-                }
-                addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: letters, duration: duration, counter: record.counter, index: index)
+            addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: letters, duration: duration, counter: record.counter, index: index)
+        }
+        
+        switch record.typeOfTouch {
+        //                FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
+        case TypeOfTouch.FromBottom.rawValue, TypeOfTouch.FromGameArray.rawValue:
+            startFromGamearray = true
+            if helpDemoSpeedSlow {
+                lastActionWasMarkingWord = record.letters.endsWith(LettersColor.Green.rawValue) ? true : lastActionWasMarkingWord
+                helpDemoSpeedSlow = lastActionWasMarkingWord ? false : helpDemoSpeedSlow
             }
-
-            switch record.typeOfTouch {
-//                FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
-            case TypeOfTouch.FromBottom.rawValue, TypeOfTouch.FromGameArray.rawValue:
-                startFromGamearray = true
-                if slow {
-                    lastActionWasMarkingWord = record.letters.endsWith(LettersColor.Green.rawValue) ? true : lastActionWasMarkingWord
-                    slow = lastActionWasMarkingWord ? false : slow
-                }
-                if record.beganInfo != "" {
-                   if record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
-                        let shapeIndex = Int(record.beganInfo)
-                        startShapeIndex = shapeIndex!
-                        let touchPosition = pieceArray[shapeIndex!].position
-                        let touchedNodes = analyzeNodes(touchLocation: touchPosition)
-                        addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
-                    } else {
-                        startShapeIndex = NoValue
+            if record.beganInfo != "" {
+                if record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
+                    let shapeIndex = Int(record.beganInfo)
+                    startShapeIndex = shapeIndex!
+                    let touchPosition = pieceArray[shapeIndex!].position
+                    let touchedNodes = analyzeNodes(touchLocation: touchPosition)
+                    addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
+                } else {
+                    startShapeIndex = NoValue
                     callTouchAction(info: record.beganInfo, type: .TouchesBegan, letters: record.letters)
-                    }
-                    let moves = record.movedInfo.components(separatedBy: "°")
-                    var countMoves = 0
-                    for (index, move) in moves.enumerated() {
-                        if move.length > 0 {
-                            callTouchAction(info: move, type: .TouchesMoved, index: index)
-                            countMoves += 1
-                        }
-                    }
-                    if countMoves == 0 && record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
-                        let touchPosition = pieceArray[startShapeIndex].position
-                        let touchedNodes = analyzeNodes(touchLocation: touchPosition)
-                        addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: record.letters, duration: Double(duration), counter: record.counter)
-                    } else {
-                        callTouchAction(info: record.endedInfo, type: .TouchesEnded, letters: record.letters)
+                }
+                let moves = record.movedInfo.components(separatedBy: "°")
+                var countMoves = 0
+                for (index, move) in moves.enumerated() {
+                    if move.length > 0 {
+                        callTouchAction(info: move, type: .TouchesMoved, index: index)
+                        countMoves += 1
                     }
                 }
-            case TypeOfTouch.UndoButton.rawValue:
-                addButtonTouchedAction(button: undoButton!)
-            case TypeOfTouch.ShowMyWordsButton.rawValue:
-                addButtonTouchedAction(button: allWordsButton!)
-            case TypeOfTouch.FinishButton.rawValue:
-                addButtonTouchedAction(button: finishButton!)
-            case TypeOfTouch.ContinueGameEasy.rawValue:
-                addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
-            case TypeOfTouch.ContinueGameMedium.rawValue:
-                addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
-            case TypeOfTouch.ContinueGameEasy.rawValue:
-                addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
-            case TypeOfTouch.ContinueGameMedium.rawValue:
-                addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
-            case TypeOfTouch.FinishGameEasy.rawValue:
-                 addAlertTouched(alertType: .FinishGameEasyAlert, action: #selector(self.finishEasyAction))
-            case TypeOfTouch.FinishGameMedium.rawValue:
-                addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishMediumAction))
-            case TypeOfTouch.OKFixLettersSolved.rawValue:
-                addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
-            case TypeOfTouch.OKMandatorySolved.rawValue:
-                addAlertTouched(alertType: .OKMandatorySolvedAlert, action: #selector(self.mandatoryOKAction))
-            case TypeOfTouch.NoMoreStepsBack.rawValue:
-                addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.startUndoTapped))
-            case TypeOfTouch.NoMoreStepsNext.rawValue:
-                addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.nextRoundTapped))
-            case TypeOfTouch.NoMoreStepsCont.rawValue:
-                addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.noActionTapped))
-            case TypeOfTouch.FinishGame.rawValue:
-                addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.finishButtonTapped2))
-            default:
-                continue
+                if countMoves == 0 && record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
+                    let touchPosition = pieceArray[startShapeIndex].position
+                    let touchedNodes = analyzeNodes(touchLocation: touchPosition)
+                    addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: record.letters, duration: Double(duration), counter: record.counter)
+                } else {
+                    callTouchAction(info: record.endedInfo, type: .TouchesEnded, letters: record.letters)
+                }
             }
-            if generateHelpInfo && index == stopIndex {
-                let deleteAction = SKAction.run({
-                    let recordsToDelete = self.realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and counter > %d", GV.actLanguage, stopIndex)
-                    if recordsToDelete.count > 0 {
-                        try! self.realmHelpInfo!.safeWrite() {
-                            self.realmHelpInfo!.delete(recordsToDelete)
+        case TypeOfTouch.UndoButton.rawValue:
+            addButtonTouchedAction(button: undoButton!)
+        case TypeOfTouch.ShowMyWordsButton.rawValue:
+            addButtonTouchedAction(button: allWordsButton!)
+        case TypeOfTouch.FinishButton.rawValue:
+            addButtonTouchedAction(button: finishButton!)
+        case TypeOfTouch.ContinueGameEasy.rawValue:
+            addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
+        case TypeOfTouch.ContinueGameMedium.rawValue:
+            addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
+        case TypeOfTouch.ContinueGameEasy.rawValue:
+            addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
+        case TypeOfTouch.ContinueGameMedium.rawValue:
+            addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
+        case TypeOfTouch.FinishGameEasy.rawValue:
+            addAlertTouched(alertType: .FinishGameEasyAlert, action: #selector(self.finishEasyAction))
+        case TypeOfTouch.FinishGameMedium.rawValue:
+            addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishMediumAction))
+        case TypeOfTouch.OKFixLettersSolved.rawValue:
+            addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
+        case TypeOfTouch.OKMandatorySolved.rawValue:
+            addAlertTouched(alertType: .OKMandatorySolvedAlert, action: #selector(self.mandatoryOKAction))
+        case TypeOfTouch.NoMoreStepsBack.rawValue:
+            addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.startUndoTapped))
+        case TypeOfTouch.NoMoreStepsNext.rawValue:
+            addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.nextRoundTapped))
+        case TypeOfTouch.NoMoreStepsCont.rawValue:
+            addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.noActionTapped))
+        case TypeOfTouch.FinishGame.rawValue:
+            addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.finishButtonTapped2))
+        default:
+            break
+        }
+        if helpRecordIndex == GV.helpInfoRecords!.count - 1 {
+            let removeAction = SKAction.run ({
+                GV.generateHelpInfo = self.generateHelpInfoActive
+                try! realm.safeWrite() {
+                    GV.basicDataRecord.difficulty = GV.origDifficulty
+                }
+            })
+            fingerActions.append(removeAction)
+            if !generateHelpInfoActive {
+                let lastWaitAction = SKAction.wait(forDuration: 1)
+                fingerActions.append(lastWaitAction)
+                let lastAction = SKAction.run({
+                    if self.gameFinished {
+                        try! realm.safeWrite() {
+                            GV.basicDataRecord.startAnimationShown = true
                         }
+                        self.timerIsCounting = false
+                        let title = GV.language.getText(.tcDemoFinishedTitle)
+                        let message = GV.language.getText(.tcDemoFinishedMessage)
+                        let newGameText = GV.language.getText(.tcDemoFinishedStartNewGame)
+                        let menuText = GV.language.getText(.tcDemoFinishedGoToMenu)
+                        let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
+                        myAlert.addAction(text: newGameText, action: #selector(self.startNewGame))
+                        myAlert.addAction(text: menuText, action: #selector(self.goBackTapped))
+                        myAlert.presentAlert()
+                        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+                        myAlert.name = self.myAlertName
+                        self.fingerSprite!.removeFromParent()
+                        self.bgSprite!.addChild(myAlert)
                     }
                 })
-                fingerActions.append(deleteAction)
-                break
+                fingerActions.append(lastAction)
+            } else {
+                let lastAction = SKAction.run({
+                    self.fingerSprite!.removeFromParent()
+                    self.hideButtons(hide: false)
+                    self.setUndoButton(enabled: true)
+                })
+                fingerActions.append(lastAction)
             }
         }
-        let removeAction = SKAction.run ({
-            GV.generateHelpInfo = generateHelpInfo
-            try! realm.safeWrite() {
-                GV.basicDataRecord.difficulty = GV.origDifficulty
+        let lastAction = SKAction.run ({
+            self.helpRecordIndex += 1
+//            if record.counter == 95 {
+//                print("hier")
+//            }
+            if self.helpRecordIndex == GV.helpInfoRecords!.count {
+                self.showHelpDemoActive = false
+            } else {
+                self.lastHelpDemoStepReady = true
             }
         })
-        fingerActions.append(removeAction)
-        if !generateHelpInfo {
-            let lastWaitAction = SKAction.wait(forDuration: 1)
-            fingerActions.append(lastWaitAction)
-            let lastAction = SKAction.run({
-                if self.gameFinished {
-                    try! realm.safeWrite() {
-                        GV.basicDataRecord.startAnimationShown = true
-                    }
-                    self.timerIsCounting = false
-                    let title = GV.language.getText(.tcDemoFinishedTitle)
-                    let message = GV.language.getText(.tcDemoFinishedMessage)
-                    let newGameText = GV.language.getText(.tcDemoFinishedStartNewGame)
-                    let menuText = GV.language.getText(.tcDemoFinishedGoToMenu)
-                    let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
-                    myAlert.addAction(text: newGameText, action: #selector(self.startNewGame))
-                    myAlert.addAction(text: menuText, action: #selector(self.goBackTapped))
-                    myAlert.presentAlert()
-                    myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-                    fingerSprite.removeFromParent()
-                    self.bgSprite!.addChild(myAlert)
-                }
-            })
-            fingerActions.append(lastAction)
-        } else {
-            let lastAction = SKAction.run({
-                fingerSprite.removeFromParent()
-                self.hideButtons(hide: false)
-                self.setUndoButton(enabled: true)
-            })
-            fingerActions.append(lastAction)
-        }
+        fingerActions.append(lastAction)
         let sequence = SKAction.sequence(fingerActions)
-        fingerSprite.run(SKAction.sequence([sequence]))
+        fingerSprite!.run(SKAction.sequence([sequence]))
     }
+
+    
+//    private func showHelpDemoStep() {
+//        hideButtons(hide: true)
+//        gameFinished = false
+//        let generateHelpInfo = GV.generateHelpInfo
+//        GV.generateHelpInfo = false
+//        let duration = 0.0//1
+//        let texture = SKTexture(imageNamed: "finger1")
+//        let fingerSprite = SKSpriteNode(texture: texture)
+//        var fingerActions = [SKAction]()
+//        fingerSprite.zPosition = 1001
+//        var lastTouchedPosition = CGPoint(x: 0, y: 0)
+//        enum ActionType: Int {
+//            case TouchesBegan, TouchesMoved, TouchesEnded, NoMore
+//        }
+//        let multiplier: CGFloat = 0.1
+//        let width = self.frame.width * multiplier
+//        let fingerSize = CGSize(width: width, height: width)
+//        var startPosition = CGPoint(x: self.frame.midX, y: self.frame.minY)
+//        fingerSprite.size = fingerSize
+//        fingerSprite.position = startPosition
+//        fingerSprite.zPosition = 100
+//        let gridStartPosition = CGPoint(x: wtGameboard!.grid!.frame.minX, y:wtGameboard!.grid!.frame.minY)
+//        let gridSize = wtGameboard!.grid!.frame.width
+//        let blockSize = wtGameboard!.blockSize! * 0.5
+//        let fingerPositionModifier = CGPoint(x: blockSize, y: blockSize)
+//        var startFromGamearray = false
+//        var countMoves = 0
+//        var stopIndex = 10000
+//        let stopCounter = 10000
+////----------------------------------------------------------------------------
+//        func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0, index: Int = 0) {
+//            fingerActions.append(SKAction.move(to: touchPosition - fingerPositionModifier, duration: duration))
+//            switch type {
+//             case .TouchesBegan:
+//                let beganAction = SKAction.run({
+//                    if counter >= stopCounter {
+//                        print("hier at \(counter), letters: \(letters)")
+//                    }
+//                    self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
+//               })
+//                fingerActions.append(beganAction)
+//            case .TouchesMoved:
+//                let moveAction = SKAction.run({
+//                    if counter == stopCounter && index > 1400 {
+//                        print("hier at counter: \(counter), index: \(index), touchedNodes: \(touchedNodes)")
+//                    }
+//                    self.myTouchesMoved(location: touchPosition, touchedNodes: touchedNodes)
+//
+//                })
+//                fingerActions.append(moveAction)
+//            case .TouchesEnded:
+//                let endedAction = SKAction.run({
+////                    if counter == 89 {
+////                        print("at \(counter)")
+////                    }
+//                    let OK = self.myTouchesEnded(location: touchPosition, touchedNodes: touchedNodes, checkLetters: letters)
+//                    if !OK {
+//                        print("error by replay at: \(counter), letters: \(letters)")
+//                    }
+//                })
+//                fingerActions.append(endedAction)
+//                lastTouchedPosition = touchPosition
+//            default:
+//                break
+//            }
+//        }
+////----------------------------------------------------------------------------
+//        func addButtonTouchedAction(button: MyButton) {
+//            let waitAction = SKAction.wait(forDuration: 0.025)
+//            let zielPosition = button.position
+//            let point = zielPosition - lastTouchedPosition
+//            let distance = point.length()
+//            let counter = Int(distance / 10)
+//            let xAdder = point.x / CGFloat(counter)
+//            let yAdder = point.y / CGFloat(counter)
+//            for index in 0..<counter {
+//                if button == undoButton {
+//                    let enableAction = SKAction.run({
+//                        self.setUndoButton(enabled: true)
+//                    })
+//                    fingerActions.append(enableAction)
+//                }
+//                fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
+//                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: duration))
+//                fingerActions.append(waitAction)
+//            }
+//            let buttonAction = SKAction.run({
+//                button.myTouchesEnded(touchLocation: zielPosition)
+//                if button == self.undoButton {
+//                    self.setUndoButton(enabled: false)
+//                }
+//            })
+//            fingerActions.append(buttonAction)
+//            fingerActions.append(waitAction)
+//        }
+////----------------------------------------------------------------------------
+//        enum AlertType: Int {
+//            case ContinueGameEasyAlert = 0, ContinueGameMediumAlert, FinishGameEasyAlert, FinishGameMediumAlert, OKFixLettersSolvedAlert, OKMandatorySolvedAlert, NoMoreStepsAlert, FinishGameAlert
+//        }
+////----------------------------------------------------------------------------
+//        func addAlertTouched(alertType: AlertType, action: Selector) {
+//            var zielPosition: CGPoint?
+//            switch alertType {
+//            case .ContinueGameEasyAlert:
+//                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+//            case .ContinueGameMediumAlert:
+//                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+//            case .FinishGameEasyAlert:
+//                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+//            case .FinishGameMediumAlert:
+//                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+//            case .OKFixLettersSolvedAlert:
+//                createCongratulationsAlert(congratulationType: .SolvedOnlyFixLetters, easy: false)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+//            case .OKMandatorySolvedAlert:
+//                createCongratulationsAlert(congratulationType: .SolvedOnlyMandatoryWords, easy: false)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+//            case .NoMoreStepsAlert:
+//                createNoMoreStepsAlert()
+//                zielPosition = noMoreStepsAlert!.getPositionForAction(action: action)
+//            case .FinishGameAlert:
+//                createFinishGameAlert(status: .OK)
+//                zielPosition = finishGameAlert!.getPositionForAction(action: action)
+//            }
+//            let point = zielPosition! - lastTouchedPosition
+//            let distance = point.length()
+//            let counter = Int(distance / 10)
+//            let xAdder = point.x / CGFloat(counter)
+//            let yAdder = point.y / CGFloat(counter)
+//            fingerActions.append(SKAction.wait(forDuration: 1.0))
+//            for index in 0..<counter {
+//                fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
+//                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: duration))
+//                fingerActions.append(SKAction.wait(forDuration: 0.05))
+//            }
+//            let beganAction = SKAction.run({
+//                switch alertType {
+//                case .ContinueGameEasyAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .ContinueGameMediumAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameEasyAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameMediumAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .OKFixLettersSolvedAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .OKMandatorySolvedAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .NoMoreStepsAlert: self.noMoreStepsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameAlert: self.finishGameAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                }
+//            })
+//            let endedAction = SKAction.run({
+//                switch alertType {
+//                case .ContinueGameEasyAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .ContinueGameMediumAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameEasyAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameMediumAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .OKFixLettersSolvedAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .OKMandatorySolvedAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .NoMoreStepsAlert:
+//                    self.noMoreStepsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameAlert:
+//                    self.finishGameAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                    self.gameFinished = true
+//
+//                }
+//            })
+//            fingerActions.append(beganAction)
+//            fingerActions.append(SKAction.wait(forDuration: 0.5))
+//            fingerActions.append(endedAction)
+//            if alertType == .NoMoreStepsAlert && action == #selector(self.nextRoundTapped) {
+//                fingerActions.append(SKAction.wait(forDuration: 8.0))
+//            } else {
+//                fingerActions.append(SKAction.wait(forDuration: 0.5))
+//            }
+//        }
+////----------------------------------------------------------------------------
+//        var slow = true
+//        var lastActionWasMarkingWord = false
+////        let firstAction = SKAction.run({
+////            self.undoButton!.isEnabled = false
+////            self.undoButton!.alpha = 0.2
+////        })
+////        fingerActions.append(firstAction)
+//        setUndoButton(enabled: false)
+//        bgSprite!.addChild(fingerSprite)
+//        for (index, record) in GV.helpInfoRecords!.enumerated() {
+//            let countMoves = record.movedInfo.components(separatedBy: "°").count
+//            var duration: Double = (slow ? 0.25 : 0.05) / Double(countMoves)
+//            func getAbsPosition(relPosX: CGFloat, relPosY: CGFloat)->CGPoint {
+//                return gridStartPosition + CGPoint(x: relPosX, y: relPosY) * gridSize
+//            }
+//            func callTouchAction(info: String, type: ActionType, index: Int = 0, letters: String = "") {
+//                let data = MovedInfoData(from: info)
+//                let onGameArray = data.onGameArray
+//                let touchPosition = getAbsPosition(relPosX: data.relPosX, relPosY: data.relPosY)
+//                var touchedNodes = analyzeNodes(touchLocation: touchPosition)
+//                if onGameArray {
+//                    touchedNodes.col = data.col
+//                    touchedNodes.row = data.row
+//                    touchedNodes.GRow = data.GRow
+//                }
+//                addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: letters, duration: duration, counter: record.counter, index: index)
+//            }
+//
+//            switch record.typeOfTouch {
+////                FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
+//            case TypeOfTouch.FromBottom.rawValue, TypeOfTouch.FromGameArray.rawValue:
+//                startFromGamearray = true
+//                if slow {
+//                    lastActionWasMarkingWord = record.letters.endsWith(LettersColor.Green.rawValue) ? true : lastActionWasMarkingWord
+//                    slow = lastActionWasMarkingWord ? false : slow
+//                }
+//                if record.beganInfo != "" {
+//                   if record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
+//                        let shapeIndex = Int(record.beganInfo)
+//                        startShapeIndex = shapeIndex!
+//                        let touchPosition = pieceArray[shapeIndex!].position
+//                        let touchedNodes = analyzeNodes(touchLocation: touchPosition)
+//                        addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
+//                    } else {
+//                        startShapeIndex = NoValue
+//                    callTouchAction(info: record.beganInfo, type: .TouchesBegan, letters: record.letters)
+//                    }
+//                    let moves = record.movedInfo.components(separatedBy: "°")
+//                    var countMoves = 0
+//                    for (index, move) in moves.enumerated() {
+//                        if move.length > 0 {
+//                            callTouchAction(info: move, type: .TouchesMoved, index: index)
+//                            countMoves += 1
+//                        }
+//                    }
+//                    if countMoves == 0 && record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
+//                        let touchPosition = pieceArray[startShapeIndex].position
+//                        let touchedNodes = analyzeNodes(touchLocation: touchPosition)
+//                        addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: record.letters, duration: Double(duration), counter: record.counter)
+//                    } else {
+//                        callTouchAction(info: record.endedInfo, type: .TouchesEnded, letters: record.letters)
+//                    }
+//                }
+//            case TypeOfTouch.UndoButton.rawValue:
+//                addButtonTouchedAction(button: undoButton!)
+//            case TypeOfTouch.ShowMyWordsButton.rawValue:
+//                addButtonTouchedAction(button: allWordsButton!)
+//            case TypeOfTouch.FinishButton.rawValue:
+//                addButtonTouchedAction(button: finishButton!)
+//            case TypeOfTouch.ContinueGameEasy.rawValue:
+//                addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
+//            case TypeOfTouch.ContinueGameMedium.rawValue:
+//                addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
+//            case TypeOfTouch.ContinueGameEasy.rawValue:
+//                addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
+//            case TypeOfTouch.ContinueGameMedium.rawValue:
+//                addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
+//            case TypeOfTouch.FinishGameEasy.rawValue:
+//                 addAlertTouched(alertType: .FinishGameEasyAlert, action: #selector(self.finishEasyAction))
+//            case TypeOfTouch.FinishGameMedium.rawValue:
+//                addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishMediumAction))
+//            case TypeOfTouch.OKFixLettersSolved.rawValue:
+//                addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
+//            case TypeOfTouch.OKMandatorySolved.rawValue:
+//                addAlertTouched(alertType: .OKMandatorySolvedAlert, action: #selector(self.mandatoryOKAction))
+//            case TypeOfTouch.NoMoreStepsBack.rawValue:
+//                addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.startUndoTapped))
+//            case TypeOfTouch.NoMoreStepsNext.rawValue:
+//                addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.nextRoundTapped))
+//            case TypeOfTouch.NoMoreStepsCont.rawValue:
+//                addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.noActionTapped))
+//            case TypeOfTouch.FinishGame.rawValue:
+//                addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.finishButtonTapped2))
+//            default:
+//                continue
+//            }
+//            if generateHelpInfo && index == stopIndex {
+//                let deleteAction = SKAction.run({
+//                    let recordsToDelete = self.realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and counter > %d", GV.actLanguage, stopIndex)
+//                    if recordsToDelete.count > 0 {
+//                        try! self.realmHelpInfo!.safeWrite() {
+//                            self.realmHelpInfo!.delete(recordsToDelete)
+//                        }
+//                    }
+//                })
+//                fingerActions.append(deleteAction)
+//                break
+//            }
+//        }
+//        let removeAction = SKAction.run ({
+//            GV.generateHelpInfo = generateHelpInfo
+//            try! realm.safeWrite() {
+//                GV.basicDataRecord.difficulty = GV.origDifficulty
+//            }
+//        })
+//        fingerActions.append(removeAction)
+//        if !generateHelpInfo {
+//            let lastWaitAction = SKAction.wait(forDuration: 1)
+//            fingerActions.append(lastWaitAction)
+//            let lastAction = SKAction.run({
+//                if self.gameFinished {
+//                    try! realm.safeWrite() {
+//                        GV.basicDataRecord.startAnimationShown = true
+//                    }
+//                    self.timerIsCounting = false
+//                    let title = GV.language.getText(.tcDemoFinishedTitle)
+//                    let message = GV.language.getText(.tcDemoFinishedMessage)
+//                    let newGameText = GV.language.getText(.tcDemoFinishedStartNewGame)
+//                    let menuText = GV.language.getText(.tcDemoFinishedGoToMenu)
+//                    let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
+//                    myAlert.addAction(text: newGameText, action: #selector(self.startNewGame))
+//                    myAlert.addAction(text: menuText, action: #selector(self.goBackTapped))
+//                    myAlert.presentAlert()
+//                    myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+//                    fingerSprite.removeFromParent()
+//                    self.bgSprite!.addChild(myAlert)
+//                }
+//            })
+//            fingerActions.append(lastAction)
+//        } else {
+//            let lastAction = SKAction.run({
+//                fingerSprite.removeFromParent()
+//                self.hideButtons(hide: false)
+//                self.setUndoButton(enabled: true)
+//            })
+//            fingerActions.append(lastAction)
+//        }
+//        let sequence = SKAction.sequence(fingerActions)
+//        fingerSprite.run(SKAction.sequence([sequence]))
+//    }
     
     var gameFinished = false
     
@@ -3340,6 +3685,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             myAlert.presentAlert()
             myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
             congratulationsAlert = myAlert
+            congratulationsAlert!.name = myAlertName
         }
     }
     
@@ -3455,6 +3801,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         myAlert.presentAlert()
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         finishGameAlert = myAlert
+        finishGameAlert!.name = myAlertName
     }
     
     @objc private func finishButtonTapped2() {
@@ -3567,6 +3914,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         myAlert.presentAlert()
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         noMoreStepsAlert = myAlert
+        noMoreStepsAlert!.name = myAlertName
     }
     
     @objc private func noActionTapped() {

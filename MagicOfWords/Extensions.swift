@@ -444,7 +444,7 @@ extension String {
         return subString(at: length - 1, length: 1)
     }
     func subString(at: Int, length: Int) -> String {
-        if self.length > 0 {
+        if self.length > 0 && length > 0 && length <= self.length {
             let indexStartOfText = self.index(self.startIndex, offsetBy: at)
             var lastPosition = at + length
             if lastPosition >= self.length {

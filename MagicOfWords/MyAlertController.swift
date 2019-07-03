@@ -308,6 +308,7 @@ class MyAlertController: SKSpriteNode {
                 let action = myActions[index! - countHeaderLines + 1]
                 _ = myTarget.perform(action)
                 self.removeFromParent()
+                break
             }
         }
     }
