@@ -27,7 +27,7 @@ class CustomTableViewCell: UITableViewCell {
         self.selectionStyle = UITableViewCell.SelectionStyle.none
         self.contentView.backgroundColor = UIColor.clear
         self.isUserInteractionEnabled = true
-        boxView.backgroundColor = UIColor.white
+//        boxView.backgroundColor = UIColor.yellow
         boxView.layer.cornerRadius = 0.0;
 //        button = UIButton(frame:CGRect(x:boxView.frame.size.width - 90 , y:6 , width: 80 , height: 32) )
 //        boxView.addSubview(button)

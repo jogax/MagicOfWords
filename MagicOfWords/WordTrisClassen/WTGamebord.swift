@@ -108,7 +108,7 @@ public struct FoundedWord {
     
     private mutating func checkContinuity(letter:UsedLetter) {
         func saveLetter(col: Int, row: Int) {
-            GV.gameArray[col][row].setStatus(toStatus: .Temporary, calledFrom: "checkContinuity")
+            GV.gameArray[col][row].setStatus(toStatus: .Temporary)
             let actLetter = GV.gameArray[col][row].letter
             let newLetter = UsedLetter(col: col, row: row, letter: actLetter)
             word.append(newLetter.letter)
@@ -545,7 +545,7 @@ class WTGameboard: SKShapeNode {
         }
         choosedWord = FoundedWord()
         choosedWord.addLetter(letter: UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter))
-        GV.gameArray[col][row].setStatus(toStatus: .Temporary, calledFrom: "startChooseOwnWord")
+        GV.gameArray[col][row].setStatus(toStatus: .Temporary)
     }
     
     var origChoosedWord = FoundedWord()
@@ -567,7 +567,7 @@ class WTGameboard: SKShapeNode {
         } else { // Not empty field
                if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters[choosedWord.usedLetters.count - 2] == actLetter {
                     let last = choosedWord.usedLetters.last!
-                    GV.gameArray[last.col][last.row].setStatus(toStatus: .OrigStatus, calledFrom: "moveChooseOwnWord - 1")
+                    GV.gameArray[last.col][last.row].setStatus(toStatus: .OrigStatus)
                     choosedWord.removeLast()
                 } else {
                     if choosedWord.usedLetters.count > 0 {
@@ -581,7 +581,7 @@ class WTGameboard: SKShapeNode {
                         }
                     }
                     if !stopChoosing {
-                        GV.gameArray[col][row].setStatus(toStatus: .Temporary, calledFrom: "moveChooseOwnWord - 2")
+                        GV.gameArray[col][row].setStatus(toStatus: .Temporary)
                         choosedWord.addLetter(letter: actLetter)
                     }
                 }
@@ -625,7 +625,7 @@ class WTGameboard: SKShapeNode {
                 }
                 if sameCol || sameRow {
                     for letter in choosedWord.usedLetters {
-                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .OrigStatus, calledFrom: "setMoveModusIfPossible")
+                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .OrigStatus)
                     }
                     myPiece = WTPiece(fromChoosedWord: startsWithLetters, parent: parentScene, blockSize: blockSize!)
                     if myPiece.myType != .NotUsed {
@@ -651,7 +651,7 @@ class WTGameboard: SKShapeNode {
         for col in 0..<countCols {
             for row in 0..<countCols {
                 if GV.gameArray[col][row].status == .Temporary {
-                    GV.gameArray[col][row].setStatus(toStatus: .OrigStatus, calledFrom: "endChooseOwnWord")
+                    GV.gameArray[col][row].setStatus(toStatus: .OrigStatus)
                 }
             }
         }
@@ -674,7 +674,9 @@ class WTGameboard: SKShapeNode {
             } else {
                 showingWords = true
                 if choosedWord.usedLetters[0].letter != emptyLetter {
-                    WTGameWordList.shared.showWordsContainingThisLetter(choosedWord: choosedWord)
+                    if choosedWord.usedLetters[0].col == col && choosedWord.usedLetters[0].row == row {
+                        WTGameWordList.shared.showWordsContainingThisLetter(choosedWord: choosedWord)
+                    }
                 }
             }
             if wordAdded {

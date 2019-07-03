@@ -91,7 +91,10 @@ class WTGameboardItem: SKSpriteNode {
             if status == .Temporary && origStatus == .WholeWord {
                 return false
             }
-            return true
+            if status == .WholeWord {
+                return false
+            }
+           return true
         }
     }
     public func copyMe()->WTGameboardItem {
@@ -117,7 +120,7 @@ class WTGameboardItem: SKSpriteNode {
         }
         if self.status == .Used || self.status == .WholeWord {
             self.origStatus = self.status
-            setStatus(toStatus: .Error, calledFrom: "setLetter - 1")
+            setStatus(toStatus: .Error)
             self.origLetter = label.text!
             label.text = letter
             self.letter = letter
@@ -131,9 +134,9 @@ class WTGameboardItem: SKSpriteNode {
             }
             if toStatus == .FixItem {
                 fixItem = true
-                setStatus(toStatus: .Used, calledFrom: "setLetter - 2")
+                setStatus(toStatus: .Used)
             } else {
-                setStatus(toStatus: toStatus, calledFrom: "setLetter - 3")
+                setStatus(toStatus: toStatus)
             }
             return true
         }
@@ -173,35 +176,35 @@ class WTGameboardItem: SKSpriteNode {
         case (.Temporary, false):
             label.text = emptyLetter
             self.letter = emptyLetter
-            setStatus(toStatus: .Empty, calledFrom: "clearIfTemporary - 1")
+            setStatus(toStatus: .Empty)
         case (.Temporary, true):
             if doubleUsed {
                 label.text = self.origLetter
                 self.letter = self.origLetter
-                setStatus(toStatus: self.origStatus, calledFrom: "clearIfTemporary - 2")
+                setStatus(toStatus: self.origStatus)
             }
         case (.Used, _):
             if doubleUsed {
                 label.text = self.origLetter
                 self.letter = self.origLetter
-                setStatus(toStatus: self.origStatus, calledFrom: "clearIfTemporary - 2")
+                setStatus(toStatus: self.origStatus)
             }
         case (.WholeWord, _):
             if doubleUsed {
                 label.text = self.origLetter
                 self.letter = self.origLetter
-                setStatus(toStatus: self.origStatus, calledFrom: "clearIfTemporary - 2")
+                setStatus(toStatus: self.origStatus)
             }
         case (.Error, _):
             if doubleUsed {
                 label.text = self.origLetter
                 self.letter = self.origLetter
-                setStatus(toStatus: self.origStatus, calledFrom: "clearIfTemporary - 2")
+                setStatus(toStatus: self.origStatus)
             }
         case (.GoldStatus, _):
-            setStatus(toStatus: .Used, calledFrom: "clearIfTemporary - 3")
+            setStatus(toStatus: .Used)
         case (.DarkGoldStatus, _):
-            setStatus(toStatus: .Used, calledFrom: "clearIfTemporary - 3")
+            setStatus(toStatus: .Used)
         default:
             break
         }
@@ -217,17 +220,17 @@ class WTGameboardItem: SKSpriteNode {
     public func fixIfTemporary()->Bool {
         if status == .Temporary {
 //            self.status = .used
-            setStatus(toStatus: .Used, calledFrom: "fixIfTemporary - 1")
+            setStatus(toStatus: .Used)
             return true
         } else if (status == .Used || status == .WholeWord) && doubleUsed {
             label.text = self.origLetter
-            setStatus(toStatus: self.origStatus, calledFrom: "fixIfTemporary - 2")
+            setStatus(toStatus: self.origStatus)
 //            self.color = convertMyColorToSKColor(color: self.origColor)
             doubleUsed = false
             return false
         } else if status == .Error {
             label.text = origLetter
-            setStatus(toStatus: self.origStatus, calledFrom: "fixIfTemporary - 3")
+            setStatus(toStatus: self.origStatus)
             return false
         }
         return true
@@ -237,7 +240,7 @@ class WTGameboardItem: SKSpriteNode {
         if status == .WholeWord {
             label.text = emptyLetter
             self.letter = emptyLetter
-            setStatus(toStatus: .Empty, calledFrom: "clearIfUsed")
+            setStatus(toStatus: .Empty)
             clearConnectionType()
         }
     }
@@ -251,7 +254,7 @@ class WTGameboardItem: SKSpriteNode {
         if all || !fixItem {
             label.text = emptyLetter
             self.letter = emptyLetter
-            setStatus(toStatus: .Empty, calledFrom: "remove")
+            setStatus(toStatus: .Empty)
             fixItem = false
         }
     }
@@ -277,7 +280,7 @@ class WTGameboardItem: SKSpriteNode {
         setTexture()
     }
     
-    public func setStatus(/*toColor: MyColor = .myWhiteColor,*/ toStatus: ItemStatus, connectionType: ConnectionType = ConnectionType(), incrWords: Bool = false, decrWords: Bool = false, calledFrom: String) {
+    public func setStatus(/*toColor: MyColor = .myWhiteColor,*/ toStatus: ItemStatus, connectionType: ConnectionType = ConnectionType(), incrWords: Bool = false, decrWords: Bool = false) {
         let newStatus = toStatus == .OrigStatus ? origStatus : toStatus
 //        let oldStatus = status
         switch (status, newStatus) {

@@ -126,7 +126,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcGameLine:           "Уведомитель: %, Игра: %",
     .tcWelcomeText1:        "Добро пожаловать/в чудесный мир слов!",
     .tcWelcomeText2:        "Желаю приятно/провести время!",
-    .tcWelcomeText3:        "А теперь давайте/посмотрим, как играть/простую или/средней сложности игру",
+    .tcWelcomeText3:        "А теперь давай/посмотрим, как играть/простую или/средней сложности игру",
     .tcLater:               "Позже",
     .tcShowEasyGame:        "Простая",
     .tcShowMediumGame:      "Средней сложности",

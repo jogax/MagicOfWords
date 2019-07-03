@@ -27,7 +27,7 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
         super.init(frame: frame, style: style)
         layer.borderColor = UIColor.black.cgColor
         layer.borderWidth = 1.0
-        layer.cornerRadius = 10.0
+        layer.cornerRadius = 15.0
         self.delegate = self
         self.dataSource = self
 //        self.addBorder(toSide: .Left, withColor: UIColor.black, andThickness: 5)
@@ -66,16 +66,26 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return self.myDelegate!.getHeightForHeaderInSection(tableView: tableView, section: section)
     }
-//    public func showActivityIndicatory() {
-//        let actInd: UIActivityIndicatorView = UIActivityIndicatorView()
-//        actInd.frame = CGRect(x:0.0, y:0.0, width:40.0, height:40.0)
-//        actInd.center = self.center
-//        actInd.hidesWhenStopped = true
-//        actInd.style =
-//            UIActivityIndicatorView.Style.whiteLarge
-//        self.addSubview(actInd)
-//        actInd.startAnimating()
-//    }
+
+    var firstTouch = CGPoint(x: 0, y: 0)
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        firstTouch = touches.first!.location(in: self)
+        if firstTouch.y < frame.height * 0.05 {
+            isScrollEnabled = false
+        }
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        let delta = CGPoint(x: touchLocation.x - firstTouch.x, y: 0)
+        self.frame.origin = self.frame.origin + delta
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        isScrollEnabled = true
+    }
+    
 
 }
 

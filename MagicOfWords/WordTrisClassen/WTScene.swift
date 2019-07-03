@@ -104,9 +104,6 @@ let iTenMinutes = 600
 let iFiveMinutes = 300
 var wtGameboard: WTGameboard?
 
-
-
-
 class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableViewDelegate {
     func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord = SelectedWord()) {
         var longWaitAction = SKAction.wait(forDuration: 0.0)
@@ -114,12 +111,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for letter in newWord.usedLetters {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showRedAction = SKAction.run({
-                myNode.setStatus(toStatus: .Error, calledFrom: "blinkWords - 1")
+                myNode.setStatus(toStatus: .Error)
             })
             let waitAction = SKAction.wait(forDuration: duration)
             let showOrigAction = SKAction.run({
 //                myNode.setColorByState()
-                myNode.setStatus(toStatus: .OrigStatus, calledFrom: "blinkWords - 2")
+                myNode.setStatus(toStatus: .OrigStatus)
             })
             var sequence = [SKAction]()
             for _ in 1...3 {
@@ -136,12 +133,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for letter in foundedWord.usedLetters {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showGreenAction = SKAction.run({
-                myNode.setStatus(toStatus: .DarkGreenStatus, calledFrom: "blinkWords - 3")
+                myNode.setStatus(toStatus: .DarkGreenStatus)
             })
             let waitAction = SKAction.wait(forDuration: duration)
             let showOrigAction = SKAction.run({
 //                myNode.setColorByState()
-                myNode.setStatus(toStatus: .OrigStatus, calledFrom: "blinkWords - 4")
+                myNode.setStatus(toStatus: .OrigStatus)
             })
             var sequence = [SKAction]()
             sequence.append(longWaitAction)
@@ -444,8 +441,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var col = NoValue
         var row = NoValue
         var shapeIndex = NoValue
-//        var onGameArray = false
-//        var shapeOnGameArray = false
     }
     
     
@@ -562,6 +557,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GV.totalScore = 0
         GV.mandatoryScore = 0
         GV.ownScore = 0
+        GV.countBlinkingNodes = 0
+        GV.blinkingNodes.removeAll()
 //        GV.bonusScore = 0
         if GV.generateHelpInfo {
             initiateHelpModel()
@@ -895,23 +892,34 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         if createNextRound && GV.nextRoundAnimationFinished {
-            try! realm.safeWrite() {
-                let roundScore = WTGameWordList.shared.getPointsForLetters()
-                GV.playingRecord.rounds.last!.roundScore = roundScore
-                let newRound = RoundDataModel()
-                newRound.gameArray = wtGameboard!.gameArrayToString()
-                GV.playingRecord.rounds.append(newRound)
-                self.timeForGame.incrementMaxTime(value: iHalfHour)
-                WTGameWordList.shared.addNewRound()
-                self.activityRoundItem.append(ActivityRound())
-                self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
-            }
-            createFixLetters()
-            checkIfGameFinished()
-            saveActualState()
-            createNextRound = false
-            GV.nextRoundAnimationFinished = false
+            afterNextRoundAnimation()
         }
+        if showHelp {
+            showHelpStepByStep()
+        }
+    }
+    
+    private func afterNextRoundAnimation() {
+        try! realm.safeWrite() {
+            let roundScore = WTGameWordList.shared.getPointsForLetters()
+            GV.playingRecord.rounds.last!.roundScore = roundScore
+            let newRound = RoundDataModel()
+            newRound.gameArray = wtGameboard!.gameArrayToString()
+            GV.playingRecord.rounds.append(newRound)
+            self.timeForGame.incrementMaxTime(value: iHalfHour)
+            WTGameWordList.shared.addNewRound()
+            self.activityRoundItem.append(ActivityRound())
+            self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
+        }
+        createFixLetters()
+        checkIfGameFinished()
+        saveActualState()
+        createNextRound = false
+        GV.nextRoundAnimationFinished = false
+    }
+    
+    private func showHelpStepByStep() {
+        
     }
     
     private func modifyHeader() {
@@ -1899,7 +1907,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var startHelpDemoTimer = Timer()
     
     @objc private func startShowHelpDemo(timerX: Timer) {
-        showHelpDemo()
+        showHelpDemoStep()
     }
     
     var bestPlayerNickname = ""
@@ -2052,8 +2060,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         wtGameboard!.addFixLettersToGamearray(fixLetters: fixLetters)
     }
-
-    private func showHelpDemo() {
+    
+    private func showHelpDemoStep() {
         hideButtons(hide: true)
         gameFinished = false
         let generateHelpInfo = GV.generateHelpInfo
@@ -2597,7 +2605,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             WTGameWordList.shared.stopShowingWords()
             showingWordsInTable = false
             if tableType == .ShowAllWords {
-                showOwnWordsTableView?.removeFromSuperview()
+                showOwnWordsTableView!.removeFromSuperview()
             } else {
                 showWordsOverPositionTableView?.removeFromSuperview()
             }
@@ -2620,7 +2628,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 if myNode.hasActions() {
                     myNode.removeAllActions()
                     let showOrigAction = SKAction.run({
-                        myNode.setStatus(toStatus: .OrigStatus, calledFrom: "blinkWords - 4")
+                        myNode.setStatus(toStatus: .OrigStatus)
                     })
                     myNode.run(showOrigAction)
                 }

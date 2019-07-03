@@ -430,7 +430,7 @@ public class WTGameWordList {
 //            for letter in selectedWord.usedLetters {
                 let letter = mySelectedWord.usedLetters[index]
                 let connectionType = mySelectedWord.connectionTypes[index]
-                GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, incrWords: true, calledFrom: "addWord")
+                GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, incrWords: true)
             }
             mySelectedWord.setScore(round: round)
             wordsInRound[wordsInRound.count - 1].wordsInGame.append(mySelectedWord)
@@ -494,10 +494,10 @@ public class WTGameWordList {
 
             for (index, letter) in mySelectedWord.usedLetters.enumerated() {
                 if isThisPositionFree(letter: letter) {
-                    GV.gameArray[letter.col][letter.row].setStatus(toStatus: .Used, decrWords: true, calledFrom: "removeLastWord - 1")
+                    GV.gameArray[letter.col][letter.row].setStatus(toStatus: .Used, decrWords: true)
                 } else {
                     let connectionType = mySelectedWord.connectionTypes[index]
-                    GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, decrWords: true, calledFrom: "removeLastWord - 2")
+                    GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, decrWords: true)
                 }
             }
 
@@ -634,7 +634,7 @@ public class WTGameWordList {
             for item in wordsInRound {
                 for selectedWord in item.wordsInGame {
                     for letter in selectedWord.usedLetters {
-                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .Used, calledFrom: "clearWordsInGame")
+                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .Used)
                     }
                 }
             }
@@ -653,9 +653,9 @@ public class WTGameWordList {
             for selectedWord in lastItem.wordsInGame {
                 if selectedWord.usedLetters.contains(where: {$0.col == choosedWord.usedLetters[0].col && $0.row == choosedWord.usedLetters[0].row}) {
                     for letter in selectedWord.usedLetters {
-                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .GoldStatus, calledFrom: "showWordsContainingThisLetter - 1")
+                        GV.gameArray[letter.col][letter.row].setStatus(toStatus: .GoldStatus)
                     }
-                    GV.gameArray[choosedWord.usedLetters[0].col][choosedWord.usedLetters[0].row].setStatus(toStatus: .DarkGoldStatus, calledFrom: "showWordsContainingThisLetter- 2")
+                    GV.gameArray[choosedWord.usedLetters[0].col][choosedWord.usedLetters[0].row].setStatus(toStatus: .DarkGoldStatus)
                     showedWords.append(selectedWord)
     //                wordsToShow.append(selectedWord.word)
                 }
@@ -670,7 +670,7 @@ public class WTGameWordList {
     public func stopShowingWords() {
         for selectedWord in showedWords {
             for letter in selectedWord.usedLetters {
-                GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, calledFrom: "stopShowingWords")
+                GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord)
             }
         }
         showedWords = [SelectedWord]()
