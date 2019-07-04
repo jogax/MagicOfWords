@@ -895,7 +895,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-        if showHelpDemoActive && lastHelpDemoStepReady {
+        if showHelpDemoActive && lastHelpDemoStepReady && !createNextRound {
             showHelpStepByStep()
         }
     }
@@ -2172,28 +2172,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             var zielPosition: CGPoint?
             switch alertType {
             case .ContinueGameEasyAlert:
-                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
+//                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
             case .ContinueGameMediumAlert:
-                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
+//                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
             case .FinishGameEasyAlert:
-                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
+//                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
             case .FinishGameMediumAlert:
-                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
+//                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
             case .OKFixLettersSolvedAlert:
-                createCongratulationsAlert(congratulationType: .SolvedOnlyFixLetters, easy: false)
+//                createCongratulationsAlert(congratulationType: .SolvedOnlyFixLetters, easy: false)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
             case .OKMandatorySolvedAlert:
-                createCongratulationsAlert(congratulationType: .SolvedOnlyMandatoryWords, easy: false)
+//                createCongratulationsAlert(congratulationType: .SolvedOnlyMandatoryWords, easy: false)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
             case .NoMoreStepsAlert:
-                createNoMoreStepsAlert()
+//                createNoMoreStepsAlert()
                 zielPosition = noMoreStepsAlert!.getPositionForAction(action: action)
             case .FinishGameAlert:
-                createFinishGameAlert(status: .OK)
+//                createFinishGameAlert(status: .OK)
                 zielPosition = finishGameAlert!.getPositionForAction(action: action)
             }
             let point = zielPosition! - lastTouchedPosition
@@ -2238,18 +2238,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             fingerActions.append(beganAction)
             fingerActions.append(SKAction.wait(forDuration: 0.5))
             fingerActions.append(endedAction)
-            let removeAlertAction = SKAction.run ({
-                self.removeNodesWith(name: self.myAlertName)
-                if self.congratulationsAlert != nil {
-                    self.congratulationsAlert = nil
-                }
-            })
-            fingerActions.append(removeAlertAction)
-            if alertType == .NoMoreStepsAlert && action == #selector(self.nextRoundTapped) {
-                fingerActions.append(SKAction.wait(forDuration: 8.0))
-            } else {
-                fingerActions.append(SKAction.wait(forDuration: 0.5))
-            }
+//            let removeAlertAction = SKAction.run ({
+//                self.removeNodesWith(name: self.myAlertName)
+//                if self.congratulationsAlert != nil {
+//                    self.congratulationsAlert = nil
+//                }
+//            })
+//            fingerActions.append(removeAlertAction)
+            fingerActions.append(SKAction.wait(forDuration: 0.5))
+//            if alertType == .NoMoreStepsAlert && action == #selector(self.nextRoundTapped) {
+//                fingerActions.append(SKAction.wait(forDuration: 0.5))
+//            } else {
+//                fingerActions.append(SKAction.wait(forDuration: 0.5))
+//            }
         }
         //----------------------------------------------------------------------------
         var startFromGamearray = false
