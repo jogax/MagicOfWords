@@ -312,19 +312,17 @@ class WTPiece: SKSpriteNode {
             let col = form.points[index] / 10
             let row = form.points[index] % 10
             let position = gridPosition(col: col, row: row)
-            let width = blockSize * (GV.buttonType == GV.ButtonTypeElite ? 1.0 : 0.9)
+            let width = blockSize
             let frameForLetter = SKSpriteNode(color: .clear, size: CGSize(width: width, height: width))
             frameForLetter.position = position
             frameForLetter.color = .white
             let name = nameArray[index]
-            if GV.buttonType == GV.ButtonTypeElite {
-                frameForLetter.texture = SKTexture(imageNamed: "GraySprite")
-                let connectionImage = SKSpriteNode(color: .clear, size: CGSize(width: width, height: width))
-                connectionImage.texture = SKTexture(imageNamed: name)
-                connectionImage.name = "Connection\(index)"
-                connectionImage.zPosition = frameForLetter.zPosition - 10
-                frameForLetter.addChild(connectionImage)
-            }
+            frameForLetter.texture = SKTexture(imageNamed: "GraySprite")
+            let connectionImage = SKSpriteNode(color: .clear, size: CGSize(width: width, height: width))
+            connectionImage.texture = SKTexture(imageNamed: name)
+            connectionImage.name = "Connection\(index)"
+            connectionImage.zPosition = frameForLetter.zPosition - 10
+            frameForLetter.addChild(connectionImage)
             let label = SKLabelNode(fontNamed: GV.actPieceFont)
 //            label.position = position
             label.text = letters[index]
@@ -390,12 +388,10 @@ class WTPiece: SKSpriteNode {
                 }
                 let rotateLetterAction = SKAction.rotate(byAngle: 90 * GV.oneGrad, duration: 0.1)
                 child.run(rotateLetterAction)
-                if GV.buttonType == GV.ButtonTypeElite {
-                    guard let child1 = child.childNode(withName: "Connection\(index)") else {
-                        continue
-                    }
-                    (child1 as! SKSpriteNode).texture = SKTexture(imageNamed: nameArray[index])
+                guard let child1 = child.childNode(withName: "Connection\(index)") else {
+                    continue
                 }
+                (child1 as! SKSpriteNode).texture = SKTexture(imageNamed: nameArray[index])
              }
         }
     }

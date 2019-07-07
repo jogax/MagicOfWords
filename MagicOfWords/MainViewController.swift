@@ -911,37 +911,37 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 
     }
     
-    private func chooseStyle() {
-        func setStyle(style: String) {
-            try! realm.safeWrite() {
-                GV.basicDataRecord.buttonType = style
-            }
-            GV.buttonType = style
-        }
-        let alertController = UIAlertController(title: GV.language.getText(.tcChooseStyle),
-                                                message: "",
-                                                preferredStyle: .alert)
-        let simpleStyleAction = UIAlertAction(title: GV.language.getText(.tcSimpleStyle), style: .default, handler: {
-            alert -> Void in
-            setStyle(style: GV.ButtonTypeSimple)
-//            GV.actFont = GV.FontTypeSimple
-//            GV.actLabel = GV.LabelFontSimple
-            self.showMenu()
-        })
-        alertController.addAction(simpleStyleAction)
-        
-        let eliteStyleAction = UIAlertAction(title: GV.language.getText(.tcEliteStyle), style: .default, handler: {
-            alert -> Void in
-            setStyle(style: GV.ButtonTypeElite)
-//            GV.actFont = GV.FontTypeElite
-//            GV.actLabel = GV.LabelFontElite
-            self.showMenu()
-        })
-        alertController.addAction(eliteStyleAction)
-        
-        present(alertController, animated: true, completion: nil)
-
-    }
+//    private func chooseStyle() {
+//        func setStyle(style: String) {
+//            try! realm.safeWrite() {
+//                GV.basicDataRecord.buttonType = style
+//            }
+//            GV.buttonType = style
+//        }
+//        let alertController = UIAlertController(title: GV.language.getText(.tcChooseStyle),
+//                                                message: "",
+//                                                preferredStyle: .alert)
+//        let simpleStyleAction = UIAlertAction(title: GV.language.getText(.tcSimpleStyle), style: .default, handler: {
+//            alert -> Void in
+//            setStyle(style: GV.ButtonTypeSimple)
+////            GV.actFont = GV.FontTypeSimple
+////            GV.actLabel = GV.LabelFontSimple
+//            self.showMenu()
+//        })
+//        alertController.addAction(simpleStyleAction)
+//        
+//        let eliteStyleAction = UIAlertAction(title: GV.language.getText(.tcEliteStyle), style: .default, handler: {
+//            alert -> Void in
+//            setStyle(style: GV.ButtonTypeElite)
+////            GV.actFont = GV.FontTypeElite
+////            GV.actLabel = GV.LabelFontElite
+//            self.showMenu()
+//        })
+//        alertController.addAction(eliteStyleAction)
+//        
+//        present(alertController, animated: true, completion: nil)
+//
+//    }
     
     private func generateBasicDataRecordIfNeeded() {
         if realm.objects(BasicDataModel.self).count == 0 {
@@ -958,7 +958,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
             GV.language.setLanguage(GV.basicDataRecord.actLanguage)
         }
-        GV.buttonType = GV.basicDataRecord.buttonType
+//        GV.buttonType = GV.basicDataRecord.buttonType
         GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
         GV.maxGameNumber = GV.minGameNumber + 999
 

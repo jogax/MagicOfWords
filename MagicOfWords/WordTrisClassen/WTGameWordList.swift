@@ -359,7 +359,8 @@ public class WTGameWordList {
                 let selectedWord = SelectedWord(from: selectedWordString)
 //                selectedWord.setScore(round: round)
                 if selectedWord.word.length > 0 {
-                    _ = addWord(selectedWord: selectedWord, doAnimate: false, round: round)
+//                    _ = addWord(selectedWord: selectedWord, doAnimate: false, round: round)
+                    addWordToAllWords(selectedWord: selectedWord, round: round)
                 }
             }
         }
@@ -377,8 +378,8 @@ public class WTGameWordList {
         return returnBool
     }
     
-    public func addWord(selectedWord: SelectedWord, doAnimate: Bool = true, round: Int)->Bool {
-        var mySelectedWord = selectedWord
+    public func addWord(selectedWord: SelectedWord, doAnimate: Bool, round: Int)->Bool {
+//        var mySelectedWord = selectedWord
         var noCommonLetter = true
         var noDiagonal = true
         var commonLetters = [UsedLetter]()
@@ -386,18 +387,18 @@ public class WTGameWordList {
             wordsInRound.append(WordInRound())
         }
         let wordsInGame = wordsInRound.last!.wordsInGame
-        for index1 in 0..<mySelectedWord.usedLetters.count - 1 {
+        for index1 in 0..<selectedWord.usedLetters.count - 1 {
             // check if a letter is 2x used in the word
-            for index2 in index1 + 1..<mySelectedWord.usedLetters.count {
-                if mySelectedWord.usedLetters[index1].col == mySelectedWord.usedLetters[index2].col &&
-                    mySelectedWord.usedLetters[index1].row == mySelectedWord.usedLetters[index2].row {
+            for index2 in index1 + 1..<selectedWord.usedLetters.count {
+                if selectedWord.usedLetters[index1].col == selectedWord.usedLetters[index2].col &&
+                    selectedWord.usedLetters[index1].row == selectedWord.usedLetters[index2].row {
                     noCommonLetter = false
                 }
             }
             // check if in the word is using the diagonal way from one letter to the other
             let index2 = index1 + 1
-            if mySelectedWord.usedLetters[index1].col != mySelectedWord.usedLetters[index2].col &&
-                mySelectedWord.usedLetters[index1].row != mySelectedWord.usedLetters[index2].row {
+            if selectedWord.usedLetters[index1].col != selectedWord.usedLetters[index2].col &&
+                selectedWord.usedLetters[index1].row != selectedWord.usedLetters[index2].row {
                 noDiagonal = false
             }
         }
@@ -405,17 +406,17 @@ public class WTGameWordList {
             // check if there is the same word in the table with one or more letters with the same position
             if savedSelectedWord.word == selectedWord.word {
                 for savedLetterIndex in 0..<savedSelectedWord.word.length {
-                    for selectedLetterIndex in 0..<mySelectedWord.word.length {
-                        if savedSelectedWord.usedLetters[savedLetterIndex].col == mySelectedWord.usedLetters[selectedLetterIndex].col &&
-                            savedSelectedWord.usedLetters[savedLetterIndex].row == mySelectedWord.usedLetters[selectedLetterIndex].row &&
-                            savedSelectedWord.usedLetters[savedLetterIndex].letter == mySelectedWord.usedLetters[selectedLetterIndex].letter {
+                    for selectedLetterIndex in 0..<selectedWord.word.length {
+                        if savedSelectedWord.usedLetters[savedLetterIndex].col == selectedWord.usedLetters[selectedLetterIndex].col &&
+                            savedSelectedWord.usedLetters[savedLetterIndex].row == selectedWord.usedLetters[selectedLetterIndex].row &&
+                            savedSelectedWord.usedLetters[savedLetterIndex].letter == selectedWord.usedLetters[selectedLetterIndex].letter {
                             commonLetters.append(savedSelectedWord.usedLetters[savedLetterIndex])
                             noCommonLetter = false
                         }
                     }
                 }
                 if !noCommonLetter {
-                    delegate!.blinkWords(newWord: mySelectedWord, foundedWord: savedSelectedWord)
+                    delegate!.blinkWords(newWord: selectedWord, foundedWord: savedSelectedWord)
                 }
             }
         }
@@ -426,41 +427,46 @@ public class WTGameWordList {
 //                oldScore = getActualScore()
 //            }
 
-            for index in 0..<mySelectedWord.usedLetters.count {
+            for index in 0..<selectedWord.usedLetters.count {
 //            for letter in selectedWord.usedLetters {
-                let letter = mySelectedWord.usedLetters[index]
-                let connectionType = mySelectedWord.connectionTypes[index]
+                let letter = selectedWord.usedLetters[index]
+                let connectionType = selectedWord.connectionTypes[index]
                 GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, incrWords: true)
             }
-            mySelectedWord.setScore(round: round)
-            wordsInRound[wordsInRound.count - 1].wordsInGame.append(mySelectedWord)
-            addWordToAllWords(selectedWord: mySelectedWord)
+//            mySelectedWord.setScore(round: round)
+//            wordsInRound[wordsInRound.count - 1].wordsInGame.append(mySelectedWord)
+            addWordToAllWords(selectedWord: selectedWord, doAnimate: doAnimate, round: round)
 
-            if doAnimate { // only when new word added, not in init
-                delegate!.showScore(newWord: mySelectedWord, minus: false, doAnimate: doAnimate)
-                
-            }
+//            if doAnimate { // only when new word added, not in init
+//                delegate!.showScore(newWord: selectedWord, minus: false, doAnimate: doAnimate)
+//
+//            }
         }
         return noCommonLetter && noDiagonal
     }
     
-    private func addWordToAllWords(selectedWord: SelectedWord) {
-        GV.totalScore += selectedWord.score
-        if self.isMandatory(word: selectedWord.word) {
-            GV.mandatoryScore += selectedWord.score
+    private func addWordToAllWords(selectedWord: SelectedWord, doAnimate: Bool = false, round: Int) {
+        var mySelectedWord = selectedWord
+        mySelectedWord.setScore(round: round)
+        wordsInRound[wordsInRound.count - 1].wordsInGame.append(mySelectedWord)
+        GV.totalScore += mySelectedWord.score
+        if self.isMandatory(word: mySelectedWord.word) {
+            GV.mandatoryScore += mySelectedWord.score
         } else {
-            GV.ownScore += selectedWord.score
+            GV.ownScore += mySelectedWord.score
         }
-        let index = allWords.firstIndex(where: {$0.word == selectedWord.word})
+        let index = allWords.firstIndex(where: {$0.word == mySelectedWord.word})
         if index == nil {
-            allWords.append(WordWithCounter(word: selectedWord.word, counter: 1, mandatory: false, score: selectedWord.score))
-        }/* else if selectedWord.countFixLetters == 0 {
-            allWords[index!].counter += 1
-        }*/ else if allWords[index!].mandatory {
-            allWords.append(WordWithCounter(word: selectedWord.word, counter: 1, mandatory: true, score: selectedWord.score))
+            allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, mandatory: false, score: mySelectedWord.score))
+        } else if allWords[index!].mandatory {
+            allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, mandatory: true, score: mySelectedWord.score))
         } else {
-            allWords.append(WordWithCounter(word: selectedWord.word, counter: 1, mandatory: false, score: selectedWord.score))
+            allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, mandatory: false, score: mySelectedWord.score))
         }
+        if doAnimate { // only when new word added, not in init
+            delegate!.showScore(newWord: mySelectedWord, minus: false, doAnimate: doAnimate)
+        }
+
     }
     
     

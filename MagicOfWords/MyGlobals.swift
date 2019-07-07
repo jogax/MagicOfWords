@@ -50,8 +50,8 @@ struct GV {
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2
     static let GameStatusContinued = 3
-    static let ButtonTypeSimple = "S"
-    static let ButtonTypeElite = "E"
+//    static let ButtonTypeSimple = "S"
+//    static let ButtonTypeElite = "E"
     static var minGameNumber = 0
     static var maxGameNumber = 0
     static var origDifficulty = 0
@@ -59,26 +59,26 @@ struct GV {
     static let HardGame = 1
     static let DemoEasyGameNumber = 10000
     static let DemoMediumGameNumber = 11000
-    static var buttonType = ButtonTypeElite
-    static let LabelFontElite = "CourierNewPS-BoldMT"
-    static let LabelFontSimple = "CourierNewPS-BoldMT"
-    static let FontTypeElite = "TimesNewRomanPS-BoldMT"
-    static let FontTypeSimple = "TimesNewRomanPS-BoldMT"
-    static let PieceFontElite = "HelveticaNeue-Light"//"HelveticaNeue-Thin" //"GillSans-Light"
-    static let PieceFontSimple = "KohinoorBangla-Regular"
+//    static let buttonType = ButtonTypeElite
+    static let LabelFont = "CourierNewPS-BoldMT"
+//    static let LabelFontSimple = "CourierNewPS-BoldMT"
+    static let FontType = "TimesNewRomanPS-BoldMT"
+//    static let FontTypeSimple = "TimesNewRomanPS-BoldMT"
+    static let PieceFont = "HelveticaNeue-Light"//"HelveticaNeue-Thin" //"GillSans-Light"
+//    static let PieceFontSimple = "KohinoorBangla-Regular"
     static var actFont: String {
         get {
-            return buttonType == ButtonTypeElite ? FontTypeElite : FontTypeSimple
+            return FontType
         }
     }
     static var actLabelFont: String {
         get {
-            return buttonType == ButtonTypeElite ? LabelFontElite : LabelFontSimple
+            return LabelFont
         }
     }
     static var actPieceFont: String {
         get {
-            return buttonType == ButtonTypeElite ? PieceFontElite : PieceFontSimple
+            return PieceFont
         }
     } 
     static var playing = false

@@ -392,8 +392,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func showWordAndScore(word: SelectedWord, minus: Bool) {
         let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.04
         let textOnBalloon = word.word + " (" + (minus ? "-" : "") + String(word.score) + ")"
-        let elite = GV.buttonType == GV.ButtonTypeElite
-        let balloon = SKSpriteNode(imageNamed: elite ? "bubbleGoldElite" : "BalloonSimple")
+//        let elite = GV.buttonType == GV.ButtonTypeElite
+        let balloon = SKSpriteNode(imageNamed: "bubbleGoldElite")
         let width = textOnBalloon.width(font: myFont!) * (GV.onIpad ? 2.0 : 1.5)
         let height = textOnBalloon.height(font: myFont!) * 2.5
         balloon.size = CGSize(width: width, height: height)
@@ -993,7 +993,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var returnBool = false
         if realmWordList.objects(WordListModel.self).filter("word = %@", GV.actLanguage + word.lowercased()).count == 1 {
             let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
-            let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord, round: GV.playingRecord.rounds.count)
+            let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord, doAnimate: true, round: GV.playingRecord.rounds.count)
             returnBool = boolValue
         }
 //        else {
@@ -1475,16 +1475,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * firstButtonColumn, y:self.frame.height * lastButtonLine)
 //        let radius = self.frame.width * 0.045
-        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
-        let imageName = hasFrame ? "LeftSimple" : "LeftElite"
+//        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
+        let imageName = "LeftElite"
         goToPreviousGameButton = createMyButton(imageName: imageName, size: buttonSize, center: center, enabled: enabled, newSize: buttonHeight)
         goToPreviousGameButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.goPreviousGame))
         goToPreviousGameButton!.name = imageName
         goToPreviousGameButton!.zPosition = 10
-//        goToPreviousGameButton = createButton(imageName: imageName, title: "", frame: frame, center: center, cornerRadius: radius, enabled: enabled, hasFrame: hasFrame)
-//        goToPreviousGameButton?.addTarget(self, action: #selector(self.goPreviousGame), for: .touchUpInside)
         bgSprite!.addChild(goToPreviousGameButton!)
-//        self.view?.addSubview(goToPreviousGameButton!)
     }
     func createGoToNextGameButton(enabled: Bool) {
         if goToNextGameButton != nil {
@@ -1494,8 +1491,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * lastButtonColumn, y:self.frame.height * lastButtonLine)
 //        let radius = self.frame.width * 0.045
-        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
-        let imageName = hasFrame ? "RightSimple" : "RightElite"
+//        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
+        let imageName = "RightElite"
         goToNextGameButton = createMyButton(imageName: imageName, size: buttonSize, center: center, enabled: enabled, newSize: buttonHeight)
         goToNextGameButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.goNextGame))
         goToNextGameButton!.name = imageName
@@ -1686,8 +1683,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = CGPoint(x:self.frame.width * firstButtonColumn, y:self.frame.height * firstButtonLine)
 //        let radius = self.frame.width * 0.04
-        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
-        let imageName = hasFrame ? "BackSimple" : "BackElite"
+//        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
+        let imageName = "BackElite"
         goBackButton = createMyButton(imageName: imageName, size: buttonSize, center: center, enabled: true, newSize: buttonHeight)
         goBackButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.goBackTapped))
         goBackButton!.name = imageName
@@ -1709,8 +1706,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             activityRoundItem.append(ActivityRound())
             activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
         }
-        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
-        let imageName = hasFrame ? "UndoSimple" : "UndoElite"
+//        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
+        let imageName = "UndoElite"
         let center = CGPoint(x: self.frame.width * lastButtonColumn, y: self.frame.height * firstButtonLine)
         let size = CGSize(width: buttonHeight, height: buttonHeight)
         let newSize = buttonHeight
@@ -3832,12 +3829,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for tile in tilesForGame {
             pieces += tile.toString() + "°"
         }
-//        var tempOwnWords = ""
-//        for item in GV.allWords {
-//            if !item.mandatory {
-//                tempOwnWords += item.toString() + "°"
-//            }
-//        }
         if GV.playingRecord.rounds.count == 0 {
             actRound = 1
         }

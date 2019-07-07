@@ -97,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 25, // new item words
+            schemaVersion: 26, // buttontype not needed any more
             // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
@@ -106,13 +106,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
-                case 19:
-                    migration.enumerateObjects(ofType: BasicDataModel.className()) { oldObject, newObject in
-                        newObject!["buttonType"] = GV.ButtonTypeElite
-                    }
+//                case 19:
+//                    migration.enumerateObjects(ofType: BasicDataModel.className()) { oldObject, newObject in
+//                        newObject!["buttonType"] = GV.ButtonType
+//                    }
                 default: migration.enumerateObjects(ofType: BasicDataModel.className())
                     { oldObject, newObject in
-                            //newObject!["buttonType"] = GV.ButtonTypeSimple
+//                        newObject!["buttonType"] = GV.ButtonTypeSimple
                     }
 
                 }

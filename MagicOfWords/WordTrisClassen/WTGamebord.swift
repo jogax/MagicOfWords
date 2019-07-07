@@ -829,9 +829,9 @@ class WTGameboard: SKShapeNode {
     var adder: CGFloat = 0
     
     private func animateClearing(col: Int, row:Int) {
-        if GV.buttonType == GV.ButtonTypeSimple {
-            return
-        }
+//        if GV.buttonType == GV.ButtonTypeSimple {
+//            return
+//        }
         if GV.gameArray[col][row].status != .WholeWord {
             return
         }
