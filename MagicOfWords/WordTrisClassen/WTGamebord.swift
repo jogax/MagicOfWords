@@ -738,6 +738,7 @@ class WTGameboard: SKShapeNode {
     }
     
     public func stringToGameArray(string: String) {
+        
         for index in 0..<countCols * countCols {
             let col = index / countCols
             let row = index % countCols

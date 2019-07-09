@@ -440,10 +440,12 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
 //                print("in Subscription!")
             switch state {
             case .creating:
-                print("creating")
+                break
+//                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                print("pending")
+                break
+//                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -510,7 +512,8 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
-                print("invalitdated")
+                break
+//                print("invalitdated")
             // The subscription has been removed
             case .error(let error):
                 print("error: \(error)")
@@ -576,10 +579,12 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
 //            print("in Subscription!")
             switch state {
             case .creating:
-                print("creating")
+                break
+//                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                print("pending")
+                break
+//                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -633,7 +638,8 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
-                print("invalitdated")
+                break
+//                print("invalidated")
             // The subscription has been removed
             case .error(let error):
                 print("error: \(error)")
@@ -745,10 +751,12 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         forGameSubscriptionToken = forGameSubscription.observe(\.state) { [weak self]  state in
             switch state {
             case .creating:
-                print("creating")
+                break
+//                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                print("pending")
+                break
+//                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -756,18 +764,9 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 self!.calculateColumnWidths()
                 self!.generateTableData()
                 self!.setTableviewSize()
-//                let origin = CGPoint(x: 0, y: 0)
-//                let maxHeight = self!.view.frame.height * 0.8
-//                let calculatedHeight = self!.headerLine.height(font: self!.myFont!) * (CGFloat(self!.bestScoreTable.count + 1))
-//                let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
-//                let size = CGSize(width: self!.headerLine.width(font: self!.myFont!) * 1, height: height)
-//                let center = CGPoint(x: 0.5 * self!.view.frame.width, y: 0.5 * self!.view.frame.height)
-//                self!.showPlayerActivityView!.frame=CGRect(origin: origin, size: size)
-//                self!.showPlayerActivityView!.center=center
-//                self!.modifyButtonsPosition()
                 self!.showPlayerActivityView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
                 self!.showPlayerActivityView!.reloadData()
-                print("complete: count records: \(String(describing: self!.forGameItems!.count))")
+//                print("complete: count records: \(String(describing: self!.forGameItems!.count))")
                 self!.bestScoreNotificationToken = self!.forGameItems!.observe { [weak self] (changes) in
                     guard let showPlayerActivityView = self?.showPlayerActivityView else { return }
                     
@@ -801,7 +800,8 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
-                print("invalitdated")
+                break
+//                print("invalidated")
             // The subscription has been removed
             case .error(let error):
                 print("error: \(error)")

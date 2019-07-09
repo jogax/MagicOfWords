@@ -835,7 +835,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
         if bgSprite!.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
-            let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(GV.playingRecord.gameNumber % 1000)
+            let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(GV.playingRecord.gameNumber % 1000 + 1)
             let text = GV.language.getText(.tcHeader, values: gameNumber, String(0), timeForGame.time.HourMinSec)
             headerLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
@@ -1862,10 +1862,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         createSaveDataButton()
         if !new {
             wtGameboard!.setRoundInfos()
-            WTGameWordList.shared.restoreFromPlayingRecord()
-            restoreGameArray()
-            showFoundedWords()
-            checkIfGameFinished()
+            if GV.playingRecord.rounds.count == 1 && GV.playingRecord.rounds[0].gameArray == "" {
+                createFixLetters()
+            } else {
+                WTGameWordList.shared.restoreFromPlayingRecord()
+                restoreGameArray()
+                showFoundedWords()
+                checkIfGameFinished()
+            }
         } else {
             if GV.playingRecord.rounds.count == 0 {
                 actRound = 1
@@ -1886,7 +1890,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 bgSprite!.addChild(pieceArray[index])
             }
         }
-//        saveActualState()
+        saveActualState()
         
         if timer != nil {
             timer!.invalidate()
@@ -2097,6 +2101,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } while letterIndex < countOfLetters
         }
         wtGameboard!.addFixLettersToGamearray(fixLetters: fixLetters)
+        saveActualState()
     }
     
     private func showHelpStepByStep() {
