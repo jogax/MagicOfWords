@@ -45,7 +45,7 @@ struct GV {
         }
     }
 //    static let actVersion = "0.92" // Build 14
-    static let actVersion = "0.94" // Build 16
+    static let actVersion = "0.95" // Build 17
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2
