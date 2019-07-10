@@ -42,7 +42,7 @@ class CopyRealm {
         var old_syncUserConfig = SyncUser.current?.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true)
         old_syncUserConfig!.objectTypes = [PlayerActivity.self, BestScoreSync.self, BestScoreForGame.self]
         let old_realm = try! Realm(configuration: old_syncUserConfig!)
-        
+
         oldPlayerActivity = old_realm.objects(PlayerActivity.self)
         oldPlayerActivitySubscription = oldPlayerActivity!.subscribe(named: "CopyPlayerActivity")
         oldPlayerActivityToken = oldPlayerActivitySubscription!.observe(\.state) {state in
@@ -189,7 +189,7 @@ class CopyRealm {
                                                 fatalError("\(error)")
                                             }
                                         }
-                                        
+
 
                                     }
                                 }

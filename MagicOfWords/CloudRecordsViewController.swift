@@ -440,12 +440,10 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
 //                print("in Subscription!")
             switch state {
             case .creating:
-                break
-//                print("creating")
+                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                break
-//                print("pending")
+                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -512,8 +510,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
-                break
-//                print("invalitdated")
+                print("invalitdated")
             // The subscription has been removed
             case .error(let error):
                 print("error: \(error)")
@@ -579,12 +576,10 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
 //            print("in Subscription!")
             switch state {
             case .creating:
-                break
-//                print("creating")
+                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                break
-//                print("pending")
+                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -638,8 +633,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
-                break
-//                print("invalidated")
+                print("invalidated")
             // The subscription has been removed
             case .error(let error):
                 print("error: \(error)")
@@ -751,12 +745,10 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
         forGameSubscriptionToken = forGameSubscription.observe(\.state) { [weak self]  state in
             switch state {
             case .creating:
-                break
-//                print("creating")
+                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                break
-//                print("pending")
+                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -800,8 +792,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
-                break
-//                print("invalidated")
+                print("invalidated")
             // The subscription has been removed
             case .error(let error):
                 print("error: \(error)")

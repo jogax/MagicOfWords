@@ -836,7 +836,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if bgSprite!.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(GV.playingRecord.gameNumber % 1000 + 1)
-            let text = GV.language.getText(.tcHeader, values: gameNumber, String(0), timeForGame.time.HourMinSec)
+            let text = GV.language.getText(.tcHeader, values: gameNumber, String(1), timeForGame.time.HourMinSec)
             headerLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
             headerLabel.name = String(headerName)

@@ -247,7 +247,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             playerActivity = realmSync!.objects(PlayerActivity.self).filter("name = %@", name)
             playerActivitySubscription = playerActivity!.subscribe(named: "PlayerActivity1:\(name)")
             playerActivityToken = playerActivitySubscription!.observe(\.state) { /*[weak self]*/  state in
-//                print("in AppDelegate setConnection -> state: \(state)")
+                print("in AppDelegate setConnection -> state: \(state)")
                 if state == .complete {
                     if playerActivity?.count == 0 {
                         try! realmSync!.safeWrite() {

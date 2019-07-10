@@ -82,7 +82,7 @@ class WelcomeScene: SKScene {
         animate(text: text1, wait: 0)
         var wait = text2.filter { $0 == "/" }.count + 1
         animate(text: text2, wait: CGFloat(wait))
-        wait += text3.filter { $0 == "/" }.count + 1
+        wait = text3.filter { $0 == "/" }.count + 1
         animate(text: text3, wait: CGFloat(wait))
     }
     

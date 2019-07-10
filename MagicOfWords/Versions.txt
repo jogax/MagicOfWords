@@ -37,4 +37,15 @@ Build 16, Version 1.16 (0.94)
 
 
 Build 17, Version 1.17 (0.95)
-
+English:
+- quick start of Helpdemo
+- bugfixing
+Deutsch:
+- Schnellstart von Helpdemo
+- Fehlerbehebung
+Magyar:
+- helpdemo azonnali indítása
+- Kisebb hibák javítása
+Orosz:
+- быстрый запуск демо-игры
+- исправление ошибок

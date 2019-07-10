@@ -59,12 +59,10 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
 
             switch state {
             case .creating:
-//                print("creating")
-                break
+                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                break
-//                print("pending")
+                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -89,8 +87,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
                 }
                 self!.generateMandatoryWords()
             default:
-                break
-//                print("state: \(state)")
+                print("state: \(state)")
             }
         }
     }
@@ -165,10 +162,10 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
 
             switch state {
             case .creating:
-                break
+                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                break
+                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -189,7 +186,7 @@ class CreateMandatoryWordsViewController: UIViewController, WTTableViewDelegate 
 //                }
                 self!.generateNewItems()
             default:
-                break
+                print("state: \(state)")
             }
         }
     }

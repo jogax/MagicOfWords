@@ -807,12 +807,10 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             print("in Subscription!")
             switch state {
             case .creating:
-                break
-//                print("creating")
+                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                break
-//                print("pending")
+                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -821,12 +819,10 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 self!.forGameSubscriptionToken = self!.forGameSubscription.observe(\.state) { [weak self]  state in
                     switch state {
                     case .creating:
-//                        print("creating")
-                        break
+                        print("creating")
                     // The subscription has not yet been written to the Realm
                     case .pending:
-                        break
-//                        print("pending")
+                        print("pending")
                         // The subscription has been written to the Realm and is waiting
                     // to be processed by the server
                     case .complete:
@@ -849,8 +845,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                             }
                         }
                     case .invalidated:
-//                        print("invalidated")
-                        break
+                        print("invalitdated")
                     // The subscription has been removed
                     case .error(let error):
                         print("error: \(error)")
@@ -859,8 +854,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 }
 
             case .invalidated:
-                break
-//                print("invalitdated")
+                print("invalidated")
             // The subscription has been removed
             case .error(let error):
                 print("error: \(error)")

@@ -380,11 +380,11 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //            print("in CollectMandatoryWords at updateCommonString -> state: \(state)")
             switch state {
             case .creating:
-                break
+                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                break
-            // The subscription has been written to the Realm and is waiting
+                print("pending")
+                // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
                 for mandatoryLine in self!.readMandatoryItems! {
@@ -402,7 +402,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
             
 //                exit(0)
             default:
-                break
+                print("state: \(state)")
             }
         }
     }
@@ -705,11 +705,11 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //                print("in CollectMandatoryWords at fillAllWordsTable -> state: \(state)")
                 switch state {
                 case .creating:
-                    break
+                    print("creating")
                 // The subscription has not yet been written to the Realm
                 case .pending:
-                    break
-                // The subscription has been written to the Realm and is waiting
+                    print("pending")
+                    // The subscription has been written to the Realm and is waiting
                 // to be processed by the server
                 case .complete:
                     let name = playerActivity![0].name
@@ -846,10 +846,10 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //            print("in CollectMandatoryWords at getSavedMandatoryWords -> state: \(state)")
             switch state {
             case .creating:
-                break
+                print("creating")
             // The subscription has not yet been written to the Realm
             case .pending:
-                break
+                print("pending")
                 // The subscription has been written to the Realm and is waiting
             // to be processed by the server
             case .complete:
@@ -872,7 +872,7 @@ class CollectMandatoryWordsViewController: UIViewController, WTTableViewDelegate
 //                print("wordLengths: \(self!.wordLengths)")
 //                self!.readTextFile()
             default:
-                break
+                print("state: \(state)")
             }
         }
     }

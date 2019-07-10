@@ -273,8 +273,8 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 var item = FinishedGameData()
                 item.gameNumber = String(bestGame.gameNumber)
                 item.score = notExists
-                item.bestPlayer = bestGame.owner!.nickName!
                 item.bestScore  = String(bestGame.bestScore)
+                item.bestPlayer = bestGame.owner == nil ? "" : bestGame.owner!.nickName!
                 returnArray.append(item)
             }
         }
