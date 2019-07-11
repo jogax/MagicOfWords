@@ -845,7 +845,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                             }
                         }
                     case .invalidated:
-                        print("invalitdated")
+                        print("invalidated")
                     // The subscription has been removed
                     case .error(let error):
                         print("error: \(error)")

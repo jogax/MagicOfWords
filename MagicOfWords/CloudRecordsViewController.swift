@@ -510,7 +510,7 @@ class CloudRecordsViewController: UIViewController, WTTableViewDelegate {
                 // The subscription has been processed by the server and all objects
             // matching the query are in the local Realm
             case .invalidated:
-                print("invalitdated")
+                print("invalidated")
             // The subscription has been removed
             case .error(let error):
                 print("error: \(error)")
