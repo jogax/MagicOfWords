@@ -262,7 +262,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             playerActivityItem.territory = GV.language.getPreferredLanguage()
                             playerActivityItem.country = Locale.current.regionCode
                             playerActivityItem.deviceType = UIDevice().modelName
-                            playerActivityItem.version = GV.actVersion
+                            playerActivityItem.version = actVersion
                             realmSync!.add(playerActivityItem)
                         }
                     }  else {
@@ -278,9 +278,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 playerActivity![0].territory = GV.language.getPreferredLanguage()
                             }
                         }
-                        if playerActivity![0].version != GV.actVersion {
+                        if playerActivity![0].version != actVersion {
                             try! RealmService.safeWrite() {
-                                playerActivity![0].version = GV.actVersion
+                                playerActivity![0].version = actVersion
                             }
                         }
                     }

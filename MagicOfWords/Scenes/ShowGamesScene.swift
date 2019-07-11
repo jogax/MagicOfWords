@@ -21,7 +21,6 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         var bestScore = ""
         var score = ""
         var finished = false
-        var place = 0
     }
 
     let xMultiplierTab: [CGFloat] = [0.3, 0.5, 0.8]
@@ -114,9 +113,9 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         self.showGamesInTableView?.reloadData()
         
         self.scene?.view?.addSubview(showGamesInTableView!)
-        subscription = allResultsItems!.subscribe(named: "allResultsNew_\(GV.actLanguage)")
+        subscription = allResultsItems!.subscribe(named: "allResultsNew_\(GV.actLanguage)_\(GV.minGameNumber)")
         subscriptionToken = subscription.observe(\.state) { [weak self]  state in
-            print("is ShowGamesScene at showFinishedGame -> state: \(state)")
+            print("in ShowGamesScene at showFinishedGame -> state: \(state)")
            if state == .complete {
             #if DEBUG
                 self!.checkContinuity()
@@ -246,17 +245,17 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 continue
             }
             var item = FinishedGameData()
-            item.gameNumber = String((game.gameNumber % GV.maxGameNumber) + 1)
-            let combinedKey = item.gameNumber + game.language
+            item.gameNumber = String((game.gameNumber % 1000) + 1)
+//            let combinedKey = String(game.gameNumber + 1) + game.language
             item.score = String(game.score)
             item.bestPlayer = notExists
             item.bestScore = notExists
             item.finished = game.gameStatus == GV.GameStatusFinished
-            item.place = RealmService.objects(BestScoreSync.self).filter("combinedPrimary beginswith %@ and score > %d", combinedKey, game.score).count + 1
+//            item.place = RealmService.objects(BestScoreSync.self).filter("combinedPrimary beginswith %@ and score > %d", combinedKey, game.score).count + 1
             returnArray.append(item)
         }
         for bestGame in allResultsItems! {
-            if let index =  returnArray.firstIndex(where: {Int($0.gameNumber) == bestGame.gameNumber}) {
+            if let index =  returnArray.firstIndex(where: {Int($0.gameNumber) == bestGame.gameNumber % 1000}) {
                 if bestGame.owner != nil {
                     if bestGame.bestScore < Int(returnArray[index].score)! {
                         if !GV.debug {
@@ -374,7 +373,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         cell.addColumn(text: String(gamesForShow[indexPath.row].bestPlayer).fixLength(length: 12)/*, color: color*/) // Best Player
         cell.addColumn(text: String(gamesForShow[indexPath.row].bestScore).fixLength(length: 7)) // Best Score
         cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: 8)/*, color: color*/) // My Score
-        cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: 4) )
+//        cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: 4) )
         if gamesForShow[indexPath.row].finished {
 //            let image = UIImage(named: "hook")
             let image = UIImage(named: "hook")!.resizeImage(newWidth: lineHeight)

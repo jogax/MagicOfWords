@@ -88,7 +88,7 @@ let deDictionary: [TextConstants: String] = [
     .tcTableOfBestscores:   "Tabelle der besten Ergebnisse",
     .tcGamesToContinue:     "Wähle ein Spiel um fortzufahren",
     .tcBestPlayerHeader:    "Bestes Ergebnis",
-    .tcMyHeader:            "Mein Erg/Pl.",
+    .tcMyHeader:            "Mein Ergebnis",
     .tcMyNickName:          "Mein Spitzname: %\r\nSchwierigkeit: %",
     .tcGameIsFinished:      "Das Spiel % ist bereits beendet!",
     .tcRestartGameQuestion: "Du kannst das Spiel fortsetzen oder neu starten! Beim Neustart werden die Ergebnisse gelöscht!",

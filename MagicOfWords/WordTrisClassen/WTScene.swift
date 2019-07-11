@@ -842,7 +842,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func createHeader() {
         let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
         if bgSprite!.childNode(withName: versionLabelName) == nil {
-            let versionText = GV.language.getText(.tcActVersion, values: GV.actVersion)
+            let versionText = GV.language.getText(.tcActVersion, values: actVersion)
             versionLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             versionLabel.text = versionText
             versionLabel.name = String(versionLabelName)
@@ -3562,7 +3562,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     private func saveToRealmCloud() {
-        if GV.debug || !(GV.playingRecord.gameNumber < 1000) {
+        if GV.debug {
+            return
+        }
+        if GV.playingRecord.gameNumber > 9999 {
             return
         }
         if GV.connectedToInternet {

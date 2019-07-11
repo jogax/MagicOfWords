@@ -11,6 +11,7 @@ import AVFoundation
 import UIKit
 import RealmSwift
 
+let actVersion = "0.96" // Build 18
 let exclamationMark = "!"
 public let roundSeparator = "/"
 let itemSeparator = "°"
@@ -44,7 +45,6 @@ struct GV {
             return GV.language.getText(.tcAktLanguage)
         }
     }
-    static let actVersion = "0.96" // Build 18
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2

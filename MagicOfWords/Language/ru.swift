@@ -88,7 +88,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcTableOfBestscores:   "Таблица лучших результатов",
     .tcGamesToContinue:     "Выбери игру для продолжения",
     .tcBestPlayerHeader:    "Лучшие очки",
-    .tcMyHeader:            "Мои очки/Mecто",
+    .tcMyHeader:            "Мои очки",
     .tcMyNickName:          "Мой псевдоним: %\r\nТекущая сложность: %",
     .tcGameIsFinished:      "Игра % уже закончена!",
     .tcRestartGameQuestion: "Ты можешь продолжить или перезапустить игру! Если перезапустить, очки будут удалены!",
