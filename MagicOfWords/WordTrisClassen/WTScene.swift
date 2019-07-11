@@ -464,6 +464,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var timer: Timer? = Timer()
 //    var timeLabel = SKLabelNode()
     var headerLabel = SKLabelNode()
+    var versionLabel = SKLabelNode()
     var myScoreheaderLabel = SKLabelNode()
     var bestScoreHeaderLabel = SKLabelNode()
     var actScoreHeaderLabel = SKLabelNode()
@@ -526,6 +527,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let undoName = "°°°undo°°°"
     let goBackName = "°°°goBack°°°"
     let headerName = "°°°header°°°"
+    let versionLabelName = "°°°versionLabel°°°"
     let headerLineName = "°°°headerLine°°°"
     let myScoreName = "°°°myScore°°°"
     let bestScoreName = "°°°bestScore°°°"
@@ -831,8 +833,25 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let pieceArrayCenterY: CGFloat = 0.08
     let scoreLength: Int = 6
     
+    private func createVersion() {
+
+    }
+    
+
+    
     private func createHeader() {
         let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
+        if bgSprite!.childNode(withName: versionLabelName) == nil {
+            let versionText = GV.language.getText(.tcActVersion, values: GV.actVersion)
+            versionLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
+            versionLabel.text = versionText
+            versionLabel.name = String(versionLabelName)
+            versionLabel.fontSize = fontSize
+            versionLabel.position = CGPoint(x: self.frame.size.width * (GV.onIpad ? 0.0175 : 0.02), y: self.frame.size.height * (GV.onIpad ? 0.010 : 0.020))
+            versionLabel.horizontalAlignmentMode = .left
+            versionLabel.fontColor = SKColor(red: 0, green: 0, blue: 0, alpha: 0.5)
+            bgSprite!.addChild(versionLabel)
+        }
         if bgSprite!.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
             let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(GV.playingRecord.gameNumber % 1000 + 1)
@@ -841,7 +860,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             headerLabel.text = text
             headerLabel.name = String(headerName)
             headerLabel.fontSize = fontSize
-            headerLabel.position = CGPoint(x: self.frame.size.width * 0.5 /*startPosXForHeaderMultiplier*/, y: YPosition)
+            headerLabel.position = CGPoint(x: self.frame.size.width * 0.5, y: YPosition)
             headerLabel.horizontalAlignmentMode = .center
             headerLabel.fontColor = SKColor.black
             bgSprite!.addChild(headerLabel)
@@ -1860,6 +1879,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         createFinishButton()
         createSearchButton()
         createSaveDataButton()
+//        createVersion()
         if !new {
             wtGameboard!.setRoundInfos()
             if GV.playingRecord.rounds.count == 1 && GV.playingRecord.rounds[0].gameArray == "" {

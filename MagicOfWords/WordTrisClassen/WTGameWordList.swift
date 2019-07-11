@@ -359,8 +359,8 @@ public class WTGameWordList {
                 let selectedWord = SelectedWord(from: selectedWordString)
 //                selectedWord.setScore(round: round)
                 if selectedWord.word.length > 0 {
-//                    _ = addWord(selectedWord: selectedWord, doAnimate: false, round: round)
-                    addWordToAllWords(selectedWord: selectedWord, round: round)
+                    _ = addWord(selectedWord: selectedWord, doAnimate: false, round: round)
+//                    addWordToAllWords(selectedWord: selectedWord, round: round)
                 }
             }
         }

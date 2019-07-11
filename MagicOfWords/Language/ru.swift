@@ -147,5 +147,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcAreYouSureForNewDemo: "Действительно хочешь создать новую демоверсию?",
     .tcAreYouSureMessage:   "Старая демо-информация будет удалена!",
     .tcVersion:             "Версия",
+    .tcActVersion:          "©MagicOfWords V%",
 ]
 

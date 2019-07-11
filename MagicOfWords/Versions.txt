@@ -37,15 +37,21 @@ Build 16, Version 1.16 (0.94)
 
 
 Build 17, Version 1.17 (0.95)
+--  depricated --
+Build 18, Version 1.18 (0.96)
 English:
 - quick start of Helpdemo
 - bugfixing
+- now shows the Version
 Deutsch:
 - Schnellstart von Helpdemo
 - Fehlerbehebung
+- jetzt zeigt die Version
 Magyar:
 - helpdemo azonnali indítása
 - Kisebb hibák javítása
+- mostantól kijelzi az aktuális verziót
 Orosz:
 - быстрый запуск демо-игры
 - исправление ошибок
+- теперь показывает текущую версию

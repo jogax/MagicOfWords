@@ -146,4 +146,5 @@ let huDictionary: [TextConstants: String] = [
     .tcAreYouSureForNewDemo: "Biztosan új demót akarsz létrehozni?",
     .tcAreYouSureMessage:   "A régi demo információ törlődik!",
     .tcVersion:             "Verzió",
+    .tcActVersion:          "©MagicOfWords V%",
 ]

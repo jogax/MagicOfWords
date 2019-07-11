@@ -147,4 +147,5 @@ let enDictionary: [TextConstants: String] = [
     .tcAreYouSureForNewDemo: "Are you sure to create a new Demo?",
     .tcAreYouSureMessage:   "The old demo info will be deleted!",
     .tcVersion:             "Version",
+    .tcActVersion:          "©MagicOfWords V%",
 ]

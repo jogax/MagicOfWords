@@ -147,6 +147,7 @@ let deDictionary: [TextConstants: String] = [
     .tcAreYouSureForNewDemo: "Möchten Sie wirklich eine neue Demo erstellen??",
     .tcAreYouSureMessage:   "Die alte Demo-Informationen werden gelöscht!",
     .tcVersion:             "Version",
+    .tcActVersion:          "©MagicOfWords V%",
 ]
 
 
