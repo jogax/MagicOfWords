@@ -950,15 +950,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if bestPlayersReady {
             place = self.bestPlayers!.filter("score > %@", score).count + 1
         }
+        if mySyncedScoreReady {
+            place = self.newBestScores!.filter { (record) in
+                record.myFilter(difficulty: GV.basicDataRecord.difficulty, score: score)
+            }.count + 1
+        }
         let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(place), String(score).fixLength(length:scoreLength), GV.basicDataRecord.myNickname)
 //        let myScorelabel = bgSprite!.childNode(withName: myScoreName) as? SKLabelNode
 //        if myScorelabel != nil {
         myScoreheaderLabel.text = scoreText
 //        }
  
-        if bestScoreForActualGame != nil && bestScoreForActualGame!.count > 0 {
-            let bestName = bestScoreForActualGame![0].owner != nil ? bestScoreForActualGame![0].owner!.nickName : ""
-            let bestScore = bestScoreForActualGame![0].bestScore
+        if newBestScores != nil && newBestScores!.count > 0 {
+            let bestName = newBestScores![0].owner != nil ? newBestScores![0].owner!.nickName : ""
+            let bestScore = newBestScores![0].getScore(difficulty: GV.basicDataRecord.difficulty)
             let bestScoretext = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:scoreLength), bestName!)
 //            let bestScorelabel = bgSprite!.childNode(withName: bestScoreName) as? SKLabelNode
             bestScoreHeaderLabel.text = bestScoretext
@@ -3316,6 +3321,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     saveActualState()
                     saveToRealmCloud()
                     saveRecord = true
+                    modifyHeader()
                 } else {
                     
                 }
@@ -3432,6 +3438,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         return returnBool
     }
+    var mySyncedScore: Results<PlayerScore>?
+    var mySyncedScoreSubscription: SyncSubscription<PlayerScore>?
+    var mySyncedScoreSubscriptionToken: NotificationToken?
+    var newBestScores: Results<PlayerScore>?
+    var newBestScoresSubscription: SyncSubscription<PlayerScore>?
+    var newBestScoresSubscriptionToken: NotificationToken?
     var bestScoreSync: Results<BestScoreSync>?
     var notificationToken: NotificationToken?
     var bestScoreSubscriptionToken: NotificationToken?
@@ -3446,7 +3458,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var bestPlayers: Results<BestScoreSync>?
     var bestPlayersSubscription: SyncSubscription<BestScoreSync>?
     var bestPlayersSubscriptionToken: NotificationToken?
+    var bestScoreForActualGameReady = false
     var bestPlayersReady = false
+    var mySyncedScoreReady = false
+    var newBestScoresReady = false
 
     @objc private func startNextRound() {
         self.modifyHeader()
@@ -3461,6 +3476,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     private func getSyncedRecords() {
+        func setSyncedRecordsOK() {
+            if bestScoreForActualGameReady && bestPlayersReady && mySyncedScoreReady && newBestScoresReady {
+                syncedRecordsOK = true
+            } else {
+                syncedRecordsOK = false
+            }
+        }
         if realmSync != nil {
             let gameNumber = GV.playingRecord.gameNumber % 10000 + 1
             let language = GV.language.getText(.tcAktLanguage)
@@ -3468,25 +3490,73 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            let difficultyKey = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? "" : "°" + String(GV.basicDataRecord.difficulty)
             let combinedPrimarySync = String(gameNumber) + language + myName// + difficultyKey
             let combinedPrimaryForGame = String(gameNumber) + language//  + difficultyKey
-            
+            let combinedPrimaryFornewBestScores = language
+            let combinedPrimaryForMySyncedScore = language + myName
+            var sortingBy = ""
+            switch GV.basicDataRecord.difficulty {
+            case GameDifficulty.Easy.rawValue: sortingBy = "easyScore"
+            case GameDifficulty.Medium.rawValue: sortingBy = "mediumScore"
+            case GameDifficulty.Hard.rawValue: sortingBy = "hardScore"
+            case GameDifficulty.VeryHard.rawValue: sortingBy = "veryHardScore"
+            default: sortingBy = ""
+            }
+
+            newBestScores = realmSync!.objects(PlayerScore.self).filter("combinedPrimary BEGINSWITH %@", combinedPrimaryFornewBestScores).sorted(byKeyPath: sortingBy, ascending: false)
+            newBestScoresSubscription = newBestScores!.subscribe(named: "newBestScores:\(combinedPrimaryFornewBestScores)")
+            newBestScoresSubscriptionToken = newBestScoresSubscription!.observe(\.state) { [weak self]  state in
+                //                print("in WTScene at getSyncedRecords at bestPlayer -> state: \(state)")
+                if state == .complete {
+                    self!.newBestScoresReady = true
+                    setSyncedRecordsOK()
+                    self!.modifyHeader()
+                } else {
+                    //                    print("state: \(state)")
+                }
+            }
             bestPlayers = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary BEGINSWITH %@", combinedPrimaryForGame).sorted(byKeyPath: "score", ascending: false)
             bestPlayersSubscription = bestPlayers!.subscribe(named: "BestList:\(combinedPrimaryForGame)")
             bestPlayersSubscriptionToken = bestPlayersSubscription!.observe(\.state) { [weak self]  state in
 //                print("in WTScene at getSyncedRecords at bestPlayer -> state: \(state)")
                 if state == .complete {
                     self!.bestPlayersReady = true
+                    setSyncedRecordsOK()
                     self!.modifyHeader()
                 } else {
 //                    print("state: \(state)")
                 }
             }
-            
+
+            mySyncedScore = realmSync!.objects(PlayerScore.self).filter("combinedPrimary = %@", combinedPrimaryForMySyncedScore)
+            mySyncedScoreSubscription = mySyncedScore!.subscribe(named: "MySyncedScore:\(combinedPrimaryForMySyncedScore)")
+            mySyncedScoreSubscriptionToken = mySyncedScoreSubscription!.observe(\.state) { [weak self]  state in
+                //                print("in WTScene at getSyncedRecords at bestPlayer -> state: \(state)")
+                if state == .complete {
+                    if self!.mySyncedScore!.count == 0 /* && !GV.debug*/ {
+                        try! realmSync!.write {
+                            let mySyncedScoreRecord = PlayerScore()
+                            mySyncedScoreRecord.combinedPrimary = combinedPrimaryForMySyncedScore
+                            mySyncedScoreRecord.language = language
+                            mySyncedScoreRecord.playerName = myName
+                            mySyncedScoreRecord.easyScore = 0
+                            mySyncedScoreRecord.mediumScore = 0
+                            mySyncedScoreRecord.hardScore = 0
+                            mySyncedScoreRecord.veryHardScore = 0
+                            mySyncedScoreRecord.owner = playerActivity?[0]
+                            mySyncedScoreRecord.timeStamp = Date()
+                            realmSync!.add(mySyncedScoreRecord)
+                        }
+                    }
+                    self!.mySyncedScoreReady = true
+                    setSyncedRecordsOK()
+                } else {
+                }
+            }
             bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary = %@", combinedPrimarySync)
             bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "MyScoreRecord:\(combinedPrimarySync)")
             bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
 //                print("in WTScene at getSyncedRecords at bestScoreSync -> state: \(state)")
                 if state == .complete {
-                    if self!.bestScoreSync!.count == 0 && !GV.debug {
+                    if self!.bestScoreSync!.count == 0 /*&& !GV.debug*/ {
                         try! realmSync!.write {
                             let bestScoreSyncRecord = BestScoreSync()
                             bestScoreSyncRecord.gameNumber = gameNumber
@@ -3503,6 +3573,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                             realmSync!.add(bestScoreSyncRecord)
                         }
                     }
+                    
                 } else {
                 }
                 
@@ -3512,8 +3583,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             forGameSubscriptionToken = bestScoreForActualGameSubscription!.observe(\.state) { [weak self]  state in
                 //                print("in Subscription!")
                 if state == .complete {
-                    if !GV.debug {
-                        
+//                    if !GV.debug {
+                    
                         if self!.bestScoreForActualGame!.count == 0 {
                             try! realmSync!.write{
                                 let bestScoreForActualGameRecord = BestScoreForGame()
@@ -3533,8 +3604,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                                 }
                             }
                         }
-                    }
-                    self!.syncedRecordsOK = self!.bestScoreForActualGame!.count > 0
+//                    }
+                    self!.bestScoreForActualGameReady = self!.bestScoreForActualGame!.count > 0
+                    setSyncedRecordsOK()
+//                    self!.syncedRecordsOK = self!.bestScoreForActualGame!.count > 0
                     self!.waitingForSynceRecords = !self!.syncedRecordsOK
                     self!.bestScoreForActualGameToken = self!.bestScoreForActualGame!.observe { [weak self] (changes) in
                         switch changes {
@@ -3562,9 +3635,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     private func saveToRealmCloud() {
-        if GV.debug {
-            return
-        }
+//        if GV.debug {
+//            return
+//        }
         if GV.playingRecord.gameNumber > 9999 {
             return
         }
@@ -3580,7 +3653,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         self.bestScoreForActualGame![0].timeStamp = Date()
                         self.bestScoreForActualGame![0].owner = playerActivity?[0]
                     }
-                }
+                    self.mySyncedScore![0].setScore(difficulty: GV.basicDataRecord.difficulty, score: GV.totalScore)
+                    self.mySyncedScore![0].timeStamp = Date()
+                 }
                 try! realm.safeWrite() {
                     GV.playingRecord.synced = true
                 }
