@@ -148,5 +148,12 @@ let ruDictionary: [TextConstants: String] = [
     .tcAreYouSureMessage:   "Старая демо-информация будет удалена!",
     .tcVersion:             "Версия",
     .tcActVersion:          "©MagicOfWords V%",
+    .tcAskForGameCenter: "Ты можешь подключиться к Игровому центру,\r\n" +
+                            "чтобы узнать, сколько очков у других игроков.",
+    .tcAskLater:        "Спроси меня позже",
+    .tcAskNoMore:       "Не спрашивай меня больше",
+    .tcConnectGC:       "Подключиться к Игровому центру",
+    .tcDisconnectGC:    "Отключиться от Игрового Центра",
+    .tcNobody:          "Неизвестный",
 ]
 

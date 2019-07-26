@@ -148,4 +148,11 @@ let enDictionary: [TextConstants: String] = [
     .tcAreYouSureMessage:   "The old demo info will be deleted!",
     .tcVersion:             "Version",
     .tcActVersion:          "©MagicOfWords V%",
+    .tcAskForGameCenter: "You can connect to the Game Center \r\n" +
+    "to see what scores other players have.",
+    .tcAskLater:        "Ask me Later",
+    .tcAskNoMore:       "Ask me no more",
+    .tcConnectGC:       "Connect to Gamecenter",
+    .tcDisconnectGC:    "Disconnect from Gamecenter",
+    .tcNobody:          "unknown",
 ]

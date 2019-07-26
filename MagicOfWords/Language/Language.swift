@@ -146,7 +146,13 @@ enum TextConstants: Int {
     tcAreYouSureForNewDemo,
     tcAreYouSureMessage,
     tcVersion,
-    tcActVersion
+    tcActVersion,
+    tcAskForGameCenter,
+    tcAskLater,
+    tcAskNoMore,
+    tcConnectGC,
+    tcDisconnectGC,
+    tcNobody
 }
 
     let LanguageEN = "en" // index 0

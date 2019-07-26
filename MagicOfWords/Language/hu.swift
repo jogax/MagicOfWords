@@ -147,4 +147,11 @@ let huDictionary: [TextConstants: String] = [
     .tcAreYouSureMessage:   "A régi demo információ törlődik!",
     .tcVersion:             "Verzió",
     .tcActVersion:          "©MagicOfWords V%",
+    .tcAskForGameCenter: "Csatlakozhatsz a Game Centerhez, \r\n" +
+                        "hogy lásd, hány pontja van a többi játékosnak.",
+    .tcAskLater:        "Kérdezz később",
+    .tcAskNoMore:       "Ne kérdezz többé",
+    .tcConnectGC:       "Kapcsolódás a Game Centerhez",
+    .tcDisconnectGC:    "Lekapcsolódás a Game Centerről",
+    .tcNobody:          "Ismeretlen",
 ]

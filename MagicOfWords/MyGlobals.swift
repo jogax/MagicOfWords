@@ -10,6 +10,7 @@ import Foundation
 import AVFoundation
 import UIKit
 import RealmSwift
+import GameKit
 
 let actVersion = "0.96" // Build 18
 let exclamationMark = "!"
@@ -112,7 +113,20 @@ struct GV {
     static var mandatoryWords = [String]()
     static var blinkingNodes = [WTGameboardItem]()
     static var countBlinkingNodes = 0
-    
+    static var countFoundedBestScores = 0
+    static var bestScores: [Int:GKScore?] = [
+        GameDifficulty.Easy.rawValue : nil,
+        GameDifficulty.Medium.rawValue : nil,
+//        GameDifficulty.Hard.rawValue : nil,
+//        GameDifficulty.VeryHard.rawValue : nil
+    ]
+    static var myScores: [Int:GKScore?] = [
+        GameDifficulty.Easy.rawValue : nil,
+        GameDifficulty.Medium.rawValue : nil,
+//        GameDifficulty.Hard.rawValue : nil,
+//        GameDifficulty.VeryHard.rawValue : nil
+    ]
+
 //    static var greenSpriteArray = [WTGameboardItem]()
     static var nextRoundAnimationFinished = true
     
@@ -162,12 +176,12 @@ struct GV {
 
 
 //    RealmSync Constants
-    static let MY_INSTANCE_ADDRESS = "magic-of-words.us1.cloud.realm.io" // <- update this
-    
-    static let AUTH_URL  = URL(string: "https://\(MY_INSTANCE_ADDRESS)")!
-//    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWords")!
-    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWordsTest1")!
-    static let NEW_REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWordsRealm")!
+//    static let MY_INSTANCE_ADDRESS = "magic-of-words.us1.cloud.realm.io" // <- update this
+//    
+//    static let AUTH_URL  = URL(string: "https://\(MY_INSTANCE_ADDRESS)")!
+////    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWords")!
+//    static let REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWordsTest1")!
+//    static let NEW_REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWordsRealm")!
 
 }
 

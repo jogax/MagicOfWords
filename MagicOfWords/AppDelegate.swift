@@ -29,7 +29,7 @@ import Reachability
 
 var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
 #endif
-var playerActivity: Results<PlayerActivity>? // = realmSync.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
+//var playerActivity: Results<PlayerActivity>? // = realmSync.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
 var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
 //var realmSync: Realm? = RealmService
 
@@ -97,8 +97,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 26, // buttontype not needed any more
-            // Set the block which will be called automatically when opening a Realm with
+            schemaVersion: 29, // optimize BasicDataModel
+//            schemaVersion: 27, // start with Game Center
+//            schemaVersion: 26, // buttontype not needed any more
+           // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
                 switch oldSchemaVersion {
@@ -123,7 +125,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Tell Realm to use this new configuration object for the default Realm
         Realm.Configuration.defaultConfiguration = config
-        loginToRealmSync()
+//        loginToRealmSync()
         reachability.whenReachable = { reachability in
             if reachability.connection == .wifi {
                 print("Reachable via WiFi")
@@ -149,7 +151,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-        setIsOffline()
+//        setIsOffline()
     }
     
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -164,292 +166,292 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        setIsOnline()
+//        setIsOnline()
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
-    private func loginToRealmSync() {
-        let userName = "magic-of-words-user"
-        let password = "@@@" + userName + "@@@"
-        GV.myUser = nil
-        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
-        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
-            if user == nil {
-                if SyncUser.current != nil {
-                    print("user offline")
-                    GV.myUser = SyncUser.current!
-                    self.setConnection()
-                }
-            } else {
-                print("OK user exists")
-                GV.myUser = user
-                self.setConnection()
-            }
-        }
-    }
-    
-    
-    func setIsOffline() {
-        if GV.myUser != nil {
-            try! realmSync!.safeWrite() {
-                if playerActivity?.count == 0 {
-                } else {
-                    if playerActivity![0].creationTime == nil {
-                        playerActivity![0].creationTime = Date()
-                    }
-                    if playerActivity![0].territory == nil {
-                        playerActivity![0].territory = GV.language.getPreferredLanguage()
-                        playerActivity![0].deviceType = UIDevice().modelName
-                    }
-                    playerActivity![0].countOnlines += 1
-                    playerActivity![0].isOnline = false
-//                    playerActivity![0].onlineTime += Int(getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!))
-//                    playerActivity![0].onlineSince = nil
-                }
-            }
-//            let subscriptions = realmSync!.subscriptions()
-//            for subscription in subscriptions {
-//                subscription.unsubscribe()
+//    private func loginToRealmSync() {
+//        let userName = "magic-of-words-user"
+//        let password = "@@@" + userName + "@@@"
+//        GV.myUser = nil
+//        let logInCredentials = SyncCredentials.usernamePassword(username: userName, password: password)
+//        SyncUser.logIn(with: logInCredentials, server: GV.AUTH_URL, timeout: 5) { user, error in
+//            if user == nil {
+//                if SyncUser.current != nil {
+//                    print("user offline")
+//                    GV.myUser = SyncUser.current!
+//                    self.setConnection()
+//                }
+//            } else {
+//                print("OK user exists")
+//                GV.myUser = user
+//                self.setConnection()
 //            }
-        }
-    }
-    var playerActivitySubscription: SyncSubscription<PlayerActivity>?
-    var playerActivityToken: NotificationToken?
-    var playerNotificationToken: NotificationToken?
-
-    func setConnection() {
-        if GV.myUser == nil {
-            return
-        }
-        realmSync = RealmService
-        #if DEBUG
-        if GV.onIpad {
-            CopyRealm.shared.copyRealms()
-        }
-        #endif
-//        let subscriptions = realmSync!.subscriptions()
-//        for subscription in subscriptions {
-//                subscription.unsubscribe()
 //        }
- 
-        //        let myObjects = RealmService.objects(PlayerActivity.self)
-        //
-        //        let syncConfig: SyncConfiguration = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL)
-        //        //        let syncConfig = SyncUser.current!.configuration(realmURL: GV.REALM_URL, user: GV.myUser!)
-        //        //        let config = SyncUser.current!.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true, urlPrefix: nil)
-        //        let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
-        if playerActivity == nil {
-            let name = GV.basicDataRecord.myName
-//            let mySubspription = realmSync!.subscription(named: "PlayerActivity1:\(name)")
-            playerActivity = realmSync!.objects(PlayerActivity.self).filter("name = %@", name)
-            playerActivitySubscription = playerActivity!.subscribe(named: "PlayerActivity1:\(name)")
-            playerActivityToken = playerActivitySubscription!.observe(\.state) { /*[weak self]*/  state in
-                print("in AppDelegate setConnection -> state: \(state)")
-                if state == .complete {
-                    if playerActivity?.count == 0 {
-                        try! realmSync!.safeWrite() {
-                            let playerActivityItem = PlayerActivity()
-                            playerActivityItem.creationTime = Date()
-                            playerActivityItem.name = GV.basicDataRecord.myName
-                            playerActivityItem.nickName = GV.basicDataRecord.myNickname
-                            playerActivityItem.keyWord = GV.basicDataRecord.keyWord
-                            playerActivityItem.isOnline = true
-                            playerActivityItem.onlineSince = getLocalDate()
-                            playerActivityItem.onlineTime = 0
-                            playerActivityItem.territory = GV.language.getPreferredLanguage()
-                            playerActivityItem.country = Locale.current.regionCode
-                            playerActivityItem.deviceType = UIDevice().modelName
-                            playerActivityItem.version = actVersion
-                            realmSync!.add(playerActivityItem)
-                        }
-                    }  else {
-                        if GV.basicDataRecord.notSaved || GV.basicDataRecord.myNickname != playerActivity![0].nickName! || GV.basicDataRecord.keyWord != playerActivity![0].keyWord! {
-                            try! realm.safeWrite() {
-                                GV.basicDataRecord.myNickname = playerActivity![0].nickName!
-                                GV.basicDataRecord.keyWord = playerActivity![0].keyWord!
-                            }
-                        }
-                        if playerActivity![0].country != Locale.current.regionCode || playerActivity![0].territory != GV.language.getPreferredLanguage() {
-                            try! RealmService.safeWrite() {
-                                playerActivity![0].country = Locale.current.regionCode
-                                playerActivity![0].territory = GV.language.getPreferredLanguage()
-                            }
-                        }
-                        if playerActivity![0].version != actVersion {
-                            try! RealmService.safeWrite() {
-                                playerActivity![0].version = actVersion
-                            }
-                        }
-                    }
-                    self.playerNotificationToken = playerActivity!.observe {  (changes) in
-                        if playerActivity!.count > 0 {
-                            GV.expertUser = playerActivity!.first!.expertUser
-                        }
-                    }
-                    if GV.basicDataRecord.notSaved {
-                        try! realm.safeWrite() {
-                            GV.basicDataRecord.notSaved = false
-                        }
-                    }
-
-                } else {
-                }
-            }
-        }
-        setIsOnline()
-    }
-    
-    var tenMinutesTimer: Timer?
-    func setIsOnline() {
-        if GV.myUser != nil {
-            try! realmSync!.safeWrite() {
-                if playerActivity?.count == 0 {
-                } else {
-                    playerActivity![0].isOnline = true
-                    playerActivity![0].onlineSince = getLocalDate()
-                    playerActivity![0].lastTouched = getLocalDate()
-                    tenMinutesTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
-                }
-            }
-            checkSyncedDB()
-        }
-    }
-    
-    @objc private func setLastTouched(timerX: Timer) {
-        tenMinutesTimer!.invalidate()
-        tenMinutesTimer = nil
-        try! realm.safeWrite() {
-            GV.basicDataRecord.onlineTime += 1
-            if GV.playing {
-                GV.basicDataRecord.playingTime += 1
-            }
-        }
-        if playerActivity?.count == 0 {
-        } else {
-            if GV.basicDataRecord.onlineTime % 60 == 0 {
-                try! RealmService.safeWrite() {
-                    playerActivity![0].lastTouched = getLocalDate()
-                    playerActivity![0].onlineTime = GV.basicDataRecord.onlineTime
-                    playerActivity![0].playingTime = GV.basicDataRecord.playingTime
-                }
-            }
-        }
-        tenMinutesTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
-    }
-    
-    var bestScoreSync: Results<BestScoreSync>?
-    var notificationToken: NotificationToken?
-    var bestScoreSubscriptionToken: NotificationToken?
-    var forGameSubscriptionToken: NotificationToken?
-    var bestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
-    var bestScoreForGame: Results<BestScoreForGame>?
-    var bestScoreForGameToken: NotificationToken?
-    var bestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
-    var syncedRecordsOK = false
-    var waitingForSynceRecords = false
-    var answer1Button: UIButton?
-    
-    
-    private func checkSyncedDB() {
-        let language = GV.language.getText(.tcAktLanguage)
-        let myName = GV.basicDataRecord.myName
-        let combinedPrimarySync = language + myName
-        let combinedPrimaryForGame = language
-// this block sets the local DB to NotSynced
-//  ==================================
-        let myGameRecords = realm.objects(GameDataModel.self).filter("language = %@ and synced = true", language).sorted(byKeyPath: "gameNumber", ascending: true)
-        try! realm.safeWrite() {
-            for record in myGameRecords {
-                record.synced = false
-            }
-        }
-        //  ==================================
-        if realmSync != nil {
-            if !GV.debug {
-                let myGameRecords = realm.objects(GameDataModel.self).filter("language = %@ and synced = false", language).sorted(byKeyPath: "gameNumber", ascending: true)
-                if myGameRecords.count > 0 && bestScoreSync == nil {
-                    bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary ENDSWITH %@", combinedPrimarySync)
-                    bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "AllMyScoreRecords:\(combinedPrimarySync)")
-                    bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
-//                        print("in AppDelegate checkSyncedDB -> state: \(state)")
-                        if state == .complete {
-                            for record in myGameRecords {
-                                let actGameNumber = record.gameNumber + 1
-                                let syncedRecord = self!.bestScoreSync!.filter("gameNumber = %@", actGameNumber)
-                                if syncedRecord.count == 0 {
-                                    try! realmSync!.safeWrite() {
-                                        let bestScoreSyncRecord = BestScoreSync()
-                                        bestScoreSyncRecord.gameNumber = actGameNumber
-                                        bestScoreSyncRecord.language = language
-                                        bestScoreSyncRecord.playerName = myName
-                                        bestScoreSyncRecord.combinedPrimary = String(actGameNumber) + combinedPrimarySync
-                                        bestScoreSyncRecord.finished = record.gameStatus == GV.GameStatusFinished
-                                        bestScoreSyncRecord.score = record.score
-                                        bestScoreSyncRecord.owner = playerActivity?[0]
-                                        realmSync!.add(bestScoreSyncRecord)
-                                    }
-                                    try! realm.safeWrite() {
-                                        record.synced = true
-                                    }
-                                } else {
-                                    if syncedRecord.first!.score < record.score {
-                                        try! realmSync!.safeWrite() {
-                                            syncedRecord.first!.finished = record.gameStatus == GV.GameStatusFinished
-                                            syncedRecord.first!.score = record.score
-                                        }
-                                    }
-                                }
-                            }
-                        } else if state == .invalidated {
-                            self!.bestScoreSubscriptionToken = nil
-//                            print ("state: \(state)")
-                        } else {
-//                            print("state: \(state)")
-                        }
-                    }
-                    bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@", combinedPrimaryForGame)
-                    bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "AllGameRecords:\(combinedPrimaryForGame)")
-                    forGameSubscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
-                        //                print("in Subscription!")
-                        if state == .complete {
-                            for record in myGameRecords {
-                                try! realm.safeWrite() {
-                                    record.synced = true
-                                }
-                                let actGameNumber = record.gameNumber + 1
-                                let syncedRecord = self!.bestScoreForGame!.filter("gameNumber = %@", actGameNumber)
-                                if syncedRecord.count == 0 {
-                                    try! realmSync!.write {
-                                        let bestScoreSyncRecord = BestScoreForGame()
-                                        bestScoreSyncRecord.gameNumber = actGameNumber
-                                        bestScoreSyncRecord.language = language
-                                        bestScoreSyncRecord.combinedPrimary = String(actGameNumber) + combinedPrimaryForGame
-                                        bestScoreSyncRecord.bestScore = record.score
-                                        bestScoreSyncRecord.owner = playerActivity?[0]
-                                        realmSync!.add(bestScoreSyncRecord)
-                                    }
-                                } else {
-                                    if syncedRecord.first!.bestScore < record.score {
-                                        try! realmSync!.write {
-                                            syncedRecord.first!.bestScore = record.score
-                                        }
-                                    }
-                                }
-                                
-                            }
-                        } else {
-//                            print("state: \(state)")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    
+//    }
+//    
+//    
+//    func setIsOffline() {
+//        if GV.myUser != nil {
+//            try! realmSync!.safeWrite() {
+//                if playerActivity?.count == 0 {
+//                } else {
+//                    if playerActivity![0].creationTime == nil {
+//                        playerActivity![0].creationTime = Date()
+//                    }
+//                    if playerActivity![0].territory == nil {
+//                        playerActivity![0].territory = GV.language.getPreferredLanguage()
+//                        playerActivity![0].deviceType = UIDevice().modelName
+//                    }
+//                    playerActivity![0].countOnlines += 1
+//                    playerActivity![0].isOnline = false
+////                    playerActivity![0].onlineTime += Int(getLocalDate().timeIntervalSince(playerActivity![0].onlineSince!))
+////                    playerActivity![0].onlineSince = nil
+//                }
+//            }
+////            let subscriptions = realmSync!.subscriptions()
+////            for subscription in subscriptions {
+////                subscription.unsubscribe()
+////            }
+//        }
+//    }
+//    var playerActivitySubscription: SyncSubscription<PlayerActivity>?
+//    var playerActivityToken: NotificationToken?
+//    var playerNotificationToken: NotificationToken?
+//
+//    func setConnection() {
+//        if GV.myUser == nil {
+//            return
+//        }
+//        realmSync = RealmService
+//        #if DEBUG
+//        if GV.onIpad {
+//            CopyRealm.shared.copyRealms()
+//        }
+//        #endif
+////        let subscriptions = realmSync!.subscriptions()
+////        for subscription in subscriptions {
+////                subscription.unsubscribe()
+////        }
+// 
+//        //        let myObjects = RealmService.objects(PlayerActivity.self)
+//        //
+//        //        let syncConfig: SyncConfiguration = SyncConfiguration(user: GV.myUser!, realmURL: GV.REALM_URL)
+//        //        //        let syncConfig = SyncUser.current!.configuration(realmURL: GV.REALM_URL, user: GV.myUser!)
+//        //        //        let config = SyncUser.current!.configuration(realmURL: GV.REALM_URL, fullSynchronization: false, enableSSLValidation: true, urlPrefix: nil)
+//        //        let config = Realm.Configuration(syncConfiguration: syncConfig, objectTypes: [BestScoreSync.self, PlayerActivity.self])
+//        if playerActivity == nil {
+//            let name = GV.basicDataRecord.myName
+////            let mySubspription = realmSync!.subscription(named: "PlayerActivity1:\(name)")
+//            playerActivity = realmSync!.objects(PlayerActivity.self).filter("name = %@", name)
+//            playerActivitySubscription = playerActivity!.subscribe(named: "PlayerActivity1:\(name)")
+//            playerActivityToken = playerActivitySubscription!.observe(\.state) { /*[weak self]*/  state in
+//                print("in AppDelegate setConnection -> state: \(state)")
+//                if state == .complete {
+//                    if playerActivity?.count == 0 {
+//                        try! realmSync!.safeWrite() {
+//                            let playerActivityItem = PlayerActivity()
+//                            playerActivityItem.creationTime = Date()
+//                            playerActivityItem.name = GV.basicDataRecord.myName
+//                            playerActivityItem.nickName = GV.basicDataRecord.myNickname
+//                            playerActivityItem.keyWord = GV.basicDataRecord.keyWord
+//                            playerActivityItem.isOnline = true
+//                            playerActivityItem.onlineSince = getLocalDate()
+//                            playerActivityItem.onlineTime = 0
+//                            playerActivityItem.territory = GV.language.getPreferredLanguage()
+//                            playerActivityItem.country = Locale.current.regionCode
+//                            playerActivityItem.deviceType = UIDevice().modelName
+//                            playerActivityItem.version = actVersion
+//                            realmSync!.add(playerActivityItem)
+//                        }
+//                    }  else {
+//                        if GV.basicDataRecord.notSaved || GV.basicDataRecord.myNickname != playerActivity![0].nickName! || GV.basicDataRecord.keyWord != playerActivity![0].keyWord! {
+//                            try! realm.safeWrite() {
+//                                GV.basicDataRecord.myNickname = playerActivity![0].nickName!
+//                                GV.basicDataRecord.keyWord = playerActivity![0].keyWord!
+//                            }
+//                        }
+//                        if playerActivity![0].country != Locale.current.regionCode || playerActivity![0].territory != GV.language.getPreferredLanguage() {
+//                            try! RealmService.safeWrite() {
+//                                playerActivity![0].country = Locale.current.regionCode
+//                                playerActivity![0].territory = GV.language.getPreferredLanguage()
+//                            }
+//                        }
+//                        if playerActivity![0].version != actVersion {
+//                            try! RealmService.safeWrite() {
+//                                playerActivity![0].version = actVersion
+//                            }
+//                        }
+//                    }
+//                    self.playerNotificationToken = playerActivity!.observe {  (changes) in
+//                        if playerActivity!.count > 0 {
+//                            GV.expertUser = playerActivity!.first!.expertUser
+//                        }
+//                    }
+//                    if GV.basicDataRecord.notSaved {
+//                        try! realm.safeWrite() {
+//                            GV.basicDataRecord.notSaved = false
+//                        }
+//                    }
+//
+//                } else {
+//                }
+//            }
+//        }
+//        setIsOnline()
+//    }
+//    
+//    var tenMinutesTimer: Timer?
+//    func setIsOnline() {
+//        if GV.myUser != nil {
+//            try! realmSync!.safeWrite() {
+//                if playerActivity?.count == 0 {
+//                } else {
+//                    playerActivity![0].isOnline = true
+//                    playerActivity![0].onlineSince = getLocalDate()
+//                    playerActivity![0].lastTouched = getLocalDate()
+//                    tenMinutesTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
+//                }
+//            }
+//            checkSyncedDB()
+//        }
+//    }
+//    
+//    @objc private func setLastTouched(timerX: Timer) {
+//        tenMinutesTimer!.invalidate()
+//        tenMinutesTimer = nil
+//        try! realm.safeWrite() {
+//            GV.basicDataRecord.onlineTime += 1
+//            if GV.playing {
+//                GV.basicDataRecord.playingTime += 1
+//            }
+//        }
+//        if playerActivity?.count == 0 {
+//        } else {
+//            if GV.basicDataRecord.onlineTime % 60 == 0 {
+//                try! RealmService.safeWrite() {
+//                    playerActivity![0].lastTouched = getLocalDate()
+//                    playerActivity![0].onlineTime = GV.basicDataRecord.onlineTime
+//                    playerActivity![0].playingTime = GV.basicDataRecord.playingTime
+//                }
+//            }
+//        }
+//        tenMinutesTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
+//    }
+//    
+//    var bestScoreSync: Results<BestScoreSync>?
+//    var notificationToken: NotificationToken?
+//    var bestScoreSubscriptionToken: NotificationToken?
+//    var forGameSubscriptionToken: NotificationToken?
+//    var bestScoreSyncSubscription: SyncSubscription<BestScoreSync>?
+//    var bestScoreForGame: Results<BestScoreForGame>?
+//    var bestScoreForGameToken: NotificationToken?
+//    var bestScoreForGameSubscription: SyncSubscription<BestScoreForGame>?
+//    var syncedRecordsOK = false
+//    var waitingForSynceRecords = false
+//    var answer1Button: UIButton?
+//    
+//    
+//    private func checkSyncedDB() {
+//        let language = GV.language.getText(.tcAktLanguage)
+//        let myName = GV.basicDataRecord.myName
+//        let combinedPrimarySync = language + myName
+//        let combinedPrimaryForGame = language
+//// this block sets the local DB to NotSynced
+////  ==================================
+//        let myGameRecords = realm.objects(GameDataModel.self).filter("language = %@ and synced = true", language).sorted(byKeyPath: "gameNumber", ascending: true)
+//        try! realm.safeWrite() {
+//            for record in myGameRecords {
+//                record.synced = false
+//            }
+//        }
+//        //  ==================================
+//        if realmSync != nil {
+//            if !GV.debug {
+//                let myGameRecords = realm.objects(GameDataModel.self).filter("language = %@ and synced = false", language).sorted(byKeyPath: "gameNumber", ascending: true)
+//                if myGameRecords.count > 0 && bestScoreSync == nil {
+//                    bestScoreSync = realmSync!.objects(BestScoreSync.self).filter("combinedPrimary ENDSWITH %@", combinedPrimarySync)
+//                    bestScoreSyncSubscription = bestScoreSync!.subscribe(named: "AllMyScoreRecords:\(combinedPrimarySync)")
+//                    bestScoreSubscriptionToken = bestScoreSyncSubscription!.observe(\.state) { [weak self]  state in
+////                        print("in AppDelegate checkSyncedDB -> state: \(state)")
+//                        if state == .complete {
+//                            for record in myGameRecords {
+//                                let actGameNumber = record.gameNumber + 1
+//                                let syncedRecord = self!.bestScoreSync!.filter("gameNumber = %@", actGameNumber)
+//                                if syncedRecord.count == 0 {
+//                                    try! realmSync!.safeWrite() {
+//                                        let bestScoreSyncRecord = BestScoreSync()
+//                                        bestScoreSyncRecord.gameNumber = actGameNumber
+//                                        bestScoreSyncRecord.language = language
+//                                        bestScoreSyncRecord.playerName = myName
+//                                        bestScoreSyncRecord.combinedPrimary = String(actGameNumber) + combinedPrimarySync
+//                                        bestScoreSyncRecord.finished = record.gameStatus == GV.GameStatusFinished
+//                                        bestScoreSyncRecord.score = record.score
+//                                        bestScoreSyncRecord.owner = playerActivity?[0]
+//                                        realmSync!.add(bestScoreSyncRecord)
+//                                    }
+//                                    try! realm.safeWrite() {
+//                                        record.synced = true
+//                                    }
+//                                } else {
+//                                    if syncedRecord.first!.score < record.score {
+//                                        try! realmSync!.safeWrite() {
+//                                            syncedRecord.first!.finished = record.gameStatus == GV.GameStatusFinished
+//                                            syncedRecord.first!.score = record.score
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        } else if state == .invalidated {
+//                            self!.bestScoreSubscriptionToken = nil
+////                            print ("state: \(state)")
+//                        } else {
+////                            print("state: \(state)")
+//                        }
+//                    }
+//                    bestScoreForGame = realmSync!.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@", combinedPrimaryForGame)
+//                    bestScoreForGameSubscription = bestScoreForGame!.subscribe(named: "AllGameRecords:\(combinedPrimaryForGame)")
+//                    forGameSubscriptionToken = bestScoreForGameSubscription!.observe(\.state) { [weak self]  state in
+//                        //                print("in Subscription!")
+//                        if state == .complete {
+//                            for record in myGameRecords {
+//                                try! realm.safeWrite() {
+//                                    record.synced = true
+//                                }
+//                                let actGameNumber = record.gameNumber + 1
+//                                let syncedRecord = self!.bestScoreForGame!.filter("gameNumber = %@", actGameNumber)
+//                                if syncedRecord.count == 0 {
+//                                    try! realmSync!.write {
+//                                        let bestScoreSyncRecord = BestScoreForGame()
+//                                        bestScoreSyncRecord.gameNumber = actGameNumber
+//                                        bestScoreSyncRecord.language = language
+//                                        bestScoreSyncRecord.combinedPrimary = String(actGameNumber) + combinedPrimaryForGame
+//                                        bestScoreSyncRecord.bestScore = record.score
+//                                        bestScoreSyncRecord.owner = playerActivity?[0]
+//                                        realmSync!.add(bestScoreSyncRecord)
+//                                    }
+//                                } else {
+//                                    if syncedRecord.first!.bestScore < record.score {
+//                                        try! realmSync!.write {
+//                                            syncedRecord.first!.bestScore = record.score
+//                                        }
+//                                    }
+//                                }
+//                                
+//                            }
+//                        } else {
+////                            print("state: \(state)")
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    
 }
 //var RealmService = ReferenceRealm.shared.realm
 //

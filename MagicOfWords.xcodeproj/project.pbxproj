@@ -108,6 +108,7 @@
 		2084FA2F221C4C61002D29D3 /* ModifiedWordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2084FA2E221C4C61002D29D3 /* ModifiedWordsModel.swift */; };
 		208528F5220DB99E009ED02B /* MandatoryListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 208528F4220DB99E009ED02B /* MandatoryListModel.swift */; };
 		20858645223A89EF0097B62A /* MyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20858644223A89EF0097B62A /* MyButton.swift */; };
+		2085C9E722E1F4E700575AB7 /* GCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2085C9E622E1F4E700575AB7 /* GCHelper.swift */; };
 		2086F3ED228ED63200D845B7 /* Connection0100.png in Resources */ = {isa = PBXBuildFile; fileRef = 2086F3E9228ED63100D845B7 /* Connection0100.png */; };
 		2086F3EE228ED63200D845B7 /* Connection0010.png in Resources */ = {isa = PBXBuildFile; fileRef = 2086F3EA228ED63100D845B7 /* Connection0010.png */; };
 		2086F3EF228ED63200D845B7 /* Connection0001.png in Resources */ = {isa = PBXBuildFile; fileRef = 2086F3EB228ED63200D845B7 /* Connection0001.png */; };
@@ -260,6 +261,7 @@
 		2084FA2E221C4C61002D29D3 /* ModifiedWordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifiedWordsModel.swift; sourceTree = "<group>"; };
 		208528F4220DB99E009ED02B /* MandatoryListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryListModel.swift; sourceTree = "<group>"; };
 		20858644223A89EF0097B62A /* MyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyButton.swift; sourceTree = "<group>"; };
+		2085C9E622E1F4E700575AB7 /* GCHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCHelper.swift; sourceTree = "<group>"; };
 		2086F3E9228ED63100D845B7 /* Connection0100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Connection0100.png; sourceTree = "<group>"; };
 		2086F3EA228ED63100D845B7 /* Connection0010.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Connection0010.png; sourceTree = "<group>"; };
 		2086F3EB228ED63200D845B7 /* Connection0001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Connection0001.png; sourceTree = "<group>"; };
@@ -346,6 +348,7 @@
 				209A182E21ECE55600FF8AB0 /* CreateMandatorysViewController.swift */,
 				20CDA668214FFEBF00160DC6 /* CloudRecordsViewController.swift */,
 				20491F4A21CFCA3B0060C675 /* CollectMandatoryWordsViewController.swift */,
+				2085C9E622E1F4E700575AB7 /* GCHelper.swift */,
 				20858644223A89EF0097B62A /* MyButton.swift */,
 				201FB1CC20288CEA00EC9F36 /* MyFunctions.swift */,
 				20553D89225665C7001628D1 /* MyAlertController.swift */,
@@ -602,6 +605,9 @@
 							com.apple.GameCenter = {
 								enabled = 1;
 							};
+							com.apple.GameCenter.iOS = {
+								enabled = 1;
+							};
 							com.apple.InAppPurchase = {
 								enabled = 1;
 							};
@@ -759,6 +765,7 @@
 				20A6914020309B9F00AB47C0 /* WTPiece.swift in Sources */,
 				201FB1D520288CEA00EC9F36 /* MyGlobals.swift in Sources */,
 				206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */,
+				2085C9E722E1F4E700575AB7 /* GCHelper.swift in Sources */,
 				205627EF214AA9E9006B9357 /* PlayerActivity.swift in Sources */,
 				201FB1DF20288CEA00EC9F36 /* de.swift in Sources */,
 				20819320202B472900406D9A /* GameDataModel.swift in Sources */,

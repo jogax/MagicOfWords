@@ -148,6 +148,14 @@ let deDictionary: [TextConstants: String] = [
     .tcAreYouSureMessage:   "Die alte Demo-Informationen werden gelöscht!",
     .tcVersion:             "Version",
     .tcActVersion:          "©MagicOfWords V%",
+    .tcAskForGameCenter: "Sie können eine Verbindung\r\n" +
+                        "zum Game Center herstellen um zu sehen, \r\n" +
+                        "welche Ergebnisse andere Spieler haben.",
+    .tcAskLater:        "Frag mich später",
+    .tcAskNoMore:       "Frag mich nie mehr",
+    .tcConnectGC:       "Verbinden mit Gamecenter",
+    .tcDisconnectGC:    "Verbindung zum Game Center trennen",
+    .tcNobody:          "Unbekannt",
 ]
 
 
