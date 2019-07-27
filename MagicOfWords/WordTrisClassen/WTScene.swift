@@ -9,6 +9,7 @@
 import Foundation
 import GameplayKit
 import RealmSwift
+import GameKit
 
 public enum StartType: Int {
     case NoMore = 0, PreviousGame, NextGame, NewGame, GameNumber
@@ -906,13 +907,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let headerText = GV.language.getText(.tcHeader, values: gameNumber, String(actRound), timeForGame.time.HourMinSec)
         headerLabel.text = headerText
         let score = GV.totalScore
-        var place = 0
-        var bestScore = 0
-        var bestName = GV.language.getText(.tcNobody)
-        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-            place = GV.basicDataRecord.getMyPlace()
-            bestScore = GV.basicDataRecord.getBestScore()
-            bestName = GV.basicDataRecord.getBestPlayerName()
+        let place = GV.basicDataRecord.myPlace
+        var bestScore = GV.basicDataRecord.bestScore
+        let bestName = GV.basicDataRecord.bestPlayer
+        // if bestscore in GC is my and < as my actual score, set bestscore to actualscore
+        if bestName == GKLocalPlayer.local.alias && bestScore < score {
+            bestScore = score
         }
         let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(place), String(score).fixLength(length:scoreLength), GCHelper.shared.getName())
         let bestScoreText = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:scoreLength), bestName)

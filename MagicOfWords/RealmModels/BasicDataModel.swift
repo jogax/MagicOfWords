@@ -32,25 +32,15 @@ class BasicDataModel: Object {
     @objc dynamic var today = Date()
     @objc dynamic var playing = false
 
-    @objc dynamic var easyBestScore = 0
-    @objc dynamic var mediumBestScore = 0
-    @objc dynamic var hardBestScore = 0
-    @objc dynamic var veryHardBestScore = 0
-
-    @objc dynamic var easyBestPlayer = ""
-    @objc dynamic var mediumBestPlayer = ""
-    @objc dynamic var hardBestPlayer = ""
-    @objc dynamic var veryHardBestPlayer = ""
-    
-    @objc dynamic var easyMyPlace = 0
-    @objc dynamic var mediumMyPlace = 0
-    @objc dynamic var hardMyPlace = 0
-    @objc dynamic var veryHardMyPlace = 0
+    @objc dynamic var bestScore = 0
+    @objc dynamic var bestPlayer = ""
+    @objc dynamic var myPlace = 0
     
     @objc dynamic var easyScore = 0
     @objc dynamic var mediumScore = 0
     @objc dynamic var hardScore = 0
     @objc dynamic var veryHardScore = 0
+    
     @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
     @objc dynamic var startAnimationShown = false
     
@@ -59,44 +49,28 @@ class BasicDataModel: Object {
         return "ID"
     }
     
-    public func setBestScore(difficulty: Int, score: Int, name: String, myPlace: Int) {
-        switch difficulty {
-        case GameDifficulty.Easy.rawValue:
-            easyBestScore = score
-            easyBestPlayer = name
-            easyMyPlace = myPlace
-        case GameDifficulty.Medium.rawValue:
-            mediumBestScore = score
-            mediumBestPlayer = name
-            mediumMyPlace = myPlace
-        default: break
-        }
+    public func resetBestScore() {
+        
     }
     
-    public func getBestPlayerName()->String {
-        switch self.difficulty {
-        case GameDifficulty.Easy.rawValue: return easyBestPlayer
-        case GameDifficulty.Medium.rawValue: return mediumBestPlayer
-        default: return "nobody"
-        }
+    public func setBestScore(score: Int, name: String, myPlace: Int) {
+        self.bestScore = score
+        self.bestPlayer = name
+        self.myPlace = myPlace
     }
     
-    public func getBestScore()->Int {
-        switch self.difficulty {
-        case GameDifficulty.Easy.rawValue: return easyBestScore
-        case GameDifficulty.Medium.rawValue: return mediumBestScore
-        default: return 0
-        }
-    }
-    
-    public func getMyPlace()->Int {
-        switch self.difficulty {
-        case GameDifficulty.Easy.rawValue: return easyMyPlace
-        case GameDifficulty.Medium.rawValue: return mediumMyPlace
-        default: return 0
-        }
-    }
-    
+//    public func getBestPlayerName()->String {
+//        return bestPlayer
+//    }
+//
+//    public func getBestScore()->Int {
+//        return bestScore
+//    }
+//
+//    public func getMyPlace()->Int {
+//        return myPlace
+//    }
+//
     public func getScore(difficulty: Int = -1)->Int {
         let myDifficulty = difficulty < 0 ? self.difficulty : difficulty
         switch myDifficulty {

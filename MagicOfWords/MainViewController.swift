@@ -36,6 +36,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterEnabled.rawValue
             }
         }
+        GCHelper.shared.getBestScore(completion: {})
+        GCHelper.shared.getAllScores()
         startDemoOrMenu()
     }
     
@@ -227,7 +229,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             try! realm.safeWrite() {
                 GV.basicDataRecord.actLanguage = language
             }
-             self.showMenu()
+            GCHelper.shared.getBestScore(completion: {})
+            GCHelper.shared.getAllScores()
+            self.showMenu()
         }
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseLanguage),
                                                 message: "",
@@ -995,6 +999,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
         GV.maxGameNumber = GV.minGameNumber + 999
         getRecordCounts()
+        GCHelper.shared.getBestScore(completion: {})
+        GCHelper.shared.getAllScores()
         self.showMenu()
     }
     

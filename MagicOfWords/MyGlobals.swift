@@ -113,22 +113,8 @@ struct GV {
     static var mandatoryWords = [String]()
     static var blinkingNodes = [WTGameboardItem]()
     static var countBlinkingNodes = 0
-    static var countFoundedBestScores = 0
-    static var bestScores: [Int:GKScore?] = [
-        GameDifficulty.Easy.rawValue : nil,
-        GameDifficulty.Medium.rawValue : nil,
-//        GameDifficulty.Hard.rawValue : nil,
-//        GameDifficulty.VeryHard.rawValue : nil
-    ]
-    static var myScores: [Int:GKScore?] = [
-        GameDifficulty.Easy.rawValue : nil,
-        GameDifficulty.Medium.rawValue : nil,
-//        GameDifficulty.Hard.rawValue : nil,
-//        GameDifficulty.VeryHard.rawValue : nil
-    ]
-
-//    static var greenSpriteArray = [WTGameboardItem]()
     static var nextRoundAnimationFinished = true
+    static var scoreTable = [Int]()
     
     static var screenWidth: CGFloat {
         if (UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait) {

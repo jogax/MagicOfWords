@@ -147,7 +147,6 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             self.startGameCenterSync()
             GKLocalPlayer.local.unregisterAllListeners()
             GKLocalPlayer.local.register(self)
-            self.getBestScores()
             self.delegate?.localPlayerAuthenticated()
         }
         if GKLocalPlayer.local.isAuthenticated == false {
@@ -377,26 +376,48 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         return returnValue
     }
     
-    public func getBestScores() {
-        GV.countFoundedBestScores = 0
-        getBestScore(difficulty:GameDifficulty.Easy.rawValue, completion: {})
-        getBestScore(difficulty:GameDifficulty.Medium.rawValue, completion: {})
+    public func getAllScores() {
+        
+        if GKLocalPlayer.local.isAuthenticated {
+            let leaderBoard = GKLeaderboard()
+            let leaderboardID = "\(GV.actLanguage)\(difficultyName(difficulty:GV.basicDataRecord.difficulty))"
+            GV.scoreTable.removeAll()
+            leaderBoard.identifier = leaderboardID
+            leaderBoard.playerScope = .global
+            leaderBoard.timeScope = .allTime
+            leaderBoard.range =  NSMakeRange(1,100) //NSRange(location: 1, length: 100)
+            leaderBoard.loadScores(completionHandler: {
+                (scores, error) in
+                if scores != nil {
+                    if scores!.count > 0 {
+                        for score in scores! {
+                            GV.scoreTable.append(Int(score.value))
+                        }
+                    }
+                }
+            })
+        }
     }
     
-    public func getBestScore(difficulty: Int, completion: @escaping ()->()) {
+//    private func getBestScores() {
+//        getBestScore(difficulty:GameDifficulty.Easy.rawValue, completion: {})
+//        getBestScore(difficulty:GameDifficulty.Medium.rawValue, completion: {})
+//    }
+    
+    public func getBestScore(completion: @escaping ()->()) {
+        let difficulty = GV.basicDataRecord.difficulty
         let leaderBoard = GKLeaderboard()
         let leaderboardID = "\(GV.actLanguage)\(difficultyName(difficulty:difficulty))"
         leaderBoard.identifier = leaderboardID
         leaderBoard.playerScope = .global
         leaderBoard.timeScope = .allTime
         leaderBoard.range = NSRange(location: 1, length: 1)
-        //                leaderBoard.range = NSMakeRange(1,1000)
         leaderBoard.loadScores(completionHandler: {
             (scores, error) in
             if scores != nil {
                 if scores!.count > 0 {
                     try! realm.safeWrite() {
-                        GV.basicDataRecord.setBestScore(difficulty: difficulty, score: Int(scores![0].value), name: scores![0].player.alias, myPlace: leaderBoard.localPlayerScore!.rank)
+                        GV.basicDataRecord.setBestScore(score: Int(scores![0].value), name: scores![0].player.alias, myPlace: leaderBoard.localPlayerScore == nil ? 0 : leaderBoard.localPlayerScore!.rank)
                         completion()
                     }
                 }
@@ -441,51 +462,39 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     
     private func syncWithGameCenter() {
-        DispatchQueue.global(qos: .background).async {
-            let myBackgroundRealm = try! Realm()
-            func getHighScoreForDifficulty(difficulty: Int)->Int? {
-                var score = 0
-                let minGameNumber = difficulty * 1000
-                let maxGameNumber = minGameNumber + 999
-                let notSyncedRecords = myBackgroundRealm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %@ and gameNumber <= %@ and synced = false", GV.actLanguage, minGameNumber, maxGameNumber)
-                if notSyncedRecords.count > 0 {
-                    score = (notSyncedRecords.max(ofProperty: "score") as Int?)!
-                    try! myBackgroundRealm.safeWrite() {
-                        for record in notSyncedRecords {
-                            record.synced = true
-                        }
+        func getHighScoreForDifficulty(difficulty: Int)->Int? {
+            var score = 0
+            let minGameNumber = difficulty * 1000
+            let maxGameNumber = minGameNumber + 999
+            let notSyncedRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %@ and gameNumber <= %@ and synced = false", GV.actLanguage, minGameNumber, maxGameNumber)
+            if notSyncedRecords.count > 0 {
+                score = (notSyncedRecords.max(ofProperty: "score") as Int?)!
+                try! realm.safeWrite() {
+                    for record in notSyncedRecords {
+                        record.synced = true
                     }
-                } else {
-                    return nil
                 }
-                return score
+            } else {
+                return nil
             }
-            let GCEnabled = myBackgroundRealm.objects(BasicDataModel.self).first!.GCEnabled
+            return score
+        }
+        if GKLocalPlayer.local.isAuthenticated {
+            let GCEnabled = realm.objects(BasicDataModel.self).first!.GCEnabled
             if GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
                 var score: Int? = 0
                 for difficulty in GameDifficulty.Easy.rawValue...GameDifficulty.Medium.rawValue {
                     score = getHighScoreForDifficulty(difficulty: GameDifficulty.Easy.rawValue)
                     if score != nil && score! > GV.basicDataRecord.getScore(difficulty: difficulty) {
                         self.sendScoreToGameCenter(score: score, difficulty: difficulty, completion: {})
-                        try! myBackgroundRealm.safeWrite() {
+                        try! realm.safeWrite() {
                             GV.basicDataRecord.setScore(score: score!, difficulty: difficulty)
                         }
                     }
                 }
             }
         }
-            //            print("This is run on the background queue")
-        
-        DispatchQueue.main.async {
-            // every 10 minutes import the best players for each countPackage and levelID
-            self.timer = Timer.scheduledTimer(timeInterval: 600.0, target: self, selector: #selector(self.waitForLocalPlayer), userInfo: nil, repeats: false)
-            //                print("This is run on the main queue, after the previous code in outer block")
-        }
     }
-    private func doNothing() {
-        
-    }
-    
     public func getName() -> String {
         return GKLocalPlayer.local.alias
     }
@@ -509,7 +518,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                 if error != nil {
                     print("Error by send score to GameCenter: \(error!.localizedDescription)")
                 } else {
-                    self.getBestScore(difficulty: GV.basicDataRecord.difficulty, completion: completion)
+                    self.getBestScore(completion: completion)
                 }
             }
         }
