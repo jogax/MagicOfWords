@@ -591,6 +591,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         WTGameWordList.shared.clear()
         WTGameWordList.shared.setMandatoryWords()
         showWordsToCollect()
+        GCHelper.shared.getAllScores(completion: {self.modifyHeader()})
         play()
    }
     
@@ -907,9 +908,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let headerText = GV.language.getText(.tcHeader, values: gameNumber, String(actRound), timeForGame.time.HourMinSec)
         headerLabel.text = headerText
         let score = GV.totalScore
-        let place = GV.basicDataRecord.myPlace
         var bestScore = GV.basicDataRecord.bestScore
         let bestName = GV.basicDataRecord.bestPlayer
+        let place = score >= bestScore ? GV.basicDataRecord.myPlace : calculateRankForScore(score: score)
         // if bestscore in GC is my and < as my actual score, set bestscore to actualscore
         if bestName == GKLocalPlayer.local.alias && bestScore < score {
             bestScore = score
@@ -918,6 +919,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let bestScoreText = GV.language.getText(.tcBestScoreHeader, values: String(bestScore).fixLength(length:scoreLength), bestName)
         myScoreheaderLabel.text = scoreText
         bestScoreHeaderLabel.text = bestScoreText
+    }
+    
+    private func calculateRankForScore(score: Int)->Int {
+        var lastRank = 0
+        for (rank, actScore) in GV.scoreTable.enumerated()  {
+            if score >= actScore {
+                return rank + 1
+            }
+            lastRank = rank
+        }
+        return lastRank + 2
     }
 
     

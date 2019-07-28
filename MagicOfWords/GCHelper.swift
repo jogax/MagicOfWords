@@ -376,16 +376,22 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         return returnValue
     }
     
-    public func getAllScores() {
-        
+    var waitingForScores = false
+    @objc public func getAllScores(rank1: Int = 1, rank2: Int = 100, inRecursion: Bool = false, completion: @escaping ()->()) {
         if GKLocalPlayer.local.isAuthenticated {
+            if waitingForScores && !inRecursion {
+                return
+            }
+            waitingForScores = true
             let leaderBoard = GKLeaderboard()
             let leaderboardID = "\(GV.actLanguage)\(difficultyName(difficulty:GV.basicDataRecord.difficulty))"
-            GV.scoreTable.removeAll()
+            if !inRecursion {
+                GV.scoreTable.removeAll()
+            }
             leaderBoard.identifier = leaderboardID
             leaderBoard.playerScope = .global
             leaderBoard.timeScope = .allTime
-            leaderBoard.range =  NSMakeRange(1,100) //NSRange(location: 1, length: 100)
+            leaderBoard.range =  NSMakeRange(rank1, rank2) //NSRange(location: 1, length: 100)
             leaderBoard.loadScores(completionHandler: {
                 (scores, error) in
                 if scores != nil {
@@ -393,16 +399,23 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                         for score in scores! {
                             GV.scoreTable.append(Int(score.value))
                         }
-                    }
+                        if scores!.count == 100 {
+                            self.getAllScores(rank1: rank1 + 100, rank2: rank2 + 100, inRecursion: true, completion: completion)
+                        } else {
+                            completion()
+                            self.waitingForScores = false
+                        }
+                    } else {
+                        completion()
+                        self.waitingForScores = false
+                   }
+                } else {
+                    completion()
+                    self.waitingForScores = false
                 }
             })
         }
     }
-    
-//    private func getBestScores() {
-//        getBestScore(difficulty:GameDifficulty.Easy.rawValue, completion: {})
-//        getBestScore(difficulty:GameDifficulty.Medium.rawValue, completion: {})
-//    }
     
     public func getBestScore(completion: @escaping ()->()) {
         let difficulty = GV.basicDataRecord.difficulty
@@ -411,7 +424,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         leaderBoard.identifier = leaderboardID
         leaderBoard.playerScope = .global
         leaderBoard.timeScope = .allTime
-        leaderBoard.range = NSRange(location: 1, length: 1)
+        leaderBoard.range = NSRange(location: 1, length: 10)
         leaderBoard.loadScores(completionHandler: {
             (scores, error) in
             if scores != nil {

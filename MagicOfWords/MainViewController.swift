@@ -16,7 +16,7 @@ import GameKit
 //import SCLAlertView
 
 
-class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate/*, ShowGamesSceneDelegate*/  {
+class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate  {
     
     func matchStarted() {
         
@@ -37,7 +37,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             }
         }
         GCHelper.shared.getBestScore(completion: {})
-        GCHelper.shared.getAllScores()
+//        GCHelper.shared.getAllScores(completion: {})
         startDemoOrMenu()
     }
     
@@ -133,7 +133,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        }
     }
     
-//    var showGamesScene: ShowGamesScene?
+    var showGamesScene: ShowGamesScene?
     func backFromSettingsScene() {
         try! realm.safeWrite() {
             GV.basicDataRecord.actLanguage = GV.actLanguage
@@ -156,12 +156,12 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     func showGames(all: Bool) {
-//        showGamesScene = ShowGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-//        showGamesScene!.setDelegate(delegate: self, controller: self)
-////        showGamesScene!.setSelect(all: all)
-//        if let view = self.view as! SKView? {
-//            view.presentScene(showGamesScene!)
-//        }
+        showGamesScene = ShowGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        showGamesScene!.setDelegate(delegate: self, controller: self)
+//        showGamesScene!.setSelect(all: all)
+        if let view = self.view as! SKView? {
+            view.presentScene(showGamesScene!)
+        }
     }
     
     func gameFinished(start: StartType) {
@@ -230,7 +230,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 GV.basicDataRecord.actLanguage = language
             }
             GCHelper.shared.getBestScore(completion: {})
-            GCHelper.shared.getAllScores()
+            GCHelper.shared.getAllScores(completion: {})
             self.showMenu()
         }
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseLanguage),
@@ -1000,7 +1000,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         GV.maxGameNumber = GV.minGameNumber + 999
         getRecordCounts()
         GCHelper.shared.getBestScore(completion: {})
-        GCHelper.shared.getAllScores()
+        GCHelper.shared.getAllScores(completion: {})
         self.showMenu()
     }
     
