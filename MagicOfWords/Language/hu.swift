@@ -29,7 +29,7 @@ let huDictionary: [TextConstants: String] = [
     .tcLoadingInProgress: "A magyar szavak betöltése folyamatban",
     .tcChooseGameType:    "Játéktípus választás",
     .tcBack:              "Vissza",
-    .tcHeader:            "Játék: %, Kör: %, Idő: %",
+    .tcHeader:            "Kör: %, Idő: %",
 //    .tcTime:              "Idő: %",
     .tcScore:             "Pontok:",
     .tcPlace:             "Hely:",

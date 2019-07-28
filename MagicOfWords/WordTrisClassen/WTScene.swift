@@ -856,8 +856,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if bgSprite!.childNode(withName: headerName) == nil {
             let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
-            let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(GV.playingRecord.gameNumber % 1000 + 1)
-            let text = GV.language.getText(.tcHeader, values: gameNumber, String(1), timeForGame.time.HourMinSec)
+//            let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(""/*GV.playingRecord.gameNumber % 1000 + 1*/)
+            let text = GV.language.getText(.tcHeader, values: String(1), timeForGame.time.HourMinSec)
             headerLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             headerLabel.text = text
             headerLabel.name = String(headerName)
@@ -904,8 +904,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         modifyHeader()
    }
     private func modifyHeader() {
-        let gameNumber = (GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(GV.playingRecord.gameNumber % 1000 + 1))
-        let headerText = GV.language.getText(.tcHeader, values: gameNumber, String(actRound), timeForGame.time.HourMinSec)
+//        let gameNumber = (GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(""/*GV.playingRecord.gameNumber % 1000 + 1*/))
+        let headerText = GV.language.getText(.tcHeader, values: String(actRound), timeForGame.time.HourMinSec)
         headerLabel.text = headerText
         let score = GV.totalScore
         var bestScore = GV.basicDataRecord.bestScore
@@ -2785,7 +2785,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let texts = headerLabel.text!.components(separatedBy:":")
         var newText = ""
         for (index, text) in texts.enumerated() {
-            if index < 3 {
+            if index < 2 {
                 newText += text + ":"
             } else {
                 newText += " \(timeForGame.time.HourMinSec)"

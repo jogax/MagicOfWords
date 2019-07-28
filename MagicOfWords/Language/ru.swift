@@ -29,7 +29,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcLoadingInProgress: "Выпольнется загрузка русских слов",
     .tcChooseGameType:    "Bыбрать тип игры",
     .tcBack:              "Назад",
-    .tcHeader:            "Игра: %, Круг: %, Время: %",
+    .tcHeader:            "Круг: %, Время: %",
 //    .tcTime:              "Время: %",
     .tcScore:             "Очки:",
     .tcPlace:             "Место:",

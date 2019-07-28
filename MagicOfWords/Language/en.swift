@@ -29,7 +29,7 @@ let enDictionary: [TextConstants: String] = [
     .tcLoadingInProgress: "Loading English Words in progress",
     .tcChooseGameType:    "Choose game type",
     .tcBack:              "Undo",
-    .tcHeader:            "Game: %, Round: %, Time: %",
+    .tcHeader:            "Round: %, Time: %",
 //    .tcTime:              "Time: %",
     .tcScore:             "Score:",
     .tcPlace:             "Place:",
