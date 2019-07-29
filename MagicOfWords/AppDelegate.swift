@@ -97,7 +97,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 30, // optimize BasicDataModel
+            schemaVersion: 31, // no more mandatory words!
+//            schemaVersion: 30, // optimize BasicDataModel
 //            schemaVersion: 27, // start with Game Center
 //            schemaVersion: 26, // buttontype not needed any more
            // Set the block which will be called automatically when opening a Realm with

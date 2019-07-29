@@ -105,7 +105,7 @@ struct GV {
     static var gameArray: [[WTGameboardItem]] = [[WTGameboardItem]]()
     static var notificationToken: NotificationToken?
     static let sizeOfGrid = 10
-    static var mandatoryScore = 0
+//    static var mandatoryScore = 0
     static var ownScore = 0
 //    static var bonusScore = 0
     static var totalScore = 0
@@ -141,13 +141,13 @@ struct GV {
             }
         }
     }
-    static var expertUser = false {
-        didSet(newValue) {
-            for callBack in callBackExpertUser {
-                callBack.callBackFunc()
-            }
-        }
-    }
+//    static var expertUser = false {
+//        didSet(newValue) {
+//            for callBack in callBackExpertUser {
+//                callBack.callBackFunc()
+//            }
+//        }
+//    }
     struct CallBackStruct {
         var myCaller:String
         var callBackFunc: ()->()

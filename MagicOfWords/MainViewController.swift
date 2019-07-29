@@ -307,28 +307,28 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        printOrigDEData()
         myHeight = self.view.frame.size.height
         myWidth = self.view.frame.size.width
-        #if CREATEMANDATORY
-        _ = WordDBGenerator(mandatory: true, create: true)
-        #endif
-
-        #if CREATEWORDLIST
-        _ = WordDBGenerator(mandatory: false, create: true)
-        #endif
-        
-       #if GENERATEWORDLIST
-        _ = WordDBGenerator(mandatory: false)
-        print("WordList Generated")
-        #endif
-        #if GENERATEMANDATORY
-        _ = WordDBGenerator(mandatory: true)
-        print("Mandatory Generated")
-        #endif
+//        #if CREATEMANDATORY
+//        _ = WordDBGenerator(mandatory: true, create: true)
+//        #endif
+//
+//        #if CREATEWORDLIST
+//        _ = WordDBGenerator(mandatory: false, create: true)
+//        #endif
+//
+//       #if GENERATEWORDLIST
+//        _ = WordDBGenerator(mandatory: false)
+//        print("WordList Generated")
+//        #endif
+//        #if GENERATEMANDATORY
+//        _ = WordDBGenerator(mandatory: true)
+//        print("Mandatory Generated")
+//        #endif
 //        readNewTextFile()
         // Get the SKScene from the loaded GKScene
         //-------------------------
         generateBasicDataRecordIfNeeded()
         getRecordCounts()
-        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue {
+        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue && GV.connectedToInternet {
             manageGameCenter()
         } else {
             startDemoOrMenu()
@@ -348,7 +348,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         if !GV.basicDataRecord.startAnimationShown {
             startWelcomeScene()
         } else {
-            if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue && GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated {
+            if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue && GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated && GV.connectedToInternet {
                 GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
                 return
             }
@@ -422,47 +422,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         switch reachability.connection {
         case .wifi:
             GV.connectedToInternet = true
-            if nickNameAction != nil {
-                nickNameAction!.isEnabled = true
-            }
-            if GV.expertUser {
-                collectMandatoryAction!.isEnabled = true
-            }
-            #if DEBUG
-            if showRealmCloudAction != nil {
-                showRealmCloudAction!.isEnabled = true
-//                createMandatoryAction!.isEnabled = true
-            }
-           #endif
         case .cellular:
             GV.connectedToInternet = true
-            if nickNameAction != nil {
-                nickNameAction!.isEnabled = true
-            }
-            if GV.expertUser {
-                collectMandatoryAction!.isEnabled = true
-            }
-            #if DEBUG
-            if showRealmCloudAction != nil {
-                showRealmCloudAction!.isEnabled = true
-//                createMandatoryAction!.isEnabled = true
-            }
-            #endif
         case .none:
             GV.connectedToInternet = false
-            if nickNameAction != nil {
-                nickNameAction!.isEnabled = false
-            }
-            if GV.expertUser {
-                collectMandatoryAction!.isEnabled = false
-            }
-
-            #if DEBUG
-            if showRealmCloudAction != nil {
-                showRealmCloudAction!.isEnabled = false
-//                createMandatoryAction!.isEnabled = false
-            }
-            #endif
+        }
+        if GV.connectedToInternet && GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+            GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
         }
     }
 

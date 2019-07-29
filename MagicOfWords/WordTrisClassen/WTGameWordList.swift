@@ -179,13 +179,13 @@ extension SelectedWord: Equatable {
 
 public struct WordWithCounter {
     var word: String
-    var mandatory: Bool
+//    var mandatory: Bool
     var counter: Int
     var score: Int
-    init(word: String, counter: Int, mandatory: Bool, score: Int) {
+    init(word: String, counter: Int, score: Int) {
         self.word = word
         self.counter = counter
-        self.mandatory = mandatory
+//        self.mandatory = mandatory
 //        self.countFixLetters = countFixLetters
         self.score = score
     }
@@ -212,66 +212,58 @@ public class WTGameWordList {
     private var wordsInRound: [WordInRound]
     private var delegate: WTGameWordListDelegate?
     public var allWords = [WordWithCounter]()
-    private var mandatoryWords = [String]()
+//    private var mandatoryWords = [String]()
     static let shared = WTGameWordList()
     init() {
         wordsInRound = [WordInRound]()
-        mandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
+//        mandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
     }
     public func reset() {
         wordsInRound = [WordInRound]()
         allWords = [WordWithCounter]()
-        setMandatoryWords()
+//        setMandatoryWords()
     }
     public func setDelegate(delegate: WTGameWordListDelegate) {
         self.delegate = delegate
     }
     
-    public func setMandatoryWords() {
-        mandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
-        GV.mandatoryWords.removeAll()
-        for word in mandatoryWords {
-            allWords.append(WordWithCounter(word: word, counter: 0, mandatory: true, score: 0))
-            GV.mandatoryWords.append(word)
-        }
-    }
+//    public func setMandatoryWords() {
+//        mandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
+//        GV.mandatoryWords.removeAll()
+//        for word in mandatoryWords {
+//            allWords.append(WordWithCounter(word: word, counter: 0, mandatory: true, score: 0))
+//            GV.mandatoryWords.append(word)
+//        }
+//    }
+//
+//    public func getMandatoryWords()->[WordWithCounter] {
+//        var returnArray = [WordWithCounter]()
+//        let mandatorySorted = allWords.filter({$0.mandatory == true}).sorted(by: {
+//            $0.word.length < $1.word.length ||
+//            $0.word.length == $1.word.length && $0.word < $1.word ||
+//            $0.word == $1.word && $0.counter < $1.counter})
+//        for (index, mandatoryWord) in mandatorySorted.enumerated() {
+////            print(mandatoryWord)
+//            if !(mandatoryWord.counter == 0 && index < mandatorySorted.count - 1 && mandatoryWord.word == mandatorySorted[index + 1].word)
+//            {
+//                returnArray.append(mandatoryWord)
+//            }
+//        }
+//        return returnArray
+//
+//    }
     
-    public func getMandatoryWords()->[WordWithCounter] {
-        var returnArray = [WordWithCounter]()
-        let mandatorySorted = allWords.filter({$0.mandatory == true}).sorted(by: {
-            $0.word.length < $1.word.length ||
-            $0.word.length == $1.word.length && $0.word < $1.word ||
-            $0.word == $1.word && $0.counter < $1.counter})
-        for (index, mandatoryWord) in mandatorySorted.enumerated() {
-//            print(mandatoryWord)
-            if !(mandatoryWord.counter == 0 && index < mandatorySorted.count - 1 && mandatoryWord.word == mandatorySorted[index + 1].word)
-            {
-                returnArray.append(mandatoryWord)
-            }
-        }
-        return returnArray
-        
-    }
+//    public func gameFinished()->Bool {
+//        var counter = 0
+//        let myMandatoryWords = allWords.filter({$0.mandatory == true && $0.counter > 0})
+//        for mandatoryWord in GV.mandatoryWords {
+//            counter += myMandatoryWords.filter({$0.word == mandatoryWord}).count > 0 ? 1 : 0
+//        }
+//        return counter == GV.mandatoryWords.count
+//    }
     
-    public func gameFinished()->Bool {
-        var counter = 0
-        let myMandatoryWords = allWords.filter({$0.mandatory == true && $0.counter > 0})
-        for mandatoryWord in GV.mandatoryWords {
-            counter += myMandatoryWords.filter({$0.word == mandatoryWord}).count > 0 ? 1 : 0
-        }
-        return counter == GV.mandatoryWords.count
-    }
-    
-    public func getCountWords(mandatory: Bool)->Int {
-        mandatoryWords = [String]()
-        let myWords = allWords.filter({$0.mandatory == mandatory})
-//        print(myWords.count)
-        if mandatory {
-            return getMandatoryWords().count
-        } else {
-            return myWords.count
-        }
-
+    public func getCountWords()->Int {
+            return allWords.count
     }
     
 //    public func getMinutesForWord(word: String)->Int {
@@ -287,7 +279,7 @@ public class WTGameWordList {
     public func getCountOwnWords(founded: Bool)->(Int) {
         var returnValue = 0
         var lastWord = ""
-        let myWords = allWords.filter({$0.mandatory == false}).sorted(by: {
+        let myWords = allWords.sorted(by: {
             $0.word.length > $1.word.length ||
             $0.word.length == $1.word.length && $0.word < $1.word
         })
@@ -304,27 +296,27 @@ public class WTGameWordList {
         return returnValue
     }
     
-    func getCountMandatoryWords(founded: Bool)->Int {
-        var returnValue = 0
-        var lastWord = ""
-        let myWords = allWords.filter({$0.mandatory == true}).sorted(by: {
-            $0.word.length > $1.word.length ||
-            $0.word.length == $1.word.length && $0.word < $1.word ||
-            $0.word == $1.word && $0.counter < $1.counter
-        })
-        for word in myWords {
-            if founded {
-                if word.word != lastWord && word.counter > 0 {
-                    returnValue += 1
-                    lastWord = word.word
-                }
-            } else {
-                returnValue += word.counter
-            }
-        }
-        return returnValue
-    }
-
+//    func getCountMandatoryWords(founded: Bool)->Int {
+//        var returnValue = 0
+//        var lastWord = ""
+//        let myWords = allWords.filter({$0.mandatory == true}).sorted(by: {
+//            $0.word.length > $1.word.length ||
+//            $0.word.length == $1.word.length && $0.word < $1.word ||
+//            $0.word == $1.word && $0.counter < $1.counter
+//        })
+//        for word in myWords {
+//            if founded {
+//                if word.word != lastWord && word.counter > 0 {
+//                    returnValue += 1
+//                    lastWord = word.word
+//                }
+//            } else {
+//                returnValue += word.counter
+//            }
+//        }
+//        return returnValue
+//    }
+//
     public func restoreFromPlayingRecord() {
         clearWordsInGame()
         for (index, round) in GV.playingRecord.rounds.enumerated() {
@@ -370,13 +362,13 @@ public class WTGameWordList {
         wordsInRound.removeLast()
     }
 
-    public func isMandatory(word: String)->Bool {
-        var returnBool = false
-        if let index = allWords.firstIndex(where: {$0.word == word}) {
-            returnBool = allWords[index].mandatory
-        }
-        return returnBool
-    }
+//    public func isMandatory(word: String)->Bool {
+//        var returnBool = false
+//        if let index = allWords.firstIndex(where: {$0.word == word}) {
+//            returnBool = allWords[index].mandatory
+//        }
+//        return returnBool
+//    }
     
     public func addWord(selectedWord: SelectedWord, doAnimate: Bool, round: Int)->Bool {
 //        var mySelectedWord = selectedWord
@@ -450,18 +442,16 @@ public class WTGameWordList {
         mySelectedWord.setScore(round: round)
         wordsInRound[wordsInRound.count - 1].wordsInGame.append(mySelectedWord)
         GV.totalScore += mySelectedWord.score
-        if self.isMandatory(word: mySelectedWord.word) {
-            GV.mandatoryScore += mySelectedWord.score
-        } else {
-            GV.ownScore += mySelectedWord.score
-        }
+//        if self.isMandatory(word: mySelectedWord.word) {
+//            GV.mandatoryScore += mySelectedWord.score
+//        } else {
+        GV.ownScore += mySelectedWord.score
+//        }
         let index = allWords.firstIndex(where: {$0.word == mySelectedWord.word})
         if index == nil {
-            allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, mandatory: false, score: mySelectedWord.score))
-        } else if allWords[index!].mandatory {
-            allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, mandatory: true, score: mySelectedWord.score))
+            allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, score: mySelectedWord.score))
         } else {
-            allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, mandatory: false, score: mySelectedWord.score))
+            allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, score: mySelectedWord.score))
         }
         if doAnimate { // only when new word added, not in init
             delegate!.showScore(newWord: mySelectedWord, minus: false, doAnimate: doAnimate)
@@ -492,11 +482,11 @@ public class WTGameWordList {
             mySelectedWord.setScore(round: GV.playingRecord.rounds.count)
             removeWordFromAllWords(selectedWord: mySelectedWord)
             GV.totalScore -= mySelectedWord.score
-            if self.isMandatory(word: mySelectedWord.word) {
-                GV.mandatoryScore -= mySelectedWord.score
-            } else {
-                GV.ownScore -= mySelectedWord.score
-            }
+//            if self.isMandatory(word: mySelectedWord.word) {
+//                GV.mandatoryScore -= mySelectedWord.score
+//            } else {
+            GV.ownScore -= mySelectedWord.score
+//            }
 
             for (index, letter) in mySelectedWord.usedLetters.enumerated() {
                 if isThisPositionFree(letter: letter) {
@@ -548,15 +538,15 @@ public class WTGameWordList {
             if allWords[index].counter > 1 {
                 allWords[index].counter -= 1
             } else {
-                if allWords[index].mandatory {
-                    if allWords[index].counter > 1 {
-                        allWords[index].counter -= 1
-                    } else {
-                        allWords.remove(at: index)
-                    }
-                } else {
-                    allWords.remove(at: index)
-                }
+//                if allWords[index].mandatory {
+//                    if allWords[index].counter > 1 {
+//                        allWords[index].counter -= 1
+//                    } else {
+//                        allWords.remove(at: index)
+//                    }
+//                } else {
+                allWords.remove(at: index)
+//                }
             }
         }
     }
@@ -682,11 +672,11 @@ public class WTGameWordList {
         showedWords = [SelectedWord]()
 //        delegate!.stopShowingWordsOverPosition()
     }
-    public func getWordsForShow(mandatory: Bool)->([FoundedWordWithCounter], Int) {
+    public func getWordsForShow()->([FoundedWordWithCounter], Int) {
         var returnWords = [FoundedWordWithCounter]()
         var maxLengthOfWords = 0
         var lastWord = ""
-        let wordsToShow = allWords.filter({$0.mandatory == mandatory}).sorted(by: {
+        let wordsToShow = allWords.sorted(by: {
             $0.word.length > $1.word.length ||
             $0.word.length == $1.word.length && $0.word < $1.word ||
             $0.word.length == $1.word.length && $0.word == $1.word && $0.score > $1.score ||
