@@ -35,6 +35,17 @@ enum GameDifficulty: Int {
     }
 }
 
+struct ScoreForShow {
+    var place = 0
+    var player = ""
+    var score = 0
+    init (place: Int, player: String, score: Int) {
+        self.place = place
+        self.player = player
+        self.score = score
+    }
+}
+
 let NoValue = -1
 var myWidth: CGFloat = 0
 var myHeight: CGFloat = 0 
@@ -46,6 +57,7 @@ struct GV {
             return GV.language.getText(.tcAktLanguage)
         }
     }
+    static var actLanguageInt = GV.languageToInt[actLanguage]
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2
@@ -115,7 +127,13 @@ struct GV {
     static var countBlinkingNodes = 0
     static var nextRoundAnimationFinished = true
     static var scoreTable = [Int]()
+    static var languageToInt: [String : Int] = ["en":0, "de":1, "hu":2, "ru":3]
+    static var IntToLanguage: [Int : String] = [0:"en", 1:"de", 2:"hu", 3:"ru"]
     
+    static var scoreForShowTable = [ScoreForShow]()
+    static var myPlace = 0
+    static var myScore = 0
+
     static var screenWidth: CGFloat {
         if (UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait) {
             return UIScreen.main.bounds.size.width

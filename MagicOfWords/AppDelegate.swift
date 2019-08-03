@@ -30,7 +30,7 @@ import Reachability
 var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
 #endif
 //var playerActivity: Results<PlayerActivity>? // = realmSync.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
-var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
+//var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
 //var realmSync: Realm? = RealmService
 
 let wordListConfig = Realm.Configuration(
@@ -97,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 31, // no more mandatory words!
+            schemaVersion: 37, // no more mandatory words!
 //            schemaVersion: 30, // optimize BasicDataModel
 //            schemaVersion: 27, // start with Game Center
 //            schemaVersion: 26, // buttontype not needed any more
@@ -120,7 +120,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                 }
         },
-            objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self]
+            objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self, ScoreInfoForLanguage.self, ScoreInfoForDifficulty.self]
 //            objectTypes: [WordListModel.self]
         )
         

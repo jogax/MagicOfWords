@@ -264,7 +264,7 @@ class WordDBGenerator {
             let frString = String(round(frequencyInProcent))
             let wordModel = WordListModel()
             wordModel.word = language + GV.frequencyString + itemSeparator + letter + itemSeparator + frString
-            try! realm.write {
+            try! realm.safeWrite {
                 realm.add(wordModel)
             }
         }
@@ -298,7 +298,7 @@ class WordDBGenerator {
                 mandatoryModel.gameNumber = Int(gameNumber)!
                 mandatoryModel.language = language
                 mandatoryModel.mandatoryWords = lineToSave
-                try! realm.write {
+                try! realm.safeWrite {
                     realm.add(mandatoryModel)
                 }
             }

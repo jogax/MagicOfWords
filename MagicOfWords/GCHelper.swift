@@ -42,6 +42,7 @@ public protocol GCHelperDelegate: class {
     /// Method called when the match has ended.
     func matchEnded(error: String)
     func localPlayerAuthenticated()
+    func localPlayerNotAuthenticated()
     func continueTimeCount()
     func firstPlaceFounded()
     func myPlaceFounded()
@@ -153,6 +154,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             GKLocalPlayer.local.authenticateHandler = { (gcAuthViewController, error) in
                 guard error == nil else {
                     print("Authentication error: \(String(describing: error?.localizedDescription))")
+                    self.delegate?.localPlayerNotAuthenticated()
                     return
                 }
                 if let gcAuthViewController = gcAuthViewController {
@@ -377,6 +379,38 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     
     var waitingForScores = false
+    
+    public func getScoresForShow(completion: @escaping ()->()) {
+        if GKLocalPlayer.local.isAuthenticated {
+            GV.scoreForShowTable.removeAll()
+            let leaderBoard = GKLeaderboard()
+            let leaderboardID = "\(GV.actLanguage)\(difficultyName(difficulty:GV.basicDataRecord.difficulty))"
+            leaderBoard.identifier = leaderboardID
+            leaderBoard.playerScope = .global
+            leaderBoard.timeScope = .allTime
+            leaderBoard.range =  NSMakeRange(1, 20) //NSRange(location: 1, length: 100)
+            leaderBoard.loadScores(completionHandler: {
+            (scores, error) in
+                if scores != nil {
+                    if leaderBoard.localPlayerScore != nil {
+                        GV.myPlace = leaderBoard.localPlayerScore!.rank
+                        GV.myScore = Int(leaderBoard.localPlayerScore!.value)
+                    } else {
+                        GV.myPlace = 0
+                        GV.myScore = 0
+                    }
+                    if scores!.count > 0 {
+                        for score in scores! {
+                            let item = ScoreForShow(place: score.rank, player: score.player.alias, score: Int(score.value))
+                            GV.scoreForShowTable.append(item)
+                        }
+                    }
+                    completion()
+                }
+            })
+        }
+    }
+    
     @objc public func getAllScores(rank1: Int = 1, rank2: Int = 100, inRecursion: Bool = false, completion: @escaping ()->()) {
         if GKLocalPlayer.local.isAuthenticated {
             if waitingForScores && !inRecursion {
@@ -424,13 +458,13 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         leaderBoard.identifier = leaderboardID
         leaderBoard.playerScope = .global
         leaderBoard.timeScope = .allTime
-        leaderBoard.range = NSRange(location: 1, length: 10)
+        leaderBoard.range = NSRange(location: 1, length: 1)
         leaderBoard.loadScores(completionHandler: {
             (scores, error) in
             if scores != nil {
                 if scores!.count > 0 {
                     try! realm.safeWrite() {
-                        GV.basicDataRecord.setBestScore(score: Int(scores![0].value), name: scores![0].player.alias, myPlace: leaderBoard.localPlayerScore == nil ? 0 : leaderBoard.localPlayerScore!.rank)
+                        GV.basicDataRecord.setBestScore(score: Int(scores![0].value), name: scores![0].player.alias, myRank: leaderBoard.localPlayerScore == nil ? 0 : leaderBoard.localPlayerScore!.rank)
                         completion()
                     }
                 }
@@ -465,7 +499,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         if GKLocalPlayer.local.isAuthenticated == false {
             timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(waitForLocalPlayer), userInfo: nil, repeats: false)
         } else {
-            syncWithGameCenter()
+//            syncWithGameCenter()
         }
     }
     
@@ -474,40 +508,6 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     
     
-    private func syncWithGameCenter() {
-        func getHighScoreForDifficulty(difficulty: Int)->Int? {
-            var score = 0
-            let minGameNumber = difficulty * 1000
-            let maxGameNumber = minGameNumber + 999
-            let notSyncedRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %@ and gameNumber <= %@ and synced = false", GV.actLanguage, minGameNumber, maxGameNumber)
-            if notSyncedRecords.count > 0 {
-                score = (notSyncedRecords.max(ofProperty: "score") as Int?)!
-                try! realm.safeWrite() {
-                    for record in notSyncedRecords {
-                        record.synced = true
-                    }
-                }
-            } else {
-                return nil
-            }
-            return score
-        }
-        if GKLocalPlayer.local.isAuthenticated {
-            let GCEnabled = realm.objects(BasicDataModel.self).first!.GCEnabled
-            if GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-                var score: Int? = 0
-                for difficulty in GameDifficulty.Easy.rawValue...GameDifficulty.Medium.rawValue {
-                    score = getHighScoreForDifficulty(difficulty: GameDifficulty.Easy.rawValue)
-                    if score != nil && score! > GV.basicDataRecord.getScore(difficulty: difficulty) {
-                        self.sendScoreToGameCenter(score: score, difficulty: difficulty, completion: {})
-                        try! realm.safeWrite() {
-                            GV.basicDataRecord.setScore(score: score!, difficulty: difficulty)
-                        }
-                    }
-                }
-            }
-        }
-    }
     public func getName() -> String {
         return GKLocalPlayer.local.alias
     }

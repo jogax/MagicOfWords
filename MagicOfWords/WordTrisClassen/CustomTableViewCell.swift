@@ -72,7 +72,7 @@ class CustomTableViewCell: UITableViewCell {
         label.font = myFont
         label.textColor = UIColor.black
         label.text = text
-//        label.backgroundColor = color
+        label.backgroundColor = color
         label.center.y = boxView.center.y
         boxView.addSubview(label)
     }

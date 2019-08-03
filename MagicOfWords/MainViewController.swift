@@ -29,16 +29,31 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     func matchEnded(error: String) {
         
     }
-    
+    func localPlayerNotAuthenticated() {
+        showMenu()
+    }
+
     func localPlayerAuthenticated() {
         if GV.basicDataRecord.GameCenterEnabled != GCEnabledType.GameCenterEnabled.rawValue {
             try! realm.safeWrite() {
                 GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterEnabled.rawValue
             }
         }
-        GCHelper.shared.getBestScore(completion: {})
-//        GCHelper.shared.getAllScores(completion: {})
-        startDemoOrMenu()
+        GCHelper.shared.getBestScore(completion: {
+            self.callModifyHeader()
+        })
+
+    }
+    
+    func callModifyHeader() {
+        if animationScene != nil {
+            return
+        }
+        if wtScene != nil {
+            wtScene!.modifyHeader()
+        } else {
+            showMenu()
+        }
     }
     
     func continueTimeCount() {
@@ -57,14 +72,20 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     func backFromAnimation() {
         if let view = self.view as! SKView? {
             view.presentScene(nil)
+            animationScene = nil
         }
         showBackgroundPicture()
-        self.showMenu()
+        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue && GV.connectedToInternet {
+            manageGameCenter()
+        } else {
+            self.showMenu()
+        }
     }
     
     func showHowToPlay(difficulty: Int) {
         if let view = self.view as! SKView? {
             view.presentScene(nil)
+            animationScene = nil
         }
         showBackgroundPicture()
         GV.origDifficulty = GV.basicDataRecord.difficulty
@@ -81,34 +102,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     
-//    func chooseNickname() {
-//        let alertController = UIAlertController(title: GV.language.getText(.tcSetNickName),
-//                                                message: GV.language.getText(.tcAddCodeRecommended),
-//                                                preferredStyle: .alert)
-//        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcSave), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            let nickNameField = alertController.textFields![0] as UITextField
-//            let keyWordField = alertController.textFields![1] as UITextField
-//            self.setNickname(nickName: nickNameField.text!, keyWord: keyWordField.text!)
-////            self.showMenu()
-//        }))
-//        alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: { [unowned self]
-//            alert -> Void in
-//            self.showMenu()
-//        }))
-//        alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
-//            textField.text = playerActivity![0].nickName
-//        })
-//        alertController.addTextField(configurationHandler: {(textField : UITextField!) -> Void in
-//            if GV.basicDataRecord.keyWord == "" {
-//                textField.placeholder = GV.language.getText(.tcKeyWord)
-//            } else {
-//                textField.text = GV.basicDataRecord.keyWord
-//            }
-//        })
-//        self.present(alertController, animated: true, completion: nil)
-//
-//    }
     #if DEBUG
     func displayCloudRecordsViewController() {
 //        if GV.myUser != nil
@@ -169,14 +162,10 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         GV.generateHelpInfo = false
         if let view = self.view as! SKView? {
             view.presentScene(nil)
+            wtScene = nil
         }
         showBackgroundPicture()
-        switch start {
-        case .NoMore: showMenu() //startMenuScene(showMenu: true)
-        case .PreviousGame, .NextGame: startWTScene(new: false, next: start, gameNumber: 0)
-        case .NewGame: startWTScene(new: true, next: .NoMore, gameNumber: 0)
-        case .GameNumber: startWTScene(new: true, next: .NoMore, gameNumber: 0)
-        }
+        showMenu()
     }
     
     func wtGame() {
@@ -194,12 +183,12 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     func startWTScene(new: Bool, next: StartType, gameNumber: Int, restart: Bool = false, showHelp: Bool = false) {
-        let wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
-            wtScene.setDelegate(delegate: self)
-            wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart, showHelp: showHelp)
-            wtScene.parentViewController = self
-            view.presentScene(wtScene)
+            wtScene!.setDelegate(delegate: self)
+            wtScene!.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart, showHelp: showHelp)
+            wtScene!.parentViewController = self
+            view.presentScene(wtScene!)
         }
         
     }
@@ -213,9 +202,26 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         
     }
     
-    func startNewGame() {
-        let gameNumber = GV.basicDataRecord.difficulty * 1000
-        startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
+    func startGame() {
+        let actPlay = realm.objects(GameDataModel.self).filter("language = %d and gameNumber >= %d and gameNumber <= %d",GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+        if actPlay.count == 0 {
+            let gameNumber = GV.basicDataRecord.difficulty * 1000
+            startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
+        } else {
+            if actPlay.count > 1 {
+                convertIfNeeded()
+            }
+            if actPlay.first!.gameStatus == GV.GameStatusFinished {
+                try! realm.safeWrite() {
+                    realm.delete(actPlay)
+                }
+                let gameNumber = GV.basicDataRecord.difficulty * 1000
+                startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
+            } else {
+                let gameNumber = actPlay.first!.gameNumber
+                startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
+            }
+        }
     }
     
     func continueGame() {
@@ -229,8 +235,12 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             try! realm.safeWrite() {
                 GV.basicDataRecord.actLanguage = language
             }
-            GCHelper.shared.getBestScore(completion: {})
-            GCHelper.shared.getAllScores(completion: {})
+            GCHelper.shared.getBestScore(completion: {
+                self.callModifyHeader()
+            })
+            GCHelper.shared.getAllScores(completion: {
+                self.callModifyHeader()
+            })
             self.showMenu()
         }
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseLanguage),
@@ -285,63 +295,71 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
 //    override func viewDidLoad() {
-    var countMandatory = 0
-    var countExistingGames = 0
-    var countContinueGames = 0
-    
+//    var countMandatory = 0
+//    var countExistingGames = 0
+//    var countContinueGames = 0
+//
     private func getRecordCounts() {
-        countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@ and gameNumber < 1000", GV.actLanguage).count
-        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).count
-        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and (gameStatus = %@ or gameStatus = %@)", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber, GV.GameStatusPlaying, GV.GameStatusContinued).count
+//        countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@ and gameNumber < 1000", GV.actLanguage).count
+//        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).count
+//        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and (gameStatus = %@ or gameStatus = %@)", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber, GV.GameStatusPlaying, GV.GameStatusContinued).count
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
-//        realmSync = RealmService
         #if DEBUG
             GV.debug = true
         #endif
         showBackgroundPicture()
-//        printDEWordsSorted()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
-//       readNewTextFile()
-//        printOrigDEData()
         myHeight = self.view.frame.size.height
         myWidth = self.view.frame.size.width
-//        #if CREATEMANDATORY
-//        _ = WordDBGenerator(mandatory: true, create: true)
-//        #endif
-//
-//        #if CREATEWORDLIST
-//        _ = WordDBGenerator(mandatory: false, create: true)
-//        #endif
-//
-//       #if GENERATEWORDLIST
-//        _ = WordDBGenerator(mandatory: false)
-//        print("WordList Generated")
-//        #endif
-//        #if GENERATEMANDATORY
-//        _ = WordDBGenerator(mandatory: true)
-//        print("Mandatory Generated")
-//        #endif
-//        readNewTextFile()
-        // Get the SKScene from the loaded GKScene
-        //-------------------------
         generateBasicDataRecordIfNeeded()
-        getRecordCounts()
+        convertIfNeeded()
+        if !GV.basicDataRecord.startAnimationShown {
+            startWelcomeScene()
+        } else {
+            let timeInterval = GV.basicDataRecord.startAnimationShown ? 0.01 : 1.0
+            _ = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
+        }
+    }
+    
+    @objc private func waitForInternet(timerX: Timer) {
         if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue && GV.connectedToInternet {
             manageGameCenter()
         } else {
             startDemoOrMenu()
         }
-//        #else
-//            if countContinueGames > 0 {
-//                startWTScene(new: false, next: .NoMore, gameNumber: 0)
-//            } else {
-//                showMenu()
-//            }
-//        #endif
-        //------------------------
-//        startMenuScene()
+    }
+    
+    private func convertIfNeeded() {
+        var bestScore = 0
+        var bestScoreIndex = 0
+        for languageIndex in 0...3 {
+            let language = GV.IntToLanguage[languageIndex]
+            for difficulty in GameDifficulty.Easy.rawValue...GameDifficulty.Medium.rawValue {
+                let minGameNumber = difficulty * 1000
+                let maxGameNumber = minGameNumber + 999
+                let myPlayingRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", language!, minGameNumber, maxGameNumber)
+                if myPlayingRecords.count > 0 {
+                    for (index, myPlayingRecord) in myPlayingRecords.enumerated() {
+                        if myPlayingRecord.score > bestScore {
+                            bestScore = myPlayingRecord.score
+                            bestScoreIndex = index
+                        }
+                    }
+                    let maxCount = myPlayingRecords.count - 1
+                    for index in 0...maxCount {
+                        let revertIndex = maxCount - index
+                        if revertIndex != bestScoreIndex {
+                            try! realm.safeWrite() {
+                                realm.delete(myPlayingRecords[revertIndex])
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
     }
     
     @objc private func startDemoOrMenu() {
@@ -352,21 +370,22 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
                 return
             }
-            if countContinueGames > 0 {
-                startWTScene(new: false, next: .NoMore, gameNumber: 0)
-            } else {
-                showMenu()
-            }
+//            if countContinueGames > 0 {
+            startWTScene(new: false, next: .NoMore, gameNumber: 0)
+//            } else {
+//                showMenu()
+//            }
         }
     }
+    var animationScene: WelcomeScene?
 
-    @objc private func startWelcomeScene(){
-        let animationScene = WelcomeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+    @objc private func startWelcomeScene() {
+        animationScene = WelcomeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
-            animationScene.setDelegate(delegate: self)
+            animationScene!.setDelegate(delegate: self)
             //                wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
             //                wtScene.parentViewController = self
-            view.presentScene(animationScene)
+            view.presentScene(animationScene!)
         }
     }
     
@@ -390,29 +409,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         }catch{
             print("could not start reachability notifier")
         }
-//        if !GV.callBackExpertUser.contains(where: {$0.myCaller == callerName}) {
-//            GV.callBackExpertUser.append(GV.CallBackStruct(caller: callerName, callBackFunction: expertUserChanged))
-//        }
-//        expertUserChanged()
     }
     
-//    public func expertUserChanged() {
-//        if GV.expertUser {
-//            let title = GV.language.getText(.tcCollectMandatory)
-//            if alertController != nil {
-//                if alertController!.actions.last!.title != title {
-//                    collectMandatoryAction = UIAlertAction(title: title, style: .default, handler: { [unowned self]
-//                        alert -> Void in
-//                        self.displayCollectMandatoryViewController()
-//                    })
-//                    collectMandatoryAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-//                    alertController!.addAction(collectMandatoryAction!)
-//                }
-//            }
-//        }
-//    }
-    
-    
+    var wtScene: WTScene?
     
     
     @objc func reachabilityChanged(note: Notification) {
@@ -427,8 +426,26 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         case .none:
             GV.connectedToInternet = false
         }
-        if GV.connectedToInternet && GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+        if GV.connectedToInternet {
+            if animationScene != nil {
+                _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
+            } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+            } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue {
+                manageGameCenter()
+            }
+        } else {
+            
+        }
+    }
+    
+    @objc private func waitForAnimationsSceneFinishing(timerX: Timer) {
+        if animationScene != nil || wtScene != nil {
+            _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
+        } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
             GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+        } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue {
+            manageGameCenter()
         }
     }
 
@@ -444,43 +461,43 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     func showMenu() {
         getRecordCounts()
         let gameDifficulty = GameDifficulty(rawValue: GV.basicDataRecord.difficulty)
-        let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
+//        let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
-                                            message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname, gameDifficulty!.description()),
+                                            message: GV.language.getText(.tcActDifficulty, values: gameDifficulty!.description()),
                                             preferredStyle: .alert)
         
-        let newOK = countMandatory - countExistingGames > 0
-        let continueOK = countContinueGames > 0
+//        let newOK = countMandatory - countExistingGames > 0
+//        let continueOK = countContinueGames > 0
         //--------------------- newGameAction ---------------------
-        let newGameAction = UIAlertAction(title: "\(GV.language.getText(.tcNewGame)) ", style: .default, handler: { [unowned self]
+        let startGameAction = UIAlertAction(title: "\(GV.language.getText(.tcPlay)) ", style: .default, handler: { [unowned self]
             alert -> Void in
-            if newOK {
-                self.startNewGame()
-            }
+                self.startGame()
         })
-        if !newOK {
-            newGameAction.setValue(disabledColor, forKey: "TitleTextColor")
-        }
-        alertController!.addAction(newGameAction)
+//        if !newOK {
+//            newGameAction.setValue(disabledColor, forKey: "TitleTextColor")
+//        }
+        alertController!.addAction(startGameAction)
         //--------------------- continueAction ---------------------
-        let continueAction = UIAlertAction(title: "\(GV.language.getText(.tcContinue))", style: .default, handler: { [unowned self]
-            alert -> Void in
-            if continueOK {
-                //                self.showGames(all: false)
-                self.startWTScene(new: false, next: .NoMore, gameNumber: 0)
-            }
-        })
-        if !continueOK {
-            continueAction.isEnabled = false
-            //            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
-        }
-        alertController!.addAction(continueAction)
+//        let continueAction = UIAlertAction(title: "\(GV.language.getText(.tcContinue))", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            if continueOK {
+//                //                self.showGames(all: false)
+//                self.startWTScene(new: false, next: .NoMore, gameNumber: 0)
+//            }
+//        })
+//        if !continueOK {
+//            continueAction.isEnabled = false
+//            //            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(continueAction)
         //--------------------- bestScoreAction ---------------------
         let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
             alert -> Void in
             self.showGames(all: true)
         })
-        alertController!.addAction(bestScoreAction)
+        if GKLocalPlayer.local.isAuthenticated && GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+            alertController!.addAction(bestScoreAction)
+        }
         //--------------------- SettingsAction ---------------------------
         let settingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
             alert -> Void in
@@ -521,7 +538,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     func manageGameCenter() {
-        switch GV.basicDataRecord.GCEnabled {
+        switch GV.basicDataRecord.GameCenterEnabled {
         case GCEnabledType.GameCenterEnabled.rawValue:
             if GCHelper.shared.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
                 GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
@@ -534,7 +551,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             let connectAction = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default,
                                               handler: {(paramAction:UIAlertAction!) in
                                                 try! realm.safeWrite() {
-                                                    GV.basicDataRecord.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
+                                                    GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterEnabled.rawValue
                                                 }
                                                 self.connectToGameCenter()
 //                                                self.startDemoOrMenu()
@@ -550,8 +567,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             alert.addAction(askLaterAction)
             let askNoMoreAction = UIAlertAction(title: GV.language.getText(.tcAskNoMore), style: .default,
                                                 handler: {(paramAction:UIAlertAction!) in
-                                                    try! realm.write({
-                                                        GV.basicDataRecord.GCEnabled = GCEnabledType.GameCenterSupressed.rawValue
+                                                    try! realm.safeWrite({
+                                                        GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterSupressed.rawValue
                                                     })
                                                     self.startDemoOrMenu()
             })
@@ -567,100 +584,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     
     func connectToGameCenter() {
         GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
-        if GV.basicDataRecord.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
             //                self.createLabelsForBestPlace()
         }
         
     }
 
 
-//    func showMenuX() {
-//        getRecordCounts()
-//        let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
-//        alertController = MyAlertController(mainText: GV.language.getText(.tcChooseAction), message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname))
-//        myAlert.addAction(text: "OK", target: self, action:#selector(self.OKTapped))
-//        myAlert.addAction(text: "cancel", target: self, action:#selector(self.cancelTapped))
-//        myAlert.zPosition = 10
-//        myAlert.presentAlert(target: bgSprite!)
-//        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-//
-//        alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
-//                                                message: GV.language.getText(.tcMyNickName, values: GV.basicDataRecord.myNickname),
-//                                                preferredStyle: .alert)
-//
-//        let newOK = countMandatory - countExistingGames > 0
-//        let continueOK = countContinueGames > 0
-//        //--------------------- newGameAction ---------------------
-//        let newGameAction = UIAlertAction(title: "\(GV.language.getText(.tcNewGame)) ", style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            if newOK {
-//                self.startNewGame()
-//            }
-//        })
-//        if !newOK {
-//            newGameAction.setValue(disabledColor, forKey: "TitleTextColor")
-//        }
-//        alertController!.addAction(newGameAction)
-//        //--------------------- continueAction ---------------------
-//        let continueAction = UIAlertAction(title: "\(GV.language.getText(.tcContinue))", style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            if continueOK {
-////                self.showGames(all: false)
-//                self.startWTScene(new: false, next: .NoMore, gameNumber: 0)
-//            }
-//        })
-//        if !continueOK {
-//            continueAction.isEnabled = false
-////            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
-//        }
-//        alertController!.addAction(continueAction)
-//        //--------------------- bestScoreAction ---------------------
-//        let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.showGames(all: true)
-//        })
-//        alertController!.addAction(bestScoreAction)
-//        //--------------------- SettingsAction ---------------------------
-//        let settingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.showSettingsMenu()
-//        })
-//        alertController!.addAction(settingsAction)
-//
-////        //--------------------- chooseLanguageAction ---------------------
-////        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
-////            alert -> Void in
-////            self.chooseLanguage()
-////        })
-////        alertController!.addAction(chooseLanguageAction)
-//        //--------------------- nickNameAction ---------------------
-//
-//        nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            if GV.connectedToInternet && playerActivity != nil && GV.myUser != nil {
-//                self.chooseNickname()
-//            } else {
-//                self.showMenu()
-//            }
-//        })
-//        nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-//        alertController!.addAction(nickNameAction!)
-//        expertUserChanged()
-//        #if DEBUG
-//            let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
-//                alert -> Void in
-//                self.developerMenuChoosed()
-//            })
-//            alertController!.addAction(developerMenuAction)
-//        #endif
-//        //--------------------- Present alert ---------------------
-//        present(alertController!, animated: true, completion: nil)
-//
-//    }
-
-//    var cloudGameData: Results<GameData>?
-//    var cloudGameDataSubscription: SyncSubscription<GameData>?
-//    var cloudGameDataToken: NotificationToken?
     var realmHelpInfo: Realm?
     #if DEBUG
     @objc private func developerMenuChoosed() {
@@ -964,7 +894,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         }
         GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
         GV.maxGameNumber = GV.minGameNumber + 999
-        getRecordCounts()
+//        getRecordCounts()
         GCHelper.shared.getBestScore(completion: {})
         GCHelper.shared.getAllScores(completion: {})
         self.showMenu()
@@ -1039,72 +969,100 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //    }
     
     private func generateBasicDataRecordIfNeeded() {
+        func createScoreInfo() {
+            try! realm.safeWrite() {
+                for language in 0...3 {
+                    let scoreInfo = ScoreInfoForLanguage()
+                    scoreInfo.language = language
+                    for difficulty in 0...3 {
+                        let difficultyInfo = ScoreInfoForDifficulty()
+                        difficultyInfo.difficulty = difficulty
+                        scoreInfo.difficultyInfos.append(difficultyInfo)
+                    }
+                    GV.basicDataRecord.scoreInfos.append(scoreInfo)
+                }
+            }
+        }
         if realm.objects(BasicDataModel.self).count == 0 {
-            let myName = generateRandomNameFromDeviceID()
+            let myName = GV.language.getText(.tcPlayer)
             GV.basicDataRecord = BasicDataModel()
             GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
             GV.basicDataRecord.myName = myName
-            GV.basicDataRecord.myNickname = generateMyNickname()
             GV.basicDataRecord.creationTime = Date()
+            createScoreInfo()
             try! realm.safeWrite() {
                 realm.add(GV.basicDataRecord)
             }
         } else {
-            GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
+           GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
             GV.language.setLanguage(GV.basicDataRecord.actLanguage)
-        }
-//        GV.buttonType = GV.basicDataRecord.buttonType
+            if GV.basicDataRecord.scoreInfos.count == 0 {
+                createScoreInfo()
+            }
+            try! realm.safeWrite() {
+                let date = Date()
+                let calendar = Calendar.current
+                let components = calendar.dateComponents([.year, .month, .day], from: date)
+                let savedComponents = calendar.dateComponents([.year, .month, .day], from: GV.basicDataRecord.lastDayPlayed)
+                if !(savedComponents.year == components.year &&
+                    savedComponents.month == components.month &&
+                    savedComponents.day == components.day)
+                {
+                    GV.basicDataRecord.lastDayPlayed = Date()
+                    GV.basicDataRecord.playToday = 1
+                }
+            }
+       }
+
         GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
         GV.maxGameNumber = GV.minGameNumber + 999
-
-//        GV.actFont = GV.basicDataRecord.buttonType == GV.ButtonTypeElite ? GV.FontTypeElite : GV.FontTypeSimple
     }
     
     
-    private func generateRandomNameFromDeviceID()->String {
-        let deviceName = UIDevice().deviceID
-        let random = MyRandom(forName: true)
-        var modifiedID = ""
-        for char in deviceName {
-            if String(char) != "-" {
-                modifiedID += String(char)
-            }
-        }
-        var index = 0
-        var randomizedID = ""
-        var counter = 0
-        repeat {
-            let input = modifiedID.subString(at: index, length: 2)
-            let scanner = Scanner(string: input)
-            var value: UInt64 = 0
-            
-            if scanner.scanHexInt64(&value) {
-                let adder = random.getRandomInt(1, max: 255)
-                let newValue = (Int(value) + adder) % 256
-                randomizedID += String(format:"%02X", newValue)
-                counter += 1
-                if counter % 2 == 0 {
-                    randomizedID += "-"
-                }
-           }
-           index += 2
-        } while index < modifiedID.length
-        
-        
-        randomizedID.removeLast()
-        return randomizedID
-    }
+//    private func generateRandomNameFromDeviceID()->String {
+//        let deviceName = UIDevice().deviceID
+//        let random = MyRandom(forName: true)
+//        var modifiedID = ""
+//        for char in deviceName {
+//            if String(char) != "-" {
+//                modifiedID += String(char)
+//            }
+//        }
+//        var index = 0
+//        var randomizedID = ""
+//        var counter = 0
+//        repeat {
+//            let input = modifiedID.subString(at: index, length: 2)
+//            let scanner = Scanner(string: input)
+//            var value: UInt64 = 0
+//
+//            if scanner.scanHexInt64(&value) {
+//                let adder = random.getRandomInt(1, max: 255)
+//                let newValue = (Int(value) + adder) % 256
+//                randomizedID += String(format:"%02X", newValue)
+//                counter += 1
+//                if counter % 2 == 0 {
+//                    randomizedID += "-"
+//                }
+//           }
+//           index += 2
+//        } while index < modifiedID.length
+//
+//
+//        randomizedID.removeLast()
+//        return randomizedID
+//    }
     
     func generateMyNickname()->String {
-        var nickName = GV.onSimulator ? "Sim" : (GV.onIpad ? "Pd" : "Ph")
-        let letters = GV.language.getText(.tcNickNameLetters)
-        for _ in 0...4 {
-            nickName += letters.subString(at: Int.random(min: 0, max: letters.count - 1), length: 1)
-        }
-        for _ in 0...4 {
-            nickName += String(Int.random(min: 0, max: 9))
-        }
-        return nickName
+//        var nickName = GV.onSimulator ? "Sim" : (GV.onIpad ? "Pd" : "Ph")
+//        let letters = GV.language.getText(.tcNickNameLetters)
+//        for _ in 0...4 {
+//            nickName += letters.subString(at: Int.random(min: 0, max: letters.count - 1), length: 1)
+//        }
+//        for _ in 0...4 {
+//            nickName += String(Int.random(min: 0, max: 9))
+//        }
+        return ""
     }
     
 //    var playerActivityByNickName: Results<PlayerActivity>?

@@ -18,7 +18,7 @@ class BasicDataModel: Object {
     @objc dynamic var ID = 0
     @objc dynamic var actLanguage = ""
     @objc dynamic var myName = ""
-    @objc dynamic var myNickname = ""
+//    @objc dynamic var myNickname = ""
     @objc dynamic var keyWord = ""
     @objc dynamic var difficulty = 0
     @objc dynamic var creationTime = Date()
@@ -29,82 +29,40 @@ class BasicDataModel: Object {
     @objc dynamic var onlineTime = 0
     @objc dynamic var playingTime = 0
     @objc dynamic var playingTimeToday = 0
-    @objc dynamic var today = Date()
+    @objc dynamic var lastDayPlayed = Date()
+    @objc dynamic var playToday = 0
     @objc dynamic var playing = false
-
-    @objc dynamic var bestScore = 0
-    @objc dynamic var bestPlayer = ""
-    @objc dynamic var myPlace = 0
-    
-    @objc dynamic var easyScore = 0
-    @objc dynamic var mediumScore = 0
-    @objc dynamic var hardScore = 0
-    @objc dynamic var veryHardScore = 0
-    
-    @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
+    @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue // GCEnabledType: 0 = AskForGameCenter, 1 = GameCenterEnabled, 2 = GameCenterSupressed
     @objc dynamic var startAnimationShown = false
-    
-    @objc dynamic var GCEnabled = 0 // GCEnabledType: 0 = AskForGameCenter, 1 = GameCenterEnabled, 2 = GameCenterSupressed
+    let scoreInfos = List<ScoreInfoForLanguage>()
+
     override  class func primaryKey() -> String {
         return "ID"
     }
-    
-    public func resetBestScore() {
-        
+    public func setBestScore(score: Int, name: String, myRank: Int) {
+        let languageIndex = GV.languageToInt[self.actLanguage]
+        scoreInfos[languageIndex!].difficultyInfos[self.difficulty].bestScore = score
+        scoreInfos[languageIndex!].difficultyInfos[self.difficulty].bestPlayerName = name
+        scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myRank = myRank
+    }
+    public func getBestScore()->(bestScore: Int, bestName: String, myRank: Int, myScore: Int) {
+        let languageIndex = GV.languageToInt[self.actLanguage]
+        let bestScore = scoreInfos[languageIndex!].difficultyInfos[self.difficulty].bestScore
+        let bestName = scoreInfos[languageIndex!].difficultyInfos[self.difficulty].bestPlayerName
+        let myRank = scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myRank
+        let myScore = scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myScore
+        return (bestScore, bestName, myRank, myScore)
+    }
+    public func getScore()->Int {
+        let languageIndex = GV.languageToInt[self.actLanguage]
+        return scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myScore
     }
     
-    public func setBestScore(score: Int, name: String, myPlace: Int) {
-        self.bestScore = score
-        self.bestPlayer = name
-        self.myPlace = myPlace
-    }
-    
-//    public func getBestPlayerName()->String {
-//        return bestPlayer
-//    }
-//
-//    public func getBestScore()->Int {
-//        return bestScore
-//    }
-//
-//    public func getMyPlace()->Int {
-//        return myPlace
-//    }
-//
-    public func getScore(difficulty: Int = -1)->Int {
-        let myDifficulty = difficulty < 0 ? self.difficulty : difficulty
-        switch myDifficulty {
-        case GameDifficulty.Easy.rawValue: return easyScore
-        case GameDifficulty.Medium.rawValue: return mediumScore
-//        case GameDifficulty.Hard.rawValue: return hardScore
-//        case GameDifficulty.Medium.rawValue: return veryHardScore
-        default: return 0
-        }
-    }
-    
-    public func setScore(score: Int, difficulty: Int = -1) {
-        let myDifficulty = difficulty < 0 ? self.difficulty : difficulty
+    public func setScore(score: Int) {
         try! realm!.safeWrite() {
-            switch myDifficulty {
-            case GameDifficulty.Easy.rawValue:
-                if score > easyScore {
-                    easyScore = score
-                }
-            case GameDifficulty.Medium.rawValue:
-                if score > mediumScore {
-                    mediumScore = score
-                }
-//            case GameDifficulty.Hard.rawValue:
-//                if score > hardScore {
-//                    hardScore = score
-//                }
-//            case GameDifficulty.Medium.rawValue:
-//                if score > veryHardScore {
-//                    veryHardScore = score
-//                }
-            default:
-                break
-            }
+            let languageIndex = GV.languageToInt[self.actLanguage]
+            scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myScore = score
         }
     }
+
 }

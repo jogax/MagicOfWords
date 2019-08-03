@@ -15,14 +15,6 @@ public protocol ShowGamesSceneDelegate: class {
     func backToMenuScene(gameNumberSelected: Bool, gameNumber: Int, restart: Bool)
 }
 class ShowGamesScene: SKScene, WTTableViewDelegate {
-    struct FinishedGameData {
-        var gameNumber = ""
-        var bestPlayer = ""
-        var bestScore = ""
-        var score = ""
-        var finished = false
-    }
-
     let xMultiplierTab: [CGFloat] = [0.3, 0.5, 0.8]
     var myDelegate: ShowGamesSceneDelegate?
     let OKLabelName = "°°°OKLabel°°°"
@@ -42,17 +34,21 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
 
     var initialLoadDone = false
 
-    override func didMove(to view: SKView) {
+    override func didMove(to view: SKView) {        
         background.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
         let widthMultiplier = background.size.width / background.size.height
         lineHeight =  "A".height(font: myFont!) * 1.25
         background.size = CGSize(width: self.size.height * widthMultiplier, height: self.size.height)
         addChild(background)
-//        self.backgroundColor = SKColor(red: 200/255, green: 220/255, blue: 208/255, alpha: 1)
-//        self.allResultsItems = RealmService.objects(BestScoreForGame.self).filter("combinedPrimary ENDSWITH %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
-//
-        showFinishedGamesInTableView()
+        GCHelper.shared.getScoresForShow(completion: {
+            self.scoresLoaded()
+        })
     }
+    
+    private func scoresLoaded() {
+        gamesForShow = GV.scoreForShowTable
+        showFinishedGamesInTableView()
+   }
 
     public func setDelegate(delegate: ShowGamesSceneDelegate, controller: UIViewController) {
         myDelegate = delegate
@@ -82,7 +78,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     }
 
     var showGamesInTableView: WTTableView?
-    var gamesForShow = [FinishedGameData]()
+    var gamesForShow = [ScoreForShow]()
     let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
     var lineHeight: CGFloat = 0
     var realmLoadingCompleted = false
@@ -92,7 +88,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
 
         calculateColumnWidths()
         showGamesInTableView?.setDelegate(delegate: self)
-//        showGamesInTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
+        showGamesInTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
 
         let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: 100)
 //        let lineHeight = title.height(font: myFont!)
@@ -119,22 +115,22 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
 
     var goOn = true
 
-    var lengthOfGameNumber: Int = 0
-    var lengthOfBestPlayer: Int = 0
-    var lengthOfMyScore: Int = 0
+    var lengthOfPlace: Int = 0
+    var lengthOfPlayer: Int = 0
+    var lengthOfScore: Int = 0
     var title = ""
 
     private func calculateColumnWidths() {
         title = ""
-        let text1 = "  \(GV.language.getText(.tcGameNumber)) "
-        let text2 = " \(GV.language.getText(.tcBestPlayerHeader)) ".fixLength(length: 20, center: true)
-        let text3 = " \(GV.language.getText(.tcMyHeader)) ".fixLength(length:15, center: true)
+        let text1 = "  \(GV.language.getText(.tcPlace)) "
+        let text2 = " \(GV.language.getText(.tcPlayerHeader)) ".fixLength(length: 20, center: true)
+        let text3 = " \(GV.language.getText(.tcScore)) ".fixLength(length:15, center: true)
         title += text1
         title += text2
         title += text3
-        lengthOfGameNumber = text1.length
-        lengthOfBestPlayer = text2.length
-        lengthOfMyScore = text3.length
+        lengthOfPlace = text1.length
+        lengthOfPlayer = text2.length
+        lengthOfScore = text3.length
    }
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
         switch section {
@@ -159,36 +155,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         }
     }
 
-    func didTappedButton(tableView: UITableView, indexPath: IndexPath, buttonName: String) {
-
-    }
-
-
-
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
-        if let number = Int(gamesForShow[indexPath.row].gameNumber) {
-            let gameNumber = number - 1
-            let combinedKey = GV.actLanguage + String(gameNumber)
-            let choosedGame = realm.objects(GameDataModel.self).filter("combinedKey = %@", combinedKey)
-            if choosedGame.count == 1 && choosedGame.first!.gameStatus == GV.GameStatusFinished {
-                let alertController = UIAlertController(title: GV.language.getText(.tcGameIsFinished, values: String(number)),
-                                                        message: GV.language.getText(.tcRestartGameQuestion),
-                                                        preferredStyle: .alert)
-                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcRestart), style: .default, handler: { [unowned self]
-                    alert -> Void in
-                    self.goBack(gameNumberSelected: true, gameNumber: gameNumber, restart: true)
-                }))
-                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcContinue), style: .default, handler: { [unowned self]
-                    alert -> Void in
-                    self.goBack(gameNumberSelected: true, gameNumber: gameNumber, restart: false)
-                }))
-
-                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .cancel, handler: nil))
-                self.parentViewController!.present(alertController, animated: true, completion: nil)
-            } else {
-                goBack(gameNumberSelected: true, gameNumber: gameNumber, restart: false)
-            }
-        }
     }
 
     func getHeightForHeaderInSection(tableView: UITableView, section: Int)->CGFloat {
@@ -208,16 +175,14 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: lineHeight/*self.frame.height * (GV.onIpad ? 0.040 : 0.010)*/))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
-        cell.addColumn(text: (gamesForShow[indexPath.row].gameNumber).fixLength(length: lengthOfGameNumber - 2)) // GameNumber
-        cell.addColumn(text: String(gamesForShow[indexPath.row].bestPlayer).fixLength(length: 12)/*, color: color*/) // Best Player
-        cell.addColumn(text: String(gamesForShow[indexPath.row].bestScore).fixLength(length: 7)) // Best Score
-        cell.addColumn(text: String(gamesForShow[indexPath.row].score).fixLength(length: 8)/*, color: color*/) // My Score
-//        cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: 4) )
-        if gamesForShow[indexPath.row].finished {
-//            let image = UIImage(named: "hook")
-            let image = UIImage(named: "hook")!.resizeImage(newWidth: lineHeight)
-            cell.addButton(image: image, callBack: buttonTapped)
+        var cellColor = UIColor.white
+        if gamesForShow[indexPath.row].player == GKLocalPlayer.local.alias {
+            cellColor = UIColor.green
         }
+        cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: lengthOfPlace - 2), color: cellColor) // GameNumber
+        cell.addColumn(text: ("   " + String(gamesForShow[indexPath.row].player)).fixLength(length: 20, leadingBlanks: false), color: cellColor)
+        cell.addColumn(text: ("  " + String(gamesForShow[indexPath.row].score)).fixLength(length: 9), color: cellColor) // My Score
+//        cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: 4) )
         return cell
     }
 
@@ -229,10 +194,11 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         return 1
     }
     func getNumberOfRowsInSections(section: Int)->Int {
-        switch section {
-        case 0: return gamesForShow.count
-        default: return 0
+        var returnValue = gamesForShow.count
+        if GV.myPlace > gamesForShow.last!.place {
+            returnValue += 1
         }
+        return returnValue
     }
 
     func getHeightForRow(tableView: UITableView, indexPath: IndexPath) -> CGFloat {

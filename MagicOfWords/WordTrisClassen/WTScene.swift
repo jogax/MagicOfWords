@@ -275,7 +275,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let color = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
 
     
-    func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
+    public func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: myFont!)
         let height = "A".height(font: myFont!)
@@ -453,7 +453,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    var timeLabel = SKLabelNode()
     var headerLabel = SKLabelNode()
     var versionLabel = SKLabelNode()
-    var myScoreheaderLabel = SKLabelNode()
+    var myScoreHeaderLabel = SKLabelNode()
     var bestScoreHeaderLabel = SKLabelNode()
     var actScoreHeaderLabel = SKLabelNode()
     var scoreLabel = SKLabelNode()
@@ -569,7 +569,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
 //        wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
-        getPlayingRecord(new: new, next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
+        getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         createHeader()
         buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
         buttonSize = CGSize(width: buttonHeight, height: buttonHeight)
@@ -578,7 +578,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         WTGameWordList.shared.clear()
 //        WTGameWordList.shared.setMandatoryWords()
 //        showWordsToCollect()
-        GCHelper.shared.getAllScores(completion: {self.modifyHeader()})
+        GCHelper.shared.getAllScores(completion: {
+            self.modifyHeader()
+        })
         play()
    }
     
@@ -621,7 +623,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
 //    }
 //
-    private func getPlayingRecord(new: Bool, next: StartType, gameNumber: Int, showHelp: Bool = false) {
+    private func getPlayingRecord(next: StartType, gameNumber: Int, showHelp: Bool = false) {
         func setMandatoryWords() {
             if GV.playingRecord.mandatoryWords == "" {
                 let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", GV.playingRecord.gameNumber, GV.actLanguage).first!
@@ -638,7 +640,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         }
-        var actGames = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+        
+        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+        if actGames.count == 0 {
+            new = true
+        }
         if showHelp {
             if gameNumber >= gameNumberForGenerating {
                 let difficulty = GV.basicDataRecord.difficulty
@@ -653,106 +659,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             deleteGameDataRecord(gameNumber: gameNumber)
             createPlayingRecord(gameNumber: gameNumber)
         } else if new {
-            let games = realm.objects(GameDataModel.self).filter("gameStatus = %d and language = %@ and gameNumber >= %d and gameNumber <= %d", GV.GameStatusNew, GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
+            let games = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
             /// reset all records with nowPlaying status
 //            wtGameWordList = WTGameWordList(delegate: self)
             if games.count > 0 {
-                GV.playingRecord = games[0]
-                try! realm.safeWrite() {
-                    GV.playingRecord.nowPlaying = true
-                    GV.playingRecord.time = timeInitValue
-                }
-            } else {
-                var freeGameNumbers = [Int]()
-                for number in GV.minGameNumber...GV.maxGameNumber {
-                    freeGameNumbers.append(number)
-                }
-                let playedGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: false)
-                for playedGame in playedGames {
-                    guard let index = freeGameNumbers.firstIndex(where: {$0 == playedGame.gameNumber}) else {continue}
-                    freeGameNumbers.remove(at: index)
-                }
-                createPlayingRecord(gameNumber: freeGameNumbers.first!)
-            }
-        } else if next == .GameNumber {
-            if actGames.count > 0 {
-                for actGame in actGames {
-                    try! realm.safeWrite() {
-                        actGame.nowPlaying = false
+                 try! realm.safeWrite() {
+                    for game in games {
+                        realm.delete(game)
                     }
                 }
             }
-            let games = realm.objects(GameDataModel.self).filter("combinedKey = %d", GV.actLanguage + String(gameNumber))
-            if games.count > 0 {
-                GV.playingRecord = games.first!
-                try! realm.safeWrite() {
-                    GV.playingRecord.nowPlaying = true
-                    if GV.playingRecord.gameStatus == GV.GameStatusFinished {
-                        GV.playingRecord.gameStatus = GV.GameStatusContinued
-                    }
-                    if GV.playingRecord.gameStatus == GV.GameStatusContinued {
-                        goOnPlaying = true
-                    }
-                }
-            } else {
-                createPlayingRecord(gameNumber: gameNumber)
+            let date = Date() // now
+            let cal = Calendar.current
+            let day = cal.ordinality(of: .day, in: .year, for: date)
+            let random = MyRandom(gameNumber: 500, modifier: day! * 100 + GV.basicDataRecord.playToday)
+            try! realm.safeWrite() {
+                GV.basicDataRecord.playToday += 1
             }
+            let gameNumber = random.getRandomInt(GV.minGameNumber, max: GV.maxGameNumber)
+            createPlayingRecord(gameNumber: gameNumber)
+            
         } else {
-            var first = true
-            if actGames.count > 0 {
-                for actGame in actGames {
-                    if !first {
-                        try! realm.safeWrite() {
-                            actGame.nowPlaying = false
-                        }
-                    }
-                    first = false
-                }
-            } else {
-                actGames = realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and language = %@ and gameNumber >= %d and gameNumber <= %d", GV.GameStatusPlaying, GV.GameStatusContinued, GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
-                if actGames.count > 0 {
-                    try! realm.safeWrite() {
-                        actGames[0].nowPlaying = true
-                    }
-                }
-            }
-            let playedNowGame = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
-            var actGameNumber = playedNowGame.first!.gameNumber
-            if playedNowGame.count > 0 {
-                switch nextGame {
-                case .NoMore:
-                    break
-                case .PreviousGame:
-                    let previousRecords = realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber < %d and language = %@ and gameNumber >= %d and gameNumber <= %d",
-                       GV.GameStatusPlaying, GV.GameStatusContinued, actGameNumber, GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
-                    if previousRecords.count == 1 {
-                        actGameNumber = previousRecords[0].gameNumber
-                    } else if let record = Array(previousRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).last {
-                        actGameNumber = record.gameNumber
-                    } else {
-                        break
-                    }
-                case .NextGame:
-                    let nextRecords = realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber > %d and language = %@ and gameNumber >= %d and gameNumber <= %d",
-                       GV.GameStatusPlaying, GV.GameStatusContinued, actGameNumber, GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
-                    if nextRecords.count == 1 {
-                        actGameNumber = nextRecords[0].gameNumber
-                    } else if let record = Array(nextRecords).sorted(by: {$0.gameNumber < $1.gameNumber}).first {
-                        actGameNumber = record.gameNumber
-                    } else {
-                        break
-                    }
-
-                default:
-                    break
-                }
-                try! realm.safeWrite() {
-                    playedNowGame.first!.nowPlaying = false
-                    GV.playingRecord = realm.objects(GameDataModel.self).filter("gameNumber = %d and language = %@",
-                        actGameNumber, GV.actLanguage).first!
-                    GV.playingRecord.nowPlaying = true
-                }
-            }
+            GV.playingRecord = actGames.first!
         }
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
@@ -855,7 +783,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             bgSprite!.addChild(headerLabel)
         }
         
-        let myName = GV.basicDataRecord.myNickname
+//        let myName = GV.basicDataRecord.myNickname
         
         let bestName = "nobody"
         let bestScore = 0
@@ -877,37 +805,47 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         
         if bgSprite!.childNode(withName: myScoreName) == nil {
             let YPosition: CGFloat = self.frame.height * myScoreLinePosition
-            let text = GV.language.getText(.tcMyScoreHeader, values: String(GV.playingRecord.score).fixLength(length:scoreLength), myName)
-            myScoreheaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
-            myScoreheaderLabel.text = text
-            myScoreheaderLabel.name = String(myScoreName)
-            myScoreheaderLabel.fontSize = fontSize
-//            myScoreheaderLabel.position = CGPoint(x: self.frame.size.width * 0.5 /*startPosXForHeaderMultiplier*/, y: YPosition)
-            myScoreheaderLabel.position = CGPoint(x: headerLabel.frame.minX, y: YPosition)
-            myScoreheaderLabel.horizontalAlignmentMode = .left
-            myScoreheaderLabel.fontColor = SKColor.black
-            bgSprite!.addChild(myScoreheaderLabel)
+            let text = GV.language.getText(.tcMyScoreHeader, values: String(GV.playingRecord.score).fixLength(length:scoreLength), GKLocalPlayer.local.alias)
+            myScoreHeaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
+            myScoreHeaderLabel.text = text
+            myScoreHeaderLabel.name = String(myScoreName)
+            myScoreHeaderLabel.fontSize = fontSize
+//            myScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * 0.5 /*startPosXForHeaderMultiplier*/, y: YPosition)
+            myScoreHeaderLabel.position = CGPoint(x: headerLabel.frame.minX, y: YPosition)
+            myScoreHeaderLabel.horizontalAlignmentMode = .left
+            myScoreHeaderLabel.fontColor = SKColor.black
+            bgSprite!.addChild(myScoreHeaderLabel)
         }
         modifyHeader()
    }
-    private func modifyHeader() {
+
+    public func modifyHeader() {
 //        let gameNumber = (GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(""/*GV.playingRecord.gameNumber % 1000 + 1*/))
         let headerText = GV.language.getText(.tcHeader, values: String(actRound), timeForGame.time.HourMinSec)
         headerLabel.text = headerText
         let score = GV.totalScore
-        var bestScore = GV.basicDataRecord.bestScore
-        let bestName = GV.basicDataRecord.bestPlayer
-        let place = score >= bestScore ? GV.basicDataRecord.myPlace : calculateRankForScore(score: score)
+//        var myScore = 0
+//        var bestScore = 0
+//        var bestName = 0
+//        var myRank = 0
+        var (bestScore, bestName, myRank, _) = GV.basicDataRecord.getBestScore()
+        let rank = score >= bestScore ? myRank : calculateRankForScore(score: score)
         // if bestscore in GC is my and < as my actual score, set bestscore to actualscore
         if bestName == GKLocalPlayer.local.alias && bestScore < score {
             bestScore = score
         }
-        let rankLength = String(place).length
-        let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(place).fixLength(length: rankLength), String(score).fixLength(length:scoreLength), GCHelper.shared.getName())
+        let rankLength = String(rank).length
+        let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(rank).fixLength(length: rankLength), String(score).fixLength(length:scoreLength), GKLocalPlayer.local.alias)
         let bestScoreText = GV.language.getText(.tcBestScoreHeader, values: String(1).fixLength(length: rankLength),String(bestScore).fixLength(length:scoreLength), bestName)
-        myScoreheaderLabel.text = scoreText
+        myScoreHeaderLabel.text = scoreText
         bestScoreHeaderLabel.text = bestScoreText
-    }
+        let scoreWidth = scoreText.width(font: myFont!)
+        let bestScoreWidth = bestScoreText.width(font: myFont!)
+        let labelWidth = scoreWidth > bestScoreWidth ? scoreWidth : bestScoreWidth
+        let myScoreNewPosition = CGPoint(x: self.frame.midX - labelWidth / 2, y: myScoreHeaderLabel.position.y)
+        let bestScoreNewPosition = CGPoint(x: self.frame.midX - labelWidth / 2, y: bestScoreHeaderLabel.position.y)
+        myScoreHeaderLabel.position = myScoreNewPosition
+        bestScoreHeaderLabel.position = bestScoreNewPosition    }
     
     private func calculateRankForScore(score: Int)->Int {
         var lastRank = 0
@@ -1640,7 +1578,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var firstButtonColumn: CGFloat = 0.1
     var lastButtonColumn: CGFloat = 0.92
-    var firstButtonLine: CGFloat = 0.86
+    var firstButtonLine: CGFloat = 0.84
     var lastButtonLine: CGFloat = 0.08
     
     private func createUndo() {
@@ -3027,17 +2965,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.basicDataRecord.GameCenterEnabled != GCEnabledType.GameCenterEnabled.rawValue {
             return
         }
-        
+
         if GV.basicDataRecord.getScore() < GV.totalScore {
             GV.basicDataRecord.setScore(score: GV.totalScore)
             GCHelper.shared.sendScoreToGameCenter(score: GV.totalScore, difficulty: GV.basicDataRecord.difficulty, completion: {self.modifyHeader()})
-        } else {
-            
-        }
+        } 
     }
     
     enum CongratulationType: Int {
-        case SolvedOnlyFixLetters = 0, GameFinished
+        case GameFinished
     }
     
     private func checkIfGameFinished(showAlert: Bool = true) {
@@ -3088,13 +3024,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var title = ""
         var message = ""
         var finishTitle = ""
-        var showMessage = true
+        let showMessage = true
  
         switch congratulationType {
-        case .SolvedOnlyFixLetters:
-                title = GV.language.getText(.tcCongratulationsFix1)
-                message = GV.language.getText(.tcCongratulationsFix2)
-                showMessage = GV.basicDataRecord.difficulty == GameDifficulty.Medium.rawValue ? true : false
+//        case .SolvedOnlyFixLetters:
+//                title = GV.language.getText(.tcCongratulationsFix1)
+//                message = GV.language.getText(.tcCongratulationsFix2)
+//                showMessage = GV.basicDataRecord.difficulty == GameDifficulty.Medium.rawValue ? true : false
         case .GameFinished:
             if easy {
                 title = GV.language.getText(.tcCongratulationsEasy1)
@@ -3117,11 +3053,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     myAlert.addAction(text: finishTitle, action: #selector(self.finishMediumAction))
                 }
             } else {
-                if congratulationType == .SolvedOnlyFixLetters {
-                    myAlert.addAction(text: OKTitle, action: #selector(self.fixLettersOKAction))
-                } else {
+//                if congratulationType == .SolvedOnlyFixLetters {
+//                    myAlert.addAction(text: OKTitle, action: #selector(self.fixLettersOKAction))
+//                } else {
                     myAlert.addAction(text: OKTitle, action: #selector(self.mandatoryOKAction))
-                }
+//                }
             }
             myAlert.presentAlert()
             myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
@@ -3579,8 +3515,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func generateArrayOfWordPieces(first: Bool)->String {
-        let gameNumberForRandom = (GV.generateHelpInfo || showHelp) ? gameNumberForGenerating : GV.playingRecord.gameNumber % 1000
-        let originalGameNumber = GV.generateHelpInfo || showHelp ? gameNumberForGenerating : GV.playingRecord.gameNumber
+        let date = Date()
+        let calendar = Calendar.current
+        let theDayOfMonth = calendar.component(.day, from: date)
+        let gameNumberForSelect = (GV.generateHelpInfo || showHelp) ? gameNumberForGenerating : GV.playingRecord.gameNumber % 1000
+        let gameNumberForRandom = (GV.generateHelpInfo || showHelp) ? gameNumberForGenerating : GV.playingRecord.gameNumber * theDayOfMonth
         let random = MyRandom(gameNumber: gameNumberForRandom, modifier: GV.playingRecord.words.count)
         var tileType = MyShapes.NotUsed
         var letters = [String]()
@@ -3669,7 +3608,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } while inputWord.length > 0
         }
         if first {
-            let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(gameNumberForRandom))[0]
+            let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(gameNumberForSelect))[0]
             let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
             for word in words {
 //                print(word)
