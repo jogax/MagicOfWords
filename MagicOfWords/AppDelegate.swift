@@ -97,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 37, // no more mandatory words!
+            schemaVersion: 41, // used since 2019-08-05
 //            schemaVersion: 30, // optimize BasicDataModel
 //            schemaVersion: 27, // start with Game Center
 //            schemaVersion: 26, // buttontype not needed any more

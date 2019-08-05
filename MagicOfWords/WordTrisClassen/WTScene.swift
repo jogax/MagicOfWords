@@ -672,9 +672,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let date = Date() // now
             let cal = Calendar.current
             let day = cal.ordinality(of: .day, in: .year, for: date)
-            let random = MyRandom(gameNumber: 500, modifier: day! * 100 + GV.basicDataRecord.playToday)
+            let random = MyRandom(gameNumber: 500, modifier: day! * 100 + GV.basicDataRecord.countPlaysToday)
             try! realm.safeWrite() {
-                GV.basicDataRecord.playToday += 1
+                GV.basicDataRecord.countPlaysToday += 1
             }
             let gameNumber = random.getRandomInt(GV.minGameNumber, max: GV.maxGameNumber)
             createPlayingRecord(gameNumber: gameNumber)

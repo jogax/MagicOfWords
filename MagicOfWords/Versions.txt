@@ -56,3 +56,32 @@ Orosz:
 - быстрый запуск демо-игры
 - исправление ошибок
 - теперь показывает текущую версию
+
+Build 19, Version 1.19 (0.97)
+English
+- no more Realm Cloud
+- using Game Center
+- no more gamenumber
+- one score for each difficulty
+- games can be finished alwais
+
+Deutsch
+- Keine Realm Cloud mehr
+- mit Game Center
+- keine Spielernummer mehr
+- eine Punktzahl für jede Schwierigkeit
+- Spiele können jederzeit beendet werden
+
+Magyar
+- nincs többé Realm Cloud
+- a Game Center bevezetése
+- nincs többé játék sorszám
+- egy pontszám minden nehézségi fokon
+- a játékok bármikor befejezhetők
+
+Orosz
+- больше нет Realm Cloud
+- с использованием Game Center
+- больше нет номера игры
+- один балл за каждую сложность
+- игры могут быть закончены всегда

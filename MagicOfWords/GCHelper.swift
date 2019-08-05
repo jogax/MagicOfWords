@@ -145,9 +145,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             self.authenticateStatus = .authenticated
             self.authenticated = true
             //                self.getAllPlayers()
-            self.startGameCenterSync()
+//            self.startGameCenterSync()
             GKLocalPlayer.local.unregisterAllListeners()
             GKLocalPlayer.local.register(self)
+            _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
+
             self.delegate?.localPlayerAuthenticated()
         }
         if GKLocalPlayer.local.isAuthenticated == false {
@@ -170,6 +172,96 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         } else {
             authAdmin()
         }
+    }
+    
+    struct GCInfo {
+        let identifier: String
+        let value: Int
+        init(identifier: String, value: Int) {
+            self.identifier = identifier
+            self.value = value
+        }
+    }
+    
+    private func sendInfoToGC(infos: [GCInfo]) {
+        var scoreArray = [GKScore]()
+        for info in infos {
+            let score = GKScore(leaderboardIdentifier: info.identifier, player: GKLocalPlayer.local)
+            score.value = Int64(info.value)
+            scoreArray.append(score)
+        }
+        GKScore.report(scoreArray) { (error) in
+            if error != nil {
+                print("Error by send score to GameCenter: \(error!.localizedDescription)")
+            } else {
+                self.getGlobalInfos()
+            }
+        }
+    }
+    
+    private func getGlobalInfos () {
+        let leaderBoardforUsedTime = GKLeaderboard()
+        leaderBoardforUsedTime.identifier = usedTimeName
+        leaderBoardforUsedTime.playerScope = .global
+        leaderBoardforUsedTime.timeScope = .allTime
+        leaderBoardforUsedTime.range = NSRange(location: 1, length: 1)
+        leaderBoardforUsedTime.loadScores(completionHandler: {
+            (scores, error) in
+            if scores != nil {
+                if leaderBoardforUsedTime.localPlayerScore != nil {
+                    let usedTimeInGC = leaderBoardforUsedTime.localPlayerScore!.value
+                    if usedTimeInGC > GV.basicDataRecord.playingTime {
+                        try! realm.safeWrite() {
+                            GV.basicDataRecord.playingTime = Int(usedTimeInGC)
+                        }
+                    }
+                }
+            }
+        })
+        let leaderBoardforplayingTimeToday = GKLeaderboard()
+        leaderBoardforplayingTimeToday.identifier = playingTimeTodayName
+        leaderBoardforplayingTimeToday.playerScope = .global
+        leaderBoardforplayingTimeToday.timeScope = .allTime
+        leaderBoardforplayingTimeToday.range = NSRange(location: 1, length: 1)
+        leaderBoardforplayingTimeToday.loadScores(completionHandler: {
+            (scores, error) in
+            if scores != nil {
+                if leaderBoardforplayingTimeToday.localPlayerScore != nil {
+                    let playingTimeTodayInGC = leaderBoardforplayingTimeToday.localPlayerScore!.value
+                    if playingTimeTodayInGC > GV.basicDataRecord.playingTimeToday {
+                        try! realm.safeWrite() {
+                            GV.basicDataRecord.playingTimeToday = Int(playingTimeTodayInGC)
+                        }
+                    }
+                }
+            }
+        })
+
+    }
+    
+    @objc private func sendGlobalInfosTOGC(timerX: Timer) {
+        var infoArray = [GCInfo]()
+        print("sendGlobalInfosTOGC actTime: \(Date())")
+        if GKLocalPlayer.local.isAuthenticated {
+            infoArray.append(GCInfo(identifier: usedTimeName, value: GV.basicDataRecord.playingTime))
+            infoArray.append(GCInfo(identifier: playingTimeTodayName, value: GV.basicDataRecord.playingTimeToday))
+            if !GV.basicDataRecord.deviceInfoSaved {
+                infoArray.append(GCInfo(identifier: myLandName, value: GV.basicDataRecord.land))
+                infoArray.append(GCInfo(identifier: myDeviceName, value: GV.basicDataRecord.deviceType))
+                try! realm.safeWrite() {
+                    GV.basicDataRecord.deviceInfoSaved = true
+                }
+            }
+            if GV.basicDataRecord.version != Int(Double(actVersion)! * 100.0) {
+                try! realm.safeWrite() {
+                    GV.basicDataRecord.version = Int(Double(actVersion)! * 100.0)
+                    infoArray.append(GCInfo(identifier: myVersionName, value: GV.basicDataRecord.version))
+                }
+            }
+            sendInfoToGC(infos: infoArray)
+        }
+        // send infos to GC each 10 minutes
+        _ = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
     }
     
     /**
@@ -471,41 +563,18 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             }
         })
     }
-    var timer: Timer?
-    
-//    @objc private func setLastTouched(timerX: Timer) {
-//        tenMinutesTimer!.invalidate()
-//        tenMinutesTimer = nil
-//        try! realm.safeWrite() {
-//            GV.basicDataRecord.onlineTime += 1
-//            if GV.playing {
-//                GV.basicDataRecord.playingTime += 1
-//            }
-//        }
-//        if playerActivity?.count == 0 {
+//    var timer: Timer?
+//    @objc private func waitForLocalPlayer() {
+//        if GKLocalPlayer.local.isAuthenticated == false {
+//            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(waitForLocalPlayer), userInfo: nil, repeats: false)
 //        } else {
-//            if GV.basicDataRecord.onlineTime % 60 == 0 {
-//                try! RealmService.safeWrite() {
-//                    playerActivity![0].lastTouched = getLocalDate()
-//                    playerActivity![0].onlineTime = GV.basicDataRecord.onlineTime
-//                    playerActivity![0].playingTime = GV.basicDataRecord.playingTime
-//                }
-//            }
+////            syncWithGameCenter()
 //        }
-//        tenMinutesTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(setLastTouched(timerX: )), userInfo: nil, repeats: false)
 //    }
-//
-    @objc private func waitForLocalPlayer() {
-        if GKLocalPlayer.local.isAuthenticated == false {
-            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(waitForLocalPlayer), userInfo: nil, repeats: false)
-        } else {
-//            syncWithGameCenter()
-        }
-    }
     
-    func startGameCenterSync() {
-        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(waitForLocalPlayer), userInfo: nil, repeats: false)
-    }
+//    func startGameCenterSync() {
+//        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(waitForLocalPlayer), userInfo: nil, repeats: false)
+//    }
     
     
     public func getName() -> String {
@@ -515,7 +584,12 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     let mediumName = "Medium"
     let hardName = "Hard"
     let veryHardName = "VeryHard"
-    
+    let usedTimeName = "usedTime"
+    let playingTimeTodayName = "lastDayTime"
+    let myDeviceName = "myDevice"
+    let myLandName = "myLand"
+    let myVersionName = "myVersion"
+
     public func sendScoreToGameCenter(score: Int?, difficulty: Int, completion: @escaping ()->()) {
             // Submit score to GC leaderboard
         if score == nil {
@@ -537,16 +611,4 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
     }
     
-    public func sendUsedTimeToGameCenter(usedTime: Int) {
-        let myUsedTime = GKScore(leaderboardIdentifier: "usedTime", player: GKLocalPlayer.local)
-        myUsedTime.value = Int64(usedTime)
-        let myUsedTimeArray = [myUsedTime]
-        GKScore.report(myUsedTimeArray) { (error) in
-            if error != nil {
-                print("Error by send usedTime to GameCenter: \(error!.localizedDescription)")
-            } else {
-                //                print("Best Score: \(score) of \(String(describing: GKLocalPlayer.local.alias))! sent to Leaderboard: \("P\(countPackages)L\(levelID + 1)")")
-            }
-        }
-    }    
 }

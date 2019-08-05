@@ -314,6 +314,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         myHeight = self.view.frame.size.height
         myWidth = self.view.frame.size.width
         generateBasicDataRecordIfNeeded()
+        _ = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
+
         convertIfNeeded()
         if !GV.basicDataRecord.startAnimationShown {
             startWelcomeScene()
@@ -321,6 +323,15 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             let timeInterval = GV.basicDataRecord.startAnimationShown ? 0.01 : 1.0
             _ = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
         }
+    }
+    
+    @objc private func oneMinutesTimer(timerX: Timer) {
+        print("oneMinutesTimer actTime: \(Date())")
+        try! realm.safeWrite() {
+            GV.basicDataRecord.playingTime += 1
+            GV.basicDataRecord.playingTimeToday += 1
+        }
+        _ = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
     }
     
     @objc private func waitForInternet(timerX: Timer) {
@@ -412,6 +423,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     var wtScene: WTScene?
+    var oldConnectedToInternet = false
     
     
     @objc func reachabilityChanged(note: Notification) {
@@ -426,16 +438,19 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         case .none:
             GV.connectedToInternet = false
         }
-        if GV.connectedToInternet {
-            if animationScene != nil {
-                _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
-            } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
-            } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue {
-                manageGameCenter()
+        if oldConnectedToInternet != GV.connectedToInternet {
+            if GV.connectedToInternet {
+                if animationScene != nil {
+                    _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
+                } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+                    GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+                } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue {
+                    manageGameCenter()
+                }
+            } else {
+                
             }
-        } else {
-            
+            oldConnectedToInternet = GV.connectedToInternet
         }
     }
     
@@ -968,6 +983,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //
 //    }
     
+    
     private func generateBasicDataRecordIfNeeded() {
         func createScoreInfo() {
             try! realm.safeWrite() {
@@ -983,33 +999,46 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 }
             }
         }
+        
+        func convertTodayToInt()->Int {
+            let date = Date()
+            let calendar = Calendar.current
+            let actComponents = calendar.dateComponents([.year, .month, .day], from: date)
+            let convertedToday = 10000 * actComponents.year! + 100 * actComponents.month! + actComponents.day!
+            return convertedToday
+        }
+        let convertedToday = convertTodayToInt()
+
         if realm.objects(BasicDataModel.self).count == 0 {
-            let myName = GV.language.getText(.tcPlayer)
+//            let myName = GV.language.getText(.tcPlayer)
             GV.basicDataRecord = BasicDataModel()
             GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
-            GV.basicDataRecord.myName = myName
             GV.basicDataRecord.creationTime = Date()
-            createScoreInfo()
+            GV.basicDataRecord.deviceType = UIDevice().getModelCode()
+            GV.basicDataRecord.land = GV.convertLocaleToInt()
+            GV.basicDataRecord.playingTimeToday = convertedToday * 10000
+
             try! realm.safeWrite() {
                 realm.add(GV.basicDataRecord)
             }
+            createScoreInfo()
         } else {
-           GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
+            GV.basicDataRecord = realm.objects(BasicDataModel.self).first!
             GV.language.setLanguage(GV.basicDataRecord.actLanguage)
             if GV.basicDataRecord.scoreInfos.count == 0 {
                 createScoreInfo()
             }
-            try! realm.safeWrite() {
-                let date = Date()
-                let calendar = Calendar.current
-                let components = calendar.dateComponents([.year, .month, .day], from: date)
-                let savedComponents = calendar.dateComponents([.year, .month, .day], from: GV.basicDataRecord.lastDayPlayed)
-                if !(savedComponents.year == components.year &&
-                    savedComponents.month == components.month &&
-                    savedComponents.day == components.day)
-                {
-                    GV.basicDataRecord.lastDayPlayed = Date()
-                    GV.basicDataRecord.playToday = 1
+            if GV.basicDataRecord.deviceType == 0 {
+                try! realm.safeWrite() {
+                    GV.basicDataRecord.deviceType = UIDevice().getModelCode()
+                    GV.basicDataRecord.land = GV.convertLocaleToInt()
+                }
+            }
+            let savedLastDay = GV.basicDataRecord.playingTimeToday / 10000
+            if convertedToday != savedLastDay {
+                try! realm.safeWrite() {
+                    GV.basicDataRecord.playingTimeToday = convertedToday * 10000
+                    GV.basicDataRecord.countPlaysToday = 0
                 }
             }
        }
@@ -1053,7 +1082,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        return randomizedID
 //    }
     
-    func generateMyNickname()->String {
+//    func generateMyNickname()->String {
 //        var nickName = GV.onSimulator ? "Sim" : (GV.onIpad ? "Pd" : "Ph")
 //        let letters = GV.language.getText(.tcNickNameLetters)
 //        for _ in 0...4 {
@@ -1062,8 +1091,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        for _ in 0...4 {
 //            nickName += String(Int.random(min: 0, max: 9))
 //        }
-        return ""
-    }
+//        return ""
+//    }
     
 //    var playerActivityByNickName: Results<PlayerActivity>?
 //    var playerActivityByNickNameSubscription: SyncSubscription<PlayerActivity>?

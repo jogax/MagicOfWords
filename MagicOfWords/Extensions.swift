@@ -22,6 +22,60 @@ public extension UIDevice {
         return (UIDevice.current.identifierForVendor?.uuidString)!
     }
     
+    func getModelCode(ident: String = "")->Int {
+//        let bounds = UIScreen.main.bounds
+//        let width = bounds.width
+//        let height = bounds.height
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        
+        let identifier = ident != "" ? ident : machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8 , value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+        var returnCode = 0
+        var index = 0
+        let iPodName = "iPod"
+        let iPhoneName = "iPhone"
+        let iPadName = "iPad"
+        let AppleTVName = "AppleTV"
+        let other1Name = "i386"
+        let other2Name = "x86_64"
+        let indexOfComma = identifier.index(from: 0, of: ",")
+        if identifier.beginsWith(iPodName) {
+            returnCode = 10000
+            index = iPodName.length
+        } else if identifier.beginsWith(iPhoneName) {
+            returnCode = 20000
+            index = iPhoneName.length
+        } else if identifier.beginsWith(iPadName) {
+            returnCode = 30000
+            index = iPadName.length
+        } else if identifier.beginsWith(AppleTVName) {
+            returnCode = 40000
+            index = AppleTVName.length
+        } else if identifier.beginsWith(other1Name) {
+            returnCode = 50000
+            return returnCode
+        } else if identifier.beginsWith(other2Name) {
+            returnCode = 60000
+            return returnCode
+        } else {
+            index = 0
+            returnCode = 1
+        }
+        if let firstNumber = Int(identifier.subString(at: index, length: indexOfComma! - index)) {
+            if let secondNumber = Int(identifier.subString(at: indexOfComma! + 1, length: identifier.length + 1)) {
+                return returnCode + firstNumber * 100 + secondNumber
+            }
+        }
+        return 0
+        
+        
+
+    }
+    
     var modelName: String {
         let bounds = UIScreen.main.bounds
         let width = bounds.width

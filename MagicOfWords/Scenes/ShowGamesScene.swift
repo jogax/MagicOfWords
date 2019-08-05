@@ -106,7 +106,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         showGamesInTableView?.frame=CGRect(origin: origin, size: size)
         let center = CGPoint(x: 0.5 * view!.frame.width, y: 0.5 * self.view!.frame.height)
         self.showGamesInTableView!.center=center
-        self.showGamesInTableView?.reloadData()
+        self.showGamesInTableView!.reloadData()
 
         self.scene?.view?.addSubview(showGamesInTableView!)
     }
@@ -176,12 +176,17 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: lineHeight/*self.frame.height * (GV.onIpad ? 0.040 : 0.010)*/))
         cell.setBGColor(color: UIColor.white) //showWordsBackgroundColor)
         var cellColor = UIColor.white
-        if gamesForShow[indexPath.row].player == GKLocalPlayer.local.alias {
-            cellColor = UIColor.green
+        var playerName = gamesForShow[indexPath.row].player
+        if playerName == GKLocalPlayer.local.alias {
+            cellColor = UIColor.white
+            playerName += GV.language.getText(.tcMe)
         }
-        cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: lengthOfPlace - 2), color: cellColor) // GameNumber
-        cell.addColumn(text: ("   " + String(gamesForShow[indexPath.row].player)).fixLength(length: 20, leadingBlanks: false), color: cellColor)
-        cell.addColumn(text: ("  " + String(gamesForShow[indexPath.row].score)).fixLength(length: 9), color: cellColor) // My Score
+        let text1 = String(gamesForShow[indexPath.row].place).fixLength(length: lengthOfPlace - 2)
+        cell.addColumn(text: text1, color: cellColor) // GameNumber
+        let text2 = ("   " + playerName).fixLength(length: 20, leadingBlanks: false)
+        cell.addColumn(text: text2, color: cellColor)
+        let text3 = ("  " + String(gamesForShow[indexPath.row].score)).fixLength(length: 9)
+        cell.addColumn(text: text3, color: cellColor) // My Score
 //        cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: 4) )
         return cell
     }

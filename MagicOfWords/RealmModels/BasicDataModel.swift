@@ -17,22 +17,20 @@ enum GCEnabledType: Int {
 class BasicDataModel: Object {
     @objc dynamic var ID = 0
     @objc dynamic var actLanguage = ""
-    @objc dynamic var myName = ""
-//    @objc dynamic var myNickname = ""
-    @objc dynamic var keyWord = ""
     @objc dynamic var difficulty = 0
     @objc dynamic var creationTime = Date()
     @objc dynamic var searchPhrase = ""
     @objc dynamic var showingRow = 0
     @objc dynamic var showingRows = ""
-//    @objc dynamic var buttonType = GV.ButtonTypeElite
-    @objc dynamic var onlineTime = 0
     @objc dynamic var playingTime = 0
     @objc dynamic var playingTimeToday = 0
-    @objc dynamic var lastDayPlayed = Date()
-    @objc dynamic var playToday = 0
-    @objc dynamic var playing = false
-    @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue // GCEnabledType: 0 = AskForGameCenter, 1 = GameCenterEnabled, 2 = GameCenterSupressed
+    @objc dynamic var countPlaysToday = 0
+    @objc dynamic var deviceType = 0
+    @objc dynamic var land = 0
+    @objc dynamic var deviceInfoSaved = false
+    @objc dynamic var version = 0
+//    GCEnabledType: 0 = AskForGameCenter, 1 = GameCenterEnabled, 2 = GameCenterSupressed
+    @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
     @objc dynamic var startAnimationShown = false
     let scoreInfos = List<ScoreInfoForLanguage>()
 
