@@ -103,29 +103,11 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     
     
     #if DEBUG
-    func displayCloudRecordsViewController() {
-//        if GV.myUser != nil
-//        {
-//            let cloudRecordsViewController = CloudRecordsViewController()
-//            self.present(cloudRecordsViewController, animated: true, completion: nil)
-//        }
-    }
-    
-    func displayCreateMandatoryViewController() {
-//        if GV.myUser != nil {
-//            let createMandatoryViewController = CreateMandatoryWordsViewController()
-//            self.present(createMandatoryViewController, animated: true, completion: nil)
-//        }
+    func displayGameCenterViewController() {
+        let gameCenterViewController = ShowGameCenterViewController()
+        self.present(gameCenterViewController, animated: true, completion: nil)
     }
     #endif
-    
-    func displayCollectMandatoryViewController() {
-//        if GV.myUser != nil && GV.expertUser {
-//            let collectMandatoryViewController = CollectMandatoryWordsViewController()
-//            self.present(collectMandatoryViewController, animated: true, completion: nil)
-//        }
-    }
-    
     var showGamesScene: ShowGamesScene?
     func backFromSettingsScene() {
         try! realm.safeWrite() {
@@ -224,16 +206,18 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         }
     }
     
-    func continueGame() {
-        let gameNumber = GV.basicDataRecord.difficulty * 1000
-        startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
-    }
+//    func continueGame() {
+//        let gameNumber = GV.basicDataRecord.difficulty * 1000
+//        startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
+//    }
     
     func chooseLanguage() {
         func setLanguage(language: String) {
             GV.language.setLanguage(language)
             try! realm.safeWrite() {
                 GV.basicDataRecord.actLanguage = language
+                GV.basicDataRecord.land = GV.convertLocaleToInt()
+                GV.basicDataRecord.deviceInfoSaved = false
             }
             GCHelper.shared.getBestScore(completion: {
                 self.callModifyHeader()
@@ -299,11 +283,11 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //    var countExistingGames = 0
 //    var countContinueGames = 0
 //
-    private func getRecordCounts() {
+//    private func getRecordCounts() {
 //        countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@ and gameNumber < 1000", GV.actLanguage).count
 //        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).count
 //        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and (gameStatus = %@ or gameStatus = %@)", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber, GV.GameStatusPlaying, GV.GameStatusContinued).count
-    }
+//    }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
         #if DEBUG
@@ -469,42 +453,31 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     var collectMandatoryAction: UIAlertAction?
 
     #if DEBUG
-    var showRealmCloudAction: UIAlertAction?
+    var showGlobalDataAction: UIAlertAction?
     var createMandatoryAction: UIAlertAction?
     #endif
     
     func showMenu() {
-        getRecordCounts()
+//        getRecordCounts()
         let gameDifficulty = GameDifficulty(rawValue: GV.basicDataRecord.difficulty)
-//        let disabledColor = UIColor(red:204/255, green: 229/255, blue: 255/255,alpha: 1.0)
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
                                             message: GV.language.getText(.tcActDifficulty, values: gameDifficulty!.description()),
                                             preferredStyle: .alert)
         
-//        let newOK = countMandatory - countExistingGames > 0
-//        let continueOK = countContinueGames > 0
-        //--------------------- newGameAction ---------------------
-        let startGameAction = UIAlertAction(title: "\(GV.language.getText(.tcPlay)) ", style: .default, handler: { [unowned self]
+        //--------------------- EasyGameAction ---------------------
+        let startEasyGameAction = UIAlertAction(title: "\(GV.language.getText(.tcEasyPlay)) ", style: .default, handler: { [unowned self]
             alert -> Void in
+                self.setDifficulty(difficulty: .Easy)
                 self.startGame()
         })
-//        if !newOK {
-//            newGameAction.setValue(disabledColor, forKey: "TitleTextColor")
-//        }
-        alertController!.addAction(startGameAction)
-        //--------------------- continueAction ---------------------
-//        let continueAction = UIAlertAction(title: "\(GV.language.getText(.tcContinue))", style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            if continueOK {
-//                //                self.showGames(all: false)
-//                self.startWTScene(new: false, next: .NoMore, gameNumber: 0)
-//            }
-//        })
-//        if !continueOK {
-//            continueAction.isEnabled = false
-//            //            continueAction.setValue(disabledColor, forKey: "TitleTextColor")
-//        }
-//        alertController!.addAction(continueAction)
+        alertController!.addAction(startEasyGameAction)
+        //--------------------- MediumGameAction ---------------------
+        let startMediumGameAction = UIAlertAction(title: "\(GV.language.getText(.tcMediumPlay)) ", style: .default, handler: { [unowned self]
+            alert -> Void in
+                self.setDifficulty(difficulty: .Medium)
+                self.startGame()
+        })
+        alertController!.addAction(startMediumGameAction)
         //--------------------- bestScoreAction ---------------------
         let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
             alert -> Void in
@@ -513,12 +486,18 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         if GKLocalPlayer.local.isAuthenticated && GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
             alertController!.addAction(bestScoreAction)
         }
-        //--------------------- SettingsAction ---------------------------
-        let settingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
+        //--------------------- chooseLanguageAction ---------------------
+        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
             alert -> Void in
-            self.showSettingsMenu()
+            self.chooseLanguage()
         })
-        alertController!.addAction(settingsAction)
+        alertController!.addAction(chooseLanguageAction)
+        //--------------------- SettingsAction ---------------------------
+//        let settingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.showSettingsMenu()
+//        })
+//        alertController!.addAction(settingsAction)
 
         
         //        //--------------------- chooseLanguageAction ---------------------
@@ -540,6 +519,14 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
 //        alertController!.addAction(nickNameAction!)
 //        expertUserChanged()
+        //--------------------- showHelpAction ---------------------
+        let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
+            alert -> Void in
+            //            self.showHowToPlay()
+            self.startWelcomeScene()
+        })
+        alertController!.addAction(showHelpAction)
+
         #if DEBUG
         let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
             alert -> Void in
@@ -616,19 +603,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                                             message: "",
                                             preferredStyle: .alert)
         
-//        showRealmCloudAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.displayCloudRecordsViewController()
-//        })
-//        showRealmCloudAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-//        alertController.addAction(showRealmCloudAction!)
-//
-//        let useGameDataAction = UIAlertAction(title: GV.language.getText(.tcUseCloudGameData), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.getCloudData()
-//        })
-//        alertController.addAction(useGameDataAction)
-//
+        if GV.connectedToInternet && GKLocalPlayer.local.isAuthenticated {
+            showGlobalDataAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.displayGameCenterViewController()
+            })
+            alertController.addAction(showGlobalDataAction!)
+        }
         let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
             alert -> Void in
             self.areYouSure()
@@ -757,34 +738,28 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             self.chooseLanguage()
         })
         myAlertController.addAction(chooseLanguageAction)
-        //--------------------- chooseDifficultyAction ---------------------
-        let chooseDifficultyAction = UIAlertAction(title: GV.language.getText(.tcChooseDifficulty), style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.chooseDifficulty()
-        })
-        myAlertController.addAction(chooseDifficultyAction)
         //--------------------- GameCenter on / off ---------------------
-        var GCTitle = ""
-        var chooseGCAction: UIAlertAction
-        if GCHelper.shared.authenticateStatus == GCHelper.AuthenticatingStatus.authenticated {
-            GCTitle = GV.language.getText(.tcDisconnectGC)
-            chooseGCAction = UIAlertAction(title: GCTitle, style: .default, handler: { /*[unowned self]*/
-                alert -> Void in
-                GCHelper.shared.authenticateStatus = .notAuthenticated
-                try! realm.safeWrite() {
-                    GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterSupressed.rawValue
-                }
-                self.showMenu()
-            })
-        } else {
-            GCTitle = GV.language.getText(.tcConnectGC)
-            chooseGCAction = UIAlertAction(title: GCTitle, style: .default, handler: { [unowned self]
-                alert -> Void in
-                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
-            })
-        }
-        myAlertController.addAction(chooseGCAction)
-       //--------------------- chooseLanguageAction ---------------------
+//        var GCTitle = ""
+//        var chooseGCAction: UIAlertAction
+//        if GCHelper.shared.authenticateStatus == GCHelper.AuthenticatingStatus.authenticated {
+//            GCTitle = GV.language.getText(.tcDisconnectGC)
+//            chooseGCAction = UIAlertAction(title: GCTitle, style: .default, handler: { /*[unowned self]*/
+//                alert -> Void in
+//                GCHelper.shared.authenticateStatus = .notAuthenticated
+//                try! realm.safeWrite() {
+//                    GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterSupressed.rawValue
+//                }
+//                self.showMenu()
+//            })
+//        } else {
+//            GCTitle = GV.language.getText(.tcConnectGC)
+//            chooseGCAction = UIAlertAction(title: GCTitle, style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+//            })
+//        }
+//        myAlertController.addAction(chooseGCAction)
+       //--------------------- showHelpAction ---------------------
         let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
             alert -> Void in
 //            self.showHowToPlay()
@@ -912,7 +887,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        getRecordCounts()
         GCHelper.shared.getBestScore(completion: {})
         GCHelper.shared.getAllScores(completion: {})
-        self.showMenu()
+//        self.showMenu()
     }
     
     private func chooseDifficulty() {
@@ -951,39 +926,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 
     }
     
-//    private func chooseStyle() {
-//        func setStyle(style: String) {
-//            try! realm.safeWrite() {
-//                GV.basicDataRecord.buttonType = style
-//            }
-//            GV.buttonType = style
-//        }
-//        let alertController = UIAlertController(title: GV.language.getText(.tcChooseStyle),
-//                                                message: "",
-//                                                preferredStyle: .alert)
-//        let simpleStyleAction = UIAlertAction(title: GV.language.getText(.tcSimpleStyle), style: .default, handler: {
-//            alert -> Void in
-//            setStyle(style: GV.ButtonTypeSimple)
-////            GV.actFont = GV.FontTypeSimple
-////            GV.actLabel = GV.LabelFontSimple
-//            self.showMenu()
-//        })
-//        alertController.addAction(simpleStyleAction)
-//        
-//        let eliteStyleAction = UIAlertAction(title: GV.language.getText(.tcEliteStyle), style: .default, handler: {
-//            alert -> Void in
-//            setStyle(style: GV.ButtonTypeElite)
-////            GV.actFont = GV.FontTypeElite
-////            GV.actLabel = GV.LabelFontElite
-//            self.showMenu()
-//        })
-//        alertController.addAction(eliteStyleAction)
-//        
-//        present(alertController, animated: true, completion: nil)
-//
-//    }
-    
-    
     private func generateBasicDataRecordIfNeeded() {
         func createScoreInfo() {
             try! realm.safeWrite() {
@@ -1000,14 +942,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             }
         }
         
-        func convertTodayToInt()->Int {
-            let date = Date()
-            let calendar = Calendar.current
-            let actComponents = calendar.dateComponents([.year, .month, .day], from: date)
-            let convertedToday = 10000 * actComponents.year! + 100 * actComponents.month! + actComponents.day!
-            return convertedToday
-        }
-        let convertedToday = convertTodayToInt()
+        let convertedToday = GV.convertNowToInt()
 
         if realm.objects(BasicDataModel.self).count == 0 {
 //            let myName = GV.language.getText(.tcPlayer)
@@ -1046,125 +981,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
         GV.maxGameNumber = GV.minGameNumber + 999
     }
-    
-    
-//    private func generateRandomNameFromDeviceID()->String {
-//        let deviceName = UIDevice().deviceID
-//        let random = MyRandom(forName: true)
-//        var modifiedID = ""
-//        for char in deviceName {
-//            if String(char) != "-" {
-//                modifiedID += String(char)
-//            }
-//        }
-//        var index = 0
-//        var randomizedID = ""
-//        var counter = 0
-//        repeat {
-//            let input = modifiedID.subString(at: index, length: 2)
-//            let scanner = Scanner(string: input)
-//            var value: UInt64 = 0
-//
-//            if scanner.scanHexInt64(&value) {
-//                let adder = random.getRandomInt(1, max: 255)
-//                let newValue = (Int(value) + adder) % 256
-//                randomizedID += String(format:"%02X", newValue)
-//                counter += 1
-//                if counter % 2 == 0 {
-//                    randomizedID += "-"
-//                }
-//           }
-//           index += 2
-//        } while index < modifiedID.length
-//
-//
-//        randomizedID.removeLast()
-//        return randomizedID
-//    }
-    
-//    func generateMyNickname()->String {
-//        var nickName = GV.onSimulator ? "Sim" : (GV.onIpad ? "Pd" : "Ph")
-//        let letters = GV.language.getText(.tcNickNameLetters)
-//        for _ in 0...4 {
-//            nickName += letters.subString(at: Int.random(min: 0, max: letters.count - 1), length: 1)
-//        }
-//        for _ in 0...4 {
-//            nickName += String(Int.random(min: 0, max: 9))
-//        }
-//        return ""
-//    }
-    
-//    var playerActivityByNickName: Results<PlayerActivity>?
-//    var playerActivityByNickNameSubscription: SyncSubscription<PlayerActivity>?
-//    var playerActivityByNickNameToken: NotificationToken?
-    
-//    func setNickname(nickName: String, keyWord: String) {
-//        if playerActivity!.count == 0 {
-//            return
-//        }
-//        if GV.myUser != nil {
-//            playerActivity = realmSync!.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
-//            playerActivityByNickName = realmSync?.objects(PlayerActivity.self).filter("nickName = %@ and name != %@", nickName, GV.basicDataRecord.myName)
-//            playerActivityByNickNameSubscription = playerActivityByNickName!.subscribe(named: "PlayerActivityByNickName:\(nickName)")
-//            playerActivityByNickNameToken = playerActivityByNickNameSubscription!.observe(\.state) { [weak self]  state in
-//                if state == .complete {
-//                    if self!.playerActivityByNickName!.count == 0 {
-//                        try! realmSync?.safeWrite() {
-//                            playerActivity![0].nickName = nickName
-//                            playerActivity![0].keyWord = keyWord
-//                        }
-//                        try! realm.safeWrite() {
-//                            GV.basicDataRecord.myNickname = nickName
-//                            GV.basicDataRecord.keyWord = keyWord
-//                        }
-//                        self!.showMenu()
-//                    } else {
-//                        if self!.playerActivityByNickName![0].keyWord == nil || self!.playerActivityByNickName![0].keyWord == "" {
-//                            let alertController = UIAlertController(title: GV.language.getText(.tcNicknameUsedwithout, values: nickName),
-//                                                                    message: GV.language.getText(.tcNicknameActivating),
-//                                                                    preferredStyle: .alert)
-//                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: {alert -> Void in
-//                                self!.showMenu()
-//                                //            self.showMenu()
-//                            }))
-////                            alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
-//                            self!.present(alertController, animated: true, completion: nil)
-//                        } else {
-//                            if self!.playerActivityByNickName![0].keyWord == keyWord {
-//                                try! realmSync?.safeWrite() {
-//                                    playerActivity![0].nickName = nickName
-//                                    playerActivity![0].keyWord = keyWord
-//                                }
-//                                try! realm.safeWrite() {
-//                                    GV.basicDataRecord.myNickname = nickName
-//                                    GV.basicDataRecord.keyWord = keyWord
-//                                }
-//                                self!.showMenu()
-//                            } else {
-//                                let alertController = UIAlertController(title: GV.language.getText(.tcNicknameUsed, values: nickName),
-//                                                                        message: GV.language.getText(.tcAddKeyWord),
-//                                                                        preferredStyle: .alert)
-//                                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: {
-//                                    alert -> Void in
-//                                    self!.showMenu()
-//                                    //            self.showMenu()
-//                                }))
-////                                alertController.addAction(UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: nil))
-//                                self!.present(alertController, animated: true, completion: nil)
-//                            }
-//                        }
-//                    }
-//                    self!.playerActivityByNickNameSubscription!.unsubscribe()
-//                    self!.playerActivityByNickNameToken!.invalidate()
-//                } else {
-////                    print("in MainViewController -> state: \(state)")
-//                }
-//            }
-//        } else {
-//
-//        }
-//     }
-    
+
     func printFonts() {
         let fontFamilyNames = UIFont.familyNames
         for familyName in fontFamilyNames {

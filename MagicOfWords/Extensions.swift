@@ -21,7 +21,7 @@ public extension UIDevice {
     var deviceID: String {
         return (UIDevice.current.identifierForVendor?.uuidString)!
     }
-    
+
     func getModelCode(ident: String = "")->Int {
 //        let bounds = UIScreen.main.bounds
 //        let width = bounds.width
@@ -34,14 +34,15 @@ public extension UIDevice {
             guard let value = element.value as? Int8 , value != 0 else { return identifier }
             return identifier + String(UnicodeScalar(UInt8(value)))
         }
-        var returnCode = 0
-        var index = 0
         let iPodName = "iPod"
         let iPhoneName = "iPhone"
         let iPadName = "iPad"
         let AppleTVName = "AppleTV"
         let other1Name = "i386"
         let other2Name = "x86_64"
+        var returnCode = 0
+        var index = 0
+
         let indexOfComma = identifier.index(from: 0, of: ",")
         if identifier.beginsWith(iPodName) {
             returnCode = 10000
@@ -71,23 +72,39 @@ public extension UIDevice {
             }
         }
         return 0
-        
-        
-
     }
     
-    var modelName: String {
-        let bounds = UIScreen.main.bounds
-        let width = bounds.width
-        let height = bounds.height
-        var systemInfo = utsname()
-        uname(&systemInfo)
-        let machineMirror = Mirror(reflecting: systemInfo.machine)
-        let identifier = machineMirror.children.reduce("") { identifier, element in
-            guard let value = element.value as? Int8 , value != 0 else { return identifier }
-            return identifier + String(UnicodeScalar(UInt8(value)))
+    public func convertIntToModelName(value: Int)-> String {
+        let iPodName = "iPod"
+        let iPhoneName = "iPhone"
+        let iPadName = "iPad"
+        let AppleTVName = "AppleTV"
+        let other1Name = "i386"
+        let other2Name = "x86_64"
+        var returnValue = ""
+        let deviceType = value / 10000
+        let firstNumber = String((value % 10000) / 100)
+        let secondNumber = String((value % 10000) % 100)
+        switch deviceType {
+        case 1:
+            returnValue = iPodName
+        case 2:
+            returnValue = iPhoneName
+        case 3:
+            returnValue = iPadName
+        case 4:
+            returnValue = AppleTVName
+        case 5:
+            returnValue = other1Name
+        case 6:
+            returnValue = other2Name
+        default:
+            break
         }
-        
+        return convertIDToModelName(identifier: returnValue + firstNumber + "," + secondNumber)
+    }
+    
+    private func convertIDToModelName(identifier: String, width: CGFloat = 0, height: CGFloat = 0)->String {
         switch identifier {
         case "iPod5,1":                                 return "iPod Touch 5"
         case "iPod7,1":                                 return "iPod Touch 6"
@@ -109,7 +126,7 @@ public extension UIDevice {
         case "iPhone11,2":                              return "iPhone XS"
         case "iPhone11,4", "iPhone11,6":                return "iPhone XS Max"
         case "iPhone11,8":                              return "iPhone XR"
-
+            
         case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":return "iPad 2"
         case "iPad3,1", "iPad3,2", "iPad3,3":           return "iPad 3"
         case "iPad3,4", "iPad3,5", "iPad3,6":           return "iPad 4"
@@ -141,7 +158,20 @@ public extension UIDevice {
             }
         default:                                        return identifier
         }
-        
+    }
+    
+    var modelName: String {
+        let bounds = UIScreen.main.bounds
+        let width = bounds.width
+        let height = bounds.height
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8 , value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+        return convertIDToModelName(identifier: identifier)
     }
 }
 

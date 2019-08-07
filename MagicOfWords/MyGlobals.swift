@@ -56,6 +56,19 @@ var codeTableToString: [Int: String]  = [65: "A", 66: "B", 67: "C", 68: "D", 69:
 var codeTableToInt: [String: Int]  = ["A": 65, "B": 66, "C": 67, "D": 68, "E": 69, "F": 70, "G": 71, "H": 72, "I": 73, "J": 74,
                                       "K": 75, "L": 76, "M": 77, "N": 78, "O": 79, "P": 80, "Q": 81, "R": 82, "S": 83, "T": 84,
                                       "U": 85, "V": 86, "W": 87, "X": 88, "Y": 89, "Z": 90]
+// for GameCenter GlobalData
+struct PlayerData {
+    var alias = ""
+    var isOnline = false
+    var allTime = 0
+    var lastDay = 0
+    var timeLastDay = 0
+    var device = ""
+    var version = ""
+    var land = ""
+    var easyScore = ""
+    var mediumScore = ""
+}
 
 struct GV {
     static var actLanguage: String {
@@ -63,6 +76,8 @@ struct GV {
             return GV.language.getText(.tcAktLanguage)
         }
     }
+    static var globalInfoTable = [PlayerData]()
+
     static var actLanguageInt = GV.languageToInt[actLanguage]
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1
@@ -141,17 +156,54 @@ struct GV {
     static var myScore = 0
     static func convertLocaleToInt()->Int {
         let locale = Locale.current.regionCode!
+        let language = actLanguage.uppercased()
         let letter1 = locale.subString(at:0, length: 1)
         let letter2 = locale.subString(at:1, length: 1)
-        let value = codeTableToInt[letter1]! * 100 + codeTableToInt[letter2]!
+        let letter3 = language.subString(at:0, length: 1)
+        let letter4 = language.subString(at:1, length: 1)
+        let minutes = getTimeIntervalSince20190101() * 100000000
+        let value = minutes + 10000 * (codeTableToInt[letter1]! * 100 + codeTableToInt[letter2]!) + codeTableToInt[letter3]! * 100 + codeTableToInt[letter4]!
         return value
     }
     
     static func convertIntToLocale(value: Int)->String {
-        let returnValue = codeTableToString[value / 100]! + codeTableToString[value % 100]!
+        let value1 = value % 100000000
+        let landInt = value1 / 10000
+        let languageInt = value1 % 10000
+        let returnValue =
+            codeTableToString[landInt / 100]! +
+            codeTableToString[landInt % 100]! +
+            "/" +
+            codeTableToString[languageInt / 100]!.lowercased() +
+            codeTableToString[languageInt % 100]!.lowercased()
         return returnValue
     }
+    
+    static func convertNowToInt(timeToo: Bool = false)->Int {
+        let date = Date()
+        let calendar = Calendar.current
+        let actComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        var convertedToday = 10000 * actComponents.year! + 100 * actComponents.month! + actComponents.day!
+        if timeToo {
+            convertedToday = 10000 * convertedToday + actComponents.hour! * 60 + actComponents.minute!
+        }
+        return convertedToday
+    }
+    static func getTimeIntervalSince20190101()->Int {
+        var dateComponents = DateComponents()
+        dateComponents.year = 2019
+        dateComponents.month = 1
+        dateComponents.day = 1
+//        dateComponents.timeZone = TimeZone(abbreviation: "JST") // Japan Standard Time
+        let userCalendar = Calendar.current // user calendar
+        let someDateTime = userCalendar.date(from: dateComponents)
+        let now = Date()
+        let returnValue = now.timeIntervalSince(someDateTime!)
+        return Int(returnValue)
+    }
 
+
+    
 
     static var screenWidth: CGFloat {
         if (UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait) {

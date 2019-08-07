@@ -199,6 +199,110 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
     }
     
+    var leaderboardIdentifiers = [String]()
+    var countNils = 0
+    
+    @objc public func getAllGlobalInfos(completion: @escaping ()->()) {
+        GV.globalInfoTable.removeAll()
+        leaderboardIdentifiers = [timeStampName, usedTimeName, playingTimeTodayName, myDeviceName, myLandName, myVersionName, easyName, mediumName]
+        countNils = leaderboardIdentifiers.count
+        func loadScoresForLeaderboard(identifier: String, firstCall: Bool = true, rank1: Int = 1, rank2: Int = 100) {
+            let leaderBoardforUsedTime = GKLeaderboard()
+            leaderBoardforUsedTime.identifier = identifier
+            leaderBoardforUsedTime.playerScope = .global
+            leaderBoardforUsedTime.timeScope = .allTime
+            leaderBoardforUsedTime.range = NSRange(location: rank1, length: rank2)
+            leaderBoardforUsedTime.loadScores(completionHandler: {
+                (scores, error) in
+                if scores != nil {
+                    for score in scores! {
+                        let player = score.player.alias
+                        let index = GV.globalInfoTable.firstIndex(where: {$0.alias == player})
+                        var tableItem = PlayerData()
+                        switch score.leaderboardIdentifier {
+                        case self.timeStampName:
+                            let actTime = GV.convertNowToInt(timeToo: true)
+                            let diff = actTime - Int(score.value)
+                            let isOnline: Bool = diff < 11
+                            if index != nil {
+                                GV.globalInfoTable[index!].isOnline = isOnline
+                            } else {
+                                tableItem.isOnline = isOnline
+                            }
+                        case self.usedTimeName:
+                            if index != nil {
+                                GV.globalInfoTable[index!].allTime = Int(score.value)
+                            } else {
+                                tableItem.allTime = Int(score.value)
+                            }
+                        case self.playingTimeTodayName:
+                            let lastDay = Int(score.value) / 10000
+                            let timeLastDay = Int(score.value) % 10000
+                            if index != nil {
+                                GV.globalInfoTable[index!].lastDay = lastDay
+                                GV.globalInfoTable[index!].timeLastDay = timeLastDay
+                            } else {
+                                tableItem.lastDay = lastDay
+                                tableItem.timeLastDay = timeLastDay
+                           }
+                        case self.myDeviceName:
+                           let myDevice = UIDevice().convertIntToModelName(value: Int(score.value))
+                           if index != nil {
+                                GV.globalInfoTable[index!].device = myDevice
+                           } else {
+                                tableItem.device = myDevice
+                           }
+                        case self.myLandName:
+                            let myLand = GV.convertIntToLocale(value: Int(score.value))
+                            if index != nil {
+                                GV.globalInfoTable[index!].land = myLand
+                            } else {
+                                tableItem.land = myLand
+                            }
+                        case self.myVersionName:
+                            let myVersion = String(Double(Int(score.value)) / 100)
+                            if index != nil {
+                                GV.globalInfoTable[index!].version = myVersion
+                            } else {
+                                tableItem.version = myVersion
+                            }
+                        case GV.actLanguage + self.easyName:
+                            if index != nil {
+                                GV.globalInfoTable[index!].easyScore = String(score.value)
+                            } else {
+                                tableItem.easyScore = String(score.value)
+                            }
+                        case GV.actLanguage + self.mediumName:
+                            if index != nil {
+                                GV.globalInfoTable[index!].mediumScore = String(score.value)
+                            } else {
+                                tableItem.mediumScore = String(score.value)
+                            }
+                       default:
+                            break
+                        }
+                        if index == nil {
+                            tableItem.alias = player
+                            GV.globalInfoTable.append(tableItem)
+                        }
+                    }
+                    let range = rank2 - rank1 + 1
+                    loadScoresForLeaderboard(identifier: identifier, firstCall: false, rank1: rank1 + range, rank2: range)
+                } else {
+                    self.countNils -= 1
+                    if self.countNils == 0 {
+                        print("at end!!!")
+                        completion()
+                    }
+                }
+            })
+            }
+        for identifier in leaderboardIdentifiers {
+            let prefix = identifier == easyName || identifier == mediumName ? GV.actLanguage : ""
+            loadScoresForLeaderboard(identifier: prefix + identifier)
+        }
+    }
+    
     private func getGlobalInfos () {
         let leaderBoardforUsedTime = GKLeaderboard()
         leaderBoardforUsedTime.identifier = usedTimeName
@@ -236,7 +340,6 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                 }
             }
         })
-
     }
     
     @objc private func sendGlobalInfosTOGC(timerX: Timer) {
@@ -245,6 +348,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         if GKLocalPlayer.local.isAuthenticated {
             infoArray.append(GCInfo(identifier: usedTimeName, value: GV.basicDataRecord.playingTime))
             infoArray.append(GCInfo(identifier: playingTimeTodayName, value: GV.basicDataRecord.playingTimeToday))
+            infoArray.append(GCInfo(identifier: timeStampName, value: GV.convertNowToInt(timeToo: true)))
             if !GV.basicDataRecord.deviceInfoSaved {
                 infoArray.append(GCInfo(identifier: myLandName, value: GV.basicDataRecord.land))
                 infoArray.append(GCInfo(identifier: myDeviceName, value: GV.basicDataRecord.deviceType))
@@ -584,6 +688,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     let mediumName = "Medium"
     let hardName = "Hard"
     let veryHardName = "VeryHard"
+    let timeStampName = "timeStamp"
     let usedTimeName = "usedTime"
     let playingTimeTodayName = "lastDayTime"
     let myDeviceName = "myDevice"
