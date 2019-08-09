@@ -35,6 +35,36 @@ enum GameDifficulty: Int {
     }
 }
 
+func == (left: MyDate, right: MyDate) -> Bool {
+    return left.year == right.year &&
+        left.month == right.month &&
+        left.day == right.day &&
+        left.hour == right.hour &&
+        abs(left.minute - right.minute) < 11
+}
+
+struct MyDate {
+    let year: Int
+    let month: Int
+    let day: Int
+    let hour: Int
+    let minute: Int
+    let second: Int
+    init(date: Date) {
+        let calendar = Calendar.current
+        let actComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+        year = actComponents.year!
+        month = actComponents.month!
+        day = actComponents.day!
+        hour = actComponents.hour!
+        minute = actComponents.minute!
+        second = actComponents.second!
+    }
+    func datum()->Int {
+        return year * 10000 + month * 100 + day
+    }
+}
+
 struct ScoreForShow {
     var place = 0
     var player = ""
@@ -62,7 +92,7 @@ struct PlayerData {
     var isOnline = false
     var allTime = 0
     var lastDay = 0
-    var timeLastDay = 0
+    var lastTime = 0
     var device = ""
     var version = ""
     var land = ""
@@ -92,6 +122,7 @@ struct GV {
     static let HardGame = 1
     static let DemoEasyGameNumber = 10000
     static let DemoMediumGameNumber = 11000
+    static let TimeModifier = 10000000000
 //    static let buttonType = ButtonTypeElite
     static let LabelFont = "CourierNewPS-BoldMT"
 //    static let LabelFontSimple = "CourierNewPS-BoldMT"
@@ -161,15 +192,13 @@ struct GV {
         let letter2 = locale.subString(at:1, length: 1)
         let letter3 = language.subString(at:0, length: 1)
         let letter4 = language.subString(at:1, length: 1)
-        let minutes = getTimeIntervalSince20190101() * 100000000
-        let value = minutes + 10000 * (codeTableToInt[letter1]! * 100 + codeTableToInt[letter2]!) + codeTableToInt[letter3]! * 100 + codeTableToInt[letter4]!
+        let value = 10000 * (codeTableToInt[letter1]! * 100 + codeTableToInt[letter2]!) + codeTableToInt[letter3]! * 100 + codeTableToInt[letter4]!
         return value
     }
     
     static func convertIntToLocale(value: Int)->String {
-        let value1 = value % 100000000
-        let landInt = value1 / 10000
-        let languageInt = value1 % 10000
+        let landInt = value / 10000
+        let languageInt = value % 10000
         let returnValue =
             codeTableToString[landInt / 100]! +
             codeTableToString[landInt % 100]! +
@@ -179,17 +208,11 @@ struct GV {
         return returnValue
     }
     
-    static func convertNowToInt(timeToo: Bool = false)->Int {
-        let date = Date()
-        let calendar = Calendar.current
-        let actComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-        var convertedToday = 10000 * actComponents.year! + 100 * actComponents.month! + actComponents.day!
-        if timeToo {
-            convertedToday = 10000 * convertedToday + actComponents.hour! * 60 + actComponents.minute!
-        }
-        return convertedToday
+    static func convertNowToMyDate()->MyDate {
+        let returnValue = MyDate(date: Date())
+        return returnValue
     }
-    static func getTimeIntervalSince20190101()->Int {
+    static func getTimeIntervalSince20190101(date: Date = Date())->Int {
         var dateComponents = DateComponents()
         dateComponents.year = 2019
         dateComponents.month = 1
@@ -197,9 +220,21 @@ struct GV {
 //        dateComponents.timeZone = TimeZone(abbreviation: "JST") // Japan Standard Time
         let userCalendar = Calendar.current // user calendar
         let someDateTime = userCalendar.date(from: dateComponents)
-        let now = Date()
+        let now = date
         let returnValue = now.timeIntervalSince(someDateTime!)
         return Int(returnValue)
+    }
+    
+    static func getDateFromInterval(interval: Int)->MyDate {
+        var dateComponents = DateComponents()
+        dateComponents.year = 2019
+        dateComponents.month = 1
+        dateComponents.day = 1
+        let userCalendar = Calendar.current // user calendar
+        let referenceDate = userCalendar.date(from: dateComponents)
+        let date = Date(timeInterval: Double(interval), since: referenceDate!)
+        let returnValue = MyDate(date: date)
+        return returnValue
     }
 
 

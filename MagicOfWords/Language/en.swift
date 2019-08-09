@@ -154,6 +154,6 @@ let enDictionary: [TextConstants: String] = [
     .tcAskLater:        "Ask me Later",
     .tcAskNoMore:       "Ask me no more",
     .tcConnectGC:       "Connect to Gamecenter",
-    .tcDisconnectGC:    "Disconnect from Gamecenter",
+//    .tcDisconnectGC:    "Disconnect from Gamecenter",
     .tcNobody:          "unknown",
 ]

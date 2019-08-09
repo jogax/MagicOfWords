@@ -153,8 +153,8 @@ let ruDictionary: [TextConstants: String] = [
                             "чтобы узнать, сколько очков у других игроков.",
     .tcAskLater:        "Спроси меня позже",
     .tcAskNoMore:       "Не спрашивай меня больше",
-    .tcConnectGC:       "Подключиться к Игровому центру",
-    .tcDisconnectGC:    "Отключиться от Игрового Центра",
+    .tcConnectGC:       "Подключ. к Игровому центру",
+//    .tcDisconnectGC:    "Отключиться от Игрового Центра",
     .tcNobody:          "Неизвестный",
 ]
 

@@ -68,15 +68,15 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         let origImage = UIImage(named: isOnline ? "online.png" : "offline.png")!
         let image = origImage.resizeImage(newWidth: cellHeight * 0.6)
         cell.addButton(image: image, xPos: cellHeight * 0.5, callBack: buttonTapped)
-//        cell.addColumn(text: " " + (playerTable[indexPath.row].nickName.fixLength(length: lengthOfNickName - 4, leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
-//        cell.addColumn(text: (playerTable[indexPath.row].device.fixLength(length: lengthOfDevice, leadingBlanks: false)), color: actColor)
-//        cell.addColumn(text: (playerTable[indexPath.row].land.fixLength(length: lengthOfLand, leadingBlanks: false)), color: actColor)
-//        cell.addColumn(text: String(playerTable[indexPath.row].onlineTimeAll.HourMin).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
-//        if GV.onIpad {
-//            cell.addColumn(text: String(playerTable[indexPath.row].lastOnlineStart.toString()).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
-//            cell.addColumn(text: String(playerTable[indexPath.row].lastOnlineTime.HourMin).fixLength(length: lengthOfOnlineDuration, leadingBlanks: false), color: actColor)
-//            cell.addColumn(text: playerTable[indexPath.row].version.fixLength(length: lengthOfVersion, leadingBlanks: false), color: actColor)
-//        }
+        cell.addColumn(text: " " + (GV.globalInfoTable[indexPath.row].alias.fixLength(length: lengthOfAlias - 4, leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
+        cell.addColumn(text: (GV.globalInfoTable[indexPath.row].device.fixLength(length: lengthOfDevice, leadingBlanks: false)), color: actColor)
+        cell.addColumn(text: (GV.globalInfoTable[indexPath.row].land.fixLength(length: lengthOfLand, leadingBlanks: false)), color: actColor)
+        cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
+        if GV.onIpad {
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastDay).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengthOfOnlineDuration, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: GV.globalInfoTable[indexPath.row].version.fixLength(length: lengthOfVersion, leadingBlanks: false), color: actColor)
+        }
         return cell
     }
     
@@ -117,7 +117,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         var text5 = ""
         var text6 = ""
         var text7 = ""
-//        text1 = "\(GV.language.getText(.tcNickName)) ".fixLength(length: lengthOfNickName, center: true)
+        text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengthOfAlias, center: true)
         text2 = "\(GV.language.getText(.tcDevice)) ".fixLength(length: lengthOfDevice, center: true)
         text3 = "\(GV.language.getText(.tcLand)) ".fixLength(length: lengthOfLand, center: true)
         text4 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengthOfOnlineTime, center: true)
@@ -317,85 +317,11 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
 //        if !buttonsCreated {
 //            createButton()
 //        }
-        modifyButtonsPosition()
+//        modifyButtonsPosition()
         showGameCenterView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
         showGameCenterView!.reloadData()
     }
 
-    private func generateTableData() {
-//        xxx
-//        playerTable.removeAll()
-//        switch tableType {
-//        case .BestScoreSync:
-//            if bestScoreItems!.count > 0 {
-//                for actGameNumber in GV.minGameNumber...GV.maxGameNumber {
-//                    let scoreItems = bestScoreItems!.filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false)
-//                    for (place, item) in scoreItems.enumerated() {
-//                        var bestScoreData = BestScoreData()
-//                        bestScoreData.gameNumber = actGameNumber
-//                        bestScoreData.place = place + 1
-//                        bestScoreData.score = item.score
-//                        if item.owner != nil {
-//                            bestScoreData.nickName = item.owner!.nickName!
-//                        }
-//                        playerTable.append(bestScoreData)
-//                    }
-//                }
-//            }
-//        case .BestScoreForGame:
-//            if forGameItems!.count > 0 {
-//                var generateRecord = false
-//                for actGameNumber in GV.minGameNumber...GV.maxGameNumber {
-//                    if forGameItems!.filter("gameNumber = %d", actGameNumber).count > 0 {
-//                        let item = forGameItems!.filter("gameNumber = %d", actGameNumber).first!
-//                        var bestScoreData = BestScoreData()
-//                        bestScoreData.gameNumber = actGameNumber
-//                        bestScoreData.score = item.bestScore
-//                        if item.owner == nil {
-//                            generateRecord = true
-//                            try! RealmService.safeWrite() {
-//    //                            RealmService.delete(item)
-//                            }
-//                        } else {
-//                            bestScoreData.nickName = item.owner!.nickName!
-//                            playerTable.append(bestScoreData)
-//                        }
-//                    } else {
-//                        generateRecord = true
-//                    }
-//                    if generateRecord {
-//                        let items = RealmService.objects(BestScoreSync.self).filter("gameNumber = %d", actGameNumber).sorted(byKeyPath: "score", ascending: false)
-//                        if items.count > 0 {
-//                            let item = items.first!
-//                            let bestScoreForGameItem = BestScoreForGame()
-//                            bestScoreForGameItem.combinedPrimary = String(actGameNumber) + item.language
-//                            bestScoreForGameItem.gameNumber = actGameNumber
-//                            bestScoreForGameItem.language = item.language
-//                            bestScoreForGameItem.bestScore = item.score
-//                            bestScoreForGameItem.timeStamp = item.timeStamp
-//                            bestScoreForGameItem.owner = item.owner!
-//                            try! RealmService.safeWrite() {
-//                                RealmService.add(bestScoreForGameItem)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            default:
-//                break
-//            }
-    }
-    
-    private func deactivateSubscriptions() {
-//        if playerSubscription != nil {
-//            playerSubscriptionToken!.invalidate()
-//            playerSubscription!.unsubscribe()
-//        }
-//        if bestScoreSubscription != nil {
-//            bestScoreSubscriptionToken!.invalidate()
-//            bestScoreSubscription!.unsubscribe()
-//        }
-    }
     
     private func setTableviewSize() {
         let origin = CGPoint(x: 0, y: 0)

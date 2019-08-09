@@ -155,7 +155,7 @@ let deDictionary: [TextConstants: String] = [
     .tcAskLater:        "Frag mich später",
     .tcAskNoMore:       "Frag mich nie mehr",
     .tcConnectGC:       "Verbinden mit Gamecenter",
-    .tcDisconnectGC:    "Verbindung zum Game Center trennen",
+//    .tcDisconnectGC:    "Verbindung zum Game Center trennen",
     .tcNobody:          "Unbekannt",
 ]
 

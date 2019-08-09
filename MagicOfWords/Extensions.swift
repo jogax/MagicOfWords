@@ -74,7 +74,7 @@ public extension UIDevice {
         return 0
     }
     
-    public func convertIntToModelName(value: Int)-> String {
+    func convertIntToModelName(value: Int)-> String {
         let iPodName = "iPod"
         let iPhoneName = "iPhone"
         let iPadName = "iPad"
@@ -171,7 +171,7 @@ public extension UIDevice {
             guard let value = element.value as? Int8 , value != 0 else { return identifier }
             return identifier + String(UnicodeScalar(UInt8(value)))
         }
-        return convertIDToModelName(identifier: identifier)
+        return convertIDToModelName(identifier: identifier, width: width, height: height)
     }
 }
 
@@ -715,6 +715,16 @@ extension Date {
         let returnValue = df.string(from: self)
 
         return returnValue
+    }
+    
+    var yearMonthDay: Int {
+        get {
+            let calendar = Calendar.current
+            let year = calendar.component(.year, from: self) * 10000
+            let month = calendar.component(.month, from: self) * 100
+            let day = calendar.component(.day, from: self)
+            return year + month + day
+        }
     }
 }
 

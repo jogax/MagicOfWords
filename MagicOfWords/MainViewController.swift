@@ -492,33 +492,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             self.chooseLanguage()
         })
         alertController!.addAction(chooseLanguageAction)
-        //--------------------- SettingsAction ---------------------------
-//        let settingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.showSettingsMenu()
-//        })
-//        alertController!.addAction(settingsAction)
-
-        
-        //        //--------------------- chooseLanguageAction ---------------------
-        //        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
-        //            alert -> Void in
-        //            self.chooseLanguage()
-        //        })
-        //        alertController!.addAction(chooseLanguageAction)
-        //--------------------- nickNameAction ---------------------
-        
-//        nickNameAction = UIAlertAction(title: GV.language.getText(.tcSetNickName), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            if GV.connectedToInternet && playerActivity != nil && GV.myUser != nil {
-//                self.chooseNickname()
-//            } else {
-//                self.showMenu()
-//            }
-//        })
-//        nickNameAction!.isEnabled = GV.connectedToInternet && playerActivity != nil
-//        alertController!.addAction(nickNameAction!)
-//        expertUserChanged()
         //--------------------- showHelpAction ---------------------
         let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
             alert -> Void in
@@ -526,6 +499,18 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             self.startWelcomeScene()
         })
         alertController!.addAction(showHelpAction)
+
+        //--------------------- GameCenter on ---------------------
+        var GCTitle = ""
+        var chooseGCAction: UIAlertAction
+        if GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated {
+            GCTitle = GV.language.getText(.tcConnectGC)
+            chooseGCAction = UIAlertAction(title: GCTitle, style: .default, handler: { [unowned self]
+                alert -> Void in
+                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+            })
+            alertController!.addAction(chooseGCAction)
+       }
 
         #if DEBUG
         let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
@@ -942,16 +927,16 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             }
         }
         
-        let convertedToday = GV.convertNowToInt()
-
         if realm.objects(BasicDataModel.self).count == 0 {
+//            minden GC-her felküldött paramétert 10 jegyü timeintervallal kezdeni, hogy ne legyenek azonos értékek!
+//            ezt a sendGlobalInfos modul intézze, a leszedést is!
 //            let myName = GV.language.getText(.tcPlayer)
             GV.basicDataRecord = BasicDataModel()
             GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
             GV.basicDataRecord.creationTime = Date()
             GV.basicDataRecord.deviceType = UIDevice().getModelCode()
             GV.basicDataRecord.land = GV.convertLocaleToInt()
-            GV.basicDataRecord.playingTimeToday = convertedToday * 10000
+            GV.basicDataRecord.lastPlayingDay = Date().yearMonthDay
 
             try! realm.safeWrite() {
                 realm.add(GV.basicDataRecord)
@@ -969,10 +954,10 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                     GV.basicDataRecord.land = GV.convertLocaleToInt()
                 }
             }
-            let savedLastDay = GV.basicDataRecord.playingTimeToday / 10000
-            if convertedToday != savedLastDay {
+            if Date().yearMonthDay != GV.basicDataRecord.lastPlayingDay {
                 try! realm.safeWrite() {
-                    GV.basicDataRecord.playingTimeToday = convertedToday * 10000
+                    GV.basicDataRecord.lastPlayingDay = Date().yearMonthDay
+                    GV.basicDataRecord.playingTimeToday = 0
                     GV.basicDataRecord.countPlaysToday = 0
                 }
             }

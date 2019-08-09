@@ -178,8 +178,9 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         let identifier: String
         let value: Int
         init(identifier: String, value: Int) {
+            let adder = GV.TimeModifier * GV.getTimeIntervalSince20190101()
             self.identifier = identifier
-            self.value = value
+            self.value = value + adder
         }
     }
     
@@ -200,67 +201,67 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     
     var leaderboardIdentifiers = [String]()
-    var countNils = 0
+    var countFinished = 0
     
     @objc public func getAllGlobalInfos(completion: @escaping ()->()) {
         GV.globalInfoTable.removeAll()
-        leaderboardIdentifiers = [timeStampName, usedTimeName, playingTimeTodayName, myDeviceName, myLandName, myVersionName, easyName, mediumName]
-        countNils = leaderboardIdentifiers.count
+        leaderboardIdentifiers = [usedTimeName, playingTimeTodayName, myDeviceName, myLandName, myVersionName, easyName, mediumName]
+        countFinished = leaderboardIdentifiers.count
+        func decreaseCoundFinished() {
+            self.countFinished -= 1
+            if self.countFinished == 0 {
+                print("at end!!!")
+                completion()
+            }
+        }
         func loadScoresForLeaderboard(identifier: String, firstCall: Bool = true, rank1: Int = 1, rank2: Int = 100) {
-            let leaderBoardforUsedTime = GKLeaderboard()
-            leaderBoardforUsedTime.identifier = identifier
-            leaderBoardforUsedTime.playerScope = .global
-            leaderBoardforUsedTime.timeScope = .allTime
-            leaderBoardforUsedTime.range = NSRange(location: rank1, length: rank2)
-            leaderBoardforUsedTime.loadScores(completionHandler: {
+            let leaderBoard = GKLeaderboard()
+            leaderBoard.identifier = identifier
+            leaderBoard.playerScope = .global
+            leaderBoard.timeScope = .allTime
+            leaderBoard.range = NSRange(location: rank1, length: rank2)
+            leaderBoard.loadScores(completionHandler: {
                 (scores, error) in
                 if scores != nil {
                     for score in scores! {
                         let player = score.player.alias
                         let index = GV.globalInfoTable.firstIndex(where: {$0.alias == player})
+                        let savedDate = GV.getDateFromInterval(interval: Int(score.value) / GV.TimeModifier)
+                        let savedValue = Int(score.value) % GV.TimeModifier
                         var tableItem = PlayerData()
                         switch score.leaderboardIdentifier {
-                        case self.timeStampName:
-                            let actTime = GV.convertNowToInt(timeToo: true)
-                            let diff = actTime - Int(score.value)
-                            let isOnline: Bool = diff < 11
-                            if index != nil {
-                                GV.globalInfoTable[index!].isOnline = isOnline
-                            } else {
-                                tableItem.isOnline = isOnline
-                            }
                         case self.usedTimeName:
                             if index != nil {
-                                GV.globalInfoTable[index!].allTime = Int(score.value)
+                                GV.globalInfoTable[index!].allTime = savedValue
                             } else {
-                                tableItem.allTime = Int(score.value)
+                                tableItem.allTime = savedValue
                             }
                         case self.playingTimeTodayName:
-                            let lastDay = Int(score.value) / 10000
-                            let timeLastDay = Int(score.value) % 10000
+                            let lastDay = savedDate.datum()
+                            let lastTime = savedValue
                             if index != nil {
                                 GV.globalInfoTable[index!].lastDay = lastDay
-                                GV.globalInfoTable[index!].timeLastDay = timeLastDay
+                                GV.globalInfoTable[index!].lastTime = lastTime
                             } else {
                                 tableItem.lastDay = lastDay
-                                tableItem.timeLastDay = timeLastDay
+                                tableItem.lastTime = lastTime
                            }
                         case self.myDeviceName:
-                           let myDevice = UIDevice().convertIntToModelName(value: Int(score.value))
+                           let myDevice = UIDevice().convertIntToModelName(value: savedValue)
                            if index != nil {
                                 GV.globalInfoTable[index!].device = myDevice
                            } else {
                                 tableItem.device = myDevice
                            }
                         case self.myLandName:
-                            let myLand = GV.convertIntToLocale(value: Int(score.value))
+                            let myLand = GV.convertIntToLocale(value: savedValue % 100000000)
                             if index != nil {
                                 GV.globalInfoTable[index!].land = myLand
                             } else {
                                 tableItem.land = myLand
                             }
                         case self.myVersionName:
-                            let myVersion = String(Double(Int(score.value)) / 100)
+                            let myVersion = String(Double(savedValue) / 100)
                             if index != nil {
                                 GV.globalInfoTable[index!].version = myVersion
                             } else {
@@ -286,14 +287,13 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                             GV.globalInfoTable.append(tableItem)
                         }
                     }
-                    let range = rank2 - rank1 + 1
-                    loadScoresForLeaderboard(identifier: identifier, firstCall: false, rank1: rank1 + range, rank2: range)
-                } else {
-                    self.countNils -= 1
-                    if self.countNils == 0 {
-                        print("at end!!!")
-                        completion()
+                    if scores!.count == rank2 {
+                        loadScoresForLeaderboard(identifier: identifier, firstCall: false, rank1: rank1 + rank2, rank2: rank2)
+                    } else {
+                        decreaseCoundFinished()
                     }
+                } else {
+                    decreaseCoundFinished()
                 }
             })
             }
@@ -304,16 +304,16 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     
     private func getGlobalInfos () {
-        let leaderBoardforUsedTime = GKLeaderboard()
-        leaderBoardforUsedTime.identifier = usedTimeName
-        leaderBoardforUsedTime.playerScope = .global
-        leaderBoardforUsedTime.timeScope = .allTime
-        leaderBoardforUsedTime.range = NSRange(location: 1, length: 1)
-        leaderBoardforUsedTime.loadScores(completionHandler: {
+        let leaderBoard = GKLeaderboard()
+        leaderBoard.identifier = usedTimeName
+        leaderBoard.playerScope = .global
+        leaderBoard.timeScope = .allTime
+        leaderBoard.range = NSRange(location: 1, length: 1)
+        leaderBoard.loadScores(completionHandler: {
             (scores, error) in
             if scores != nil {
-                if leaderBoardforUsedTime.localPlayerScore != nil {
-                    let usedTimeInGC = leaderBoardforUsedTime.localPlayerScore!.value
+                if leaderBoard.localPlayerScore != nil {
+                    let usedTimeInGC = leaderBoard.localPlayerScore!.value
                     if usedTimeInGC > GV.basicDataRecord.playingTime {
                         try! realm.safeWrite() {
                             GV.basicDataRecord.playingTime = Int(usedTimeInGC)
@@ -348,7 +348,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         if GKLocalPlayer.local.isAuthenticated {
             infoArray.append(GCInfo(identifier: usedTimeName, value: GV.basicDataRecord.playingTime))
             infoArray.append(GCInfo(identifier: playingTimeTodayName, value: GV.basicDataRecord.playingTimeToday))
-            infoArray.append(GCInfo(identifier: timeStampName, value: GV.convertNowToInt(timeToo: true)))
+//            infoArray.append(GCInfo(identifier: timeStampName, value: 0))
             if !GV.basicDataRecord.deviceInfoSaved {
                 infoArray.append(GCInfo(identifier: myLandName, value: GV.basicDataRecord.land))
                 infoArray.append(GCInfo(identifier: myDeviceName, value: GV.basicDataRecord.deviceType))
@@ -688,11 +688,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     let mediumName = "Medium"
     let hardName = "Hard"
     let veryHardName = "VeryHard"
-    let timeStampName = "timeStamp"
-    let usedTimeName = "usedTime"
-    let playingTimeTodayName = "lastDayTime"
+//    let timeStampName = "timeStamp"
+    let usedTimeName = "allTime"
+    let playingTimeTodayName = "lastTime"
     let myDeviceName = "myDevice"
-    let myLandName = "myLand"
+    let myLandName = "myLandLanguage"
     let myVersionName = "myVersion"
 
     public func sendScoreToGameCenter(score: Int?, difficulty: Int, completion: @escaping ()->()) {

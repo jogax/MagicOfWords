@@ -25,10 +25,11 @@ class BasicDataModel: Object {
     @objc dynamic var playingTime = 0
     @objc dynamic var playingTimeToday = 0
     @objc dynamic var countPlaysToday = 0
+    @objc dynamic var lastPlayingDay = 0
     @objc dynamic var deviceType = 0
     @objc dynamic var land = 0
-    @objc dynamic var deviceInfoSaved = false
     @objc dynamic var version = 0
+    @objc dynamic var deviceInfoSaved = false
 //    GCEnabledType: 0 = AskForGameCenter, 1 = GameCenterEnabled, 2 = GameCenterSupressed
     @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
     @objc dynamic var startAnimationShown = false
@@ -62,5 +63,7 @@ class BasicDataModel: Object {
             scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myScore = score
         }
     }
+    
+
 
 }

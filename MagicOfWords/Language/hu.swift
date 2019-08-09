@@ -152,7 +152,7 @@ let huDictionary: [TextConstants: String] = [
                         "hogy lásd, hány pontja van a többi játékosnak.",
     .tcAskLater:        "Kérdezz később",
     .tcAskNoMore:       "Ne kérdezz többé",
-    .tcConnectGC:       "Kapcsolódás a Game Centerhez",
-    .tcDisconnectGC:    "Lekapcsolódás a Game Centerről",
+    .tcConnectGC:       "Kapcs. a Game Centerhez",
+//    .tcDisconnectGC:    "Lekapcsolódás a Game Centerről",
     .tcNobody:          "Ismeretlen",
 ]
