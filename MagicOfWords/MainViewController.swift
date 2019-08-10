@@ -16,7 +16,12 @@ import GameKit
 //import SCLAlertView
 
 
-class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate  {
+class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate  {
+    func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
+        gameCenterViewController.dismiss(animated: true, completion: nil)
+        showMenu()
+    }
+    
     
     func matchStarted() {
         
@@ -225,7 +230,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             GCHelper.shared.getAllScores(completion: {
                 self.callModifyHeader()
             })
-            self.showMenu()
+            GCHelper.shared.restartGlobalInfosTimer()
         }
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseLanguage),
                                                 message: "",
@@ -595,6 +600,15 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             })
             alertController.addAction(showGlobalDataAction!)
         }
+        let showGameCenterAction = UIAlertAction(title: GV.language.getText(.tcShowGameCenter), style: .default, handler: { [unowned self]
+            alert -> Void in
+                let gcVC = GKGameCenterViewController()
+                gcVC.gameCenterDelegate = self
+                gcVC.viewState = .leaderboards
+                gcVC.leaderboardIdentifier = "myDevice"
+                self.present(gcVC, animated: true, completion: nil)
+        })
+        alertController.addAction(showGameCenterAction)
         let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
             alert -> Void in
             self.areYouSure()

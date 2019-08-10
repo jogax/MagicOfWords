@@ -154,7 +154,10 @@ enum TextConstants: Int {
     tcAskNoMore,
     tcConnectGC,
     tcDisconnectGC,
-    tcNobody
+    tcNobody,
+    tcEasyScore,
+    tcMediumScore,
+    tcShowGameCenter
 }
 
     let LanguageEN = "en" // index 0

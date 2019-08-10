@@ -156,5 +156,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcConnectGC:       "Подключ. к Игровому центру",
 //    .tcDisconnectGC:    "Отключиться от Игрового Центра",
     .tcNobody:          "Неизвестный",
+    .tcEasyScore:       "Простая",
+    .tcMediumScore:     "Средняя",
+    .tcShowGameCenter:  "Покажи Game Center"
 ]
 

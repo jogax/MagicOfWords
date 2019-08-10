@@ -134,6 +134,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     // MARK: User functions
     
+    var globalInfosTimer: Timer?
     
     /// Authenticates the user with their Game Center account if possible
     public func authenticateLocalUser(theDelegate: GCHelperDelegate, presentingViewController: UIViewController) {
@@ -148,7 +149,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
 //            self.startGameCenterSync()
             GKLocalPlayer.local.unregisterAllListeners()
             GKLocalPlayer.local.register(self)
-            _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
+            globalInfosTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
 
             self.delegate?.localPlayerAuthenticated()
         }
@@ -184,6 +185,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
     }
     
+    
     private func sendInfoToGC(infos: [GCInfo]) {
         var scoreArray = [GKScore]()
         for info in infos {
@@ -205,9 +207,9 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     @objc public func getAllGlobalInfos(completion: @escaping ()->()) {
         GV.globalInfoTable.removeAll()
-        leaderboardIdentifiers = [usedTimeName, playingTimeTodayName, myDeviceName, myLandName, myVersionName, easyName, mediumName]
+        leaderboardIdentifiers = [playingTimeName, playingTimeTodayName, myDeviceName, myLandName, myVersionName, easyName, mediumName]
         countFinished = leaderboardIdentifiers.count
-        func decreaseCoundFinished() {
+        func decreaseCountFinished() {
             self.countFinished -= 1
             if self.countFinished == 0 {
                 print("at end!!!")
@@ -230,11 +232,16 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                         let savedValue = Int(score.value) % GV.TimeModifier
                         var tableItem = PlayerData()
                         switch score.leaderboardIdentifier {
-                        case self.usedTimeName:
+                        case self.playingTimeName:
+                            let actTime = MyDate(date: Date())
+                            let isOnline = actTime == savedDate
+
                             if index != nil {
                                 GV.globalInfoTable[index!].allTime = savedValue
+                                GV.globalInfoTable[index!].isOnline = isOnline
                             } else {
                                 tableItem.allTime = savedValue
+                                tableItem.isOnline = isOnline
                             }
                         case self.playingTimeTodayName:
                             let lastDay = savedDate.datum()
@@ -290,10 +297,10 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     if scores!.count == rank2 {
                         loadScoresForLeaderboard(identifier: identifier, firstCall: false, rank1: rank1 + rank2, rank2: rank2)
                     } else {
-                        decreaseCoundFinished()
+                        decreaseCountFinished()
                     }
                 } else {
-                    decreaseCoundFinished()
+                    decreaseCountFinished()
                 }
             })
             }
@@ -305,7 +312,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     private func getGlobalInfos () {
         let leaderBoard = GKLeaderboard()
-        leaderBoard.identifier = usedTimeName
+        leaderBoard.identifier = playingTimeName
         leaderBoard.playerScope = .global
         leaderBoard.timeScope = .allTime
         leaderBoard.range = NSRange(location: 1, length: 1)
@@ -313,10 +320,10 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             (scores, error) in
             if scores != nil {
                 if leaderBoard.localPlayerScore != nil {
-                    let usedTimeInGC = leaderBoard.localPlayerScore!.value
+                    let usedTimeInGC = Int(leaderBoard.localPlayerScore!.value) % GV.TimeModifier
                     if usedTimeInGC > GV.basicDataRecord.playingTime {
                         try! realm.safeWrite() {
-                            GV.basicDataRecord.playingTime = Int(usedTimeInGC)
+                            GV.basicDataRecord.playingTime = usedTimeInGC
                         }
                     }
                 }
@@ -331,10 +338,10 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             (scores, error) in
             if scores != nil {
                 if leaderBoardforplayingTimeToday.localPlayerScore != nil {
-                    let playingTimeTodayInGC = leaderBoardforplayingTimeToday.localPlayerScore!.value
+                    let playingTimeTodayInGC = Int(leaderBoardforplayingTimeToday.localPlayerScore!.value) % GV.TimeModifier
                     if playingTimeTodayInGC > GV.basicDataRecord.playingTimeToday {
                         try! realm.safeWrite() {
-                            GV.basicDataRecord.playingTimeToday = Int(playingTimeTodayInGC)
+                            GV.basicDataRecord.playingTimeToday = playingTimeTodayInGC
                         }
                     }
                 }
@@ -342,11 +349,17 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         })
     }
     
+    public func restartGlobalInfosTimer() {
+        if globalInfosTimer != nil {
+            globalInfosTimer!.invalidate()
+        }
+        globalInfosTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
+    }
     @objc private func sendGlobalInfosTOGC(timerX: Timer) {
         var infoArray = [GCInfo]()
         print("sendGlobalInfosTOGC actTime: \(Date())")
         if GKLocalPlayer.local.isAuthenticated {
-            infoArray.append(GCInfo(identifier: usedTimeName, value: GV.basicDataRecord.playingTime))
+            infoArray.append(GCInfo(identifier: playingTimeName, value: GV.basicDataRecord.playingTime))
             infoArray.append(GCInfo(identifier: playingTimeTodayName, value: GV.basicDataRecord.playingTimeToday))
 //            infoArray.append(GCInfo(identifier: timeStampName, value: 0))
             if !GV.basicDataRecord.deviceInfoSaved {
@@ -365,7 +378,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             sendInfoToGC(infos: infoArray)
         }
         // send infos to GC each 10 minutes
-        _ = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
+        globalInfosTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
     }
     
     /**
@@ -689,8 +702,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     let hardName = "Hard"
     let veryHardName = "VeryHard"
 //    let timeStampName = "timeStamp"
-    let usedTimeName = "allTime"
-    let playingTimeTodayName = "lastTime"
+    let playingTimeName = "playingTime"
+    let playingTimeTodayName = "playingTimeToday"
     let myDeviceName = "myDevice"
     let myLandName = "myLandLanguage"
     let myVersionName = "myVersion"
@@ -715,5 +728,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             }
         }
     }
+    
+
     
 }

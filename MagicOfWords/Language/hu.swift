@@ -155,4 +155,7 @@ let huDictionary: [TextConstants: String] = [
     .tcConnectGC:       "Kapcs. a Game Centerhez",
 //    .tcDisconnectGC:    "Lekapcsolódás a Game Centerről",
     .tcNobody:          "Ismeretlen",
+    .tcEasyScore:       "Könnyű",
+    .tcMediumScore:     "Közepes",
+    .tcShowGameCenter:  "Mutasd a Game Center-t"
 ]

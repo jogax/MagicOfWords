@@ -221,18 +221,9 @@ extension Int {
         //        var days: Int = 0
         var hours: Int = 0
         var minutes: Int = 0
-        var seconds: Int = self
-        if self > 59 {
-            seconds = self % 60
-            minutes = self / 60
-            if seconds > 30 {
-                minutes += 1
-            }
-        }
-        if minutes > 59 {
-            hours = minutes / 60
-            minutes = minutes % 60
-        }
+ 
+        minutes = self % 60
+        hours = self / 60
         let hoursString = String(hours) + "h "
         let minutesString = (minutes < 10 ? "0" : "") + String(minutes) + "m "
 //        let secondsString = hours > 0 ? (seconds < 10 ? "0" : "") : String(seconds) + "s"
@@ -725,6 +716,17 @@ extension Date {
             let day = calendar.component(.day, from: self)
             return year + month + day
         }
+    }
+
+    init(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0) {
+        var dateComponents = DateComponents()
+        dateComponents.year = year
+        dateComponents.month = month
+        dateComponents.day = day
+        dateComponents.hour = hour
+        //        dateComponents.timeZone = TimeZone(abbreviation: "JST") // Japan Standard Time
+        let userCalendar = Calendar.current // user calendar
+        self = userCalendar.date(from: dateComponents)!
     }
 }
 

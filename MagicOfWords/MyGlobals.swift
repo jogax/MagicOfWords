@@ -212,12 +212,13 @@ struct GV {
         let returnValue = MyDate(date: Date())
         return returnValue
     }
+    
     static func getTimeIntervalSince20190101(date: Date = Date())->Int {
         var dateComponents = DateComponents()
         dateComponents.year = 2019
         dateComponents.month = 1
         dateComponents.day = 1
-//        dateComponents.timeZone = TimeZone(abbreviation: "JST") // Japan Standard Time
+        //        dateComponents.timeZone = TimeZone(abbreviation: "JST") // Japan Standard Time
         let userCalendar = Calendar.current // user calendar
         let someDateTime = userCalendar.date(from: dateComponents)
         let now = date
@@ -225,6 +226,7 @@ struct GV {
         return Int(returnValue)
     }
     
+
     static func getDateFromInterval(interval: Int)->MyDate {
         var dateComponents = DateComponents()
         dateComponents.year = 2019

@@ -20,11 +20,12 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     var lengthOfDevice = 18
     var lengthOfLand = 7
     var lengthOfIsOnline = 0
-    var lengthOfOnlineTime = 9
-    var lengthOfLastOnline = 18
+    var lengthOfOnlineTime = 8
+    var lengthOfLastOnline = 11
     var lengthOfOnlineDuration = 8
     var lengthOfVersion = 10
-    var lengthOfGameNumber = 6
+    var lengthOfEasyScore = 10
+    var lengthOfMediumScore = 10
     var lengthOfScore = 5
     var lengthOfPlace = 5
 
@@ -32,7 +33,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     
     
     //    var lengthOfOnlineSince = 0
-    let myFont = UIFont(name: GV.actLabelFont, size: GV.onIpad ? 18 : 12)
+    let myFont = UIFont(name: GV.actLabelFont, size: GV.onIpad ? 16 : 12)
     
     func didTappedButton(tableView: UITableView, indexPath: IndexPath, buttonName: String) {
         
@@ -55,6 +56,21 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         
     }
     
+    private func yearMonthDayString(value: Int)-> String {
+        var returnValue = ""
+        if value > 0 {
+            let year = String(value / 10000)
+            var month = String((value % 10000) / 100)
+            month = month.length == 1 ? "0" + month : month
+            var day = String((value % 10000) % 100)
+            day = day.length == 1 ? "0" + day : day
+            returnValue = year + "-" + month + "-" + day
+        }
+        return returnValue
+    }
+    
+
+    
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
@@ -73,9 +89,11 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         cell.addColumn(text: (GV.globalInfoTable[indexPath.row].land.fixLength(length: lengthOfLand, leadingBlanks: false)), color: actColor)
         cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
         if GV.onIpad {
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastDay).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: yearMonthDayString(value: GV.globalInfoTable[indexPath.row].lastDay).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengthOfOnlineDuration, leadingBlanks: false), color: actColor)
             cell.addColumn(text: GV.globalInfoTable[indexPath.row].version.fixLength(length: lengthOfVersion, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyScore).fixLength(length: lengthOfEasyScore, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumScore.fixLength(length: lengthOfMediumScore, leadingBlanks: false), color: actColor)
         }
         return cell
     }
@@ -117,6 +135,8 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         var text5 = ""
         var text6 = ""
         var text7 = ""
+        var text8 = ""
+        var text9 = ""
         text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengthOfAlias, center: true)
         text2 = "\(GV.language.getText(.tcDevice)) ".fixLength(length: lengthOfDevice, center: true)
         text3 = "\(GV.language.getText(.tcLand)) ".fixLength(length: lengthOfLand, center: true)
@@ -125,6 +145,8 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
             text5 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengthOfLastOnline, center: true)
             text6 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengthOfOnlineDuration, center: true)
             text7 = "\(GV.language.getText(.tcVersion))".fixLength(length: lengthOfVersion, center: true)
+            text8 = "\(GV.language.getText(.tcEasyScore))".fixLength(length: lengthOfEasyScore, center: true)
+            text9 = "\(GV.language.getText(.tcMediumScore))".fixLength(length: lengthOfMediumScore, center: true)
         }
         headerLine += text1
         headerLine += text2
@@ -133,6 +155,8 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         headerLine += text5
         headerLine += text6
         headerLine += text7
+        headerLine += text8
+        headerLine += text9
         lengthOfIsOnline = text2.length
     }
     
@@ -335,69 +359,6 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         modifyButtonsPosition()
     }
     
-//    private func showBestScoreForGame() {
-//        deactivateSubscriptions()
-//        forGameItems = RealmService.objects(BestScoreForGame.self).filter("language = %@ AND gameNumber >= %d AND gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
-//        forGameSubscription = forGameItems!.subscribe(named: "\(GV.actLanguage)bestForGameQuery")
-//        forGameSubscriptionToken = forGameSubscription.observe(\.state) { [weak self]  state in
-//            switch state {
-//            case .creating:
-//                print("creating")
-//            // The subscription has not yet been written to the Realm
-//            case .pending:
-//                print("pending")
-//                // The subscription has been written to the Realm and is waiting
-//            // to be processed by the server
-//            case .complete:
-//                self!.view.addSubview(self!.showGameCenterView!)
-//                self!.calculateColumnWidths()
-//                self!.generateTableData()
-//                self!.setTableviewSize()
-//                self!.showGameCenterView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-//                self!.showGameCenterView!.reloadData()
-////                print("complete: count records: \(String(describing: self!.forGameItems!.count))")
-//                self!.bestScoreNotificationToken = self!.forGameItems!.observe { [weak self] (changes) in
-//                    guard let showGameCenterView = self?.showGameCenterView else { return }
-//                    
-//                    switch changes {
-//                    case .initial:
-//                        self!.initialLoadDone = true
-//                    case .update(_, let deletions, let insertions, let modifications):
-//                        if self!.initialLoadDone && self!.tableType == .BestScoreSync {
-//                            // Query results have changed, so apply them to the UITableView
-//                            if insertions.count > 0 {
-//                                showGameCenterView.frame.size.height += CGFloat(insertions.count) * self!.headerLine.height(font: self!.myFont!)
-//                            }
-//                            if deletions.count > 0 {
-//                                showGameCenterView.frame.size.height -= CGFloat(deletions.count) * self!.headerLine.height(font: self!.myFont!)
-//                            }
-//                            showGameCenterView.beginUpdates()
-//                            showGameCenterView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
-//                                                              with: .automatic)
-//                            showGameCenterView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}),
-//                                                              with: .automatic)
-//                            showGameCenterView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
-//                                                              with: .automatic)
-//                            showGameCenterView.endUpdates()
-//                        }
-//                    case .error(let error):
-//                        // An error occurred while opening the Realm file on the background worker thread
-//                        fatalError("\(error)")
-//                    }
-//                }
-//                
-//                // The subscription has been processed by the server and all objects
-//            // matching the query are in the local Realm
-//            case .invalidated:
-//                print("invalidated")
-//            // The subscription has been removed
-//            case .error(let error):
-//                print("error: \(error)")
-//                // An error occurred while processing the subscription
-//            }        }
-//        
-//        
-//    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
