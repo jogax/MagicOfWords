@@ -890,7 +890,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
         }
         createFixLetters()
-        checkIfGameFinished()
+//        checkIfGameFinished()
         saveActualState()
         createNextRound = false
         GV.nextRoundAnimationFinished = false
@@ -1517,7 +1517,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let finishButtonCenter = CGPoint(x:self.frame.width * 0.2, y: ownHeaderYPos) //self.frame.height * 0.20)
 //        let radius = frame.height * 0.5
         finishButton = createMyButton(title: title, size: size, center: finishButtonCenter, enabled: true )
-        finishButton!.isHidden = goOnPlaying ? false : true
+        finishButton!.isHidden = false //goOnPlaying ? false : true
         finishButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(finishButtonTapped))
 
 //        myButton!.addTarget(self, action: #selector(self.finishButtonTapped), for: .touchUpInside)
@@ -1723,7 +1723,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 WTGameWordList.shared.restoreFromPlayingRecord()
                 restoreGameArray()
                 showFoundedWords()
-                checkIfGameFinished()
+//                checkIfGameFinished()
                 modifyHeader()
             }
         } else {
@@ -2032,10 +2032,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             case .ContinueGameEasyAlert:
 //                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
-            case .ContinueGameMediumAlert:
+//            case .ContinueGameMediumAlert:
 //                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
-            case .FinishGameEasyAlert:
+//            case .FinishGameEasyAlert:
 //                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
                 zielPosition = congratulationsAlert!.getPositionForAction(action: action)
             case .FinishGameMediumAlert:
@@ -2185,7 +2185,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             break
 //            addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
         case TypeOfTouch.ContinueGameMedium.rawValue:
-            addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
+            break
+//            addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
         case TypeOfTouch.ContinueGameMedium.rawValue:
             addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
         case TypeOfTouch.FinishGameEasy.rawValue:
@@ -2938,7 +2939,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
         startShapeIndex = -1
         if checkFreePlace() {
-            checkIfGameFinished()
+//            checkIfGameFinished()
         }
         return returnBool
     }
@@ -2966,43 +2967,40 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             return
         }
 
-        if GV.basicDataRecord.getScore() < GV.totalScore {
-            GV.basicDataRecord.setScore(score: GV.totalScore)
-            GCHelper.shared.sendScoreToGameCenter(score: GV.totalScore, difficulty: GV.basicDataRecord.difficulty, completion: {self.modifyHeader()})
-        } 
+//        if GV.basicDataRecord.getScore() < GV.totalScore {
+//        GV.basicDataRecord.setScore(score: GV.totalScore)
+        GCHelper.shared.sendScoreToGameCenter(score: GV.totalScore, difficulty: GV.basicDataRecord.difficulty, completion: {self.modifyHeader()})
+//        }
     }
     
     enum CongratulationType: Int {
         case GameFinished
     }
     
-    private func checkIfGameFinished(showAlert: Bool = true) {
-        let allFixLettersUsed: Bool = wtGameboard!.checkFixLetters()
-//        let allMandatoryWordsSolved: Bool = WTGameWordList.shared.gameFinished()
-        switch (allFixLettersUsed) {
-        case (false): // nothing is solved
-            if goOnPlaying {
-                self.saveToGameCenter()
-                finishButton!.isHidden = true
-                goOnPlaying = false
-                try! realm.safeWrite() {
-                    GV.playingRecord.gameStatus = GV.GameStatusPlaying
-                    GV.playingRecord.allFixIndicated = false
-                }
-            }
-        case true: // game finished
-            goOnPlaying = true
-            finishButton!.isHidden = false
-//            if !goOnPlaying && showAlert {
-            if !GV.playingRecord.allFixIndicated && showAlert && GV.basicDataRecord.difficulty != GameDifficulty.Easy.rawValue {
-                congratulations(congratulationType: .GameFinished)
-                saveToGameCenter()
-            }
-            try! realm.safeWrite() {
-                GV.playingRecord.allFixIndicated = true
-            }
-        }
-    }
+//    private func checkIfGameFinished(showAlert: Bool = true) {
+////        let allFixLettersUsed: Bool = wtGameboard!.checkFixLetters()
+////        let allMandatoryWordsSolved: Bool = WTGameWordList.shared.gameFinished()
+////        switch (allFixLettersUsed) {
+////        case (false): // nothing is solved
+////            if goOnPlaying {
+////                self.saveToGameCenter()
+////                finishButton!.isHidden = true
+////                goOnPlaying = false
+////                try! realm.safeWrite() {
+////                    GV.playingRecord.gameStatus = GV.GameStatusPlaying
+////                    GV.playingRecord.allFixIndicated = false
+////                }
+////            }
+////        case true: // game finished
+//            goOnPlaying = true
+//            finishButton!.isHidden = false
+////            if !goOnPlaying && showAlert {
+////            if !GV.playingRecord.allFixIndicated && showAlert && GV.basicDataRecord.difficulty != GameDifficulty.Easy.rawValue {
+////                congratulations(congratulationType: .GameFinished)
+////                saveToGameCenter()
+////            }
+////        }
+//    }
     
     var goOnPlaying = false
     var congratulationsAlert: MyAlertController?
@@ -3363,7 +3361,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 WTGameWordList.shared.restoreFromPlayingRecord()
                 restoreGameArray()
                 modifyHeader()
-                checkIfGameFinished(showAlert: false)
+//                checkIfGameFinished(showAlert: false)
             }
         } else {
             switch activityRoundItem[activityRoundItem.count - 1].activityItems.last!.type {
@@ -3418,7 +3416,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 let actItem = activityRoundItem[activityRoundItem.count - 1].activityItems.last!
                 let selectedWord = SelectedWord(word: actItem.choosedWord.word, usedLetters: actItem.choosedWord.usedLetters)
                 WTGameWordList.shared.removeLastWord(selectedWord: selectedWord)
-                checkIfGameFinished()
+//                checkIfGameFinished()
 //                saveActualState()
 //                saveToGameCenter()
                 activityRoundItem[activityRoundItem.count - 1].activityItems.removeLast()

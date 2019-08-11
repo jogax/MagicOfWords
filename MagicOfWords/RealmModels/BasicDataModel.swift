@@ -33,36 +33,32 @@ class BasicDataModel: Object {
 //    GCEnabledType: 0 = AskForGameCenter, 1 = GameCenterEnabled, 2 = GameCenterSupressed
     @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
     @objc dynamic var startAnimationShown = false
-    let scoreInfos = List<ScoreInfoForLanguage>()
+    let scoreInfos = List<ScoreInfoForDifficulty>()
 
     override  class func primaryKey() -> String {
         return "ID"
     }
     public func setBestScore(score: Int, name: String, myRank: Int) {
-        let languageIndex = GV.languageToInt[self.actLanguage]
-        scoreInfos[languageIndex!].difficultyInfos[self.difficulty].bestScore = score
-        scoreInfos[languageIndex!].difficultyInfos[self.difficulty].bestPlayerName = name
-        scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myRank = myRank
+        scoreInfos[self.difficulty].bestScore = score
+        scoreInfos[self.difficulty].bestPlayerName = name
+        scoreInfos[self.difficulty].myRank = myRank
     }
     public func getBestScore()->(bestScore: Int, bestName: String, myRank: Int, myScore: Int) {
-        let languageIndex = GV.languageToInt[self.actLanguage]
-        let bestScore = scoreInfos[languageIndex!].difficultyInfos[self.difficulty].bestScore
-        let bestName = scoreInfos[languageIndex!].difficultyInfos[self.difficulty].bestPlayerName
-        let myRank = scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myRank
-        let myScore = scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myScore
+        let bestScore = scoreInfos[self.difficulty].bestScore
+        let bestName = scoreInfos[self.difficulty].bestPlayerName
+        let myRank = scoreInfos[self.difficulty].myRank
+        let myScore = scoreInfos[self.difficulty].myScore
         return (bestScore, bestName, myRank, myScore)
     }
-    public func getScore()->Int {
-        let languageIndex = GV.languageToInt[self.actLanguage]
-        return scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myScore
-    }
+//    public func getScore()->Int {
+//        return scoreInfos[self.difficulty].myScore
+//    }
     
-    public func setScore(score: Int) {
-        try! realm!.safeWrite() {
-            let languageIndex = GV.languageToInt[self.actLanguage]
-            scoreInfos[languageIndex!].difficultyInfos[self.difficulty].myScore = score
-        }
-    }
+//    public func setScore(score: Int) {
+//        try! realm!.safeWrite() {
+//            scoreInfos[self.difficulty].myScore = score
+//        }
+//    }
     
 
 

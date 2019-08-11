@@ -42,7 +42,6 @@
 		20491F4D21CFCEB20060C675 /* ruMandatory.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20491F4C21CFCEB20060C675 /* ruMandatory.txt */; };
 		2049314A21E6494D00BE66EA /* deMandatory.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2049314921E6494D00BE66EA /* deMandatory.txt */; };
 		2049314C21E6496100BE66EA /* enMandatory.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2049314B21E6496100BE66EA /* enMandatory.txt */; };
-		2049784022F0B02E003E2D37 /* ScoreInfoForLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2049783F22F0B02E003E2D37 /* ScoreInfoForLanguage.swift */; };
 		2049784222F0C3FF003E2D37 /* ScoreInfoForDifficulty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2049784122F0C3FF003E2D37 /* ScoreInfoForDifficulty.swift */; };
 		204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204A8AD72029DDFF00E9C11F /* huWords.txt */; };
 		204A8ADA2029EE6000E9C11F /* WTScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204A8AD92029EE6000E9C11F /* WTScene.swift */; };
@@ -192,7 +191,6 @@
 		20491F4C21CFCEB20060C675 /* ruMandatory.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruMandatory.txt; sourceTree = "<group>"; };
 		2049314921E6494D00BE66EA /* deMandatory.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deMandatory.txt; sourceTree = "<group>"; };
 		2049314B21E6496100BE66EA /* enMandatory.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enMandatory.txt; sourceTree = "<group>"; };
-		2049783F22F0B02E003E2D37 /* ScoreInfoForLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreInfoForLanguage.swift; sourceTree = "<group>"; };
 		2049784122F0C3FF003E2D37 /* ScoreInfoForDifficulty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreInfoForDifficulty.swift; sourceTree = "<group>"; };
 		204A8AD72029DDFF00E9C11F /* huWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = huWords.txt; sourceTree = "<group>"; };
 		204A8AD92029EE6000E9C11F /* WTScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WTScene.swift; sourceTree = "<group>"; };
@@ -400,7 +398,6 @@
 				2081931F202B472900406D9A /* GameDataModel.swift */,
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
-				2049783F22F0B02E003E2D37 /* ScoreInfoForLanguage.swift */,
 				2049784122F0C3FF003E2D37 /* ScoreInfoForDifficulty.swift */,
 				205E601920C02BB800A5AB39 /* WordDBGenerator.swift */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
@@ -769,7 +766,6 @@
 				205627EF214AA9E9006B9357 /* PlayerActivity.swift in Sources */,
 				201FB1DF20288CEA00EC9F36 /* de.swift in Sources */,
 				20819320202B472900406D9A /* GameDataModel.swift in Sources */,
-				2049784022F0B02E003E2D37 /* ScoreInfoForLanguage.swift in Sources */,
 				207B67862243BDBB001456C8 /* GameData.swift in Sources */,
 				201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */,
 				201FB1E020288CEA00EC9F36 /* Language.swift in Sources */,

@@ -201,6 +201,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             if actPlay.first!.gameStatus == GV.GameStatusFinished {
                 try! realm.safeWrite() {
                     realm.delete(actPlay)
+                    GV.basicDataRecord.scoreInfos[GV.basicDataRecord.difficulty].countPlays += 1
+                    GCHelper.shared.sendScoreToGameCenter(score: 0, difficulty: GV.basicDataRecord.difficulty, completion: {})
                 }
                 let gameNumber = GV.basicDataRecord.difficulty * 1000
                 startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
@@ -928,15 +930,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     private func generateBasicDataRecordIfNeeded() {
         func createScoreInfo() {
             try! realm.safeWrite() {
-                for language in 0...3 {
-                    let scoreInfo = ScoreInfoForLanguage()
-                    scoreInfo.language = language
-                    for difficulty in 0...3 {
-                        let difficultyInfo = ScoreInfoForDifficulty()
-                        difficultyInfo.difficulty = difficulty
-                        scoreInfo.difficultyInfos.append(difficultyInfo)
-                    }
-                    GV.basicDataRecord.scoreInfos.append(scoreInfo)
+                for _ in 0...3 {
+                    let difficultyInfo = ScoreInfoForDifficulty()
+                    GV.basicDataRecord.scoreInfos.append(difficultyInfo)
                 }
             }
         }

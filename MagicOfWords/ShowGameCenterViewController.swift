@@ -92,8 +92,8 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
             cell.addColumn(text: yearMonthDayString(value: GV.globalInfoTable[indexPath.row].lastDay).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengthOfOnlineDuration, leadingBlanks: false), color: actColor)
             cell.addColumn(text: GV.globalInfoTable[indexPath.row].version.fixLength(length: lengthOfVersion, leadingBlanks: false), color: actColor)
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyScore).fixLength(length: lengthOfEasyScore, leadingBlanks: false), color: actColor)
-            cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumScore.fixLength(length: lengthOfMediumScore, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengthOfEasyScore, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengthOfMediumScore, leadingBlanks: false), color: actColor)
         }
         return cell
     }
@@ -184,6 +184,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         self.view.insertSubview(myBackgroundImage, at: 0)
         view.addSubview(showGameCenterView!)
         showGameCenterView!.setDelegate(delegate: self)
+        createButtons()
         GCHelper.shared.getAllGlobalInfos(completion: {self.allGlobalDataLoaded()})
         buttonsCreated = false
         buttonRadius = self.view.frame.width / 25
@@ -215,7 +216,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     var sortUp = true
     var buttonsCreated = false
 
-//    private func createButtons() {
+    private func createButtons() {
 //        let buttonCenterDistance = (showGameCenterView!.frame.size.width - 2 * buttonRadius) / 4
 //        let buttonFrameWidth = 2 * buttonRadius
 //        let buttonFrame = CGRect(x: 0, y: 0, width:buttonFrameWidth, height: buttonFrameWidth)
@@ -246,7 +247,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
 //        sortButton!.addTarget(self, action: #selector(self.sortButtonTapped), for: .touchUpInside)
 //        self.view?.addSubview(sortButton!)
 //        self.buttonsCreated = true
-//    }
+    }
     
     private func modifyButtonsPosition() {
         let height = showGameCenterView!.frame.height * 0.5

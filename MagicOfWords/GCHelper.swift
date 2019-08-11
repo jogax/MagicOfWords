@@ -178,8 +178,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     struct GCInfo {
         let identifier: String
         let value: Int
-        init(identifier: String, value: Int) {
-            let adder = GV.TimeModifier * GV.getTimeIntervalSince20190101()
+        init(identifier: String, value: Int, modifyValue: Int = GV.TimeModifier) {
+            let adder = modifyValue * GV.getTimeIntervalSince20190101()
             self.identifier = identifier
             self.value = value + adder
         }
@@ -207,7 +207,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     @objc public func getAllGlobalInfos(completion: @escaping ()->()) {
         GV.globalInfoTable.removeAll()
-        leaderboardIdentifiers = [playingTimeName, playingTimeTodayName, myDeviceName, myLandName, myVersionName, easyName, mediumName]
+        leaderboardIdentifiers = [playingTimeName, playingTimeTodayName, myDeviceName, myLandName, myVersionName, easyBestScoreName, mediumBestScoreName, easyActScoreName, mediumActScoreName, easyCountPlaysName, mediumCountPlaysName]
         countFinished = leaderboardIdentifiers.count
         func decreaseCountFinished() {
             self.countFinished -= 1
@@ -274,19 +274,43 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                             } else {
                                 tableItem.version = myVersion
                             }
-                        case GV.actLanguage + self.easyName:
+                        case self.easyBestScoreName:
                             if index != nil {
-                                GV.globalInfoTable[index!].easyScore = String(score.value)
+                                GV.globalInfoTable[index!].easyBestScore = String(score.value)
                             } else {
-                                tableItem.easyScore = String(score.value)
+                                tableItem.easyBestScore = String(score.value)
                             }
-                        case GV.actLanguage + self.mediumName:
+                        case self.mediumBestScoreName:
                             if index != nil {
-                                GV.globalInfoTable[index!].mediumScore = String(score.value)
+                                GV.globalInfoTable[index!].mediumBestScore = String(score.value)
                             } else {
-                                tableItem.mediumScore = String(score.value)
+                                tableItem.mediumBestScore = String(score.value)
                             }
-                       default:
+                        case self.easyActScoreName:
+                            if index != nil {
+                                GV.globalInfoTable[index!].easyActScore = String(savedValue)
+                            } else {
+                                tableItem.easyActScore = String(savedValue)
+                            }
+                        case self.mediumActScoreName:
+                            if index != nil {
+                                GV.globalInfoTable[index!].mediumActScore = String(savedValue)
+                            } else {
+                                tableItem.mediumActScore = String(savedValue)
+                            }
+                        case self.easyCountPlaysName:
+                            if index != nil {
+                                GV.globalInfoTable[index!].easyCountPlays = String(savedValue)
+                            } else {
+                                tableItem.easyCountPlays = String(savedValue)
+                            }
+                        case self.mediumCountPlaysName:
+                            if index != nil {
+                                GV.globalInfoTable[index!].mediumCountPlays = String(savedValue)
+                            } else {
+                                tableItem.mediumCountPlays = String(savedValue)
+                            }
+                     default:
                             break
                         }
                         if index == nil {
@@ -305,8 +329,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             })
             }
         for identifier in leaderboardIdentifiers {
-            let prefix = identifier == easyName || identifier == mediumName ? GV.actLanguage : ""
-            loadScoresForLeaderboard(identifier: prefix + identifier)
+            loadScoresForLeaderboard(identifier: identifier)
         }
     }
     
@@ -355,13 +378,31 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
         globalInfosTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
     }
+    public func sendScoreToGameCenter(score: Int?, difficulty: Int, completion: @escaping ()->()) {
+        // Submit score to GC leaderboard
+        if score == nil {
+            return
+        }
+        var infoArray = [GCInfo]()
+        if GKLocalPlayer.local.isAuthenticated {
+            let bestIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyBestScoreName : mediumBestScoreName
+            let actIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyActScoreName : mediumActScoreName
+            infoArray.append(GCInfo(identifier: bestIdentifier, value: score!, modifyValue: 0))
+            infoArray.append(GCInfo(identifier: actIdentifier, value: score!))
+            if score! == 0 {
+                let countPlaysIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyCountPlaysName : mediumCountPlaysName
+                infoArray.append(GCInfo(identifier: countPlaysIdentifier, value: GV.basicDataRecord.scoreInfos[difficulty].countPlays))
+            }
+            sendInfoToGC(infos: infoArray)
+        }
+    }
+
     @objc private func sendGlobalInfosTOGC(timerX: Timer) {
         var infoArray = [GCInfo]()
         print("sendGlobalInfosTOGC actTime: \(Date())")
         if GKLocalPlayer.local.isAuthenticated {
             infoArray.append(GCInfo(identifier: playingTimeName, value: GV.basicDataRecord.playingTime))
             infoArray.append(GCInfo(identifier: playingTimeTodayName, value: GV.basicDataRecord.playingTimeToday))
-//            infoArray.append(GCInfo(identifier: timeStampName, value: 0))
             if !GV.basicDataRecord.deviceInfoSaved {
                 infoArray.append(GCInfo(identifier: myLandName, value: GV.basicDataRecord.land))
                 infoArray.append(GCInfo(identifier: myDeviceName, value: GV.basicDataRecord.deviceType))
@@ -579,13 +620,6 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         presentingViewController.present(mmvc, animated: true, completion: nil)
     }
     
-    private func difficultyName(difficulty: Int)->String {
-        let returnValue =
-            difficulty == GameDifficulty.Easy.rawValue ? easyName :
-            difficulty == GameDifficulty.Medium.rawValue ? mediumName :
-            difficulty == GameDifficulty.Hard.rawValue ? hardName : veryHardName
-        return returnValue
-    }
     
     var waitingForScores = false
     
@@ -593,7 +627,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         if GKLocalPlayer.local.isAuthenticated {
             GV.scoreForShowTable.removeAll()
             let leaderBoard = GKLeaderboard()
-            let leaderboardID = "\(GV.actLanguage)\(difficultyName(difficulty:GV.basicDataRecord.difficulty))"
+            let leaderboardID = "\(GameDifficulty(rawValue: GV.basicDataRecord.difficulty)!.description().lowercased())BestScore"
             leaderBoard.identifier = leaderboardID
             leaderBoard.playerScope = .global
             leaderBoard.timeScope = .allTime
@@ -627,7 +661,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             }
             waitingForScores = true
             let leaderBoard = GKLeaderboard()
-            let leaderboardID = "\(GV.actLanguage)\(difficultyName(difficulty:GV.basicDataRecord.difficulty))"
+            let leaderboardID = "\(GameDifficulty(rawValue: GV.basicDataRecord.difficulty)!.description().lowercased())BestScore"
             if !inRecursion {
                 GV.scoreTable.removeAll()
             }
@@ -663,7 +697,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     public func getBestScore(completion: @escaping ()->()) {
         let difficulty = GV.basicDataRecord.difficulty
         let leaderBoard = GKLeaderboard()
-        let leaderboardID = "\(GV.actLanguage)\(difficultyName(difficulty:difficulty))"
+        let leaderboardID = difficulty == GameDifficulty.Easy.rawValue ? easyBestScoreName : mediumBestScoreName
         leaderBoard.identifier = leaderboardID
         leaderBoard.playerScope = .global
         leaderBoard.timeScope = .allTime
@@ -697,38 +731,16 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     public func getName() -> String {
         return GKLocalPlayer.local.alias
     }
-    let easyName = "Easy"
-    let mediumName = "Medium"
-    let hardName = "Hard"
-    let veryHardName = "VeryHard"
-//    let timeStampName = "timeStamp"
+    let easyBestScoreName = "easyBestScore"
+    let mediumBestScoreName = "mediumBestScore"
+    let easyActScoreName = "easyActScore"
+    let mediumActScoreName = "mediumActScore"
+    let easyCountPlaysName = "easyCountPlays"
+    let mediumCountPlaysName = "mediumCountPlays"
     let playingTimeName = "playingTime"
     let playingTimeTodayName = "playingTimeToday"
     let myDeviceName = "myDevice"
     let myLandName = "myLandLanguage"
     let myVersionName = "myVersion"
 
-    public func sendScoreToGameCenter(score: Int?, difficulty: Int, completion: @escaping ()->()) {
-            // Submit score to GC leaderboard
-        if score == nil {
-            return
-        }
-        if GKLocalPlayer.local.isAuthenticated {
-            let language = GV.actLanguage
-
-            let bestScore = GKScore(leaderboardIdentifier: "\(language)\(difficultyName(difficulty: difficulty))", player: GKLocalPlayer.local)
-            bestScore.value = Int64(score!)
-            let scoreArray = [bestScore]
-            GKScore.report(scoreArray) { (error) in
-                if error != nil {
-                    print("Error by send score to GameCenter: \(error!.localizedDescription)")
-                } else {
-                    self.getBestScore(completion: completion)
-                }
-            }
-        }
-    }
-    
-
-    
 }

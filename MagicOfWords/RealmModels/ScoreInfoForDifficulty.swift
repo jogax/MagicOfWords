@@ -10,10 +10,10 @@ import Foundation
 import RealmSwift
 
 class ScoreInfoForDifficulty: Object {
-    @objc dynamic var difficulty = 0
     @objc dynamic var bestScore = 0
     @objc dynamic var bestPlayerName = ""
     @objc dynamic var myRank = 0
     @objc dynamic var myScore = 0
+    @objc dynamic var countPlays = 0
 }
 

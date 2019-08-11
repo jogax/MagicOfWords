@@ -30,7 +30,7 @@ class WelcomeScene: SKScene {
     
     let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
     var myDelegate: WelcomeSceneDelegate?
-    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 25 : 14)
+    let myTitleFont = UIFont(name: "TimesNewRomanPS-BoldMT", size: GV.onIpad ? 22 : 14)
     var button1: MyButton?
     var button2: MyButton?
     var button3: MyButton?
@@ -96,14 +96,15 @@ class WelcomeScene: SKScene {
         
         letterTable.removeAll()
         countLetters += getLetters(text: text)
-        firstLinePosY = lastPosY > 0 ? lastPosY - self.frame.height * 0.05 : firstLinePosY
-
+        firstLinePosY = lastPosY > 0 ? lastPosY - self.frame.height * 0.04 : firstLinePosY
+        let blockSizeModifier: CGFloat = 0.75
         for (lineIndex, lineTable) in letterTable.enumerated() {
-            let startPosX = (self.frame.width - blockSize * 1.1 * CGFloat(lineTable.count)) / 2 - blockSize / 2
+            let value = self.frame.width - blockSize * blockSizeModifier * CGFloat(lineTable.count)
+            let startPosX = value / 2 - blockSize / 2
             for (index, item) in lineTable.enumerated() {
                 if item.text != " " {
-                    let toPositionX = startPosX + CGFloat(index + 1) * blockSize * 1.1
-                    let toPositionY = firstLinePosY - 1.4 * (CGFloat(lineIndex) * blockSize * 1.1)
+                    let toPositionX = startPosX + CGFloat(index + 1) * blockSize * blockSizeModifier
+                    let toPositionY = firstLinePosY - 1.4 * (CGFloat(lineIndex) * blockSize * 1.0)
                     lastPosY = toPositionY
                     let waitAction = SKAction.wait(forDuration: TimeInterval(waiting))
                     waiting += 0.05
@@ -128,10 +129,10 @@ class WelcomeScene: SKScene {
         for (tableIndex, word) in words.enumerated() {
             letterTable.append([SKLabelNode]())
             for letter in word {
-                let label = SKLabelNode(fontNamed: "CourierNewPS-BoldMT")
+                let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
                 label.text = String(letter)
                 label.horizontalAlignmentMode = .center
-                label.fontSize = self.frame.width * (GV.onIpad ? 0.04 : 0.04)
+                label.fontSize = self.frame.width * (GV.onIpad ? 0.03 : 0.03)
                 label.fontColor = SKColor.black
                 label.position = CGPoint(x: self.frame.width * 0.5, y: self.frame.height * -0.1)
                 label.zPosition = self.zPosition + 2
