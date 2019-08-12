@@ -158,6 +158,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcNobody:          "Неизвестный",
     .tcEasyScore:       "Простая",
     .tcMediumScore:     "Средняя",
-    .tcShowGameCenter:  "Покажи Game Center"
+    .tcShowGameCenter:  "Покажи Game Center",
+    .tcEasyActScore:    "АктПростая",
+    .tcMediumActScore:  "АктСредняя",
+    .tcCountPlays:      "Игры",
 ]
 

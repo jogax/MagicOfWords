@@ -157,7 +157,10 @@ enum TextConstants: Int {
     tcNobody,
     tcEasyScore,
     tcMediumScore,
-    tcShowGameCenter
+    tcShowGameCenter,
+    tcEasyActScore,
+    tcMediumActScore,
+    tcCountPlays
 }
 
     let LanguageEN = "en" // index 0

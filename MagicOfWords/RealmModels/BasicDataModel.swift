@@ -29,6 +29,7 @@ class BasicDataModel: Object {
     @objc dynamic var deviceType = 0
     @objc dynamic var land = 0
     @objc dynamic var version = 0
+    @objc dynamic var countPlays = 0
     @objc dynamic var deviceInfoSaved = false
 //    GCEnabledType: 0 = AskForGameCenter, 1 = GameCenterEnabled, 2 = GameCenterSupressed
     @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue

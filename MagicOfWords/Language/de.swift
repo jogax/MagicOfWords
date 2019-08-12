@@ -159,7 +159,10 @@ let deDictionary: [TextConstants: String] = [
     .tcNobody:          "Unbekannt",
     .tcEasyScore:       "Einfach",
     .tcMediumScore:     "Mittel",
-    .tcShowGameCenter:  "Zeige Game Center"
+    .tcShowGameCenter:  "Zeige Game Center",
+    .tcEasyActScore:    "EinfachAct",
+    .tcMediumActScore:  "MittelAct",
+    .tcCountPlays:      "Gespielt",
 ]
 
 

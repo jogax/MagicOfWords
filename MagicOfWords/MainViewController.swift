@@ -201,7 +201,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             if actPlay.first!.gameStatus == GV.GameStatusFinished {
                 try! realm.safeWrite() {
                     realm.delete(actPlay)
-                    GV.basicDataRecord.scoreInfos[GV.basicDataRecord.difficulty].countPlays += 1
+                    GV.basicDataRecord.countPlays += 1
                     GCHelper.shared.sendScoreToGameCenter(score: 0, difficulty: GV.basicDataRecord.difficulty, completion: {})
                 }
                 let gameNumber = GV.basicDataRecord.difficulty * 1000
@@ -295,6 +295,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).count
 //        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and (gameStatus = %@ or gameStatus = %@)", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber, GV.GameStatusPlaying, GV.GameStatusContinued).count
 //    }
+    var oneMinutesTimer: Timer?
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
         #if DEBUG
@@ -305,7 +306,11 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         myHeight = self.view.frame.size.height
         myWidth = self.view.frame.size.width
         generateBasicDataRecordIfNeeded()
-        _ = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
+        
+        if oneMinutesTimer != nil {
+            oneMinutesTimer!.invalidate()
+        }
+        oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
         convertIfNeeded()
         if !GV.basicDataRecord.startAnimationShown {
@@ -322,7 +327,10 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             GV.basicDataRecord.playingTime += 1
             GV.basicDataRecord.playingTimeToday += 1
         }
-        _ = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
+        if oneMinutesTimer != nil {
+            oneMinutesTimer!.invalidate()
+        }
+        oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
     }
     
     @objc private func waitForInternet(timerX: Timer) {

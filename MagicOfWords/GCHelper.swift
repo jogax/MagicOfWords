@@ -197,7 +197,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             if error != nil {
                 print("Error by send score to GameCenter: \(error!.localizedDescription)")
             } else {
-                self.getGlobalInfos()
+//                self.getGlobalInfos()
             }
         }
     }
@@ -207,7 +207,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     @objc public func getAllGlobalInfos(completion: @escaping ()->()) {
         GV.globalInfoTable.removeAll()
-        leaderboardIdentifiers = [playingTimeName, playingTimeTodayName, myDeviceName, myLandName, myVersionName, easyBestScoreName, mediumBestScoreName, easyActScoreName, mediumActScoreName, easyCountPlaysName, mediumCountPlaysName]
+        leaderboardIdentifiers = [playingTimeName, playingTimeTodayName, myDeviceName, myLandName, myVersionName, easyBestScoreName, mediumBestScoreName, easyActScoreName, mediumActScoreName, countPlaysName]
         countFinished = leaderboardIdentifiers.count
         func decreaseCountFinished() {
             self.countFinished -= 1
@@ -298,17 +298,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                             } else {
                                 tableItem.mediumActScore = String(savedValue)
                             }
-                        case self.easyCountPlaysName:
+                        case self.countPlaysName:
                             if index != nil {
-                                GV.globalInfoTable[index!].easyCountPlays = String(savedValue)
+                                GV.globalInfoTable[index!].countPlays = String(savedValue)
                             } else {
-                                tableItem.easyCountPlays = String(savedValue)
-                            }
-                        case self.mediumCountPlaysName:
-                            if index != nil {
-                                GV.globalInfoTable[index!].mediumCountPlays = String(savedValue)
-                            } else {
-                                tableItem.mediumCountPlays = String(savedValue)
+                                tableItem.countPlays = String(savedValue)
                             }
                      default:
                             break
@@ -333,44 +327,44 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
     }
     
-    private func getGlobalInfos () {
-        let leaderBoard = GKLeaderboard()
-        leaderBoard.identifier = playingTimeName
-        leaderBoard.playerScope = .global
-        leaderBoard.timeScope = .allTime
-        leaderBoard.range = NSRange(location: 1, length: 1)
-        leaderBoard.loadScores(completionHandler: {
-            (scores, error) in
-            if scores != nil {
-                if leaderBoard.localPlayerScore != nil {
-                    let usedTimeInGC = Int(leaderBoard.localPlayerScore!.value) % GV.TimeModifier
-                    if usedTimeInGC > GV.basicDataRecord.playingTime {
-                        try! realm.safeWrite() {
-                            GV.basicDataRecord.playingTime = usedTimeInGC
-                        }
-                    }
-                }
-            }
-        })
-        let leaderBoardforplayingTimeToday = GKLeaderboard()
-        leaderBoardforplayingTimeToday.identifier = playingTimeTodayName
-        leaderBoardforplayingTimeToday.playerScope = .global
-        leaderBoardforplayingTimeToday.timeScope = .allTime
-        leaderBoardforplayingTimeToday.range = NSRange(location: 1, length: 1)
-        leaderBoardforplayingTimeToday.loadScores(completionHandler: {
-            (scores, error) in
-            if scores != nil {
-                if leaderBoardforplayingTimeToday.localPlayerScore != nil {
-                    let playingTimeTodayInGC = Int(leaderBoardforplayingTimeToday.localPlayerScore!.value) % GV.TimeModifier
-                    if playingTimeTodayInGC > GV.basicDataRecord.playingTimeToday {
-                        try! realm.safeWrite() {
-                            GV.basicDataRecord.playingTimeToday = playingTimeTodayInGC
-                        }
-                    }
-                }
-            }
-        })
-    }
+//    private func getGlobalInfos () {
+//        let leaderBoard = GKLeaderboard()
+//        leaderBoard.identifier = playingTimeName
+//        leaderBoard.playerScope = .global
+//        leaderBoard.timeScope = .allTime
+//        leaderBoard.range = NSRange(location: 1, length: 1)
+//        leaderBoard.loadScores(completionHandler: {
+//            (scores, error) in
+//            if scores != nil {
+//                if leaderBoard.localPlayerScore != nil {
+//                    let usedTimeInGC = Int(leaderBoard.localPlayerScore!.value) % GV.TimeModifier
+//                    if usedTimeInGC > GV.basicDataRecord.playingTime {
+//                        try! realm.safeWrite() {
+//                            GV.basicDataRecord.playingTime = usedTimeInGC
+//                        }
+//                    }
+//                }
+//            }
+//        })
+//        let leaderBoardforplayingTimeToday = GKLeaderboard()
+//        leaderBoardforplayingTimeToday.identifier = playingTimeTodayName
+//        leaderBoardforplayingTimeToday.playerScope = .global
+//        leaderBoardforplayingTimeToday.timeScope = .allTime
+//        leaderBoardforplayingTimeToday.range = NSRange(location: 1, length: 1)
+//        leaderBoardforplayingTimeToday.loadScores(completionHandler: {
+//            (scores, error) in
+//            if scores != nil {
+//                if leaderBoardforplayingTimeToday.localPlayerScore != nil {
+//                    let playingTimeTodayInGC = Int(leaderBoardforplayingTimeToday.localPlayerScore!.value) % GV.TimeModifier
+//                    if playingTimeTodayInGC > GV.basicDataRecord.playingTimeToday {
+//                        try! realm.safeWrite() {
+//                            GV.basicDataRecord.playingTimeToday = playingTimeTodayInGC
+//                        }
+//                    }
+//                }
+//            }
+//        })
+//    }
     
     public func restartGlobalInfosTimer() {
         if globalInfosTimer != nil {
@@ -390,8 +384,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             infoArray.append(GCInfo(identifier: bestIdentifier, value: score!, modifyValue: 0))
             infoArray.append(GCInfo(identifier: actIdentifier, value: score!))
             if score! == 0 {
-                let countPlaysIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyCountPlaysName : mediumCountPlaysName
-                infoArray.append(GCInfo(identifier: countPlaysIdentifier, value: GV.basicDataRecord.scoreInfos[difficulty].countPlays))
+                let countPlaysIdentifier = countPlaysName
+                infoArray.append(GCInfo(identifier: countPlaysIdentifier, value: GV.basicDataRecord.countPlays))
             }
             sendInfoToGC(infos: infoArray)
         }
@@ -735,8 +729,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     let mediumBestScoreName = "mediumBestScore"
     let easyActScoreName = "easyActScore"
     let mediumActScoreName = "mediumActScore"
-    let easyCountPlaysName = "easyCountPlays"
-    let mediumCountPlaysName = "mediumCountPlays"
+    let countPlaysName = "countPlays"
     let playingTimeName = "playingTime"
     let playingTimeTodayName = "playingTimeToday"
     let myDeviceName = "myDevice"

@@ -157,5 +157,8 @@ let huDictionary: [TextConstants: String] = [
     .tcNobody:          "Ismeretlen",
     .tcEasyScore:       "Könnyű",
     .tcMediumScore:     "Közepes",
-    .tcShowGameCenter:  "Mutasd a Game Center-t"
+    .tcShowGameCenter:  "Mutasd a Game Center-t",
+    .tcEasyActScore:    "KönnyűAct",
+    .tcMediumActScore:  "KözepesAct",
+    .tcCountPlays:      "Játszott",
 ]

@@ -14,24 +14,27 @@ import GameplayKit
 
 class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     var showGameCenterView: WTTableView? = WTTableView()
-    var headerLine = ""
+    var headerLine = [String]()
     let color = UIColor(red: 230/255, green: 230/255, blue: 240/255, alpha: 1.0)
     var lengthOfAlias = 16
     var lengthOfDevice = 18
     var lengthOfLand = 7
-    var lengthOfIsOnline = 0
     var lengthOfOnlineTime = 8
     var lengthOfLastOnline = 11
     var lengthOfOnlineDuration = 8
-    var lengthOfVersion = 10
+    var lengthOfVersion = 8
     var lengthOfEasyScore = 10
     var lengthOfMediumScore = 10
-    var lengthOfScore = 5
-    var lengthOfPlace = 5
-
-
+    var lengthOfEasyActScore = 12
+    var lengthOfMediumActScore = 12
+    var lengthOfCountPlays = 10
     
+    enum ShowingModus: Int {
+        case Left = 0, Right
+    }
     
+    var showingModus: ShowingModus = .Left
+
     //    var lengthOfOnlineSince = 0
     let myFont = UIFont(name: GV.actLabelFont, size: GV.onIpad ? 16 : 12)
     
@@ -75,7 +78,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         let cellWidth = tableView.frame.width
-        let cellHeight = headerLine.height(font: myFont!) * 1.0
+        let cellHeight = headerLine[0].height(font: myFont!) * 1.0
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: cellWidth, height: cellHeight))
 //        cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.010)))
@@ -84,34 +87,47 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         let origImage = UIImage(named: isOnline ? "online.png" : "offline.png")!
         let image = origImage.resizeImage(newWidth: cellHeight * 0.6)
         cell.addButton(image: image, xPos: cellHeight * 0.5, callBack: buttonTapped)
-        cell.addColumn(text: " " + (GV.globalInfoTable[indexPath.row].alias.fixLength(length: lengthOfAlias - 4, leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
-        cell.addColumn(text: (GV.globalInfoTable[indexPath.row].device.fixLength(length: lengthOfDevice, leadingBlanks: false)), color: actColor)
-        cell.addColumn(text: (GV.globalInfoTable[indexPath.row].land.fixLength(length: lengthOfLand, leadingBlanks: false)), color: actColor)
-        cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
-        if GV.onIpad {
+        cell.addColumn(text: " " + (GV.globalInfoTable[indexPath.row].alias.fixLength(length: lengthOfAlias, leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
+        switch showingModus {
+        case .Left:
+            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].device.fixLength(length: lengthOfDevice, leadingBlanks: false)), color: actColor)
+            cell.addColumn(text: GV.globalInfoTable[indexPath.row].version.fixLength(length: lengthOfVersion, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].land.fixLength(length: lengthOfLand, leadingBlanks: false)), color: actColor)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
+            if GV.onIpad {
+                cell.addColumn(text: yearMonthDayString(value: GV.globalInfoTable[indexPath.row].lastDay).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengthOfOnlineDuration, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengthOfEasyScore, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengthOfMediumScore, leadingBlanks: false), color: actColor)
+            }
+        case .Right:
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
             cell.addColumn(text: yearMonthDayString(value: GV.globalInfoTable[indexPath.row].lastDay).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengthOfOnlineDuration, leadingBlanks: false), color: actColor)
-            cell.addColumn(text: GV.globalInfoTable[indexPath.row].version.fixLength(length: lengthOfVersion, leadingBlanks: false), color: actColor)
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengthOfEasyScore, leadingBlanks: false), color: actColor)
-            cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengthOfMediumScore, leadingBlanks: false), color: actColor)
+            if GV.onIpad {
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengthOfEasyScore, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengthOfMediumScore, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyActScore).fixLength(length: lengthOfEasyActScore, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumActScore.fixLength(length: lengthOfMediumActScore, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].countPlays.fixLength(length: lengthOfCountPlays, leadingBlanks: false), color: actColor)            }
         }
         return cell
     }
     
     func getHeightForRow(tableView: UITableView, indexPath: IndexPath) -> CGFloat {
-        return headerLine.height(font: myFont!)
+        return headerLine[0].height(font: myFont!)
     }
     
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int) {
     }
     
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
-        let lineHeight = headerLine.height(font: myFont!)
-        let width = headerLine.width(withConstrainedHeight: 0, font: myFont!)
+        let lineHeight = headerLine[0].height(font: myFont!)
+        let width = headerLine[0].width(withConstrainedHeight: 0, font: myFont!)
         let view = UIView()
         let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
         label1.font = myFont!
-        label1.text = headerLine
+        label1.text = headerLine[showingModus.rawValue]
         view.addSubview(label1)
         let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight, width: width, height: lineHeight))
         label2.font = myFont!
@@ -122,12 +138,12 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     }
     
     func getHeightForHeaderInSection(tableView: UITableView, section: Int) -> CGFloat {
-        return headerLine.height(font: myFont!)
+        return headerLine[0].height(font: myFont!)
     }
     
     private func calculateColumnWidths() {
         
-        headerLine = ""
+        headerLine.removeAll()
         var text1 = ""
         var text2 = ""
         var text3 = ""
@@ -139,25 +155,49 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         var text9 = ""
         text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengthOfAlias, center: true)
         text2 = "\(GV.language.getText(.tcDevice)) ".fixLength(length: lengthOfDevice, center: true)
-        text3 = "\(GV.language.getText(.tcLand)) ".fixLength(length: lengthOfLand, center: true)
-        text4 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengthOfOnlineTime, center: true)
+        text3 = "\(GV.language.getText(.tcVersion))".fixLength(length: lengthOfVersion, center: true)
+        text4 = "\(GV.language.getText(.tcLand)) ".fixLength(length: lengthOfLand, center: true)
+        text5 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengthOfOnlineTime, center: true)
         if GV.onIpad {
-            text5 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengthOfLastOnline, center: true)
-            text6 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengthOfOnlineDuration, center: true)
-            text7 = "\(GV.language.getText(.tcVersion))".fixLength(length: lengthOfVersion, center: true)
+            text6 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengthOfLastOnline, center: true)
+            text7 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengthOfOnlineDuration, center: true)
             text8 = "\(GV.language.getText(.tcEasyScore))".fixLength(length: lengthOfEasyScore, center: true)
             text9 = "\(GV.language.getText(.tcMediumScore))".fixLength(length: lengthOfMediumScore, center: true)
         }
-        headerLine += text1
-        headerLine += text2
-        headerLine += text3
-        headerLine += text4
-        headerLine += text5
-        headerLine += text6
-        headerLine += text7
-        headerLine += text8
-        headerLine += text9
-        lengthOfIsOnline = text2.length
+        var line = ""
+        line += text1
+        line += text2
+        line += text3
+        line += text4
+        line += text5
+        line += text6
+        line += text7
+        line += text8
+        line += text9
+        headerLine.append(line)
+        text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengthOfAlias, center: true)
+        text2 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengthOfOnlineTime, center: true)
+        text3 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengthOfLastOnline, center: true)
+        text4 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengthOfOnlineDuration, center: true)
+        if GV.onIpad {
+            text5 = "\(GV.language.getText(.tcEasyScore))".fixLength(length: lengthOfEasyScore, center: true)
+            text6 = "\(GV.language.getText(.tcMediumScore))".fixLength(length: lengthOfMediumScore, center: true)
+            text7 = "\(GV.language.getText(.tcEasyActScore))".fixLength(length: lengthOfEasyActScore, center: true)
+            text8 = "\(GV.language.getText(.tcMediumActScore))".fixLength(length: lengthOfMediumActScore, center: true)
+            text9 = "\(GV.language.getText(.tcCountPlays))".fixLength(length: lengthOfCountPlays, center: true)        }
+        line = ""
+        line += text1
+        line += text2
+        line += text3
+        line += text4
+        line += text5
+        line += text6
+        line += text7
+        line += text8
+        line += text9
+        headerLine.append(line)
+
+        
     }
     
     //    let realm: Realm
@@ -184,8 +224,9 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         self.view.insertSubview(myBackgroundImage, at: 0)
         view.addSubview(showGameCenterView!)
         showGameCenterView!.setDelegate(delegate: self)
-        createButtons()
+//        createButtons()
         GCHelper.shared.getAllGlobalInfos(completion: {self.allGlobalDataLoaded()})
+        showingModus = .Left
         buttonsCreated = false
         buttonRadius = self.view.frame.width / 25
 
@@ -202,10 +243,20 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         })
     }
     
+    @objc func leftButtonTapped() {
+        showingModus = .Left
+        showGameCenterView!.reloadData()
+    }
+    
+    @objc func rightButtonTapped() {
+        showingModus = .Right
+        showGameCenterView!.reloadData()
+    }
+
     var enabled = true
     var doneButton: UIButton?
-    var playersButton: UIButton?
-    var scoreButton: UIButton?
+    var leftButton: UIButton?
+    var rightButton: UIButton?
     var bestButton: UIButton?
     var sortButton: UIButton?
     let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 0.8)
@@ -217,25 +268,26 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     var buttonsCreated = false
 
     private func createButtons() {
-//        let buttonCenterDistance = (showGameCenterView!.frame.size.width - 2 * buttonRadius) / 4
-//        let buttonFrameWidth = 2 * buttonRadius
-//        let buttonFrame = CGRect(x: 0, y: 0, width:buttonFrameWidth, height: buttonFrameWidth)
-//        let yPos = showGameCenterView!.frame.maxY + buttonRadius * 1.2
-//        let xPos1 = showGameCenterView!.frame.minX + buttonRadius
-//        let center1 = CGPoint(x: xPos1, y:yPos)
-//        doneButton = createButton(imageName: "hook.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center1, enabled: enabled)
-//        doneButton?.addTarget(self, action: #selector(self.stopShowingTable), for: .touchUpInside)
-//        self.view?.addSubview(doneButton!)
-//        let xPos2 = showGameCenterView!.frame.minX + buttonRadius + buttonCenterDistance
-//        let center2 = CGPoint(x: xPos2, y:yPos)
-//        playersButton = createButton(imageName: "players.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center2, enabled: enabled)
-//        playersButton?.addTarget(self, action: #selector(self.playersButtonTapped), for: .touchUpInside)
-//        self.view?.addSubview(playersButton!)
-//        let xPos3 = showGameCenterView!.frame.minX + buttonRadius + buttonCenterDistance * 2
-//        let center3 = CGPoint(x: xPos3, y:yPos)
-//        scoreButton = createButton(imageName: "bestScores.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center3, enabled: enabled)
-//        scoreButton?.addTarget(self, action: #selector(self.scoreButtonTapped), for: .touchUpInside)
-//        self.view?.addSubview(scoreButton!)
+        let buttonCenterDistance = (showGameCenterView!.frame.size.width - 2 * buttonRadius) / 4
+        let buttonFrameWidth = 2 * buttonRadius
+        let buttonFrame = CGRect(x: 0, y: 0, width:buttonFrameWidth, height: buttonFrameWidth)
+        let yPos = showGameCenterView!.frame.maxY + buttonRadius * 1.2
+        let xPos1 = showGameCenterView!.frame.minX + buttonRadius
+        let center1 = CGPoint(x: xPos1, y:yPos)
+        doneButton = createButton(imageName: "hook", imageSize: 0.05, title: "", frame: buttonFrame, center: center1, enabled: enabled)
+        doneButton?.addTarget(self, action: #selector(self.stopShowingTable), for: .touchUpInside)
+        self.view?.addSubview(doneButton!)
+        
+        let xPos2 = showGameCenterView!.frame.minX + buttonRadius + buttonCenterDistance
+        let center2 = CGPoint(x: xPos2, y:yPos)
+        leftButton = createButton(imageName: "LeftSimple", imageSize: 0.05, title: "", frame: buttonFrame, center: center2, enabled: enabled)
+        leftButton?.addTarget(self, action: #selector(self.leftButtonTapped), for: .touchUpInside)
+        self.view?.addSubview(leftButton!)
+        let xPos3 = showGameCenterView!.frame.minX + buttonRadius + buttonCenterDistance * 2
+        let center3 = CGPoint(x: xPos3, y:yPos)
+        rightButton = createButton(imageName: "RightSimple", imageSize: 0.05, title: "", frame: buttonFrame, center: center3, enabled: enabled)
+        rightButton!.addTarget(self, action: #selector(self.rightButtonTapped), for: .touchUpInside)
+        self.view!.addSubview(rightButton!)
 //        let xPos4 = showGameCenterView!.frame.minX + buttonRadius + buttonCenterDistance * 3
 //        let center4 = CGPoint(x: xPos4, y:yPos)
 //        bestButton = createButton(imageName: "firstplaces.png", imageSize: 0.05, title: "", frame: buttonFrame, center: center4, enabled: enabled)
@@ -254,8 +306,8 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         let center = self.view.frame.midY
         let calculatedYPos = center + height + self.buttonRadius * 1.2
         doneButton!.center = CGPoint(x: doneButton!.center.x, y: calculatedYPos)
-        playersButton!.center = CGPoint(x: playersButton!.center.x, y: calculatedYPos)
-        scoreButton!.center = CGPoint(x: scoreButton!.center.x, y: calculatedYPos)
+        leftButton!.center = CGPoint(x: leftButton!.center.x, y: calculatedYPos)
+        rightButton!.center = CGPoint(x: rightButton!.center.x, y: calculatedYPos)
         bestButton!.center = CGPoint(x: bestButton!.center.x, y: calculatedYPos)
         sortButton!.center = CGPoint(x: sortButton!.center.x, y: calculatedYPos)
     }
@@ -332,16 +384,16 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         calculateColumnWidths()
         let origin = CGPoint(x: 0, y: 0)
         let maxHeight = view.frame.height * 0.8
-        let calculatedHeight = headerLine.height(font: myFont!) * (CGFloat(GV.globalInfoTable.count + 1))
+        let calculatedHeight = headerLine[0].height(font: myFont!) * (CGFloat(GV.globalInfoTable.count + 1))
         let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
-        let size = CGSize(width: CGFloat(headerLine.width(font: myFont!) * 1), height:height)
+        let size = CGSize(width: CGFloat(headerLine[0].width(font: myFont!) * 1), height:height)
         let center = CGPoint(x: 0.5 * view.frame.width, y: 0.5 * view.frame.height)
         showGameCenterView!.frame=CGRect(origin: origin, size: size)
         showGameCenterView!.center=center
         //        showGameCenterView!.frame = self.view.frame
-//        if !buttonsCreated {
-//            createButton()
-//        }
+        if !buttonsCreated {
+            createButtons()
+        }
 //        modifyButtonsPosition()
         showGameCenterView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
         showGameCenterView!.reloadData()
@@ -351,9 +403,9 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     private func setTableviewSize() {
         let origin = CGPoint(x: 0, y: 0)
         let maxHeight = view.frame.height * 0.8
-        let calculatedHeight = headerLine.height(font: myFont!) * (CGFloat(GV.globalInfoTable.count + 1))
+        let calculatedHeight = headerLine[0].height(font: myFont!) * (CGFloat(GV.globalInfoTable.count + 1))
         let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
-        let size = CGSize(width: headerLine.width(font: myFont!) * 1, height: height)
+        let size = CGSize(width: headerLine[0].width(font: myFont!) * 1, height: height)
         let center = CGPoint(x: 0.5 * view.frame.width, y: 0.5 * view.frame.height)
         showGameCenterView!.frame=CGRect(origin: origin, size: size)
         showGameCenterView!.center=center

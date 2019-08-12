@@ -100,8 +100,7 @@ struct PlayerData {
     var mediumBestScore = ""
     var easyActScore = ""
     var mediumActScore = ""
-    var easyCountPlays = ""
-    var mediumCountPlays = ""
+    var countPlays = ""
 }
 
 struct GV {

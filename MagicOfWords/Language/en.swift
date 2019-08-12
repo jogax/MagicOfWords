@@ -158,5 +158,8 @@ let enDictionary: [TextConstants: String] = [
     .tcNobody:          "unknown",
     .tcEasyScore:       "Easy",
     .tcMediumScore:     "Medium",
-    .tcShowGameCenter:  "Show Game Center"
+    .tcShowGameCenter:  "Show Game Center",
+    .tcEasyActScore:    "EasyAct",
+    .tcMediumActScore:  "MediumAct",
+    .tcCountPlays:      "Played",
 ]

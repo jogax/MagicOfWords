@@ -14,6 +14,5 @@ class ScoreInfoForDifficulty: Object {
     @objc dynamic var bestPlayerName = ""
     @objc dynamic var myRank = 0
     @objc dynamic var myScore = 0
-    @objc dynamic var countPlays = 0
 }
 
