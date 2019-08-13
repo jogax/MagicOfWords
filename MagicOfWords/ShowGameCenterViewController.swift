@@ -14,20 +14,21 @@ import GameplayKit
 
 class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     var showGameCenterView: WTTableView? = WTTableView()
-    var headerLine = [String]()
+//    var headerLine = [String]()
     let color = UIColor(red: 230/255, green: 230/255, blue: 240/255, alpha: 1.0)
-    var lengthOfAlias = 16
-    var lengthOfDevice = 18
-    var lengthOfLand = 7
-    var lengthOfOnlineTime = 8
-    var lengthOfLastOnline = 11
-    var lengthOfOnlineDuration = 8
-    var lengthOfVersion = 8
-    var lengthOfEasyScore = 10
-    var lengthOfMediumScore = 10
-    var lengthOfEasyActScore = 12
-    var lengthOfMediumActScore = 12
-    var lengthOfCountPlays = 10
+    let indexOfOnlineImage = 0
+    let indexOfAlias = 1
+    let indexOfDevice = 2
+    let indexOfLand = 3
+    let indexOfOnlineTime = 4
+    let indexOfLastOnline = 5
+    let indexOfOnlineDuration = 6
+    let indexOfVersion = 7
+    let indexOfEasyScore = 8
+    let indexOfMediumScore = 9
+    let indexOfEasyActScore = 10
+    let indexOfMediumActScore = 11
+    let indexOfCountPlays = 12
     
     enum ShowingModus: Int {
         case Left = 0, Right
@@ -36,7 +37,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     var showingModus: ShowingModus = .Left
 
     //    var lengthOfOnlineSince = 0
-    let myFont = UIFont(name: GV.actLabelFont, size: GV.onIpad ? 16 : 12)
+    let myFont = UIFont(name: GV.actLabelFont, size: GV.onIpad ? 16 : 10)
     
     func didTappedButton(tableView: UITableView, indexPath: IndexPath, buttonName: String) {
         
@@ -59,18 +60,18 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         
     }
     
-    private func yearMonthDayString(value: Int)-> String {
-        var returnValue = ""
-        if value > 0 {
-            let year = String(value / 10000)
-            var month = String((value % 10000) / 100)
-            month = month.length == 1 ? "0" + month : month
-            var day = String((value % 10000) % 100)
-            day = day.length == 1 ? "0" + day : day
-            returnValue = year + "-" + month + "-" + day
-        }
-        return returnValue
-    }
+//    private func yearMonthDayString(value: Int)-> String {
+//        var returnValue = ""
+//        if value > 0 {
+//            let year = String(value / 10000)
+//            var month = String((value % 10000) / 100)
+//            month = month.length == 1 ? "0" + month : month
+//            var day = String((value % 10000) % 100)
+//            day = day.length == 1 ? "0" + day : day
+//            returnValue = year + "-" + month + "-" + day
+//        }
+//        return returnValue
+//    }
     
 
     
@@ -78,7 +79,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         let cellWidth = tableView.frame.width
-        let cellHeight = headerLine[0].height(font: myFont!) * 1.0
+        let cellHeight = " ".height(font: myFont!) * 1.0
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: cellWidth, height: cellHeight))
 //        cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.010)))
@@ -86,116 +87,174 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         let isOnline = GV.globalInfoTable[indexPath.row].isOnline
         let origImage = UIImage(named: isOnline ? "online.png" : "offline.png")!
         let image = origImage.resizeImage(newWidth: cellHeight * 0.6)
+        let index = indexOfAlias
         cell.addButton(image: image, xPos: cellHeight * 0.5, callBack: buttonTapped)
-        cell.addColumn(text: " " + (GV.globalInfoTable[indexPath.row].alias.fixLength(length: lengthOfAlias, leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
+        cell.addColumn(text: " " + (GV.globalInfoTable[indexPath.row].alias.fixLength(length: lengths[index], leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
         switch showingModus {
         case .Left:
-            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].device.fixLength(length: lengthOfDevice, leadingBlanks: false)), color: actColor)
-            cell.addColumn(text: GV.globalInfoTable[indexPath.row].version.fixLength(length: lengthOfVersion, leadingBlanks: false), color: actColor)
-            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].land.fixLength(length: lengthOfLand, leadingBlanks: false)), color: actColor)
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
+            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].device.fixLength(length: lengths[index + 1], leadingBlanks: false)), color: actColor)
+            cell.addColumn(text: GV.globalInfoTable[indexPath.row].version.fixLength(length: lengths[index + 2], leadingBlanks: false), color: actColor)
+            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].land.fixLength(length: lengths[index + 3], leadingBlanks: false)), color: actColor)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengths[index + 4], leadingBlanks: false), color: actColor)
             if GV.onIpad {
-                cell.addColumn(text: yearMonthDayString(value: GV.globalInfoTable[indexPath.row].lastDay).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengthOfOnlineDuration, leadingBlanks: false), color: actColor)
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengthOfEasyScore, leadingBlanks: false), color: actColor)
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengthOfMediumScore, leadingBlanks: false), color: actColor)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 5], leadingBlanks: false), color: actColor)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengths[index + 6], leadingBlanks: false), color: actColor)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 7], leadingBlanks: false), color: actColor)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengths[index + 8], leadingBlanks: false), color: actColor)
             }
         case .Right:
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengthOfOnlineTime, leadingBlanks: true), color: actColor)
-            cell.addColumn(text: yearMonthDayString(value: GV.globalInfoTable[indexPath.row].lastDay).fixLength(length: lengthOfLastOnline, leadingBlanks: false), color: actColor)
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengthOfOnlineDuration, leadingBlanks: false), color: actColor)
-            if GV.onIpad {
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengthOfEasyScore, leadingBlanks: false), color: actColor)
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengthOfMediumScore, leadingBlanks: false), color: actColor)
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyActScore).fixLength(length: lengthOfEasyActScore, leadingBlanks: false), color: actColor)
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumActScore.fixLength(length: lengthOfMediumActScore, leadingBlanks: false), color: actColor)
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].countPlays.fixLength(length: lengthOfCountPlays, leadingBlanks: false), color: actColor)            }
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengths[index + 1], leadingBlanks: false), color: actColor)
+            cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 2], leadingBlanks: false), color: actColor)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengths[index + 3], leadingBlanks: false), color: actColor)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 4], leadingBlanks: false), color: actColor)
+           if GV.onIpad {
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengths[index + 5], leadingBlanks: false), color: actColor)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyActScore).fixLength(length: lengths[index + 6], leadingBlanks: false), color: actColor)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumActScore.fixLength(length: lengths[index + 7], leadingBlanks: false), color: actColor)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].countPlays.fixLength(length: lengths[index + 8], leadingBlanks: false), color: actColor)
+            }
         }
         return cell
     }
     
     func getHeightForRow(tableView: UITableView, indexPath: IndexPath) -> CGFloat {
-        return headerLine[0].height(font: myFont!)
+        return " ".height(font: myFont!)
     }
     
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int) {
     }
     
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
-        let lineHeight = headerLine[0].height(font: myFont!)
-        let width = headerLine[0].width(withConstrainedHeight: 0, font: myFont!)
         let view = UIView()
-        let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
-        label1.font = myFont!
-        label1.text = headerLine[showingModus.rawValue]
-        view.addSubview(label1)
-        let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight, width: width, height: lineHeight))
-        label2.font = myFont!
-        label2.text = title
-        view.addSubview(label2)
+        var lastPosX: CGFloat = 0
+        let textConstants = showingModus == ShowingModus.Left ? headerTextContantsLeft : headerTextContantsRight
+        for (index, textConstant) in textConstants.enumerated() {
+            let text = GV.language.getText(textConstant)
+            let width = text.fixLength(length: lengths[index]).width(withConstrainedHeight: 0, font: myFont!)// * 1.1
+            let height = text.height(font: myFont!)
+            let label = UILabel(frame: CGRect(x: lastPosX, y: CGFloat(0), width: width, height: height))
+            label.text = text
+            label.font = myFont!
+            view.addSubview(label)
+            lastPosX += width
+        }
         view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
         return view
     }
     
     func getHeightForHeaderInSection(tableView: UITableView, section: Int) -> CGFloat {
-        return headerLine[0].height(font: myFont!)
+        return " ".height(font: myFont!)
     }
+    var calculatedWidth: CGFloat = 0
+    var lengths = [Int]()
+    let headerTextContantsLeft: [TextConstants] = [.tcBlank, .tcPlayer, .tcDevice, .tcVersion, .tcLand, .tcOnlineTime, .tcLastOnline, .tcLastOnlineTime, .tcEasyScore, .tcMediumScore]
+    let headerTextContantsRight: [TextConstants] = [.tcBlank, .tcPlayer, .tcOnlineTime, .tcLastOnline, .tcLastOnlineTime, .tcEasyScore, .tcMediumScore, .tcEasyActScore, .tcMediumActScore, .tcCountPlays]
     
     private func calculateColumnWidths() {
-        
-        headerLine.removeAll()
-        var text1 = ""
-        var text2 = ""
-        var text3 = ""
-        var text4 = ""
-        var text5 = ""
-        var text6 = ""
-        var text7 = ""
-        var text8 = ""
-        var text9 = ""
-        text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengthOfAlias, center: true)
-        text2 = "\(GV.language.getText(.tcDevice)) ".fixLength(length: lengthOfDevice, center: true)
-        text3 = "\(GV.language.getText(.tcVersion))".fixLength(length: lengthOfVersion, center: true)
-        text4 = "\(GV.language.getText(.tcLand)) ".fixLength(length: lengthOfLand, center: true)
-        text5 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengthOfOnlineTime, center: true)
-        if GV.onIpad {
-            text6 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengthOfLastOnline, center: true)
-            text7 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengthOfOnlineDuration, center: true)
-            text8 = "\(GV.language.getText(.tcEasyScore))".fixLength(length: lengthOfEasyScore, center: true)
-            text9 = "\(GV.language.getText(.tcMediumScore))".fixLength(length: lengthOfMediumScore, center: true)
+        calculatedWidth = 0
+        lengths.removeAll()
+        switch showingModus {
+        case .Left:
+            for textConstant in headerTextContantsLeft {
+                lengths.append(GV.language.getText(textConstant).length)
+            }
+        case .Right:
+            for textConstant in headerTextContantsRight {
+                lengths.append(GV.language.getText(textConstant).length)
+            }
         }
-        var line = ""
-        line += text1
-        line += text2
-        line += text3
-        line += text4
-        line += text5
-        line += text6
-        line += text7
-        line += text8
-        line += text9
-        headerLine.append(line)
-        text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengthOfAlias, center: true)
-        text2 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengthOfOnlineTime, center: true)
-        text3 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengthOfLastOnline, center: true)
-        text4 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengthOfOnlineDuration, center: true)
-        if GV.onIpad {
-            text5 = "\(GV.language.getText(.tcEasyScore))".fixLength(length: lengthOfEasyScore, center: true)
-            text6 = "\(GV.language.getText(.tcMediumScore))".fixLength(length: lengthOfMediumScore, center: true)
-            text7 = "\(GV.language.getText(.tcEasyActScore))".fixLength(length: lengthOfEasyActScore, center: true)
-            text8 = "\(GV.language.getText(.tcMediumActScore))".fixLength(length: lengthOfMediumActScore, center: true)
-            text9 = "\(GV.language.getText(.tcCountPlays))".fixLength(length: lengthOfCountPlays, center: true)        }
-        line = ""
-        line += text1
-        line += text2
-        line += text3
-        line += text4
-        line += text5
-        line += text6
-        line += text7
-        line += text8
-        line += text9
-        headerLine.append(line)
+        let index = indexOfAlias
+        for item in GV.globalInfoTable {
+            lengths[indexOfAlias] = item.alias.length > lengths[indexOfAlias] ? item.alias.length : lengths[indexOfAlias]
+            if showingModus == ShowingModus.Left {
+                lengths[index + 1] = item.device.length > lengths[index + 1] ? item.device.length : lengths[index + 1]
+                lengths[index + 2] = item.version.length > lengths[index + 2] ? item.version.length : lengths[index + 2]
+                lengths[index + 3] = item.land.length > lengths[index + 3] ? item.land.length : lengths[index + 3]
+                lengths[index + 4] = item.allTime.HourMin.length > lengths[index + 4] ? item.allTime.HourMin.length : lengths[index + 4]
+                if GV.onIpad {
+                    lengths[index + 5] = item.lastDay.yearMonthDay().length > lengths[index + 5] ? item.lastDay.yearMonthDay().length : lengths[index + 5]
+                    lengths[index + 6] = item.lastTime.HourMin.length > lengths[index + 6] ? item.lastTime.HourMin.length : lengths[index + 6]
+                    lengths[index + 7] = item.easyBestScore.length > lengths[index + 7] ? item.easyBestScore.length : lengths[index + 7]
+                    lengths[index + 8] = item.mediumBestScore.length > lengths[index + 8] ? item.mediumBestScore.length : lengths[index + 8]
+                }
+            } else  {
+                lengths[index + 1] = item.allTime.HourMin.length > lengths[index + 1] ? item.allTime.HourMin.length : lengths[index + 1]
+                lengths[index + 2] = item.lastDay.yearMonthDay().length > lengths[index + 2] ? item.lastDay.yearMonthDay().length : lengths[index + 2]
+                lengths[index + 3] = item.lastTime.HourMin.length > lengths[index + 3] ? item.lastTime.HourMin.length : lengths[index + 3]
+                lengths[index + 4] = item.easyBestScore.length > lengths[index + 4] ? item.easyBestScore.length : lengths[index + 4]
+                if GV.onIpad {
+                    lengths[index + 5] = item.mediumBestScore.length > lengths[index + 5] ? item.mediumBestScore.length : lengths[index + 5]
+                    lengths[index + 6] = item.easyActScore.length > lengths[index + 6] ? item.easyActScore.length : lengths[index + 6]
+                    lengths[index + 7] = item.mediumActScore.length > lengths[index + 7] ? item.mediumActScore.length : lengths[index + 7]
+                    lengths[index + 8] = item.countPlays.length > lengths[index + 8] ? item.countPlays.length : lengths[index + 8]
+                }
+            }
+       }
+        let adder = 2
+        for (index, _) in lengths.enumerated() {
+            lengths[index] += adder
+            let fixText = " ".fixLength(length: lengths[index])
+            calculatedWidth += fixText.width(font: myFont!)// * 1.1
+            if !GV.onIpad {
+                if index > 4 {
+                    break
+                }
+            }
+        }
+//        " ".removeAll()
+//        var text1 = ""
+//        var text2 = ""
+//        var text3 = ""
+//        var text4 = ""
+//        var text5 = ""
+//        var text6 = ""
+//        var text7 = ""
+//        var text8 = ""
+//        var text9 = ""
+//        text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengths[indexOfAlias], center: true)
+//        text2 = "\(GV.language.getText(.tcDevice)) ".fixLength(length: lengths[indexOfDevice], center: true)
+//        text3 = "\(GV.language.getText(.tcVersion))".fixLength(length: lengths[indexOfVersion], center: true)
+//        text4 = "\(GV.language.getText(.tcLand)) ".fixLength(length: lengths[indexOfLand], center: true)
+//        text5 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengths[indexOfOnlineTime], center: true)
+//        if GV.onIpad {
+//            text6 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengths[indexOfLastOnline], center: true)
+//            text7 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengths[indexOfOnlineDuration], center: true)
+//            text8 = "\(GV.language.getText(.tcEasyScore))".fixLength(length: lengths[indexOfEasyScore], center: true)
+//            text9 = "\(GV.language.getText(.tcMediumScore))".fixLength(length: lengths[indexOfMediumScore], center: true)
+//        }
+//        var line = ""
+//        line += text1
+//        line += text2
+//        line += text3
+//        line += text4
+//        line += text5
+//        line += text6
+//        line += text7
+//        line += text8
+//        line += text9
+//        headerLine.append(line)
+//        text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengths[indexOfAlias], center: true)
+//        text2 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengths[indexOfOnlineTime], center: true)
+//        text3 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengths[indexOfLastOnline], center: true)
+//        text4 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengths[indexOfOnlineDuration], center: true)
+//        if GV.onIpad {
+//            text5 = "\(GV.language.getText(.tcEasyScore))".fixLength(length: lengths[indexOfEasyScore], center: true)
+//            text6 = "\(GV.language.getText(.tcMediumScore))".fixLength(length: lengths[indexOfMediumScore], center: true)
+//            text7 = "\(GV.language.getText(.tcEasyActScore))".fixLength(length: lengths[indexOfEasyActScore], center: true)
+//            text8 = "\(GV.language.getText(.tcMediumActScore))".fixLength(length: lengths[indexOfMediumActScore], center: true)
+//            text9 = "\(GV.language.getText(.tcCountPlays))".fixLength(length: lengths[indexOfCountPlays], center: true)
+//        }
+//        line = ""
+//        line += text1
+//        line += text2
+//        line += text3
+//        line += text4
+//        line += text5
+//        line += text6
+//        line += text7
+//        line += text8
+//        line += text9
+//        headerLine.append(line)
 
         
     }
@@ -245,11 +304,13 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     
     @objc func leftButtonTapped() {
         showingModus = .Left
+        calculateColumnWidths()
         showGameCenterView!.reloadData()
     }
     
     @objc func rightButtonTapped() {
         showingModus = .Right
+        calculateColumnWidths()
         showGameCenterView!.reloadData()
     }
 
@@ -381,12 +442,13 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     }
     
     private func showPlayerActivity() {
+        let textHeight = GV.language.getText(.tcBlank)
         calculateColumnWidths()
         let origin = CGPoint(x: 0, y: 0)
         let maxHeight = view.frame.height * 0.8
-        let calculatedHeight = headerLine[0].height(font: myFont!) * (CGFloat(GV.globalInfoTable.count + 1))
+        let calculatedHeight = textHeight.height(font: myFont!) * (CGFloat(GV.globalInfoTable.count + 1))
         let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
-        let size = CGSize(width: CGFloat(headerLine[0].width(font: myFont!) * 1), height:height)
+        let size = CGSize(width: calculatedWidth, height:height)
         let center = CGPoint(x: 0.5 * view.frame.width, y: 0.5 * view.frame.height)
         showGameCenterView!.frame=CGRect(origin: origin, size: size)
         showGameCenterView!.center=center
@@ -403,9 +465,9 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     private func setTableviewSize() {
         let origin = CGPoint(x: 0, y: 0)
         let maxHeight = view.frame.height * 0.8
-        let calculatedHeight = headerLine[0].height(font: myFont!) * (CGFloat(GV.globalInfoTable.count + 1))
+        let calculatedHeight = " ".height(font: myFont!) * (CGFloat(GV.globalInfoTable.count + 1))
         let height = maxHeight > calculatedHeight ? calculatedHeight : maxHeight
-        let size = CGSize(width: headerLine[0].width(font: myFont!) * 1, height: height)
+        let size = CGSize(width: calculatedWidth, height: height)
         let center = CGPoint(x: 0.5 * view.frame.width, y: 0.5 * view.frame.height)
         showGameCenterView!.frame=CGRect(origin: origin, size: size)
         showGameCenterView!.center=center

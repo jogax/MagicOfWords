@@ -383,7 +383,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             let actIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyActScoreName : mediumActScoreName
             infoArray.append(GCInfo(identifier: bestIdentifier, value: score!, modifyValue: 0))
             infoArray.append(GCInfo(identifier: actIdentifier, value: score!))
-            if score! == 0 {
+            if score! != 0 {
                 let countPlaysIdentifier = countPlaysName
                 infoArray.append(GCInfo(identifier: countPlaysIdentifier, value: GV.basicDataRecord.countPlays))
             }

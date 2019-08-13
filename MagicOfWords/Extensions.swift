@@ -306,6 +306,20 @@ extension Int {
         return Int.random(n: max - min + 1) + min
         
     }
+    
+    public func yearMonthDay()-> String {
+        var returnValue = ""
+        if self > 0 {
+            let year = String(self / 10000)
+            var month = String((self % 10000) / 100)
+            month = month.length == 1 ? "0" + month : month
+            var day = String((self % 10000) % 100)
+            day = day.length == 1 ? "0" + day : day
+            returnValue = year + "-" + month + "-" + day
+        }
+        return returnValue
+    }
+
 
 }
 

@@ -64,7 +64,7 @@ class CustomTableViewCell: UITableViewCell {
         if xValue < 0 {
             xValue = posForColumn
         }
-        let wordLength = text.width(font: myFont) * 1.1
+        let wordLength = text.width(font: myFont)// * 1.1
         let wordHeight = text.height(font: myFont) * 2
 //        let label = UILabel(frame: CGRect(x: xValue, y: GV.onIpad ? 6 : 3, width: wordLength, height: wordHeight))
         let label = UILabel(frame: CGRect(x: xValue, y: GV.onIpad ? 2 : 3, width: wordLength, height: wordHeight))
