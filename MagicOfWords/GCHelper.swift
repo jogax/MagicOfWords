@@ -625,7 +625,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             leaderBoard.identifier = leaderboardID
             leaderBoard.playerScope = .global
             leaderBoard.timeScope = .allTime
-            leaderBoard.range =  NSMakeRange(1, 20) //NSRange(location: 1, length: 100)
+            leaderBoard.range =  NSRange(location: 1, length: 20)
             leaderBoard.loadScores(completionHandler: {
             (scores, error) in
                 if scores != nil {
@@ -648,21 +648,22 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
     }
     
-    @objc public func getAllScores(rank1: Int = 1, rank2: Int = 100, inRecursion: Bool = false, completion: @escaping ()->()) {
+    @objc public func getAllScores(rank1: Int = 1, length: Int = 100, inRecursion: Bool = false, completion: @escaping ()->()) {
         if GKLocalPlayer.local.isAuthenticated {
             if waitingForScores && !inRecursion {
                 return
             }
             waitingForScores = true
             let leaderBoard = GKLeaderboard()
-            let leaderboardID = "\(GameDifficulty(rawValue: GV.basicDataRecord.difficulty)!.description().lowercased())BestScore"
+            let difficultyName = "\(GameDifficulty(rawValue: GV.basicDataRecord.difficulty)!.description().lowercased())BestScore"
+            let leaderboardID = difficultyName
             if !inRecursion {
                 GV.scoreTable.removeAll()
             }
             leaderBoard.identifier = leaderboardID
             leaderBoard.playerScope = .global
             leaderBoard.timeScope = .allTime
-            leaderBoard.range =  NSMakeRange(rank1, rank2) //NSRange(location: 1, length: 100)
+            leaderBoard.range =  NSRange(location: 1, length: length)
             leaderBoard.loadScores(completionHandler: {
                 (scores, error) in
                 if scores != nil {
@@ -670,12 +671,12 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                         for score in scores! {
                             GV.scoreTable.append(Int(score.value))
                         }
-                        if scores!.count == 100 {
-                            self.getAllScores(rank1: rank1 + 100, rank2: rank2 + 100, inRecursion: true, completion: completion)
-                        } else {
+//                        if scores!.count == length {
+//                            self.getAllScores(rank1: rank1 + 100, inRecursion: true, completion: completion)
+//                        } else {
                             completion()
                             self.waitingForScores = false
-                        }
+//                        }
                     } else {
                         completion()
                         self.waitingForScores = false

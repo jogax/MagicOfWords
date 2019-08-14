@@ -229,9 +229,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             GCHelper.shared.getBestScore(completion: {
                 self.callModifyHeader()
             })
-            GCHelper.shared.getAllScores(completion: {
-                self.callModifyHeader()
-            })
             GCHelper.shared.restartGlobalInfosTimer()
         }
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseLanguage),
@@ -895,7 +892,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         GV.maxGameNumber = GV.minGameNumber + 999
 //        getRecordCounts()
         GCHelper.shared.getBestScore(completion: {})
-        GCHelper.shared.getAllScores(completion: {})
+//        GCHelper.shared.getAllScores(completion: {})
 //        self.showMenu()
     }
     

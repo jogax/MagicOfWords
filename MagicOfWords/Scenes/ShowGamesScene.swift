@@ -85,7 +85,6 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
 
     private func showFinishedGamesInTableView() {
         showGamesInTableView = WTTableView()
-
         calculateColumnWidths()
         showGamesInTableView?.setDelegate(delegate: self)
         showGamesInTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
@@ -101,8 +100,8 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 showingWordsHeight = lineHeight * counter
             } while showingWordsHeight + headerframeHeight > self.frame.height * 0.6
         }
-        let width = title.width(font: myFont!)
-        let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
+//        let width = title.width(font: myFont!)
+        let size = CGSize(width: widthOfView, height: showingWordsHeight + headerframeHeight)
         showGamesInTableView?.frame=CGRect(origin: origin, size: size)
         let center = CGPoint(x: 0.5 * view!.frame.width, y: 0.5 * self.view!.frame.height)
         self.showGamesInTableView!.center=center
@@ -114,45 +113,81 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     var missingRecords = [Int]()
 
     var goOn = true
+    
 
-    var lengthOfPlace: Int = 0
-    var lengthOfPlayer: Int = 0
-    var lengthOfScore: Int = 0
     var title = ""
+    
+    struct ColumnLengths {
+        var text = ""
+        var length = 0
+        init(text: String, length: Int){
+            self.text = text
+            self.length = length
+        }
+    }
+    
+    var columns = [ColumnLengths]()
 
     private func calculateColumnWidths() {
-        title = ""
-        let text1 = "  \(GV.language.getText(.tcPlace)) "
-        let text2 = " \(GV.language.getText(.tcPlayerHeader)) ".fixLength(length: 20, center: true)
-        let text3 = " \(GV.language.getText(.tcScore)) ".fixLength(length:15, center: true)
-        title += text1
-        title += text2
-        title += text3
-        lengthOfPlace = text1.length
-        lengthOfPlayer = text2.length
-        lengthOfScore = text3.length
-   }
-    func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
-        switch section {
-        case 0:
-            let view = UIView()
-            //            let fontSize = GV.onIpad ? self.frame.width * 0.020 : self.frame.width * 0.040
-            //            let myFont = UIFont(name: "CourierNewPS-BoldMT", size: fontSize) // change it according to ur requirement
-            let lineHeight = (myFont?.lineHeight)!// * (GV.onIpad ? 1.5 : 2.0)
-            let width = CGFloat(title.width(font: myFont!)) //lineHeight * CGFloat(title.length)
-            //            view.frame = CGRect(x: 50, y: 0, width: width, height: 2 * lineHeight)
-            let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: lineHeight))
-            label1.font = myFont!
-            label1.text = GV.language.getText(.tcTableOfBestscores).fixLength(length: title.length, center: true)
-            view.addSubview(label1)
-            let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight, width: width, height: lineHeight))
-            label2.font = myFont!
-            label2.text = title
-            view.addSubview(label2)
-            view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
-            return view
-        default: return UIView()
+        let text0 = GV.language.getText(.tcBlank)
+        let text1 = GV.language.getText(.tcPlace)
+        let text2 = GV.language.getText(.tcPlayerHeader)
+        let text3 = GV.language.getText(.tcScore)
+        let text4 = GV.language.getText(.tcTableOfBestscores)
+        let lengthOfBlanks = text0.length
+        var lengthOfPlace = text1.length
+        var lengthOfPlayer = text2.length
+        var lengthOfScore = text3.length
+        
+        for item in gamesForShow {
+            let name = item.player + GV.language.getText(.tcMe)
+            lengthOfPlace = String(item.place).length > lengthOfPlace ? String(item.place).length : lengthOfPlace
+            lengthOfPlayer = name.length > lengthOfPlayer ? name.length : lengthOfPlayer
+            lengthOfScore = String(item.score).length > lengthOfScore ? String(item.score).length : lengthOfScore
         }
+        columns.append(ColumnLengths(text: text0, length: lengthOfBlanks + 2))
+        columns.append(ColumnLengths(text: text1, length: lengthOfPlace + 2))
+        columns.append(ColumnLengths(text: text2, length: lengthOfPlayer + 2))
+        columns.append(ColumnLengths(text: text3, length: lengthOfScore + 2))
+        widthOfView = 0
+        for column in columns {
+            widthOfView += column.text.fixLength(length: column.length).width(font:myFont!)
+        }
+        if text4.width(font: myFont!) > widthOfView {
+            widthOfView = text4.width(font: myFont!)
+        }
+   }
+    var widthOfView:CGFloat = 0
+    
+    func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
+        let view = UIView()
+        
+        let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: widthOfView, height: lineHeight))
+        label1.font = myFont!
+        label1.text = GV.language.getText(.tcTableOfBestscores).fixLength(length: title.length, center: true)
+        label1.textAlignment = .center
+        view.addSubview(label1)
+        
+        var labelPos: CGFloat = 0
+
+        let lineHeight = (myFont?.lineHeight)!// * (GV.onIpad ? 1.5 : 2.0)
+        for column in columns {
+            let width = column.text.fixLength(length:column.length).width(font:myFont!)
+            let label = UILabel(frame: CGRect(x: labelPos, y: lineHeight, width: width, height: lineHeight))
+            labelPos += width
+            label.text = column.text.fixLength(length: column.length, leadingBlanks: false)
+            label.font = myFont!
+//            widthOfView += width
+            view.addSubview(label)
+        }
+//        let width = CGFloat(title.width(font: myFont!)) //lineHeight * CGFloat(title.length)
+        //            view.frame = CGRect(x: 50, y: 0, width: width, height: 2 * lineHeight)
+//        let label2 = UILabel(frame: CGRect(x: 0, y: lineHeight, width: width, height: lineHeight))
+//        label2.font = myFont!
+//        label2.text = title
+//        view.addSubview(subView)
+        view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
+        return view
     }
 
     func didSelectedRow(tableView: UITableView, indexPath: IndexPath) {
@@ -181,11 +216,13 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
             cellColor = UIColor.white
             playerName += GV.language.getText(.tcMe)
         }
-        let text1 = String(gamesForShow[indexPath.row].place).fixLength(length: lengthOfPlace - 2)
+        let text0 = GV.language.getText(.tcBlank)
+        cell.addColumn(text: text0, color: cellColor)
+        let text1 = String(gamesForShow[indexPath.row].place).fixLength(length: columns[1].length)
         cell.addColumn(text: text1, color: cellColor) // GameNumber
-        let text2 = ("   " + playerName).fixLength(length: 20, leadingBlanks: false)
+        let text2 = "  " + (playerName).fixLength(length: columns[2].length - 2, leadingBlanks: false)
         cell.addColumn(text: text2, color: cellColor)
-        let text3 = ("  " + String(gamesForShow[indexPath.row].score)).fixLength(length: 9)
+        let text3 = (String(gamesForShow[indexPath.row].score)).fixLength(length: columns[3].length)
         cell.addColumn(text: text3, color: cellColor) // My Score
 //        cell.addColumn(text: String(gamesForShow[indexPath.row].place).fixLength(length: 4) )
         return cell

@@ -201,62 +201,6 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
                 }
             }
         }
-//        " ".removeAll()
-//        var text1 = ""
-//        var text2 = ""
-//        var text3 = ""
-//        var text4 = ""
-//        var text5 = ""
-//        var text6 = ""
-//        var text7 = ""
-//        var text8 = ""
-//        var text9 = ""
-//        text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengths[indexOfAlias], center: true)
-//        text2 = "\(GV.language.getText(.tcDevice)) ".fixLength(length: lengths[indexOfDevice], center: true)
-//        text3 = "\(GV.language.getText(.tcVersion))".fixLength(length: lengths[indexOfVersion], center: true)
-//        text4 = "\(GV.language.getText(.tcLand)) ".fixLength(length: lengths[indexOfLand], center: true)
-//        text5 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengths[indexOfOnlineTime], center: true)
-//        if GV.onIpad {
-//            text6 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengths[indexOfLastOnline], center: true)
-//            text7 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengths[indexOfOnlineDuration], center: true)
-//            text8 = "\(GV.language.getText(.tcEasyScore))".fixLength(length: lengths[indexOfEasyScore], center: true)
-//            text9 = "\(GV.language.getText(.tcMediumScore))".fixLength(length: lengths[indexOfMediumScore], center: true)
-//        }
-//        var line = ""
-//        line += text1
-//        line += text2
-//        line += text3
-//        line += text4
-//        line += text5
-//        line += text6
-//        line += text7
-//        line += text8
-//        line += text9
-//        headerLine.append(line)
-//        text1 = "\(GV.language.getText(.tcPlayer)) ".fixLength(length: lengths[indexOfAlias], center: true)
-//        text2 = "\(GV.language.getText(.tcOnlineTime)) ".fixLength(length: lengths[indexOfOnlineTime], center: true)
-//        text3 = "\(GV.language.getText(.tcLastOnline))".fixLength(length: lengths[indexOfLastOnline], center: true)
-//        text4 = "\(GV.language.getText(.tcLastOnlineTime))".fixLength(length: lengths[indexOfOnlineDuration], center: true)
-//        if GV.onIpad {
-//            text5 = "\(GV.language.getText(.tcEasyScore))".fixLength(length: lengths[indexOfEasyScore], center: true)
-//            text6 = "\(GV.language.getText(.tcMediumScore))".fixLength(length: lengths[indexOfMediumScore], center: true)
-//            text7 = "\(GV.language.getText(.tcEasyActScore))".fixLength(length: lengths[indexOfEasyActScore], center: true)
-//            text8 = "\(GV.language.getText(.tcMediumActScore))".fixLength(length: lengths[indexOfMediumActScore], center: true)
-//            text9 = "\(GV.language.getText(.tcCountPlays))".fixLength(length: lengths[indexOfCountPlays], center: true)
-//        }
-//        line = ""
-//        line += text1
-//        line += text2
-//        line += text3
-//        line += text4
-//        line += text5
-//        line += text6
-//        line += text7
-//        line += text8
-//        line += text9
-//        headerLine.append(line)
-
-        
     }
     
     //    let realm: Realm

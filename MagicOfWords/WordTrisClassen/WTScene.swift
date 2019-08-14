@@ -578,6 +578,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         WTGameWordList.shared.clear()
 //        WTGameWordList.shared.setMandatoryWords()
 //        showWordsToCollect()
+//        GCHelper.shared.getScoresForShow(completion: {
+//            self.modifyHeader()
+//        })
         GCHelper.shared.getAllScores(completion: {
             self.modifyHeader()
         })
