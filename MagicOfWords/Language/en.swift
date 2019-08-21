@@ -21,7 +21,7 @@ let enDictionary: [TextConstants: String] = [
     .tcEasyPlay:         "Easy game",
     .tcMediumPlay:       "Medium game",
     .tcPlayer:           "Player",
-//    .tcNewGame:          "New game %",
+    .tcNewGame:          "New game",
     .tcRestart:          "Restart",
 //    .tcContinue:         "Continue %",
     .tcFinished:         "Finished games %",
@@ -163,4 +163,5 @@ let enDictionary: [TextConstants: String] = [
     .tcMediumActScore:  "MediumAct",
     .tcCountPlays:      "Played",
     .tcBlank:           " ",
+    .tcStartGame:       "Play",
 ]

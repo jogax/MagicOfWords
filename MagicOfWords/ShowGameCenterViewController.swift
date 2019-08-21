@@ -100,15 +100,14 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
                 cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 5], leadingBlanks: false), color: actColor)
                 cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengths[index + 6], leadingBlanks: false), color: actColor)
                 cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 7], leadingBlanks: false), color: actColor)
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengths[index + 8], leadingBlanks: false), color: actColor)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].mediumBestScore).fixLength(length: lengths[index + 8], leadingBlanks: false), color: actColor)
             }
         case .Right:
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengths[index + 1], leadingBlanks: false), color: actColor)
             cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 2], leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengths[index + 3], leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 4], leadingBlanks: false), color: actColor)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].mediumBestScore).fixLength(length: lengths[index + 5], leadingBlanks: false), color: actColor)
            if GV.onIpad {
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumBestScore.fixLength(length: lengths[index + 5], leadingBlanks: false), color: actColor)
                 cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyActScore).fixLength(length: lengths[index + 6], leadingBlanks: false), color: actColor)
                 cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumActScore.fixLength(length: lengths[index + 7], leadingBlanks: false), color: actColor)
                 cell.addColumn(text: GV.globalInfoTable[indexPath.row].countPlays.fixLength(length: lengths[index + 8], leadingBlanks: false), color: actColor)
@@ -137,6 +136,9 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
             label.font = myFont!
             view.addSubview(label)
             lastPosX += width
+            if !GV.onIpad && index == 5 {
+                break
+            }
         }
         view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
         return view
@@ -148,7 +150,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     var calculatedWidth: CGFloat = 0
     var lengths = [Int]()
     let headerTextContantsLeft: [TextConstants] = [.tcBlank, .tcPlayer, .tcDevice, .tcVersion, .tcLand, .tcOnlineTime, .tcLastOnline, .tcLastOnlineTime, .tcEasyScore, .tcMediumScore]
-    let headerTextContantsRight: [TextConstants] = [.tcBlank, .tcPlayer, .tcOnlineTime, .tcLastOnline, .tcLastOnlineTime, .tcEasyScore, .tcMediumScore, .tcEasyActScore, .tcMediumActScore, .tcCountPlays]
+    let headerTextContantsRight: [TextConstants] = [.tcBlank, .tcPlayer, .tcLastOnline, .tcLastOnlineTime, .tcEasyScore, .tcMediumScore, .tcEasyActScore, .tcMediumActScore, .tcCountPlays, .tcBlank]
     
     private func calculateColumnWidths() {
         calculatedWidth = 0
@@ -174,16 +176,16 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
                 if GV.onIpad {
                     lengths[index + 5] = item.lastDay.yearMonthDay().length > lengths[index + 5] ? item.lastDay.yearMonthDay().length : lengths[index + 5]
                     lengths[index + 6] = item.lastTime.HourMin.length > lengths[index + 6] ? item.lastTime.HourMin.length : lengths[index + 6]
-                    lengths[index + 7] = item.easyBestScore.length > lengths[index + 7] ? item.easyBestScore.length : lengths[index + 7]
-                    lengths[index + 8] = item.mediumBestScore.length > lengths[index + 8] ? item.mediumBestScore.length : lengths[index + 8]
+                    lengths[index + 7] = String(item.easyBestScore).length > lengths[index + 7] ? String(item.easyBestScore).length : lengths[index + 7]
+                    lengths[index + 8] = String(item.mediumBestScore).length > lengths[index + 8] ? String(item.mediumBestScore).length : lengths[index + 8]
                 }
             } else  {
                 lengths[index + 1] = item.allTime.HourMin.length > lengths[index + 1] ? item.allTime.HourMin.length : lengths[index + 1]
                 lengths[index + 2] = item.lastDay.yearMonthDay().length > lengths[index + 2] ? item.lastDay.yearMonthDay().length : lengths[index + 2]
                 lengths[index + 3] = item.lastTime.HourMin.length > lengths[index + 3] ? item.lastTime.HourMin.length : lengths[index + 3]
-                lengths[index + 4] = item.easyBestScore.length > lengths[index + 4] ? item.easyBestScore.length : lengths[index + 4]
+                lengths[index + 4] = String(item.easyBestScore).length > lengths[index + 4] ? String(item.easyBestScore).length : lengths[index + 4]
                 if GV.onIpad {
-                    lengths[index + 5] = item.mediumBestScore.length > lengths[index + 5] ? item.mediumBestScore.length : lengths[index + 5]
+                    lengths[index + 5] = String(item.mediumBestScore).length > lengths[index + 5] ? String(item.mediumBestScore).length : lengths[index + 5]
                     lengths[index + 6] = item.easyActScore.length > lengths[index + 6] ? item.easyActScore.length : lengths[index + 6]
                     lengths[index + 7] = item.mediumActScore.length > lengths[index + 7] ? item.mediumActScore.length : lengths[index + 7]
                     lengths[index + 8] = item.countPlays.length > lengths[index + 8] ? item.countPlays.length : lengths[index + 8]

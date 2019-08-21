@@ -101,6 +101,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
     }
     
+    
     fileprivate func lookupPlayers() {
         print ("\(match.players.count)")
         let playerIDs = match.players.map { $0.playerID }
@@ -150,7 +151,6 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             GKLocalPlayer.local.unregisterAllListeners()
             GKLocalPlayer.local.register(self)
             globalInfosTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
-
             self.delegate?.localPlayerAuthenticated()
         }
         if GKLocalPlayer.local.isAuthenticated == false {
@@ -164,7 +164,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     // Pause any activities that require user interaction, then present the
                     // gcAuthViewController to the player.
                     viewController.present(gcAuthViewController, animated:true, completion:nil)
-                } else if GKLocalPlayer.local.isAuthenticated {
+                } else if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
                     authAdmin()
                 } else {
                     // Error
@@ -216,12 +216,12 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                 completion()
             }
         }
-        func loadScoresForLeaderboard(identifier: String, firstCall: Bool = true, rank1: Int = 1, rank2: Int = 100) {
+        func loadScoresForLeaderboard(identifier: String, firstCall: Bool = true, rank1: Int = 1, length: Int = 100) {
             let leaderBoard = GKLeaderboard()
             leaderBoard.identifier = identifier
             leaderBoard.playerScope = .global
             leaderBoard.timeScope = .allTime
-            leaderBoard.range = NSRange(location: rank1, length: rank2)
+            leaderBoard.range = NSRange(location: rank1, length: length)
             leaderBoard.loadScores(completionHandler: {
                 (scores, error) in
                 if scores != nil {
@@ -276,15 +276,15 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                             }
                         case self.easyBestScoreName:
                             if index != nil {
-                                GV.globalInfoTable[index!].easyBestScore = String(score.value)
+                                GV.globalInfoTable[index!].easyBestScore = score.value
                             } else {
-                                tableItem.easyBestScore = String(score.value)
+                                tableItem.easyBestScore = score.value
                             }
                         case self.mediumBestScoreName:
                             if index != nil {
-                                GV.globalInfoTable[index!].mediumBestScore = String(score.value)
+                                GV.globalInfoTable[index!].mediumBestScore = score.value
                             } else {
-                                tableItem.mediumBestScore = String(score.value)
+                                tableItem.mediumBestScore = score.value
                             }
                         case self.easyActScoreName:
                             if index != nil {
@@ -312,8 +312,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                             GV.globalInfoTable.append(tableItem)
                         }
                     }
-                    if scores!.count == rank2 {
-                        loadScoresForLeaderboard(identifier: identifier, firstCall: false, rank1: rank1 + rank2, rank2: rank2)
+                    if scores!.count == length {
+                        loadScoresForLeaderboard(identifier: identifier, firstCall: false, rank1: rank1 + length, length: length)
                     } else {
                         decreaseCountFinished()
                     }
@@ -378,7 +378,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             return
         }
         var infoArray = [GCInfo]()
-        if GKLocalPlayer.local.isAuthenticated {
+        if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             let bestIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyBestScoreName : mediumBestScoreName
             let actIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyActScoreName : mediumActScoreName
             infoArray.append(GCInfo(identifier: bestIdentifier, value: score!, modifyValue: 0))
@@ -394,7 +394,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     @objc private func sendGlobalInfosTOGC(timerX: Timer) {
         var infoArray = [GCInfo]()
         print("sendGlobalInfosTOGC actTime: \(Date())")
-        if GKLocalPlayer.local.isAuthenticated {
+        if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             infoArray.append(GCInfo(identifier: playingTimeName, value: GV.basicDataRecord.playingTime))
             infoArray.append(GCInfo(identifier: playingTimeTodayName, value: GV.basicDataRecord.playingTimeToday))
             if !GV.basicDataRecord.deviceInfoSaved {
@@ -618,8 +618,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     var waitingForScores = false
     
     public func getScoresForShow(completion: @escaping ()->()) {
-        if GKLocalPlayer.local.isAuthenticated {
-            GV.scoreForShowTable.removeAll()
+        GV.scoreForShowTable.removeAll()
+        if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             let leaderBoard = GKLeaderboard()
             let leaderboardID = "\(GameDifficulty(rawValue: GV.basicDataRecord.difficulty)!.description().lowercased())BestScore"
             leaderBoard.identifier = leaderboardID
@@ -645,83 +645,85 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     completion()
                 }
             })
+        } else {
+            completion()
         }
     }
     
-    @objc public func getAllScores(rank1: Int = 1, length: Int = 100, inRecursion: Bool = false, completion: @escaping ()->()) {
-        if GKLocalPlayer.local.isAuthenticated {
+    var bestScoreLeaderboard: GKLeaderboard?
+    
+    @objc public func getAllScores(rank: Int = 1, length: Int = 100, inRecursion: Bool = false, completion: @escaping ()->()) {
+        if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             if waitingForScores && !inRecursion {
                 return
             }
             waitingForScores = true
-            let leaderBoard = GKLeaderboard()
-            let difficultyName = "\(GameDifficulty(rawValue: GV.basicDataRecord.difficulty)!.description().lowercased())BestScore"
-            let leaderboardID = difficultyName
+            bestScoreLeaderboard = GKLeaderboard()
+            if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
+                bestScoreLeaderboard!.identifier = easyBestScoreName
+            } else {
+                bestScoreLeaderboard!.identifier = mediumBestScoreName
+            }
+            bestScoreLeaderboard!.playerScope = .global
+            bestScoreLeaderboard!.timeScope = .allTime
+            bestScoreLeaderboard!.range = NSRange(location: rank, length: length)
             if !inRecursion {
                 GV.scoreTable.removeAll()
             }
-            leaderBoard.identifier = leaderboardID
-            leaderBoard.playerScope = .global
-            leaderBoard.timeScope = .allTime
-            leaderBoard.range =  NSRange(location: 1, length: length)
-            leaderBoard.loadScores(completionHandler: {
-                (scores, error) in
-                if scores != nil {
-                    if scores!.count > 0 {
-                        for score in scores! {
-                            GV.scoreTable.append(Int(score.value))
-                        }
-//                        if scores!.count == length {
-//                            self.getAllScores(rank1: rank1 + 100, inRecursion: true, completion: completion)
-//                        } else {
-                            completion()
-                            self.waitingForScores = false
-//                        }
-                    } else {
-                        completion()
-                        self.waitingForScores = false
-                   }
+            bestScoreLeaderboard!.loadScores(completionHandler: {
+                (myScores, error) in
+                    if myScores!.count > 0 {
+                        self.bestScoreLeaderboard!.loadScores(completionHandler: {
+                            (myScores, error) in
+                            if myScores!.count > 0 {
+                                    for score in myScores! {
+                                        GV.scoreTable.append(Int(score.value))
+                                    }
+                                    if myScores!.count == length {
+                                        self.getAllScores(rank: rank + length, inRecursion: true, completion: completion)
+                                    } else {
+                                        self.waitingForScores = false
+                                        completion()
+                                    }
+                            } else {
+                                self.waitingForScores = false
+                                completion()
+                            }
+                        })
                 } else {
                     completion()
                     self.waitingForScores = false
                 }
             })
+        } else {
+            completion()
+            self.waitingForScores = false
         }
     }
+    var leaderboardForBestScore: GKLeaderboard?
     
     public func getBestScore(completion: @escaping ()->()) {
-        let difficulty = GV.basicDataRecord.difficulty
-        let leaderBoard = GKLeaderboard()
-        let leaderboardID = difficulty == GameDifficulty.Easy.rawValue ? easyBestScoreName : mediumBestScoreName
-        leaderBoard.identifier = leaderboardID
-        leaderBoard.playerScope = .global
-        leaderBoard.timeScope = .allTime
-        leaderBoard.range = NSRange(location: 1, length: 1)
-        leaderBoard.loadScores(completionHandler: {
-            (scores, error) in
-            if scores != nil {
-                if scores!.count > 0 {
-                    try! realm.safeWrite() {
-                        GV.basicDataRecord.setBestScore(score: Int(scores![0].value), name: scores![0].player.alias, myRank: leaderBoard.localPlayerScore == nil ? 0 : leaderBoard.localPlayerScore!.rank)
-                        completion()
+        if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
+            let difficulty = GV.basicDataRecord.difficulty
+            leaderboardForBestScore = GKLeaderboard()
+            let leaderboardID = difficulty == GameDifficulty.Easy.rawValue ? easyBestScoreName : mediumBestScoreName
+            leaderboardForBestScore!.identifier = leaderboardID
+            leaderboardForBestScore!.playerScope = .global
+            leaderboardForBestScore!.timeScope = .allTime
+            leaderboardForBestScore!.range = NSRange(location: 1, length: 1)
+            leaderboardForBestScore!.loadScores(completionHandler: {
+                (scores, error) in
+                if scores != nil {
+                    if scores!.count > 0 {
+                        try! realm.safeWrite() {
+                            GV.basicDataRecord.setBestScore(score: Int(scores![0].value), name: scores![0].player.alias, myRank: self.leaderboardForBestScore!.localPlayerScore == nil ? 0 : self.leaderboardForBestScore!.localPlayerScore!.rank)
+                            completion()
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
     }
-//    var timer: Timer?
-//    @objc private func waitForLocalPlayer() {
-//        if GKLocalPlayer.local.isAuthenticated == false {
-//            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(waitForLocalPlayer), userInfo: nil, repeats: false)
-//        } else {
-////            syncWithGameCenter()
-//        }
-//    }
-    
-//    func startGameCenterSync() {
-//        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(waitForLocalPlayer), userInfo: nil, repeats: false)
-//    }
-    
     
     public func getName() -> String {
         return GKLocalPlayer.local.alias

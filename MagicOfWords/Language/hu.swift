@@ -21,7 +21,7 @@ let huDictionary: [TextConstants: String] = [
     .tcEasyPlay:         "Egyszerű Játék",
     .tcMediumPlay:       "közepes Játék",
     .tcPlayer:           "Játékos",
-//    .tcNewGame:          "Új játék %",
+    .tcNewGame:          "Új játék",
     .tcRestart:          "Újrakezdés",
 //    .tcContinue:         "Folytatás %",
     .tcFinished:         "Befejezett játékok %",
@@ -162,4 +162,5 @@ let huDictionary: [TextConstants: String] = [
     .tcMediumActScore:  "KözepesAct",
     .tcCountPlays:      "Játszott",
     .tcBlank:           " ",
+    .tcStartGame:       "Játék",
 ]

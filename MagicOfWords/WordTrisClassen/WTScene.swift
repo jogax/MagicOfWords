@@ -12,7 +12,7 @@ import RealmSwift
 import GameKit
 
 public enum StartType: Int {
-    case NoMore = 0, PreviousGame, NextGame, NewGame, GameNumber
+    case NoMore = 0, PreviousGame, NextGame, NewGame, GameNumber, SetEasy, SetMedium
 }
 
 
@@ -560,14 +560,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             
         }
         self.backgroundColor = bgColor
-        if restart {
-            let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, newGameNumber)
-            if recordToDelete.count == 1 {
-                try! realm.safeWrite() {
-                    realm.delete(recordToDelete)
-                }
-            }
-        }
+//        if restart {
+//            let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, newGameNumber)
+//            if recordToDelete.count == 1 {
+//                try! realm.safeWrite() {
+//                    realm.delete(recordToDelete)
+//                }
+//            }
+//        }
 //        wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
         getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         createHeader()
@@ -575,28 +575,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         buttonSize = CGSize(width: buttonHeight, height: buttonHeight)
         createUndo()
         createGoBackButton()
+        createDifficultyButtons()
         WTGameWordList.shared.clear()
-//        WTGameWordList.shared.setMandatoryWords()
-//        showWordsToCollect()
-//        GCHelper.shared.getScoresForShow(completion: {
-//            self.modifyHeader()
-//        })
         GCHelper.shared.getAllScores(completion: {
             self.modifyHeader()
         })
         play()
    }
     
+    
     @objc func startNewGame() {
         wtSceneDelegate!.gameFinished(start: .NewGame)
     }
-    
-//    func generateReadOnly() {
-//        let real
-//        for gameNumber in 0...999 {
-//            getPlayingRecord(new: new, next: nextGame, gameNumber: gameNumber)
-//        }
-//    }
     
     let timeInitValue = "0°origMaxTime"
     func restartThisGame() {
@@ -644,6 +634,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         
+        let nowPlaying = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and nowPlaying = true", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "combinedKey")
+        if nowPlaying.count > 1 {
+            print(nowPlaying.count)
+        }
+        
         let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
         if actGames.count == 0 {
             new = true
@@ -662,16 +657,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             deleteGameDataRecord(gameNumber: gameNumber)
             createPlayingRecord(gameNumber: gameNumber)
         } else if new {
-            let games = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
+//            let games = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
             /// reset all records with nowPlaying status
 //            wtGameWordList = WTGameWordList(delegate: self)
-            if games.count > 0 {
-                 try! realm.safeWrite() {
-                    for game in games {
-                        realm.delete(game)
-                    }
-                }
-            }
+//            if games.count > 0 {
+//                 try! realm.safeWrite() {
+//                    for game in games {
+//                        realm.delete(game)
+//                    }
+//                }
+//            }
             let date = Date() // now
             let cal = Calendar.current
             let day = cal.ordinality(of: .day, in: .year, for: date)
@@ -688,12 +683,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
         }
-        let activRecords = realm.objects(GameDataModel.self).filter("nowPlaying = TRUE and language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+        let activRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
         for activRecord in activRecords {
-            if activRecord.gameNumber != GV.playingRecord.gameNumber {
-                try! realm.safeWrite() {
-                    activRecord.nowPlaying = false
-                }
+            try! realm.safeWrite() {
+                activRecord.nowPlaying = activRecord.gameNumber == GV.playingRecord.gameNumber
             }
         }
         setMandatoryWords()
@@ -717,7 +710,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 newString.removeLast()
                 GV.playingRecord = GameDataModel()
-                GV.playingRecord.combinedKey = GV.actLanguage + String(gameNumber)
+                GV.playingRecord.combinedKey = Date().toString()//GV.actLanguage + String(gameNumber)
                 GV.playingRecord.mandatoryWords = newString
                 GV.playingRecord.gameNumber = gameNumber
                 GV.playingRecord.language = GV.actLanguage
@@ -1403,6 +1396,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         finishButton!.isEnabled = !hide
         goBackButton!.isEnabled = showHelp ? true : !hide
         searchButton!.isEnabled = !hide
+        if startEasyGameButton != nil {
+            startEasyGameButton!.isEnabled = !hide
+        }
+        if startMediumGameButton != nil {
+            startMediumGameButton!.isEnabled = !hide
+        }
         if hide {
             goToPreviousGameButton!.alpha = 0.2
             goToNextGameButton!.alpha = 0.2
@@ -1411,6 +1410,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             finishButton!.alpha = 0.2
             goBackButton!.alpha = showHelp ? 1.0 : 0.2
             searchButton!.alpha = 0.2
+            if startEasyGameButton != nil {
+                startEasyGameButton!.alpha = 0.2
+            }
+            if startMediumGameButton != nil {
+                startMediumGameButton!.alpha = 0.2
+            }
         } else {
             goToPreviousGameButton!.alpha = hasPreviousRecords() ? 1.0 : 0.2
             goToNextGameButton!.alpha = hasNextRecords() ? 1.0 : 0.2
@@ -1419,6 +1424,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             finishButton!.alpha = 1.0
             goBackButton!.alpha = 1.0
             searchButton!.alpha = 1.0
+            if startEasyGameButton != nil {
+                startEasyGameButton!.alpha = 1.0
+            }
+            if startMediumGameButton != nil {
+                startMediumGameButton!.alpha = 1.0
+            }
         }
 
     }
@@ -1512,7 +1523,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             finishButton?.removeFromParent()
             finishButton = nil
         }
-        let title = GV.language.getText(.tcFinishGame)
+        let title = GV.language.getText(.tcNewGame)
         let wordLength = title.width(font: myTitleFont!)
 //        let wordHeight = title.height(font: myTitleFont!)
         let size = CGSize(width:wordLength * 1.2, height: buttonHeight)
@@ -1579,9 +1590,91 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         bgSprite!.addChild(goBackButton!)
     }
     
+    var startEasyGameButton: MyButton?
+    var startMediumGameButton: MyButton?
+
+    
+    private func createDifficultyButtons() {
+        if startEasyGameButton != nil {
+            startEasyGameButton?.removeFromParent()
+            startEasyGameButton = nil
+        }
+        if startMediumGameButton != nil {
+            startMediumGameButton?.removeFromParent()
+            startMediumGameButton = nil
+        }
+        func createLabel(difficulty: GameDifficulty, left: Bool) {
+            let label = SKLabelNode(fontNamed: GV.actFont)// Snell Roundhand")
+            let yPosition = self.frame.height * firstButtonLine
+            let xPosition = self.frame.size.width * 0.5
+            label.position = CGPoint(x: xPosition, y: yPosition)
+            label.fontSize = self.frame.size.height * 0.04
+            label.fontColor = .black
+            label.text = GV.language.getText(difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay)
+            label.name = label.text
+            label.zPosition = self.zPosition + 10
+            bgSprite!.addChild(label)
+        }
+        func createButton(difficulty: GameDifficulty, left: Bool) {
+            
+            let title = GV.language.getText(difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay)
+            let wordLength = title.width(font: myTitleFont!)
+            //        let wordHeight = title.height(font: myTitleFont!)
+            let size = CGSize(width:wordLength * 1.4, height: buttonHeight)
+            let ownHeaderYPos = self.frame.height * secondButtonLine
+            let buttonCenter = CGPoint(x:self.frame.width * 0.5, y: ownHeaderYPos)
+            //        let radius = frame.height * 0.5
+            let button = createMyButton(title: title, size: size, center: buttonCenter, enabled: true )
+            button.isHidden = false
+            if difficulty == .Easy {
+                button.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(startEasyGame))
+            } else {
+                button.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(startMediumGame))
+            }
+            button.zPosition = self.zPosition + 1
+            if difficulty == .Easy {
+                startEasyGameButton = button
+            } else {
+                startMediumGameButton = button
+            }
+            bgSprite!.addChild(button)
+
+        }
+        switch GV.basicDataRecord.difficulty {
+        case GameDifficulty.Easy.rawValue:
+            createLabel(difficulty: .Easy, left: true)
+            createButton(difficulty: .Medium, left: false)
+        case GameDifficulty.Medium.rawValue:
+            createLabel(difficulty: .Medium, left: false)
+            createButton(difficulty: .Easy, left: true)
+        default: break
+        }
+    }
+    
+    @objc private func startEasyGame() {
+        stopShowingTableIfNeeded()
+        if timer != nil {
+            timer!.invalidate()
+            timer = nil
+        }
+        removeAllSubviews()
+        wtSceneDelegate!.gameFinished(start: .SetEasy)
+    }
+    
+    @objc private func startMediumGame() {
+        stopShowingTableIfNeeded()
+        if timer != nil {
+            timer!.invalidate()
+            timer = nil
+        }
+        removeAllSubviews()
+        wtSceneDelegate!.gameFinished(start: .SetMedium)
+    }
+    
     var firstButtonColumn: CGFloat = 0.1
     var lastButtonColumn: CGFloat = 0.92
     var firstButtonLine: CGFloat = 0.84
+    var secondButtonLine: CGFloat = 0.80
     var lastButtonLine: CGFloat = 0.08
     
     private func createUndo() {

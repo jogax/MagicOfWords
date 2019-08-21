@@ -21,7 +21,7 @@ let deDictionary: [TextConstants: String] = [
     .tcEasyPlay:         "Einfaches Spiel",
     .tcMediumPlay:       "Mittelschweres Spiel",
     .tcPlayer:           "Spieler",
-//    .tcNewGame:          "Neues Spiel %",
+    .tcNewGame:          "Neues Spiel",
     .tcRestart:          "Neustart",
 //    .tcContinue:         "Fortsetzen %",
     .tcFinished:         "Beendete Spiele %",
@@ -164,6 +164,7 @@ let deDictionary: [TextConstants: String] = [
     .tcMediumActScore:  "MittelAct",
     .tcCountPlays:      "Gespielt",
     .tcBlank:           " ",
+    .tcStartGame:       "Spielen",
 ]
 
 

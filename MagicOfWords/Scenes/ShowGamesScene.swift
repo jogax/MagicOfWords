@@ -46,8 +46,24 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     }
     
     private func scoresLoaded() {
-        gamesForShow = GV.scoreForShowTable
-        showFinishedGamesInTableView()
+        if GV.debug {
+            gamesForShow = GV.scoreForShowTable
+        } else {
+            for (index, item) in GV.scoreForShowTable.enumerated() {
+                if !item.player.lowercased().begins(with: "jogax") {
+                    let place = index == 0 ? 1 : gamesForShow[index - 1].place + 1
+                    let player = item.player
+                    let score = item.score
+                    gamesForShow.append(ScoreForShow(place: place, player: player, score: score))
+                }
+            }
+        }
+        
+        if gamesForShow.count > 0 {
+            showFinishedGamesInTableView()
+        } else {
+            goBack(gameNumberSelected: false, gameNumber: 0)
+        }
    }
 
     public func setDelegate(delegate: ShowGamesSceneDelegate, controller: UIViewController) {
@@ -68,9 +84,10 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     }
 
     private func goBack(gameNumberSelected: Bool, gameNumber: Int, restart: Bool = false) {
-        showGamesInTableView!.isHidden = true
-        showGamesInTableView = nil
-//        subscription.unsubscribe()
+        if showGamesInTableView != nil {
+            showGamesInTableView!.isHidden = true
+            showGamesInTableView = nil
+        }
          if myDelegate == nil {
             return
         }

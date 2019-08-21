@@ -21,7 +21,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcEasyPlay:         "Простая игра",
     .tcMediumPlay:       "Средняя игра",
     .tcPlayer:           "Игрок",
-//    .tcNewGame:          "Новая игра %",
+    .tcNewGame:          "Новая игра",
     .tcRestart:          "Перезапуск",
 //    .tcContinue:         "Продолжение %",
     .tcFinished:         "Законченные игры %",
@@ -163,5 +163,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcMediumActScore:  "АктСредняя",
     .tcCountPlays:      "Игры",
     .tcBlank:           " ",
+    .tcStartGame:       "Играть",
 ]
 

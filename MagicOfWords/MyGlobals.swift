@@ -96,8 +96,8 @@ struct PlayerData {
     var device = ""
     var version = ""
     var land = ""
-    var easyBestScore = ""
-    var mediumBestScore = ""
+    var easyBestScore: Int64 = 0
+    var mediumBestScore: Int64 = 0
     var easyActScore = ""
     var mediumActScore = ""
     var countPlays = ""
