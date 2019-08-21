@@ -715,7 +715,7 @@ extension Data {
 extension Date {
     func toString()->String {
         let df = DateFormatter()
-        df.dateFormat = "yyyy-MM-dd HH:mm"
+        df.dateFormat = "yyyy-MM-dd HH:mm:ss"
         df.timeZone = TimeZone(abbreviation: "UTC")
         let returnValue = df.string(from: self)
 
@@ -742,6 +742,7 @@ extension Date {
         let userCalendar = Calendar.current // user calendar
         self = userCalendar.date(from: dateComponents)!
     }
+    
 }
 
 extension UIViewController {

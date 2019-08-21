@@ -39,6 +39,7 @@ class BasicDataModel: Object {
     override  class func primaryKey() -> String {
         return "ID"
     }
+    
     public func setBestScore(score: Int, name: String, myRank: Int) {
         scoreInfos[self.difficulty].bestScore = score
         scoreInfos[self.difficulty].bestPlayerName = name

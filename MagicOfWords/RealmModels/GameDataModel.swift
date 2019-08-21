@@ -29,5 +29,26 @@ class GameDataModel: Object {
         return "combinedKey"
     }
     
+    public func copy(newCombinedKey: String)->GameDataModel {
+        let newRecord = GameDataModel()
+        
+        newRecord.combinedKey = newCombinedKey
+        newRecord.language = self.language
+        newRecord.gameNumber = self.gameNumber
+        newRecord.nowPlaying = self.nowPlaying
+        newRecord.gameStatus = self.gameStatus
+        newRecord.mandatoryWords = self.mandatoryWords
+        newRecord.ownWords = self.ownWords
+        newRecord.pieces = self.pieces
+        newRecord.words = self.words
+        newRecord.score = self.score
+        newRecord.time = self.time
+        newRecord.synced = self.synced
+        for round in self.rounds {
+            newRecord.rounds.append(round)
+        }
+        return newRecord
+    }
+    
     
 }

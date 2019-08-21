@@ -634,15 +634,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         
-        let nowPlaying = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and nowPlaying = true", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "combinedKey")
-        if nowPlaying.count > 1 {
-            print(nowPlaying.count)
-        }
         
-        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "combinedKey")
+        
         if actGames.count == 0 {
             new = true
         }
+        let nowPlaying = actGames.filter("nowPlaying = true")
+        if nowPlaying.count > 1 {
+            for item in nowPlaying {
+                if item.combinedKey != nowPlaying.last!.combinedKey {
+                    try! realm.safeWrite() {
+                        item.nowPlaying = false
+                    }
+                }
+            }
+        } else if nowPlaying.count == 0 && actGames.count > 0 {
+            try! realm.safeWrite() {
+                actGames.last!.nowPlaying = true
+            }
+        }
+
         if showHelp {
             if gameNumber >= gameNumberForGenerating {
                 let difficulty = GV.basicDataRecord.difficulty
@@ -657,16 +669,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             deleteGameDataRecord(gameNumber: gameNumber)
             createPlayingRecord(gameNumber: gameNumber)
         } else if new {
-//            let games = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "gameNumber", ascending: true)
-            /// reset all records with nowPlaying status
-//            wtGameWordList = WTGameWordList(delegate: self)
-//            if games.count > 0 {
-//                 try! realm.safeWrite() {
-//                    for game in games {
-//                        realm.delete(game)
-//                    }
-//                }
-//            }
             let date = Date() // now
             let cal = Calendar.current
             let day = cal.ordinality(of: .day, in: .year, for: date)
@@ -678,28 +680,46 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             createPlayingRecord(gameNumber: gameNumber)
             
         } else {
-            GV.playingRecord = actGames.first!
+            if next == .PreviousGame && hasRecords(before: true) {
+                for (index, game) in actGames.enumerated() {
+                    if game.nowPlaying == true && index > 0 {
+                        try! realm.safeWrite() {
+                            game.nowPlaying = false
+                            actGames[index - 1].nowPlaying = true
+                            GV.playingRecord = actGames[index - 1]
+                        }
+                    }
+                    
+                }
+            } else if next == .NextGame && hasRecords(before: false) {
+                for (index, game) in actGames.enumerated() {
+                    if game.nowPlaying == true && index + 1 < actGames.count {
+                        try! realm.safeWrite() {
+                            game.nowPlaying = false
+                            actGames[index + 1].nowPlaying = true
+                            GV.playingRecord = actGames[index + 1]
+                        }
+                        break
+                    }
+                }
+            } else {
+                GV.playingRecord = nowPlaying.last!
+            }
         }
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
         }
-        let activRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
-        for activRecord in activRecords {
-            try! realm.safeWrite() {
-                activRecord.nowPlaying = activRecord.gameNumber == GV.playingRecord.gameNumber
-            }
-        }
+//        let activRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+//        for activRecord in activRecords {
+//            try! realm.safeWrite() {
+//                activRecord.nowPlaying = activRecord.gameNumber == GV.playingRecord.gameNumber
+//            }
+//        }
         setMandatoryWords()
     }
     
     private func createPlayingRecord(gameNumber: Int) {
         let gameNumberForMandatoryRecord = gameNumber >= gameNumberForGenerating ? gameNumber : gameNumber % 1000
-//        let difficulty = showHelp ? GameDifficulty.Medium.rawValue : GV.basicDataRecord.difficulty
-//        if GV.generateHelpInfo {
-//            gameNumberForMandatoryRecord = gameNumberForGenerating
-//        } else {
-//            gameNumberForMandatoryRecord = gameNumber - difficulty * 1000
-//        }
         let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumberForMandatoryRecord, GV.actLanguage).first!
         if mandatoryRecord != nil {
             try! realm.safeWrite() {
@@ -1389,8 +1409,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var buttonSize = CGSize(width: CGFloat(0), height: CGFloat(0))
     
     func hideButtons(hide: Bool) {
-        goToPreviousGameButton!.isEnabled = hide ? false : hasPreviousRecords()
-        goToNextGameButton!.isEnabled = hide ? false : hasNextRecords()
+        goToPreviousGameButton!.isEnabled = hide ? false : hasRecords(before: true)
+        goToNextGameButton!.isEnabled = hide ? false : hasRecords(before: false)
 //        undoButton!.isEnabled = !hide
         allWordsButton!.isEnabled = !hide
         finishButton!.isEnabled = !hide
@@ -1417,8 +1437,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 startMediumGameButton!.alpha = 0.2
             }
         } else {
-            goToPreviousGameButton!.alpha = hasPreviousRecords() ? 1.0 : 0.2
-            goToNextGameButton!.alpha = hasNextRecords() ? 1.0 : 0.2
+            goToPreviousGameButton!.alpha = hasRecords(before: true) ? 1.0 : 0.2
+            goToNextGameButton!.alpha = hasRecords(before: false) ? 1.0 : 0.2
 //            undoButton!.alpha = 1.0
             allWordsButton!.alpha = 1.0
             finishButton!.alpha = 1.0
@@ -1804,8 +1824,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * pieceArrayCenterY)
         }
-        createGoToPreviousGameButton(enabled: hasPreviousRecords())
-        createGoToNextGameButton(enabled: hasNextRecords())
+        createGoToPreviousGameButton(enabled: hasRecords(before: true))
+        createGoToNextGameButton(enabled: hasRecords(before: false))
         createAllWordsButton()
         createFinishButton()
         createSearchButton()
@@ -2365,14 +2385,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var gameFinished = false
     
-    private func hasPreviousRecords()->Bool {
-        return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber >= %d and gameNumber < %d and language = %@",
-            GV.GameStatusPlaying, GV.GameStatusContinued, GV.minGameNumber, GV.playingRecord.gameNumber, GV.actLanguage).count > 0
-    }
-    
-    private func hasNextRecords()->Bool {
-        return realm.objects(GameDataModel.self).filter("(gameStatus = %d or gameStatus = %d) and gameNumber > %d and gameNumber <= %d and language = %@",
-            GV.GameStatusPlaying, GV.GameStatusContinued, GV.playingRecord.gameNumber, GV.maxGameNumber, GV.actLanguage).count > 0
+    private func hasRecords(before: Bool)->Bool {
+        let allRecords = realm.objects(GameDataModel.self).filter("gameNumber >= %d and gameNumber < %d and language = %@",
+              GV.minGameNumber, GV.maxGameNumber, GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: true)
+        if allRecords.count > 1 {
+            if before && allRecords[0].nowPlaying || !before && allRecords.last!.nowPlaying {
+                return false
+            } else {
+                return true
+            }
+        } else {
+            return false
+        }
     }
     
     @objc private func countTime(timerX: Timer) {
@@ -3280,9 +3304,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         enabled = true
         if gameFinishedStatus == .OK {
             saveHelpInfo(action: .FinishGame)
-            try! realm.safeWrite() {
-                GV.playingRecord.gameStatus = GV.GameStatusFinished
-            }
+//            try! realm.safeWrite() {
+//                GV.playingRecord.gameStatus = GV.GameStatusFinished
+//            }
             if !showHelp {
                 self.startNewGame()
             }

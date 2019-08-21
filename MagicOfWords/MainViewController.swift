@@ -213,18 +213,18 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             if actPlay.count > 1 {
                 convertIfNeeded()
             }
-            if actPlay.first!.gameStatus == GV.GameStatusFinished {
-                try! realm.safeWrite() {
-//                    realm.delete(actPlay)
-                    GV.basicDataRecord.countPlays += 1
-                    GCHelper.shared.sendScoreToGameCenter(score: 0, difficulty: GV.basicDataRecord.difficulty, completion: {})
-                }
-                let gameNumber = GV.basicDataRecord.difficulty * 1000
-                startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
-            } else {
-                let gameNumber = actPlay.first!.gameNumber
-                startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
-            }
+//            if actPlay.first!.gameStatus == GV.GameStatusFinished {
+//                try! realm.safeWrite() {
+////                    realm.delete(actPlay)
+//                    GV.basicDataRecord.countPlays += 1
+//                    GCHelper.shared.sendScoreToGameCenter(score: 0, difficulty: GV.basicDataRecord.difficulty, completion: {})
+//                }
+//                let gameNumber = GV.basicDataRecord.difficulty * 1000
+//                startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
+//            } else {
+            let gameNumber = actPlay.first!.gameNumber
+            startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
+//            }
         }
     }
     
@@ -354,29 +354,26 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     private func convertIfNeeded() {
-        var bestScore = 0
-        var bestScoreIndex = 0
+//        var bestScore = 0
+//        var bestScoreIndex = 0
+        var dayAdder = 1
         for languageIndex in 0...3 {
             let language = GV.IntToLanguage[languageIndex]
             for difficulty in GameDifficulty.Easy.rawValue...GameDifficulty.Medium.rawValue {
                 let minGameNumber = difficulty * 1000
                 let maxGameNumber = minGameNumber + 999
-                let myPlayingRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", language!, minGameNumber, maxGameNumber)
+                let myPlayingRecords = realm.objects(GameDataModel.self).filter("language = %@ and combinedKey BEGINSWITH %@ and gameNumber >= %d and gameNumber <= %d", language!, language!, minGameNumber, maxGameNumber)
                 if myPlayingRecords.count > 0 {
-                    for (index, myPlayingRecord) in myPlayingRecords.enumerated() {
-                        if myPlayingRecord.score > bestScore {
-                            bestScore = myPlayingRecord.score
-                            bestScoreIndex = index
+                    for myPlayingRecord in myPlayingRecords {
+                        let combinedKey =  Calendar.current.date(byAdding: .hour, value: -dayAdder, to: Date())!.toString()
+                        let newRecord = myPlayingRecord.copy(newCombinedKey: combinedKey)
+                        try! realm.safeWrite() {
+                            realm.add(newRecord)
                         }
+                        dayAdder += 1
                     }
-                    let maxCount = myPlayingRecords.count - 1
-                    for index in 0...maxCount {
-                        let revertIndex = maxCount - index
-                        if revertIndex != bestScoreIndex {
-                            try! realm.safeWrite() {
-                                realm.delete(myPlayingRecords[revertIndex])
-                            }
-                        }
+                    try! realm.safeWrite() {
+                        realm.delete(myPlayingRecords)
                     }
                 }
             }
