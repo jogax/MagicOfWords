@@ -569,13 +569,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
 //        }
 //        wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
-        getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
+        let number = getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         createHeader()
         buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
         buttonSize = CGSize(width: buttonHeight, height: buttonHeight)
         createUndo()
         createGoBackButton()
-        createDifficultyButtons()
+        createDifficultyButtons(number: number)
         WTGameWordList.shared.clear()
         GCHelper.shared.getAllScores(completion: {
             self.modifyHeader()
@@ -616,7 +616,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
 //    }
 //
-    private func getPlayingRecord(next: StartType, gameNumber: Int, showHelp: Bool = false) {
+    private func getPlayingRecord(next: StartType, gameNumber: Int, showHelp: Bool = false)->Int {
         func setMandatoryWords() {
             if GV.playingRecord.mandatoryWords == "" {
                 let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", GV.playingRecord.gameNumber, GV.actLanguage).first!
@@ -709,13 +709,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
         }
-//        let activRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
-//        for activRecord in activRecords {
-//            try! realm.safeWrite() {
-//                activRecord.nowPlaying = activRecord.gameNumber == GV.playingRecord.gameNumber
-//            }
-//        }
         setMandatoryWords()
+        var returnValue = 0
+        for (index, record) in actGames.enumerated() {
+            if record.combinedKey == GV.playingRecord.combinedKey {
+                returnValue = index + 1
+                break
+            }
+        }
+        return returnValue
     }
     
     private func createPlayingRecord(gameNumber: Int) {
@@ -1614,7 +1616,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var startMediumGameButton: MyButton?
 
     
-    private func createDifficultyButtons() {
+    private func createDifficultyButtons(number: Int) {
         if startEasyGameButton != nil {
             startEasyGameButton?.removeFromParent()
             startEasyGameButton = nil
@@ -1630,13 +1632,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             label.position = CGPoint(x: xPosition, y: yPosition)
             label.fontSize = self.frame.size.height * 0.04
             label.fontColor = .black
-            label.text = GV.language.getText(difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay)
+            label.text = GV.language.getText((difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay), values: String(number))
             label.name = label.text
             label.zPosition = self.zPosition + 10
             bgSprite!.addChild(label)
         }
         func createButton(difficulty: GameDifficulty, left: Bool) {
-            
             let title = GV.language.getText(difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay)
             let wordLength = title.width(font: myTitleFont!)
             //        let wordHeight = title.height(font: myTitleFont!)
