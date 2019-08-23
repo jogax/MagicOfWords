@@ -743,6 +743,17 @@ extension Date {
         self = userCalendar.date(from: dateComponents)!
     }
     
+    func getDateDiff(start: Date) -> String  {
+        let calendar = Calendar.current
+        let dateComponents = calendar.dateComponents([Calendar.Component.hour,
+                                                      Calendar.Component.minute,
+                                                      Calendar.Component.nanosecond], from: start, to: self)
+        let milliseconds = String(dateComponents.nanosecond! / 1000000)
+        let hours = String(dateComponents.hour!)
+        let minutes = String(dateComponents.minute!)
+        return "\(hours):\(minutes):\(milliseconds)"
+    }
+    
 }
 
 extension UIViewController {

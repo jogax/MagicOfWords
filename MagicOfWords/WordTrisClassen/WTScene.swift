@@ -578,7 +578,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         createDifficultyButtons(number: number)
         WTGameWordList.shared.clear()
         GCHelper.shared.getAllScores(completion: {
-            self.modifyHeader()
+            [unowned self] in self.modifyHeader()
         })
         play()
    }
@@ -635,7 +635,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         
         
-        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "combinedKey")
+        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "score", ascending: false)
         
         if actGames.count == 0 {
             new = true
@@ -1837,10 +1837,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if GV.playingRecord.rounds.count == 1 && GV.playingRecord.rounds[0].gameArray == "" {
                 createFixLetters()
             } else {
+                var start = Date()
                 WTGameWordList.shared.restoreFromPlayingRecord()
+                print(Date().getDateDiff(start: start))
+                start = Date()
                 restoreGameArray()
+                print(Date().getDateDiff(start: start))
+                start = Date()
                 showFoundedWords()
-//                checkIfGameFinished()
+                print(Date().getDateDiff(start: start))
+                print("===================================")
                 modifyHeader()
             }
         } else {
@@ -2388,7 +2394,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func hasRecords(before: Bool)->Bool {
         let allRecords = realm.objects(GameDataModel.self).filter("gameNumber >= %d and gameNumber < %d and language = %@",
-              GV.minGameNumber, GV.maxGameNumber, GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: true)
+              GV.minGameNumber, GV.maxGameNumber, GV.actLanguage).sorted(byKeyPath: "score", ascending: false)
         if allRecords.count > 1 {
             if before && allRecords[0].nowPlaying || !before && allRecords.last!.nowPlaying {
                 return false
@@ -3934,9 +3940,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         
     }
 
-    deinit {
-        print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
-    }
     private func printGameArray() {
         let line = "____________________________________________"
         for row in 0..<10 {
@@ -3956,6 +3959,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         print(line)
     }
-
+    deinit {
+        print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
+    }
+    
 }
 

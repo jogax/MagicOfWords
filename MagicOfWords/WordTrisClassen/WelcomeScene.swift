@@ -188,6 +188,11 @@ class WelcomeScene: SKScene {
         return button
         
     }
+    
+    deinit {
+        print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
+    }
+
 
 
 }

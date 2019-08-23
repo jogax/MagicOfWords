@@ -1128,5 +1128,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         realmHelpInfo = try! Realm(configuration: helpInfoConfig)
         
     }
+    
+    deinit {
+        print("deinit of mainViewController")
+    }
 
 }
