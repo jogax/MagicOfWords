@@ -162,6 +162,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         saveActualState()
     }
     
+    public class var shared: WTScene {
+        struct Static {
+            static let instance = WTScene()
+        }
+        return Static.instance
+    }
+    
+
     var lengthOfWord: Int = 0
     var lengthOfCnt: Int = 0
     var lengthOfLength: Int = 0
@@ -541,6 +549,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.view!.isMultipleTouchEnabled = false
         self.view!.subviews.forEach { $0.removeFromSuperview() }
         self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+        if self.children.count > 0 {
+            for child in self.children {
+                child.removeFromParent()
+            }
+        }
         self.bgSprite = SKSpriteNode()
 //        bgSprite!.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
 //        bgSprite!.color = bgColor
@@ -569,13 +582,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
 //        }
 //        wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
-        let number = getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
+        getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         createHeader()
         buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
         buttonSize = CGSize(width: buttonHeight, height: buttonHeight)
         createUndo()
         createGoBackButton()
-        createDifficultyButtons(number: number)
+        createDifficultyButtons(number: calculatePlace()
+)
         WTGameWordList.shared.clear()
         GCHelper.shared.getAllScores(completion: {
             [unowned self] in self.modifyHeader()
@@ -583,9 +597,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         play()
    }
     
+    private func goBackToWTScene(start: StartType) {
+        removeAllSubviews()
+        wtSceneDelegate!.gameFinished(start: start)
+    }
+    
     
     @objc func startNewGame() {
-        wtSceneDelegate!.gameFinished(start: .NewGame)
+        goBackToWTScene(start: .NewGame)
+//        wtSceneDelegate!.gameFinished(start: .NewGame)
     }
     
     let timeInitValue = "0°origMaxTime"
@@ -600,7 +620,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             GV.playingRecord.gameStatus = GV.GameStatusNew
             GV.playingRecord.mandatoryWords = ""
         }
-        wtSceneDelegate!.gameFinished(start: .NewGame)
+        goBackToWTScene(start: .NewGame)
+        //        wtSceneDelegate!.gameFinished(start: .NewGame)
     }
     
 //    private func clearAllWords() {
@@ -616,7 +637,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
 //    }
 //
-    private func getPlayingRecord(next: StartType, gameNumber: Int, showHelp: Bool = false)->Int {
+    private func getPlayingRecord(next: StartType, gameNumber: Int, showHelp: Bool = false) {
         func setMandatoryWords() {
             if GV.playingRecord.mandatoryWords == "" {
                 let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", GV.playingRecord.gameNumber, GV.actLanguage).first!
@@ -710,14 +731,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             goOnPlaying = true
         }
         setMandatoryWords()
-        var returnValue = 0
+    }
+    
+    private func calculatePlace()->Int {
+        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "score", ascending: false)
         for (index, record) in actGames.enumerated() {
             if record.combinedKey == GV.playingRecord.combinedKey {
-                returnValue = index + 1
-                break
+                return index + 1
             }
         }
-        return returnValue
+        return 0
     }
     
     private func createPlayingRecord(gameNumber: Int) {
@@ -725,6 +748,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumberForMandatoryRecord, GV.actLanguage).first!
         if mandatoryRecord != nil {
             try! realm.safeWrite() {
+                let oldRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and nowPlaying = true", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+                for oldRecord in oldRecords {
+                    oldRecord.nowPlaying = false
+                }
                 let components = mandatoryRecord!.mandatoryWords.components(separatedBy: "°")
                 var newString = ""
                 for index in 0...5 {
@@ -741,6 +768,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 realm.add(GV.playingRecord)
             }
         }
+        hideButtons(hide: false)
     }
 
 
@@ -997,8 +1025,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 timer!.invalidate()
                 timer = nil
             }
-            removeAllSubviews()
-            wtSceneDelegate!.gameFinished(start: .NoMore)
+            goBackToWTScene(start: .NoMore)
+//            wtSceneDelegate!.gameFinished(start: .NoMore)
         }
     }
     
@@ -1370,8 +1398,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 timer!.invalidate()
                 timer = nil
             }
-            removeAllSubviews()
-            wtSceneDelegate!.gameFinished(start: .PreviousGame)
+//            removeAllSubviews()
+            goBackToWTScene(start: .PreviousGame)
+//            wtSceneDelegate!.gameFinished(start: .PreviousGame)
         }
     }
     
@@ -1382,8 +1411,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 timer!.invalidate()
                 timer = nil
             }
-            removeAllSubviews()
-            wtSceneDelegate!.gameFinished(start: .NextGame)
+            goBackToWTScene(start: .NextGame)
+//            removeAllSubviews()
+//            wtSceneDelegate!.gameFinished(start: .NextGame)
         }
     }
     
@@ -1614,7 +1644,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var startEasyGameButton: MyButton?
     var startMediumGameButton: MyButton?
+    var easyLabel: SKLabelNode?
+    var mediumLabel: SKLabelNode?
 
+    private func modifyDifficultyLabels(number: Int) {
+        switch GV.basicDataRecord.difficulty {
+        case GameDifficulty.Easy.rawValue:
+            easyLabel!.text = GV.language.getText(.tcEasyPlay, values: String(number) + ". ")
+        case GameDifficulty.Medium.rawValue:
+            mediumLabel!.text = GV.language.getText(.tcMediumPlay, values: String(number) + ". ")
+        default: break
+        }
+    }
     
     private func createDifficultyButtons(number: Int) {
         if startEasyGameButton != nil {
@@ -1632,11 +1673,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             label.position = CGPoint(x: xPosition, y: yPosition)
             label.fontSize = self.frame.size.height * 0.04
             label.fontColor = .black
-            label.text = GV.language.getText((difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay), values: String(number))
+            label.text = GV.language.getText((difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay), values: String(number) + ". ")
             label.name = label.text
             label.zPosition = self.zPosition + 10
             bgSprite!.addChild(label)
+            if left {
+                easyLabel = label
+            } else {
+                mediumLabel = label
+            }
         }
+        
         func createButton(difficulty: GameDifficulty, left: Bool) {
             let title = GV.language.getText(difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay)
             let wordLength = title.width(font: myTitleFont!)
@@ -1678,8 +1725,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             timer!.invalidate()
             timer = nil
         }
-        removeAllSubviews()
-        wtSceneDelegate!.gameFinished(start: .SetEasy)
+        goBackToWTScene(start: .SetEasy)
+//        removeAllSubviews()
+//        wtSceneDelegate!.gameFinished(start: .SetEasy)
     }
     
     @objc private func startMediumGame() {
@@ -1688,8 +1736,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             timer!.invalidate()
             timer = nil
         }
-        removeAllSubviews()
-        wtSceneDelegate!.gameFinished(start: .SetMedium)
+        goBackToWTScene(start: .SetMedium)
+//        removeAllSubviews()
+//        wtSceneDelegate!.gameFinished(start: .SetMedium)
     }
     
     var firstButtonColumn: CGFloat = 0.1
@@ -1810,8 +1859,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GV.playing = true
         timerIsCounting = true
         headerCreated = false
-//        gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
-        gameNumberForGenerating = newGameNumber
+        gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
+//        gameNumberForGenerating = newGameNumber
         WTGameWordList.shared.setDelegate(delegate: self)
         timeForGame = TimeForGame(from: GV.playingRecord.time)
         myTimer = MyTimer(time: timeForGame)
@@ -1837,16 +1886,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if GV.playingRecord.rounds.count == 1 && GV.playingRecord.rounds[0].gameArray == "" {
                 createFixLetters()
             } else {
-                var start = Date()
+//                var start = Date()
                 WTGameWordList.shared.restoreFromPlayingRecord()
-                print(Date().getDateDiff(start: start))
-                start = Date()
+//                print(Date().getDateDiff(start: start))
+//                start = Date()
                 restoreGameArray()
-                print(Date().getDateDiff(start: start))
-                start = Date()
+//                print(Date().getDateDiff(start: start))
+//                start = Date()
                 showFoundedWords()
-                print(Date().getDateDiff(start: start))
-                print("===================================")
+//                print(Date().getDateDiff(start: start))
+//                print("===================================")
                 modifyHeader()
             }
         } else {
@@ -2546,13 +2595,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func saveArrayOfPieces() {
 //        tilesForGame.removeAll()
         let piecesToPlay = GV.playingRecord.pieces.components(separatedBy: "°")
-        for index in tilesForGame.count..<piecesToPlay.count {
-            if index >= tilesForGame.count {
-                let piece = piecesToPlay[index]
-                if piece.count > 0 {
-                    let tile = WTPiece(from: piece, parent: self, blockSize: blockSize, arrayIndex: index)
-                    tilesForGame.append(tile)
-                    tilesForGame.last!.setArrayIndex(index: index)
+        if tilesForGame.count < piecesToPlay.count {
+            for index in tilesForGame.count..<piecesToPlay.count {
+                if index >= tilesForGame.count {
+                    let piece = piecesToPlay[index]
+                    if piece.count > 0 {
+                        let tile = WTPiece(from: piece, parent: self, blockSize: blockSize, arrayIndex: index)
+                        tilesForGame.append(tile)
+                        tilesForGame.last!.setArrayIndex(index: index)
+                    }
                 }
             }
         }
@@ -3290,7 +3341,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if gameFinishedStatus == .OK {
             title = GV.language.getText(.tcGameFinished1)
             message = GV.language.getText(.tcGameFinished2)
-            action1Title = GV.language.getText(.tcFinishGame)
+            action1Title = GV.language.getText(.tcNewGame)
         } else {
             title = GV.language.getText(.tcTaskNotCompletedWithNoMoreSteps)
             message = GV.language.getText(.tcWillBeRestarted)
@@ -3373,7 +3424,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 activityItemsString.removeLast()
                 rounds.activityItems = activityItemsString
             }
-        }
+        }        
+        modifyDifficultyLabels(number: calculatePlace())
+        hideButtons(hide: false)
+        GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyHeader()})
     }
     
     private func checkFreePlace()->Bool {

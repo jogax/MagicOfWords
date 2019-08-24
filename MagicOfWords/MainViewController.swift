@@ -153,7 +153,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         GV.generateHelpInfo = false
         if let view = self.view as! SKView? {
             view.presentScene(nil)
-            wtScene = nil
+            wtSceneStarted = false
         }
         showBackgroundPicture()
         switch start {
@@ -183,16 +183,19 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         showMenu()
 //        startMenuScene()
     }
+    var wtSceneStarted = false
     
     func startWTScene(new: Bool, next: StartType, gameNumber: Int, restart: Bool = false, showHelp: Bool = false) {
-        wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        if let view = self.view as! SKView? {
-            wtScene!.setDelegate(delegate: self)
-            wtScene!.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart, showHelp: showHelp)
-            wtScene!.parentViewController = self
-            view.presentScene(wtScene!)
+//        wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        if !wtSceneStarted {
+            if let view = self.view as! SKView? {
+                wtScene!.setDelegate(delegate: self)
+                wtScene!.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart, showHelp: showHelp)
+                wtScene!.parentViewController = self
+                view.presentScene(wtScene!)
+                wtSceneStarted = true
+            }
         }
-        
     }
     
     func startFindWordsScene() {
@@ -313,6 +316,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         #if DEBUG
             GV.debug = true
         #endif
+        wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         showBackgroundPicture()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         myHeight = self.view.frame.size.height
@@ -334,7 +338,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     @objc private func oneMinutesTimer(timerX: Timer) {
-        print("oneMinutesTimer actTime: \(Date())")
+//        print("oneMinutesTimer actTime: \(Date())")
         try! realm.safeWrite() {
             GV.basicDataRecord.playingTime += 1
             GV.basicDataRecord.playingTimeToday += 1
@@ -350,6 +354,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             manageGameCenter()
         } else {
             startDemoOrMenu()
+            startWTScene(new: false, next: .NoMore, gameNumber: 0)
         }
     }
     
@@ -386,7 +391,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             startWelcomeScene()
         } else {
             if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue && GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated && GV.connectedToInternet {
-                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+                    GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+                _ = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(startPlaying(timerX: )), userInfo: nil, repeats: false)
+
                 return
             }
 //            if countContinueGames > 0 {
@@ -396,6 +403,13 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //            }
         }
     }
+    
+    @objc func startPlaying(timerX: Timer) {
+        if GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated {
+            startWTScene(new: false, next: .NoMore, gameNumber: 0)
+        }
+    }
+    
     var animationScene: WelcomeScene?
 
     @objc private func startWelcomeScene() {
@@ -895,7 +909,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
         GV.maxGameNumber = GV.minGameNumber + 999
 //        getRecordCounts()
-        GCHelper.shared.getBestScore(completion: {})
+        GCHelper.shared.getBestScore(completion: {self.callModifyHeader()})
 //        GCHelper.shared.getAllScores(completion: {})
 //        self.showMenu()
     }

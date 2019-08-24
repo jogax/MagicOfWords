@@ -213,7 +213,14 @@ public class WTGameWordList {
     private var delegate: WTGameWordListDelegate?
     public var allWords = [WordWithCounter]()
 //    private var mandatoryWords = [String]()
-    static let shared = WTGameWordList()
+//    static let shared = WTGameWordList()
+    public class var shared: WTGameWordList {
+        struct Static {
+            static let instance = WTGameWordList()
+        }
+        return Static.instance
+    }
+    
     init() {
         wordsInRound = [WordInRound]()
 //        mandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
