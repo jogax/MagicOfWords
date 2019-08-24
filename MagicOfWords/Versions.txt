@@ -63,7 +63,7 @@ English
 - using Game Center
 - no more gamenumber
 - one score for each difficulty
-- games can be finished alwais
+- games can be finished always
 
 Deutsch
 - Keine Realm Cloud mehr
