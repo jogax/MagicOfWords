@@ -51,6 +51,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         })
         if wtScene == nil {
             showMenu()
+        } else {
+            startGame()
         }
     }
     
@@ -187,14 +189,14 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     
     func startWTScene(new: Bool, next: StartType, gameNumber: Int, restart: Bool = false, showHelp: Bool = false) {
 //        wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        if !wtSceneStarted {
-            if let view = self.view as! SKView? {
+        if let view = self.view as! SKView? {
+//            if !wtSceneStarted {
                 wtScene!.setDelegate(delegate: self)
                 wtScene!.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart, showHelp: showHelp)
                 wtScene!.parentViewController = self
                 view.presentScene(wtScene!)
                 wtSceneStarted = true
-            }
+//            }
         }
     }
     

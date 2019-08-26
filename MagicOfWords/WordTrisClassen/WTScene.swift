@@ -3145,10 +3145,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             return
         }
 
-//        if GV.basicDataRecord.getScore() < GV.totalScore {
-//        GV.basicDataRecord.setScore(score: GV.totalScore)
         GCHelper.shared.sendScoreToGameCenter(score: GV.totalScore, difficulty: GV.basicDataRecord.difficulty, completion: {self.modifyHeader()})
-//        }
+        GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyHeader()})
     }
     
     enum CongratulationType: Int {
@@ -3427,7 +3425,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }        
         modifyDifficultyLabels(number: calculatePlace())
         hideButtons(hide: false)
-        GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyHeader()})
     }
     
     private func checkFreePlace()->Bool {

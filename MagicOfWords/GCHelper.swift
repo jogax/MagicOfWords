@@ -672,6 +672,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             }
             bestScoreLeaderboard!.loadScores(completionHandler: {
                 (myScores, error) in
+                if error == nil && myScores != nil {
                     if myScores!.count > 0 {
                         self.bestScoreLeaderboard!.loadScores(completionHandler: {
                             (myScores, error) in
@@ -690,6 +691,10 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                                 completion()
                             }
                         })
+                    } else {
+                        completion()
+                        self.waitingForScores = false
+                    }
                 } else {
                     completion()
                     self.waitingForScores = false
