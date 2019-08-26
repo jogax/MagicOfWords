@@ -177,9 +177,9 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     struct GCInfo {
         let identifier: String
-        let value: Int
-        init(identifier: String, value: Int, modifyValue: Int = GV.TimeModifier) {
-            let adder = modifyValue * GV.getTimeIntervalSince20190101()
+        let value: Int64
+        init(identifier: String, value: Int64, modifyValue: Int64 = GV.TimeModifier) {
+            let adder: Int64 = modifyValue * Int64(GV.getTimeIntervalSince20190101())
             self.identifier = identifier
             self.value = value + adder
         }
@@ -228,8 +228,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     for score in scores! {
                         let player = score.player.alias
                         let index = GV.globalInfoTable.firstIndex(where: {$0.alias == player})
-                        let savedDate = GV.getDateFromInterval(interval: Int(score.value) / GV.TimeModifier)
-                        let savedValue = Int(score.value) % GV.TimeModifier
+                        let savedDate = GV.getDateFromInterval(interval: Int(score.value) / Int(GV.TimeModifier))
+                        let savedValue = Int(score.value) % Int(GV.TimeModifier)
                         var tableItem = PlayerData()
                         switch score.leaderboardIdentifier {
                         case self.playingTimeName:
@@ -381,11 +381,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             let bestIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyBestScoreName : mediumBestScoreName
             let actIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyActScoreName : mediumActScoreName
-            infoArray.append(GCInfo(identifier: bestIdentifier, value: score!, modifyValue: 0))
-            infoArray.append(GCInfo(identifier: actIdentifier, value: score!))
+            infoArray.append(GCInfo(identifier: bestIdentifier, value: Int64(score!), modifyValue: 0))
+            infoArray.append(GCInfo(identifier: actIdentifier, value: Int64(score!)))
             if score! != 0 {
                 let countPlaysIdentifier = countPlaysName
-                infoArray.append(GCInfo(identifier: countPlaysIdentifier, value: GV.basicDataRecord.countPlays))
+                infoArray.append(GCInfo(identifier: countPlaysIdentifier, value: Int64(GV.basicDataRecord.countPlays)))
             }
             sendInfoToGC(infos: infoArray)
         }
@@ -395,11 +395,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         var infoArray = [GCInfo]()
         print("sendGlobalInfosTOGC actTime: \(Date())")
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
-            infoArray.append(GCInfo(identifier: playingTimeName, value: GV.basicDataRecord.playingTime))
-            infoArray.append(GCInfo(identifier: playingTimeTodayName, value: GV.basicDataRecord.playingTimeToday))
+            infoArray.append(GCInfo(identifier: playingTimeName, value: Int64(GV.basicDataRecord.playingTime)))
+            infoArray.append(GCInfo(identifier: playingTimeTodayName, value: Int64(GV.basicDataRecord.playingTimeToday)))
             if !GV.basicDataRecord.deviceInfoSaved {
-                infoArray.append(GCInfo(identifier: myLandName, value: GV.basicDataRecord.land))
-                infoArray.append(GCInfo(identifier: myDeviceName, value: GV.basicDataRecord.deviceType))
+                infoArray.append(GCInfo(identifier: myLandName, value: Int64(GV.basicDataRecord.land)))
+                infoArray.append(GCInfo(identifier: myDeviceName, value: Int64(GV.basicDataRecord.deviceType)))
                 try! realm.safeWrite() {
                     GV.basicDataRecord.deviceInfoSaved = true
                 }
@@ -407,7 +407,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             if GV.basicDataRecord.version != Int(Double(actVersion)! * 100.0) {
                 try! realm.safeWrite() {
                     GV.basicDataRecord.version = Int(Double(actVersion)! * 100.0)
-                    infoArray.append(GCInfo(identifier: myVersionName, value: GV.basicDataRecord.version))
+                    infoArray.append(GCInfo(identifier: myVersionName, value: Int64(GV.basicDataRecord.version)))
                 }
             }
             sendInfoToGC(infos: infoArray)

@@ -125,7 +125,7 @@ struct GV {
     static let HardGame = 1
     static let DemoEasyGameNumber = 10000
     static let DemoMediumGameNumber = 11000
-    static let TimeModifier = 10000000000
+    static let TimeModifier: Int64 = 10000000000
 //    static let buttonType = ButtonTypeElite
     static let LabelFont = "CourierNewPS-BoldMT"
 //    static let LabelFontSimple = "CourierNewPS-BoldMT"
