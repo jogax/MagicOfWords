@@ -483,7 +483,7 @@ extension String {
         return OK
     }
     
-    func pad(with character: String = "0", toLength length: Int = 8) -> String {
+    func fill(with character: String = "0", toLength length: Int = 8) -> String {
         let padCount = length - self.count
         guard padCount > 0 else { return self }
         

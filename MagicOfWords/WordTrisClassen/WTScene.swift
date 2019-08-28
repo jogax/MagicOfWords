@@ -549,6 +549,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.view!.isMultipleTouchEnabled = false
         self.view!.subviews.forEach { $0.removeFromSuperview() }
         self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+        self.tilesForGame.removeAll()
         if self.children.count > 0 {
             for child in self.children {
                 child.removeFromParent()
@@ -582,14 +583,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
 //        }
 //        wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
-        getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         createHeader()
         buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
         buttonSize = CGSize(width: buttonHeight, height: buttonHeight)
         createUndo()
         createGoBackButton()
-        createDifficultyButtons(number: calculatePlace()
-)
+        createGoToPreviousGameButton(enabled: hasRecords(before: true))
+        createGoToNextGameButton(enabled: hasRecords(before: false))
+//        createTippButton()
+        createAllWordsButton()
+        createFinishButton()
+        createSearchButton()
+        createDifficultyButtons(number: calculatePlace())
+        getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         WTGameWordList.shared.clear()
         GCHelper.shared.getAllScores(completion: {
             [unowned self] in self.modifyHeader()
@@ -690,6 +696,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             deleteGameDataRecord(gameNumber: gameNumber)
             createPlayingRecord(gameNumber: gameNumber)
         } else if new {
+            let emptyRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and score = 0", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+            if emptyRecords.count > 0 {
+                try! realm.safeWrite() {
+                    realm.delete(emptyRecords)
+                }
+            }
             let date = Date() // now
             let cal = Calendar.current
             let day = cal.ordinality(of: .day, in: .year, for: date)
@@ -734,6 +746,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func calculatePlace()->Int {
+        if showHelp {
+            return 1
+        }
         let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "score", ascending: false)
         for (index, record) in actGames.enumerated() {
             if record.combinedKey == GV.playingRecord.combinedKey {
@@ -1428,10 +1443,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    var searchButton: MyButton?
     var saveDataButton: MyButton?
-    var allWordsButton: MyButton?
     var finishButton: MyButton?
+    var allWordsButton: MyButton?
+//    var tippButton: MyButton?
+    var searchButton: MyButton?
     var undoButton: MyButton?
     var goBackButton: MyButton?
     var goToPreviousGameButton: MyButton?
@@ -1443,7 +1459,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     func hideButtons(hide: Bool) {
         goToPreviousGameButton!.isEnabled = hide ? false : hasRecords(before: true)
         goToNextGameButton!.isEnabled = hide ? false : hasRecords(before: false)
-//        undoButton!.isEnabled = !hide
+//        tippButton!.isEnabled = !hide
         allWordsButton!.isEnabled = !hide
         finishButton!.isEnabled = !hide
         goBackButton!.isEnabled = showHelp ? true : !hide
@@ -1457,7 +1473,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if hide {
             goToPreviousGameButton!.alpha = 0.2
             goToNextGameButton!.alpha = 0.2
-//            undoButton!.alpha = 0.2
+//            tippButton!.alpha = 0.2
             allWordsButton!.alpha = 0.2
             finishButton!.alpha = 0.2
             goBackButton!.alpha = showHelp ? 1.0 : 0.2
@@ -1471,7 +1487,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else {
             goToPreviousGameButton!.alpha = hasRecords(before: true) ? 1.0 : 0.2
             goToNextGameButton!.alpha = hasRecords(before: false) ? 1.0 : 0.2
-//            undoButton!.alpha = 1.0
+//            tippButton!.alpha = 1.0
             allWordsButton!.alpha = 1.0
             finishButton!.alpha = 1.0
             goBackButton!.alpha = 1.0
@@ -1486,7 +1502,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     }
 
-    func createGoToPreviousGameButton(enabled: Bool) {
+    private func createGoToPreviousGameButton(enabled: Bool) {
         if goToPreviousGameButton != nil {
             goToPreviousGameButton?.removeFromParent()
             goToPreviousGameButton = nil
@@ -1502,7 +1518,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         goToPreviousGameButton!.zPosition = 10
         bgSprite!.addChild(goToPreviousGameButton!)
     }
-    func createGoToNextGameButton(enabled: Bool) {
+    
+    private func createGoToNextGameButton(enabled: Bool) {
         if goToNextGameButton != nil {
             goToNextGameButton?.removeFromParent()
             goToNextGameButton = nil
@@ -1611,7 +1628,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let size = CGSize(width: buttonHeight, height: buttonHeight)
 //        let freePlaceWidth = self.frame.width - allWordsButton!.frame.maxX
-        let center = CGPoint(x: allWordsButton!.frame.maxX + (self.frame.width - allWordsButton!.frame.maxX) * 0.5, y: allWordsButtonCenter.y)
+        let center = CGPoint(x: self.frame.width * lastButtonColumn, y: allWordsButtonCenter.y)
 //        let radius = self.frame.width * 0.04
 //        let image = UIImage(named: "search")
         let newSize = allWordsButton!.size.height
@@ -1623,6 +1640,33 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        searchButton!.addTarget(self, action: #selector(self.wordListTapped), for: .touchUpInside)
         bgSprite!.addChild(searchButton!)
     }
+    
+//    private func createTippButton() {
+//        if tippButton != nil {
+//            tippButton?.removeFromParent()
+//            tippButton = nil
+//        }
+//        let xPosition = self.self.frame.width * (GV.onIpad ? 0.75 : 0.5)
+//        let yPosition = self.frame.height * (GV.onIpad ? mybuttonLineCenterY : lastButtonLine)
+//        let center = CGPoint(x: xPosition, y: yPosition)
+//        let size = CGSize(width: buttonHeight, height: buttonHeight)
+//        let imageName = "Tipp"
+//        tippButton = createMyButton(imageName: imageName, size: size, center: center, enabled: enabled, newSize: buttonHeight)
+//        tippButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.showTipps))
+//        tippButton!.name = imageName
+//        tippButton!.zPosition = 10
+//        bgSprite!.addChild(tippButton!)
+//    }
+//
+//    @objc private func showTipps() {
+//        //        let freeLetters = findFreeLetters()
+//    }
+//    private func findFreeLetters()->(redLetters:[String], freePositions:[(Int, Int)]) {
+//
+//    }
+
+    
+
     
     let buttonYPosition: CGFloat = 0.145
     private func createGoBackButton() {
@@ -1671,7 +1715,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let yPosition = self.frame.height * firstButtonLine
             let xPosition = self.frame.size.width * 0.5
             label.position = CGPoint(x: xPosition, y: yPosition)
-            label.fontSize = self.frame.size.height * 0.04
+            label.fontSize = self.frame.size.height * (GV.onIpad ? 0.04 : 0.03)
             label.fontColor = .black
             label.text = GV.language.getText((difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay), values: String(number) + ". ")
             label.name = label.text
@@ -1745,7 +1789,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var lastButtonColumn: CGFloat = 0.92
     var firstButtonLine: CGFloat = 0.84
     var secondButtonLine: CGFloat = 0.80
-    var lastButtonLine: CGFloat = 0.08
+    var lastButtonLine: CGFloat = GV.onIpad ? 0.08 : 0.18
     
     private func createUndo() {
         if undoButton != nil {
@@ -1874,11 +1918,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * pieceArrayCenterY)
         }
-        createGoToPreviousGameButton(enabled: hasRecords(before: true))
-        createGoToNextGameButton(enabled: hasRecords(before: false))
-        createAllWordsButton()
-        createFinishButton()
-        createSearchButton()
 //        createSaveDataButton()
 //        createVersion()
         if !new {
@@ -2223,7 +2262,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                createNoMoreStepsAlert()
                 zielPosition = noMoreStepsAlert!.getPositionForAction(action: action)
             case .FinishGameAlert:
-//                createFinishGameAlert(status: .OK)
+                if finishGameAlert == nil {
+                    createFinishGameAlert(status: .OK)
+                }
                 zielPosition = finishGameAlert!.getPositionForAction(action: action)
             default: break
             }
@@ -2364,7 +2405,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         case TypeOfTouch.FinishGameEasy.rawValue:
             addAlertTouched(alertType: .FinishGameEasyAlert, action: #selector(self.finishEasyAction))
         case TypeOfTouch.FinishGameMedium.rawValue:
-            addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishMediumAction))
+            break
+//            addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishMediumAction))
         case TypeOfTouch.OKFixLettersSolved.rawValue:
             addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
         case TypeOfTouch.OKMandatorySolved.rawValue:
@@ -3748,6 +3790,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 inputWord = word.uppercased()
             }
             for letter in inputWord {
+                if letterCounters[String(letter)] == nil {
+                    letterCounters[String(letter)] = 0
+                }
                 letterCounters[String(letter)]! += 1
             }
             usedWords.append(inputWord)
@@ -4010,6 +4055,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         print(line)
     }
+    
+    private func searchWords(lettersToSearch: [String]) {
+        let filter1 = "word like %@ and word BEGINSWITH %@"
+        let filter2 = " and word CONTAINS %@"
+        let filter = filter1 + filter2 + filter2 + filter2 + filter2 + filter2
+        let founded = realmWordList.objects(WordListModel.self).filter(filter, "????????", "hu", "hu", "a", "l", "m", "f")
+        for item in founded {
+            var counter = 0
+            for char in item.word.subString(at: 2, length: item.word.length - 2) {
+                if lettersToSearch.contains(String(char)) {
+                    counter += 1
+                }
+            }
+            if counter == item.word.length - 2 {
+                print(item.word)
+            }
+        }
+        print(founded.count)
+    }
+    
+
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
     }

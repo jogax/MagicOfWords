@@ -97,14 +97,14 @@ class WelcomeScene: SKScene {
         letterTable.removeAll()
         countLetters += getLetters(text: text)
         firstLinePosY = lastPosY > 0 ? lastPosY - self.frame.height * 0.04 : firstLinePosY
-        let blockSizeModifier: CGFloat = 0.75
+        let blockSizeModifier: CGFloat = GV.onIpad ? 0.75 : 1.8
         for (lineIndex, lineTable) in letterTable.enumerated() {
             let value = self.frame.width - blockSize * blockSizeModifier * CGFloat(lineTable.count)
             let startPosX = value / 2 - blockSize / 2
             for (index, item) in lineTable.enumerated() {
                 if item.text != " " {
                     let toPositionX = startPosX + CGFloat(index + 1) * blockSize * blockSizeModifier
-                    let toPositionY = firstLinePosY - 1.4 * (CGFloat(lineIndex) * blockSize * 1.0)
+                    let toPositionY = firstLinePosY - 1.4 * (CGFloat(lineIndex) * blockSize * (GV.onIpad ? 1.0 : 1.4))
                     lastPosY = toPositionY
                     let waitAction = SKAction.wait(forDuration: TimeInterval(waiting))
                     waiting += 0.05
@@ -132,7 +132,7 @@ class WelcomeScene: SKScene {
                 let label = SKLabelNode(fontNamed: "TimesNewRomanPS-BoldMT")
                 label.text = String(letter)
                 label.horizontalAlignmentMode = .center
-                label.fontSize = self.frame.width * (GV.onIpad ? 0.03 : 0.03)
+                label.fontSize = self.frame.width * (GV.onIpad ? 0.03 : 0.05)
                 label.fontColor = SKColor.black
                 label.position = CGPoint(x: self.frame.width * 0.5, y: self.frame.height * -0.1)
                 label.zPosition = self.zPosition + 2

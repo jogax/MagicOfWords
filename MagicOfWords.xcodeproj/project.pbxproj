@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		20009AF92260C47900D34ACD /* HelpInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20009AF82260C47900D34ACD /* HelpInfo.swift */; };
+		201484CC23157590002F323F /* Tipp.png in Resources */ = {isa = PBXBuildFile; fileRef = 201484CB2315758E002F323F /* Tipp.png */; };
 		201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201FB1B120288C2B00EC9F36 /* AppDelegate.swift */; };
 		201FB1BD20288C2B00EC9F36 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BB20288C2B00EC9F36 /* Main.storyboard */; };
 		201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 201FB1BE20288C2B00EC9F36 /* Assets.xcassets */; };
@@ -154,6 +155,7 @@
 
 /* Begin PBXFileReference section */
 		20009AF82260C47900D34ACD /* HelpInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpInfo.swift; sourceTree = "<group>"; };
+		201484CB2315758E002F323F /* Tipp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Tipp.png; sourceTree = "<group>"; };
 		201FB1AE20288C2B00EC9F36 /* MagicOfWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MagicOfWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		201FB1B120288C2B00EC9F36 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		201FB1BC20288C2B00EC9F36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -422,6 +424,7 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				201484CB2315758E002F323F /* Tipp.png */,
 				2093C49222B116EB00B16649 /* DarkGoldSprite1.png */,
 				2093C49122B116EB00B16649 /* DarkGreenSprite1.png */,
 				2086F407228EF25000D845B7 /* Connection0000.png */,
@@ -723,6 +726,7 @@
 				2038F26722317AFE0028372D /* BalloonElite.png in Resources */,
 				209739182295779A00360819 /* GoldSprite.png in Resources */,
 				2086F405228EEE8B00D845B7 /* Connection1001.png in Resources */,
+				201484CC23157590002F323F /* Tipp.png in Resources */,
 				208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */,
 				20395F5F21A31D4300947D7F /* search.png in Resources */,
 				2086F408228EF25000D845B7 /* Connection0000.png in Resources */,

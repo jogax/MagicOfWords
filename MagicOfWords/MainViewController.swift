@@ -246,10 +246,11 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 GV.basicDataRecord.land = GV.convertLocaleToInt()
                 GV.basicDataRecord.deviceInfoSaved = false
             }
-            GCHelper.shared.getBestScore(completion: {
+            GCHelper.shared.getBestScore(completion: {[unowned self] in
                 self.callModifyHeader()
             })
             GCHelper.shared.restartGlobalInfosTimer()
+            self.showMenu()
         }
         let alertController = UIAlertController(title: GV.language.getText(.tcChooseLanguage),
                                                 message: "",
@@ -498,6 +499,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     #endif
     
     func showMenu() {
+        if GV.playing {
+            return
+        }
 //        getRecordCounts()
 //        let gameDifficulty = GameDifficulty(rawValue: GV.basicDataRecord.difficulty)
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
