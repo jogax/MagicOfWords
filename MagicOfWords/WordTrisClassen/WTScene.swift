@@ -10,6 +10,8 @@ import Foundation
 import GameplayKit
 import RealmSwift
 import GameKit
+import AVFoundation
+
 
 public enum StartType: Int {
     case NoMore = 0, PreviousGame, NextGame, NewGame, GameNumber, SetEasy, SetMedium
@@ -604,6 +606,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
    }
     
     private func goBackToWTScene(start: StartType) {
+        if player != nil {
+            player!.stop()
+        }
+        playingMusic = false
         removeAllSubviews()
         wtSceneDelegate!.gameFinished(start: start)
     }
@@ -661,6 +667,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         
+        let demoGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d", GV.actLanguage, 9999)
+        if demoGames.count > 0 {
+            try! realm.safeWrite() {
+                realm.delete(demoGames)
+            }
+        }
         
         let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "score", ascending: false)
         
@@ -1690,6 +1702,42 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var startMediumGameButton: MyButton?
     var easyLabel: SKLabelNode?
     var mediumLabel: SKLabelNode?
+    
+    
+    var player: AVAudioPlayer?
+    var playingMusic = false
+    
+    func playSound() {
+        if playingMusic {
+            return
+        }
+        guard let url = Bundle.main.url(forResource: "MagicOfWords", withExtension: "mp3") else { return }
+        
+        do {
+            if #available(iOS 10.0, *) {
+                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            } else {
+                // Fallback on earlier versions
+            }
+            try AVAudioSession.sharedInstance().setActive(true)
+            
+            /* The following line is required for the player to work on iOS 11. Change the file type accordingly*/
+            player = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
+            
+            /* iOS 10 and earlier require the following line:
+             player = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileTypeMPEGLayer3) */
+            
+            guard let player = player else { return }
+            player.volume = 0.2
+            player.numberOfLoops = -1
+            
+            player.play()
+            playingMusic = true
+            
+        } catch let error {
+            print(error.localizedDescription)
+        }
+    }
 
     private func modifyDifficultyLabels(number: Int) {
         switch GV.basicDataRecord.difficulty {
@@ -1900,6 +1948,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         print("cancel")
     }
     private func play() {
+        playSound()
         GV.playing = true
         timerIsCounting = true
         headerCreated = false
@@ -1925,7 +1974,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if GV.playingRecord.rounds.count == 1 && GV.playingRecord.rounds[0].gameArray == "" {
                 createFixLetters()
             } else {
-//                var start = Date()
+                GV.restoring = GV.playingRecord.myWordsInitiated
                 WTGameWordList.shared.restoreFromPlayingRecord()
 //                print(Date().getDateDiff(start: start))
 //                start = Date()
@@ -1936,6 +1985,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                print(Date().getDateDiff(start: start))
 //                print("===================================")
                 modifyHeader()
+                GV.restoring = false
+                try! realm.safeWrite() {
+                    GV.playingRecord.myWordsInitiated = true
+                }
             }
         } else {
             if GV.playingRecord.rounds.count == 0 {
@@ -4081,4 +4134,3 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
 }
-

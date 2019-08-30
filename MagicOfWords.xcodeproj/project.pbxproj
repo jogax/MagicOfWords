@@ -100,6 +100,8 @@
 		20819320202B472900406D9A /* GameDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081931F202B472900406D9A /* GameDataModel.swift */; };
 		20819322202B484D00406D9A /* gameData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20819321202B484D00406D9A /* gameData.txt */; };
 		20819324202B4A7100406D9A /* GenerateGameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20819323202B4A7100406D9A /* GenerateGameData.swift */; };
+		2081F47223194B43004C2FE9 /* MyWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2081F47123194B43004C2FE9 /* MyWords.swift */; };
+		208326D523180166008F9C26 /* MagicOfWords.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 208326D423180165008F9C26 /* MagicOfWords.mp3 */; };
 		208424D82236B7FD00D18A12 /* greenButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 208424D62236B7FD00D18A12 /* greenButton.png */; };
 		208424D92236B7FD00D18A12 /* bubbleGoldElite.png in Resources */ = {isa = PBXBuildFile; fileRef = 208424D72236B7FD00D18A12 /* bubbleGoldElite.png */; };
 		20842DE62031EA910078FFDA /* ruWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20842DE52031EA910078FFDA /* ruWords.txt */; };
@@ -252,6 +254,8 @@
 		2081931F202B472900406D9A /* GameDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDataModel.swift; sourceTree = "<group>"; };
 		20819321202B484D00406D9A /* gameData.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = gameData.txt; sourceTree = "<group>"; };
 		20819323202B4A7100406D9A /* GenerateGameData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateGameData.swift; sourceTree = "<group>"; };
+		2081F47123194B43004C2FE9 /* MyWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyWords.swift; sourceTree = "<group>"; };
+		208326D423180165008F9C26 /* MagicOfWords.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = MagicOfWords.mp3; sourceTree = "<group>"; };
 		208424D62236B7FD00D18A12 /* greenButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greenButton.png; sourceTree = "<group>"; };
 		208424D72236B7FD00D18A12 /* bubbleGoldElite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bubbleGoldElite.png; sourceTree = "<group>"; };
 		20842DE52031EA910078FFDA /* ruWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruWords.txt; sourceTree = "<group>"; };
@@ -364,6 +368,7 @@
 				201FB1E8202893E500EC9F36 /* Language */,
 				2074A64120C051780075432A /* ReadOnlyDB */,
 				201FB1EA20289CEC00EC9F36 /* RealmModels */,
+				208326D12317FED3008F9C26 /* Music */,
 				206B38C221BC102E008CDE1D /* RealmCloudModels */,
 				20587FAF205A6D9F008C018A /* Pictures */,
 				20895DF921FA143900E54BF3 /* WordFiles */,
@@ -404,6 +409,7 @@
 				205E601920C02BB800A5AB39 /* WordDBGenerator.swift */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
 				20009AF82260C47900D34ACD /* HelpInfo.swift */,
+				2081F47123194B43004C2FE9 /* MyWords.swift */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -517,6 +523,14 @@
 				2078EE6222CA33FF00502C7C /* WordList.realm */,
 			);
 			path = ReadOnlyDB;
+			sourceTree = "<group>";
+		};
+		208326D12317FED3008F9C26 /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				208326D423180165008F9C26 /* MagicOfWords.mp3 */,
+			);
+			path = Music;
 			sourceTree = "<group>";
 		};
 		20895DF921FA143900E54BF3 /* WordFiles */ = {
@@ -717,6 +731,7 @@
 				204B6FD421CD418D00893D58 /* bestScores.png in Resources */,
 				2086F406228EEE8B00D845B7 /* Connection1101.png in Resources */,
 				2048259921E8CC59000933B3 /* deWords.txt in Resources */,
+				208326D523180166008F9C26 /* MagicOfWords.mp3 in Resources */,
 				20895E6D228D951900506685 /* LilaSprite.png in Resources */,
 				2078EE6822CA340000502C7C /* HelpInfo.realm in Resources */,
 				2086F400228EEE8A00D845B7 /* Connection1011.png in Resources */,
@@ -776,6 +791,7 @@
 				209F69CB22DDF8E90013F67D /* PlayerScore.swift in Sources */,
 				20A6914220309CC500AB47C0 /* WTGamebord.swift in Sources */,
 				20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */,
+				2081F47223194B43004C2FE9 /* MyWords.swift in Sources */,
 				201FB1DE20288CEA00EC9F36 /* en.swift in Sources */,
 				20491F4921CFC88B0060C675 /* CommonString.swift in Sources */,
 				201FB1DA20288CEA00EC9F36 /* hu.swift in Sources */,

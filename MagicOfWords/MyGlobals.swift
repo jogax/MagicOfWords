@@ -147,7 +147,8 @@ struct GV {
         get {
             return PieceFont
         }
-    } 
+    }
+    static var restoring = false
     static var playing = false
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()

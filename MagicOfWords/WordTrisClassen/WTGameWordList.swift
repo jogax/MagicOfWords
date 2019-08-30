@@ -432,16 +432,43 @@ public class WTGameWordList {
                 let connectionType = selectedWord.connectionTypes[index]
                 GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, incrWords: true)
             }
-//            mySelectedWord.setScore(round: round)
-//            wordsInRound[wordsInRound.count - 1].wordsInGame.append(mySelectedWord)
             addWordToAllWords(selectedWord: selectedWord, doAnimate: doAnimate, round: round)
-
-//            if doAnimate { // only when new word added, not in init
-//                delegate!.showScore(newWord: selectedWord, minus: false, doAnimate: doAnimate)
-//
-//            }
+            addWordToMyWords(word: selectedWord.word)
         }
         return noCommonLetter && noDiagonal
+    }
+    
+    private func addWordToMyWords(word: String) {
+        if GV.restoring {
+            return
+        }
+        let foundedWord = realm.objects(MyWords.self).filter("word = %@", word)
+        if foundedWord.count > 0 {
+            try! realm.safeWrite() {
+                foundedWord.first!.count += 1
+            }
+        } else {
+            let wordToInsert = MyWords()
+            wordToInsert.word = word
+            wordToInsert.count = 1
+            try! realm.safeWrite() {
+                realm.add(wordToInsert)
+            }
+        }
+    }
+    
+    private func removeWordFromMyWords(word: String) {
+        let foundedWord = realm.objects(MyWords.self).filter("word = %@", word)
+        if foundedWord.count > 0 {
+            try! realm.safeWrite() {
+                if foundedWord.first!.count > 1 {
+                    foundedWord.first!.count -= 1
+                } else {
+                    realm.delete(foundedWord)
+                }
+            }
+        }
+
     }
     
     private func addWordToAllWords(selectedWord: SelectedWord, doAnimate: Bool = false, round: Int) {
@@ -503,11 +530,8 @@ public class WTGameWordList {
                     GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, decrWords: true)
                 }
             }
+            removeWordFromMyWords(word: selectedWord.word)
 
-//            var scoreOfWord = modifyBonus(selectedWord: selectedWord, plus: false)
-//            let scoreOfWord = modifyScores(selectedWord: selectedWord, plus: false)
-//            let newScore = getActualScore()
-//            let changeTime = selectedWord.word.length > maxUsedLength ? minutesForWord[maxUsedLength] : minutesForWord[selectedWord.word.length]
             delegate!.showScore(newWord: mySelectedWord, minus: true, doAnimate: true)
         }
         

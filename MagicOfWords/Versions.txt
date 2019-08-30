@@ -63,25 +63,29 @@ English
 - using Game Center
 - no more gamenumber
 - one score for each difficulty
-- games can be finished always
+- it is always possible to start a new game
+- you can easily change between the games and difficultys
 
 Deutsch
 - Keine Realm Cloud mehr
 - mit Game Center
 - keine Spielernummer mehr
 - eine Punktzahl für jede Schwierigkeit
-- Spiele können jederzeit beendet werden
+- es ist jederzeit möglich, ein neues Spiel zu beginnen
+- Sie können leicht zwischen den Spielen und Schwierigkeiten wechseln
 
 Magyar
 - nincs többé Realm Cloud
 - a Game Center bevezetése
 - nincs többé játék sorszám
 - egy pontszám minden nehézségi fokon
-- a játékok bármikor befejezhetők
+- mindig lehetséges egy új játék indítása
+- könnyedén válthat a játékok és a nehézségek között
 
 Orosz
 - больше нет Realm Cloud
 - с использованием Game Center
 - больше нет номера игры
 - за каждую сложность свои очки
-- игры могут быть закончены в любой момент
+- всегда можно начать новую игру
+- вы можете легко переключаться между играми и трудностями
