@@ -65,14 +65,26 @@ struct MyDate {
     }
 }
 
+enum ScoreType: Int {
+    case WordCount = 0, Easy, Medium, Hard, VeryHard
+}
+enum TimeScope: Int {
+    case Today = 0, ThisWeek, All
+}
 struct ScoreForShow {
+    var scoreType: ScoreType = ScoreType.WordCount
+    var timeScope: TimeScope = TimeScope.Today
     var place = 0
     var player = ""
     var score = 0
-    init (place: Int, player: String, score: Int) {
+    var me = false
+    init (scoreType: ScoreType, timeScope: TimeScope, place: Int, player: String, score: Int, me: Bool) {
+        self.scoreType = scoreType
+        self.timeScope = timeScope
         self.place = place
         self.player = player
         self.score = score
+        self.me = me
     }
 }
 
@@ -148,7 +160,6 @@ struct GV {
             return PieceFont
         }
     }
-    static var restoring = false
     static var playing = false
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()
@@ -166,6 +177,7 @@ struct GV {
 //    static var gameType = 0
     static var connectedToInternet = false
     static let onIpad = UIDevice.current.model.hasSuffix("iPad")
+    static let onIPhone5 = UIDevice.current.modelName.begins(with: "iPhone 5")
     static let onSimulator = UIDevice.current.modelName.contains(strings: ["Simulator", "i386", "x86_64"])
     static var debug = false
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
@@ -187,8 +199,8 @@ struct GV {
     static var IntToLanguage: [Int : String] = [0:"en", 1:"de", 2:"hu", 3:"ru"]
     
     static var scoreForShowTable = [ScoreForShow]()
-    static var myPlace = 0
-    static var myScore = 0
+//    static var myPlace = 0
+//    static var myScore = 0
     static func convertLocaleToInt()->Int {
         let locale = Locale.current.regionCode!
         let language = actLanguage.uppercased()

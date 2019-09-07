@@ -35,10 +35,18 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         
     }
     func localPlayerNotAuthenticated() {
-//        if wtScene == nil {
-//            showMenu()
-//        }
+        let alertController = UIAlertController(title: GV.language.getText(.tcLocalPlayerNotAuth),
+                                                message: "",
+                                                preferredStyle: .alert)
+        let OKAction = UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler:  { [unowned self]
+            alert -> Void in
+                self.showMenu()
+        })
+        alertController.addAction(OKAction)
+        present(alertController, animated: true, completion: nil)
     }
+    
+    var tenMinutesTimer: Timer?
 
     func localPlayerAuthenticated() {
         if GV.basicDataRecord.GameCenterEnabled != GCEnabledType.GameCenterEnabled.rawValue {
@@ -49,12 +57,18 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         GCHelper.shared.getBestScore(completion: {
             self.callModifyHeader()
         })
+        tenMinutesTimer = Timer.scheduledTimer(timeInterval: 0.0, target: self, selector: #selector(tenMinutesTimer(timerX: )), userInfo: nil, repeats: false)
+        
+
+
         if wtScene == nil {
             showMenu()
         } else {
             startGame()
         }
     }
+    
+    
     
     func callModifyHeader() {
         if animationScene != nil {
@@ -332,12 +346,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
         convertIfNeeded()
-        if !GV.basicDataRecord.startAnimationShown {
-            startWelcomeScene()
-        } else {
-            let timeInterval = GV.basicDataRecord.startAnimationShown ? 0.01 : 1.0
-            _ = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
-        }
+        _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
     }
     
     @objc private func oneMinutesTimer(timerX: Timer) {
@@ -350,6 +359,11 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             oneMinutesTimer!.invalidate()
         }
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
+    }
+    
+    @objc private func tenMinutesTimer(timerX: Timer) {
+        GCHelper.shared.getScoresForShow(completion: {})
+        tenMinutesTimer = Timer.scheduledTimer(timeInterval: 600.0, target: self, selector: #selector(tenMinutesTimer(timerX: )), userInfo: nil, repeats: false)
     }
     
     @objc private func waitForInternet(timerX: Timer) {

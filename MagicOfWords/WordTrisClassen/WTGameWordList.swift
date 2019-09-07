@@ -439,36 +439,16 @@ public class WTGameWordList {
     }
     
     private func addWordToMyWords(word: String) {
-        if GV.restoring {
-            return
-        }
-        let foundedWord = realm.objects(MyWords.self).filter("word = %@", word)
-        if foundedWord.count > 0 {
-            try! realm.safeWrite() {
-                foundedWord.first!.count += 1
-            }
-        } else {
+        let foundedWord = realm.objects(MyWords.self).filter("word = %@", GV.actLanguage + word.lowercased())
+        if foundedWord.count == 0 {
             let wordToInsert = MyWords()
-            wordToInsert.word = word
-            wordToInsert.count = 1
+            wordToInsert.word = GV.actLanguage + word.lowercased()
             try! realm.safeWrite() {
                 realm.add(wordToInsert)
             }
+            let counter = realm.objects(MyWords.self).filter("word BEGINSWITH %@", GV.actLanguage).count
+            GCHelper.shared.sendCountWordsToGameCenter(counter: counter, completion: {})
         }
-    }
-    
-    private func removeWordFromMyWords(word: String) {
-        let foundedWord = realm.objects(MyWords.self).filter("word = %@", word)
-        if foundedWord.count > 0 {
-            try! realm.safeWrite() {
-                if foundedWord.first!.count > 1 {
-                    foundedWord.first!.count -= 1
-                } else {
-                    realm.delete(foundedWord)
-                }
-            }
-        }
-
     }
     
     private func addWordToAllWords(selectedWord: SelectedWord, doAnimate: Bool = false, round: Int) {
@@ -530,7 +510,7 @@ public class WTGameWordList {
                     GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, decrWords: true)
                 }
             }
-            removeWordFromMyWords(word: selectedWord.word)
+//            removeWordFromMyWords(word: selectedWord.word)
 
             delegate!.showScore(newWord: mySelectedWord, minus: true, doAnimate: true)
         }

@@ -86,7 +86,9 @@ let deDictionary: [TextConstants: String] = [
     .tcNicknameActivating:  "Wenn dies Dein Gerät ist, öffne es und füge ein Schlüsselwort dem Spitzname hinzu!",
     .tcAddKeyWord:          "Wenn dies Dein Gerät ist, füge hier dasselbe Schlüsselwort hinzu, ansonsten wähle einen anderen Spitznamen!",
     .tcChooseAction:        "Bitte wählen!",
-    .tcTableOfBestscores:   "Tabelle der besten Ergebnisse",
+    .tcTableOfEasyBestscores:"Einfaches Spiel Ergebnisse",
+    .tcTableOfMediumBestscores:"Mittleres Spiel Ergebnisse",
+    .tcTableOfWordCounts:    "Wort Zählers",
     .tcGamesToContinue:     "Wähle ein Spiel um fortzufahren",
     .tcPlayerHeader:        "Spieler",
     .tcMyHeader:            "Mein Ergebnis",
@@ -165,6 +167,10 @@ let deDictionary: [TextConstants: String] = [
     .tcCountPlays:      "Gespielt",
     .tcBlank:           " ",
     .tcStartGame:       "Spielen",
+    .tcWordCount:       "Wortzähler",
+    .tcLocalPlayerNotAuth: "Verbindung fehlgeschlagen!",
+    .tcChooseWhatYouWant: "Wähle, was angezeigt werden soll",
+    .tcChooseTimeScope: "Wähle den Zeitraum",
 ]
 
 

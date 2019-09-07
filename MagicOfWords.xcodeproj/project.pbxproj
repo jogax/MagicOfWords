@@ -132,6 +132,8 @@
 		20895DFB21FA152100E54BF3 /* enMandatoryInput.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */; };
 		20895E6D228D951900506685 /* LilaSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E6C228D951900506685 /* LilaSprite.png */; };
 		20895E8A228DB72D00506685 /* GreenLilaSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 20895E7A228DB72C00506685 /* GreenLilaSprite.png */; };
+		208A7E37231AC7CB00B23B6D /* MusicOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 208A7E35231AC7CB00B23B6D /* MusicOn.png */; };
+		208A7E38231AC7CB00B23B6D /* MusicOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 208A7E36231AC7CB00B23B6D /* MusicOff.png */; };
 		208B278F21FB382C007259B6 /* enRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B278E21FB382C007259B6 /* enRestWords.txt */; };
 		208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B279021FB8ED1007259B6 /* ruRestWords.txt */; };
 		2093C4B922B116EE00B16649 /* DarkGreenSprite1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2093C49122B116EB00B16649 /* DarkGreenSprite1.png */; };
@@ -287,6 +289,8 @@
 		20895DFA21FA152100E54BF3 /* enMandatoryInput.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enMandatoryInput.txt; sourceTree = "<group>"; };
 		20895E6C228D951900506685 /* LilaSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LilaSprite.png; sourceTree = "<group>"; };
 		20895E7A228DB72C00506685 /* GreenLilaSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenLilaSprite.png; sourceTree = "<group>"; };
+		208A7E35231AC7CB00B23B6D /* MusicOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MusicOn.png; sourceTree = "<group>"; };
+		208A7E36231AC7CB00B23B6D /* MusicOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MusicOff.png; sourceTree = "<group>"; };
 		208B278E21FB382C007259B6 /* enRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enRestWords.txt; sourceTree = "<group>"; };
 		208B279021FB8ED1007259B6 /* ruRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruRestWords.txt; sourceTree = "<group>"; };
 		2093C49122B116EB00B16649 /* DarkGreenSprite1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DarkGreenSprite1.png; sourceTree = "<group>"; };
@@ -430,6 +434,8 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				208A7E36231AC7CB00B23B6D /* MusicOff.png */,
+				208A7E35231AC7CB00B23B6D /* MusicOn.png */,
 				201484CB2315758E002F323F /* Tipp.png */,
 				2093C49222B116EB00B16649 /* DarkGoldSprite1.png */,
 				2093C49122B116EB00B16649 /* DarkGreenSprite1.png */,
@@ -690,6 +696,7 @@
 				20846B7622467C1300CD5060 /* bgImage.png in Resources */,
 				2086F3FF228EEE8A00D845B7 /* Connection0111.png in Resources */,
 				204B6FD321CD418D00893D58 /* firstplaces.png in Resources */,
+				208A7E37231AC7CB00B23B6D /* MusicOn.png in Resources */,
 				20895E8A228DB72D00506685 /* GreenLilaSprite.png in Resources */,
 				2084FA2D221C2523002D29D3 /* Delete.png in Resources */,
 				207B678A2243C9F8001456C8 /* save.png in Resources */,
@@ -722,6 +729,7 @@
 				204C30B321EF789A008B1CB3 /* ruMandatory6.txt in Resources */,
 				209739202295BE3C00360819 /* whiteSprite.png in Resources */,
 				204BB45D2063E9E000CDF085 /* BackElite.png in Resources */,
+				208A7E38231AC7CB00B23B6D /* MusicOff.png in Resources */,
 				2086F401228EEE8A00D845B7 /* Connection0101.png in Resources */,
 				2049314A21E6494D00BE66EA /* deMandatory.txt in Resources */,
 				20491F4D21CFCEB20060C675 /* ruMandatory.txt in Resources */,

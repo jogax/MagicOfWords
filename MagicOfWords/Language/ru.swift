@@ -86,7 +86,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcNicknameActivating:  "Если это твоё устройство, открой его и добавь ключевое слово к псевдониму!",
     .tcAddKeyWord:          "Если это твоё устройство, добавь тут то же ключевое слово, иначе выбери другой псевдоним!",
     .tcChooseAction:        "Выбери пожалуйста!",
-    .tcTableOfBestscores:   "Таблица лучших результатов",
+    .tcTableOfEasyBestscores:"Лучшие результаты простых игр",
+    .tcTableOfMediumBestscores:"Лучшие результаты средних игр",
+    .tcTableOfWordCounts:    "Счетчики слов",
     .tcGamesToContinue:     "Выбери игру для продолжения",
     .tcPlayerHeader:        "Игрок",
     .tcMyHeader:            "Мои очки",
@@ -164,5 +166,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcCountPlays:      "Игры",
     .tcBlank:           " ",
     .tcStartGame:       "Играть",
+    .tcWordCount:       "Счетчики слов",
+    .tcLocalPlayerNotAuth: "Подключение не удалось!",
+    .tcChooseWhatYouWant: "Выбери, что показать",
+    .tcChooseTimeScope: "Выбери продолжительность",
 ]
 

@@ -11,7 +11,6 @@ import RealmSwift
 
 class MyWords: Object {
     @objc dynamic var word = ""
-    @objc dynamic var count = 0
     override  class func primaryKey() -> String {
         return "word"
     }

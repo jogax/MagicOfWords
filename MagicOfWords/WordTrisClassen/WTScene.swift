@@ -592,6 +592,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         createGoBackButton()
         createGoToPreviousGameButton(enabled: hasRecords(before: true))
         createGoToNextGameButton(enabled: hasRecords(before: false))
+        createMusicOnOffButton()
 //        createTippButton()
         createAllWordsButton()
         createFinishButton()
@@ -819,8 +820,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let mandatoryWordsLinePosition:CGFloat = 0.82
     let buttonLineCenterY:CGFloat = 0.265
     let mybuttonLineCenterY:CGFloat = 1 - 0.265 // 1 - buttonLineCenterY
-    let gameboardCenterY: CGFloat = 0.42
-    let pieceArrayCenterY: CGFloat = 0.08
+    let gameboardCenterY: CGFloat = GV.onIpad ? 0.43 : 0.46
+    let pieceArrayCenterY: CGFloat = GV.onIpad ? 0.08 : 0.1
     let scoreLength: Int = 6
     
     private func createVersion() {
@@ -1550,6 +1551,39 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         bgSprite!.addChild(goToNextGameButton!)
     }
     
+    var musicOnOffButton: MyButton?
+    
+    private func createMusicOnOffButton() {
+        if musicOnOffButton != nil {
+            musicOnOffButton!.removeFromParent()
+            musicOnOffButton = nil
+        }
+        let center = CGPoint(x:self.frame.width * lastButtonColumn, y:self.frame.height * musicOnOffLine)
+        
+        let imageName = GV.basicDataRecord.musicOn ? "MusicOff" : "MusicOn"
+        musicOnOffButton = createMyButton(imageName: imageName, size: buttonSize, center: center, enabled: enabled, newSize: buttonHeight)
+        musicOnOffButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.switchMusicOnOff))
+        musicOnOffButton!.name = imageName
+        musicOnOffButton!.zPosition = 10
+        bgSprite!.addChild(musicOnOffButton!)
+    }
+    
+    @objc private func switchMusicOnOff() {
+        try! realm.safeWrite() {
+            GV.basicDataRecord.musicOn = !GV.basicDataRecord.musicOn
+        }
+        createMusicOnOffButton()
+        if player != nil {
+            if GV.basicDataRecord.musicOn {
+                player!.play()
+            } else {
+                player!.stop()
+            }
+        }
+        playingMusic = false
+
+    }
+    
     private func createAllWordsButton() {
         if allWordsButton != nil {
             allWordsButton?.removeFromParent()
@@ -1730,9 +1764,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             guard let player = player else { return }
             player.volume = 0.2
             player.numberOfLoops = -1
-            
-            player.play()
-            playingMusic = true
+            if GV.basicDataRecord.musicOn {
+                player.play()
+                playingMusic = true
+            } 
             
         } catch let error {
             print(error.localizedDescription)
@@ -1835,9 +1870,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var firstButtonColumn: CGFloat = 0.1
     var lastButtonColumn: CGFloat = 0.92
+    var musicOnOffLine: CGFloat = 0.92
     var firstButtonLine: CGFloat = 0.84
     var secondButtonLine: CGFloat = 0.80
-    var lastButtonLine: CGFloat = GV.onIpad ? 0.08 : 0.18
+    var lastButtonLine: CGFloat = GV.onIpad ? 0.16 : 0.18
     
     private func createUndo() {
         if undoButton != nil {
@@ -1974,7 +2010,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if GV.playingRecord.rounds.count == 1 && GV.playingRecord.rounds[0].gameArray == "" {
                 createFixLetters()
             } else {
-                GV.restoring = GV.playingRecord.myWordsInitiated
                 WTGameWordList.shared.restoreFromPlayingRecord()
 //                print(Date().getDateDiff(start: start))
 //                start = Date()
@@ -1985,10 +2020,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                print(Date().getDateDiff(start: start))
 //                print("===================================")
                 modifyHeader()
-                GV.restoring = false
-                try! realm.safeWrite() {
-                    GV.playingRecord.myWordsInitiated = true
-                }
             }
         } else {
             if GV.playingRecord.rounds.count == 0 {

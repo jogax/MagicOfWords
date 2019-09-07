@@ -390,6 +390,17 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             sendInfoToGC(infos: infoArray)
         }
     }
+    
+    public func sendCountWordsToGameCenter(counter: Int, completion: @escaping ()->()) {
+        // Submit WordCounters to GC leaderboard
+        var infoArray = [GCInfo]()
+        if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
+            let identifier = GV.actLanguage + countWordsName
+            infoArray.append(GCInfo(identifier: identifier, value: Int64(counter), modifyValue: 0))
+            sendInfoToGC(infos: infoArray)
+        }
+    }
+    
 
     @objc private func sendGlobalInfosTOGC(timerX: Timer) {
         var infoArray = [GCInfo]()
@@ -616,35 +627,74 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     
     var waitingForScores = false
+    var myLeaderboards = [GKLeaderboard]()
     
     public func getScoresForShow(completion: @escaping ()->()) {
-        GV.scoreForShowTable.removeAll()
+        var scoreForShowTable = [ScoreForShow]()
+        var countFinished = 0
+//        GV.scoreForShowTable.removeAll()
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
-            let leaderBoard = GKLeaderboard()
-            let leaderboardID = "\(GameDifficulty(rawValue: GV.basicDataRecord.difficulty)!.description().lowercased())BestScore"
-            leaderBoard.identifier = leaderboardID
-            leaderBoard.playerScope = .global
-            leaderBoard.timeScope = .allTime
-            leaderBoard.range =  NSRange(location: 1, length: 20)
-            leaderBoard.loadScores(completionHandler: {
-            (scores, error) in
-                if scores != nil {
-                    if leaderBoard.localPlayerScore != nil {
-                        GV.myPlace = leaderBoard.localPlayerScore!.rank
-                        GV.myScore = Int(leaderBoard.localPlayerScore!.value)
-                    } else {
-                        GV.myPlace = 0
-                        GV.myScore = 0
-                    }
-                    if scores!.count > 0 {
-                        for score in scores! {
-                            let item = ScoreForShow(place: score.rank, player: score.player.alias, score: Int(score.value))
-                            GV.scoreForShowTable.append(item)
-                        }
-                    }
-                    completion()
+            func getScoreForLeaderboard(type: ScoreType, timeScope: TimeScope) {
+                let leaderBoard = GKLeaderboard()
+                var leadeboardID = ""
+                switch type {
+                case .WordCount: leadeboardID = GV.actLanguage + countWordsName
+                case .Easy: leadeboardID = easyBestScoreName
+                case .Medium: leadeboardID = mediumBestScoreName
+                default: break
                 }
-            })
+                print("leaderboardID: \(leadeboardID), type: \(type), scope: \(timeScope)")
+                leaderBoard.identifier = leadeboardID
+                leaderBoard.playerScope = .global
+                leaderBoard.timeScope = timeScope == .Today ? .today : timeScope == .ThisWeek ? .week : .allTime
+                leaderBoard.range =  NSRange(location: 1, length: 25)
+                myLeaderboards.append(leaderBoard)
+                leaderBoard.loadScores(completionHandler: {
+                (scores, error) in
+                    if scores != nil {
+                        if error == nil && scores != nil {
+                            if scores!.count > 0 {
+                                let leadeboardID = scores![0].leaderboardIdentifier
+                                let leaderBoard = self.myLeaderboards.first(where: {$0.identifier == leadeboardID})
+                                leaderBoard!.loadScores(completionHandler: {
+                                    (scores, error) in
+                                         if scores != nil {
+                                            if scores!.count > 0 {
+                                                print("found: type: \(type), scope: \(timeScope)")
+                                                for score in scores! {
+                                                    let me = GKLocalPlayer.local.alias == score.player.alias
+                                                    let item = ScoreForShow(scoreType: type, timeScope: timeScope, place: score.rank, player: score.player.alias, score: Int(score.value), me: me)
+                                                    scoreForShowTable.append(item)
+                                                }
+                                            } else {
+                                                print("found: count: 0, type: \(type), scope: \(timeScope)")
+                                            }
+                                        } else {
+                                            print("not found: type: \(type), scope: \(timeScope)")
+                                        }
+                                        countFinished += 1
+                                        if countFinished == 9 {
+                                            GV.scoreForShowTable = scoreForShowTable
+                                            completion()
+                                        }
+                                })
+                            }
+                        }
+                    } else {
+                        print("nil found: type: \(type), scope: \(timeScope)")
+                        countFinished += 1
+                    }
+                })
+            }
+            getScoreForLeaderboard(type: .Easy, timeScope: .Today)
+            getScoreForLeaderboard(type: .Easy, timeScope: .ThisWeek)
+            getScoreForLeaderboard(type: .Easy, timeScope: .All)
+            getScoreForLeaderboard(type: .Medium, timeScope: .Today)
+            getScoreForLeaderboard(type: .Medium, timeScope: .ThisWeek)
+            getScoreForLeaderboard(type: .Medium, timeScope: .All)
+            getScoreForLeaderboard(type: .WordCount, timeScope: .Today)
+            getScoreForLeaderboard(type: .WordCount, timeScope: .ThisWeek)
+            getScoreForLeaderboard(type: .WordCount, timeScope: .All)
         } else {
             completion()
         }
@@ -743,5 +793,6 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     let myDeviceName = "myDevice"
     let myLandName = "myLandLanguage"
     let myVersionName = "myVersion"
+    let countWordsName = "CountWords"
 
 }

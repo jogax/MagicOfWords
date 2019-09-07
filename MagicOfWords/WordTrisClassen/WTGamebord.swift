@@ -262,7 +262,8 @@ class WTGameboard: SKShapeNode {
     init(countCols: Int, parentScene: SKScene, delegate: WTGameboardDelegate, yCenter: CGFloat) {
         self.countCols = countCols
         self.parentScene = parentScene
-        self.blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(countCols)
+        let onIPhoneValue: CGFloat = GV.onIPhone5 ? 0.80 : 0.85
+        self.blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : onIPhoneValue) / CGFloat(countCols)
         self.delegate = delegate
         self.yCenter = yCenter
         super.init()
