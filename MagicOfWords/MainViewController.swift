@@ -157,7 +157,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     
     func showGames(all: Bool) {
         showGamesScene = ShowGamesScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        showGamesScene!.setDelegate(delegate: self, controller: self)
+        showGamesScene!.setDelegate(delegate: self)
 //        showGamesScene!.setSelect(all: all)
         if let view = self.view as! SKView? {
             view.presentScene(showGamesScene!)
@@ -362,7 +362,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     @objc private func tenMinutesTimer(timerX: Timer) {
-        GCHelper.shared.getScoresForShow(completion: {})
         tenMinutesTimer = Timer.scheduledTimer(timeInterval: 600.0, target: self, selector: #selector(tenMinutesTimer(timerX: )), userInfo: nil, repeats: false)
     }
     

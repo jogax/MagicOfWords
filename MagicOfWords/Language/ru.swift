@@ -170,5 +170,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcLocalPlayerNotAuth: "Подключение не удалось!",
     .tcChooseWhatYouWant: "Выбери, что показать",
     .tcChooseTimeScope: "Выбери продолжительность",
+    .tcAll:             "Все",
+    .tcWeek:            "Неделя",
+    .tcToday:           "Сегодня",
+    .tcCounters:        "Счетчики",
 ]
 

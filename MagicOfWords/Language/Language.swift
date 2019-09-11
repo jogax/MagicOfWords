@@ -168,7 +168,11 @@ enum TextConstants: Int {
     tcWordCount,
     tcLocalPlayerNotAuth,
     tcChooseWhatYouWant,
-    tcChooseTimeScope
+    tcChooseTimeScope,
+    tcAll,
+    tcWeek,
+    tcToday,
+    tcCounters
 }
 
     let LanguageEN = "en" // index 0

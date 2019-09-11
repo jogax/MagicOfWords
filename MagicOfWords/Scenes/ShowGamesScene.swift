@@ -15,51 +15,25 @@ public protocol ShowGamesSceneDelegate: class {
     func backToMenuScene(gameNumberSelected: Bool, gameNumber: Int, restart: Bool)
 }
 class ShowGamesScene: SKScene, WTTableViewDelegate {
-    let xMultiplierTab: [CGFloat] = [0.3, 0.5, 0.8]
     var myDelegate: ShowGamesSceneDelegate?
-    let OKLabelName = "°°°OKLabel°°°"
-    let OKButtonName = "°°°OKButton°°°"
     let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 10)
-    var buttonHeight: CGFloat = 0
-    var buttonLine: CGFloat = GV.onIpad ? 0.1 : 0.1
-
-
-//    var allResultsItems: Results<BestScoreForGame>?
+    var actType = ScoreType.Easy
     var background = SKSpriteNode(imageNamed: "magier")
-//    var notificationToken: NotificationToken?
-//    var subscriptionToken: NotificationToken?
-//    var subscription: SyncSubscription<BestScoreForGame>!
-//    var showAll = true
-    var parentViewController: UIViewController?
-
-//    override func didMoveToView(view: SKView) {
-//        background.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
-//        addChild(background)
-
     var initialLoadDone = false
 
     override func didMove(to view: SKView) {        
-//        background.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
-        
-        buttonHeight = frame.size.width * (GV.onIpad ? 0.08 : 0.125)
-//        let widthMultiplier = background.size.width / background.size.height
-        lineHeight =  "A".height(font: myFont!) * 1.25
-//        background.size = CGSize(width: self.size.height * widthMultiplier, height: self.size.height)
-//        addChild(background)
-        createChooseTypeLabel()
-        createChooseTimeScopeLabel()
-        self.zPosition = 50
-//        createButtons()
-        if GV.scoreForShowTable.count > 0 {
-            self.showTable()
-        } else {
-            goBack(gameNumberSelected: false, gameNumber: 0)
+        try! realm.safeWrite() {
+            GV.basicDataRecord.showingScoreType = ScoreType.Easy.rawValue
+            GV.basicDataRecord.showingTimeScope = TimeScope.All.rawValue
         }
-//        })
+        
+        lineHeight =  "A".height(font: myFont!) * 1.25
+        self.zPosition = 50
+        GCHelper.shared.getScoresForShow(completion: {self.showTable()})
     }
     
-    var actType: ScoreType = .Easy
     private func showTable() {
+        actType = ScoreType(rawValue: GV.basicDataRecord.showingScoreType)!
         gamesForShow.removeAll()
         for item in GV.scoreForShowTable {
             if !item.player.lowercased().begins(with: "jogax") && item.scoreType == actType {
@@ -72,51 +46,26 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                 gamesForShow.append(ScoreForShow(scoreType: type, timeScope: timeScope, place: place, player: player, score: score, me: me))
             }
         }
-//        }
-        
-        if gamesForShow.count > 0 {
-            showFoundedGamesInTableView()
-        } else {
-            goBack(gameNumberSelected: false, gameNumber: 0)
-        }
+        showFoundedGamesInTableView()
    }
     
-    private func createChooseTypeLabel() {
-
-        let myX = self.frame.minX + self.frame.width * 0.3
-        let myY = self.frame.minY + self.frame.height * 0.90
-        let text = GV.language.getText(.tcChooseWhatYouWant)
-        let width = text.width(font:myFont!)
-        let height = text.height(font:myFont!)
-        let label = UILabel(frame: CGRect(x: myX, y: myY, width: width, height: height))
+    private func createLabel(text: String, target: Selector, lineNr: CGFloat) {
+        let width = showGamesInTableView!.frame.width //self.frame.width //text.width(font:myFont!)
+        let height = text.height(font:myFont!) * 1.5
+        let myX = self.frame.midX - width / 2
+        let yPos = showGamesInTableView!.frame.maxY + lineHeight * lineNr * 2
+        let label = UILabel(frame: CGRect(x: myX, y: yPos, width: width, height: height))
         label.text = text
         label.font = myFont!
         label.textColor = .blue
+        label.textAlignment = .center
+        label.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
         label.isUserInteractionEnabled = true
         
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(typeLabelClicked))
+        let gesture = UITapGestureRecognizer(target: self, action: target)
         label.addGestureRecognizer(gesture)
         view!.addSubview(label)
     }
-    
-    private func createChooseTimeScopeLabel() {
-        
-        let myX = self.frame.minX + self.frame.width * 0.6
-        let myY = self.frame.minY + self.frame.height * 0.90
-        let text = GV.language.getText(.tcChooseTimeScope)
-        let width = text.width(font:myFont!)
-        let height = text.height(font:myFont!)
-        let label = UILabel(frame: CGRect(x: myX, y: myY, width: width, height: height))
-        label.text = text
-        label.font = myFont!
-        label.textColor = .blue
-        label.isUserInteractionEnabled = true
-        
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(timeScopeLabelClicked))
-        label.addGestureRecognizer(gesture)
-        view!.addSubview(label)
-    }
-
     
     @objc private func typeLabelClicked() {
         let alert = UIAlertController(title: "",
@@ -124,53 +73,76 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
                                       preferredStyle: .alert)
         let easyAction = UIAlertAction(title: GV.language.getText(.tcEasyPlay), style: .default,
                                           handler: {[unowned self] (paramAction:UIAlertAction!) in
-                                            self.actType = .Easy
-                                            self.showTable()
+                                            try! realm.safeWrite() {
+                                                GV.basicDataRecord.showingScoreType = ScoreType.Easy.rawValue
+                                            }
+                                            GCHelper.shared.getScoresForShow(completion: {self.showTable()})
         })
         alert.addAction(easyAction)
         let mediumAction = UIAlertAction(title: GV.language.getText(.tcMediumPlay), style: .default,
                                        handler: {[unowned self] (paramAction:UIAlertAction!) in
-                                        self.actType = .Medium
-                                        self.showTable()
+                                        try! realm.safeWrite() {
+                                            GV.basicDataRecord.showingScoreType = ScoreType.Medium.rawValue
+                                        }
+                                        GCHelper.shared.getScoresForShow(completion: {self.showTable()})
         })
         alert.addAction(mediumAction)
         let wordCountAction = UIAlertAction(title: GV.language.getText(.tcWordCount), style: .default,
                                        handler: {[unowned self] (paramAction:UIAlertAction!) in
-                                        self.actType = .WordCount
-                                        self.showTable()
+                                        try! realm.safeWrite() {
+                                            GV.basicDataRecord.showingScoreType = ScoreType.WordCount.rawValue
+                                        }
+                                        GCHelper.shared.getScoresForShow(completion: {self.showTable()})
         })
         alert.addAction(wordCountAction)
         view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
     }
     
     @objc private func timeScopeLabelClicked() {
-        
+        let alert = UIAlertController(title: "",
+                                      message: "",
+                                      preferredStyle: .alert)
+        let easyAction = UIAlertAction(title: GV.language.getText(.tcAll), style: .default,
+                                       handler: {[unowned self] (paramAction:UIAlertAction!) in
+                                        try! realm.safeWrite() {
+                                            GV.basicDataRecord.showingTimeScope = TimeScope.All.rawValue
+                                        }
+                                        GCHelper.shared.getScoresForShow(completion: {self.showTable()})
+        })
+        alert.addAction(easyAction)
+        let mediumAction = UIAlertAction(title: GV.language.getText(.tcWeek), style: .default,
+                                         handler: {[unowned self] (paramAction:UIAlertAction!) in
+                                            try! realm.safeWrite() {
+                                                GV.basicDataRecord.showingTimeScope = TimeScope.Week.rawValue
+                                            }
+                                            GCHelper.shared.getScoresForShow(completion: {self.showTable()})
+        })
+        alert.addAction(mediumAction)
+        let wordCountAction = UIAlertAction(title: GV.language.getText(.tcToday), style: .default,
+                                            handler: {[unowned self] (paramAction:UIAlertAction!) in
+                                                try! realm.safeWrite() {
+                                                    GV.basicDataRecord.showingTimeScope = TimeScope.Today.rawValue
+                                                }
+                                                GCHelper.shared.getScoresForShow(completion: {self.showTable()})
+        })
+        alert.addAction(wordCountAction)
+        view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
     }
 
-    public func setDelegate(delegate: ShowGamesSceneDelegate, controller: UIViewController) {
+    public func setDelegate(delegate: ShowGamesSceneDelegate) {
         myDelegate = delegate
-        parentViewController = controller
     }
 
-//    public func setSelect(all: Bool) {
-//        self.showAll = all
-//    }
-//
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-//        let subscribes = RealmService.subscriptions()
-//        for subscribe in subscribes {
-//            subscribe.unsubscribe()
-//        }
-        goBack(gameNumberSelected: false, gameNumber: 0)
-    }
-
-    private func goBack(gameNumberSelected: Bool, gameNumber: Int, restart: Bool = false) {
+    private func removeLabels() {
         for subView in view!.subviews as [UIView] {
             if type(of: subView) == UILabel.self {
                 subView.removeFromSuperview()
             }
         }
+    }
+
+    @objc private func goBack(gameNumberSelected: Bool = false, gameNumber: Int = 0, restart: Bool = false) {
+        removeLabels()
         if showGamesInTableView != nil {
             showGamesInTableView!.isHidden = true
             showGamesInTableView = nil
@@ -183,7 +155,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
 
     var showGamesInTableView: WTTableView?
     var gamesForShow = [ScoreForShow]()
-    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 12)
+    let myFont = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 14)
     var lineHeight: CGFloat = 0
     var realmLoadingCompleted = false
 
@@ -196,60 +168,34 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         showGamesInTableView?.setDelegate(delegate: self)
         showGamesInTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
 
-        let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: 100)
-//        let lineHeight = title.height(font: myFont!)
+        let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: 0)
+        let lineHeight = title.height(font: myFont!)
         let headerframeHeight = lineHeight * 2.2
-        var showingWordsHeight = CGFloat(gamesForShow.count) * lineHeight
-        if showingWordsHeight  > self.frame.height * 0.9 {
+        var showingWordsHeight = CGFloat(gamesForShow.count) * 1.3 * lineHeight
+        if showingWordsHeight  > self.frame.height * 0.5 {
             var counter = CGFloat(gamesForShow.count)
             repeat {
                 counter -= 1
                 showingWordsHeight = lineHeight * counter
-            } while showingWordsHeight + headerframeHeight > self.frame.height * 0.6
+            } while showingWordsHeight + headerframeHeight > self.frame.height * (GV.onIpad ? 0.9 : 0.6)
         }
-//        let width = title.width(font: myFont!)
-        let size = CGSize(width: widthOfView, height: showingWordsHeight + headerframeHeight)
+        let height = showingWordsHeight + headerframeHeight
+        let size = CGSize(width: widthOfView, height: height)
         showGamesInTableView?.frame=CGRect(origin: origin, size: size)
-        let center = CGPoint(x: 0.5 * view!.frame.width, y: 0.5 * self.view!.frame.height)
+        let center = CGPoint(x: 0.5 * view!.frame.width, y: self.view!.frame.height * 0.1 + height / 2)
         self.showGamesInTableView!.center=center
         self.showGamesInTableView!.reloadData()
 
         self.scene?.view?.addSubview(showGamesInTableView!)
-//        showAlert()
+        removeLabels()
+//        createChooseTypeLabel(yPos: showGamesInTableView!.frame.maxY + lineHeight * 2)
+//        createChooseTimeScopeLabel(yPos: showGamesInTableView!.frame.maxY + 4 * lineHeight)
+        createLabel(text: GV.language.getText(.tcChooseWhatYouWant), target: #selector(typeLabelClicked), lineNr: 1)
+        createLabel(text: GV.language.getText(.tcChooseTimeScope), target: #selector(timeScopeLabelClicked), lineNr: 2)
+        createLabel(text: GV.language.getText(.tcBack), target: #selector(goBack), lineNr: 3)
+//        createGoBackLabel(yPos: showGamesInTableView!.frame.maxY + 6 * lineHeight)
     }
     
-    private func showAlert() {
-        let alert = UIAlertController(title: GV.language.getText(.tcChooseWhatYouWant),
-                                      message: "",
-                                      preferredStyle: .alert)
-        let easyAction = UIAlertAction(title: GV.language.getText(.tcEasyPlay), style: .default,
-                                          handler: {(paramAction:UIAlertAction!) in
-                                            self.actType = .Easy
-                                            self.showTable()
-                                            
-        })
-        alert.addAction(easyAction)
-        
-        let mediumAction = UIAlertAction(title: GV.language.getText(.tcMediumPlay), style: .default,
-                                       handler: {(paramAction:UIAlertAction!) in
-                                        self.actType = .Medium
-                                        self.showTable()
-                                        
-        })
-        alert.addAction(mediumAction)
-        
-        let wordCountAction = UIAlertAction(title: GV.language.getText(.tcWordCount), style: .default,
-                                         handler: {(paramAction:UIAlertAction!) in
-                                            self.actType = .WordCount
-                                            self.showTable()
-                                            
-        })
-        alert.addAction(wordCountAction)
-        alert.view.center = CGPoint(x: self.frame.midX, y: self.frame.maxY * 0.9)
-        view?.window?.rootViewController?.present(alert, animated: true, completion: nil)
-//        self.scene?.view?.present(alert, animated: true, completion: nil)
-
-    }
     
     var timer = Timer()
     var missingRecords = [Int]()
@@ -271,11 +217,12 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     var columns = [ColumnLengths]()
 
     private func calculateColumnWidths() {
+        actType = ScoreType(rawValue: GV.basicDataRecord.showingScoreType)!
         columns.removeAll()
         let text0 = GV.language.getText(.tcBlank)
         let text1 = GV.language.getText(.tcPlace)
         let text2 = GV.language.getText(.tcPlayerHeader)
-        let text3 = GV.language.getText(.tcScore)
+        let text3 = GV.language.getText(actType == .WordCount ? .tcCounters : .tcScore)
         let textConstant: TextConstants  = actType == .Easy ? .tcTableOfEasyBestscores : actType == .Medium ? .tcTableOfMediumBestscores : .tcTableOfWordCounts
         let text4 = GV.language.getText(textConstant)
         let lengthOfBlanks = text0.length
@@ -302,10 +249,10 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         }
    }
     var widthOfView:CGFloat = 0
-    
+
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
         let view = UIView()
-        
+        let actType = ScoreType(rawValue: GV.basicDataRecord.showingScoreType)
         let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: widthOfView, height: lineHeight))
         label1.font = myFont!
         let textConstant: TextConstants  = actType == .Easy ? .tcTableOfEasyBestscores : actType == .Medium ? .tcTableOfMediumBestscores : .tcTableOfWordCounts
@@ -373,10 +320,6 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         return cell
     }
 
-    @objc public func buttonTapped(indexPath: IndexPath) {
-
-    }
-
     func getNumberOfSections() -> Int {
         return 1
     }
@@ -392,74 +335,4 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         return lineHeight//title.height(font: myFont!) * 1.15//1.12
     }
     
-    private func createMyButton(imageName: String = "", title: String = "", size: CGSize, center: CGPoint, enabled: Bool = false, newSize: CGFloat = 0)->MyButton {
-        var button: MyButton
-        if imageName != "" {
-            let texture = SKTexture(imageNamed: imageName)
-            button = MyButton(normalTexture: texture, selectedTexture:texture, disabledTexture: texture)
-        } else {
-            button = MyButton(fontName: myTitleFont!.fontName, size: size)
-            button.setButtonLabel(title: title, font: myTitleFont!)
-        }
-        button.position = center
-        button.size = size
-        
-        button.alpha = enabled ? 1.0 : 0.2
-        button.isEnabled = enabled
-        //        if hasFrame {
-        //            button.layer.borderWidth = GV.onIpad ? 5 : 3
-        //            button.layer.borderColor = UIColor(red: 220/255, green: 220/255, blue: 220/255, alpha: 1.0).cgColor
-        //        }
-        //        button.frame = frame
-        //        button.center = center
-        return button
-        
-    }
-    
-
-    private func createButtons() {
-        
-        func createButton(type: ScoreType, position: CGFloat) {
-            var title = ""
-            var selector: Selector?
-            switch type {
-            case .Easy:
-                title = GV.language.getText(.tcEasyPlay)
-                selector = #selector(showEasyTable)
-            case .Medium:
-                title = GV.language.getText(.tcMediumPlay)
-                selector = #selector(showMediumTable)
-            case .WordCount:
-                title = GV.language.getText(.tcWordCount)
-                selector = #selector(showWordCountTable)
-            default: break
-            }
-            let wordLength = title.width(font: myTitleFont!)
-            //        let wordHeight = title.height(font: myTitleFont!)
-            let size = CGSize(width:wordLength * 1.4, height: buttonHeight)
-            let ownHeaderYPos = self.frame.height * buttonLine
-            let buttonCenter = CGPoint(x:self.frame.width * 0.3 * position, y: ownHeaderYPos)
-            //        let radius = frame.height * 0.5
-            let button = createMyButton(title: title, size: size, center: buttonCenter, enabled: true )
-            button.isHidden = false
-            button.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: selector!)
-            button.zPosition = 100
-            self.addChild(button)
-        }
-        createButton(type: .Easy, position: 1)
-        createButton(type: .Medium, position: 2)
-        createButton(type: .WordCount, position: 3)
-    }
-    
-    @objc private func showEasyTable() {
-        
-    }
-    
-    @objc private func showMediumTable() {
-        
-    }
-    @objc private func showWordCountTable() {
-        
-    }
-
 }

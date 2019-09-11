@@ -1017,15 +1017,31 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     func addOwnWordNew(word: String, usedLetters: [UsedLetter])->Bool {
+        let letter1 = "е" // cirillic "e"
+        let letter2 = "ё" // cirillic "ё"
+        let lowercasedWord = word.lowercased()
         var returnBool = false
-        if realmWordList.objects(WordListModel.self).filter("word = %@", GV.actLanguage + word.lowercased()).count == 1 {
+        if realmWordList.objects(WordListModel.self).filter("word = %@", GV.actLanguage + lowercasedWord).count == 1 {
             let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
             let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord, doAnimate: true, round: GV.playingRecord.rounds.count)
             returnBool = boolValue
+        } else if GV.actLanguage == "ru" && lowercasedWord.firstIndex(where: {$0 == "е"}) != nil {
+            for (index, char) in lowercasedWord.enumerated() {
+                var newWord = ""
+                if String(char) == letter1 {
+                    if index == 0 {
+                        newWord = letter2 + lowercasedWord.subString(at: index + 1, length: word.length - index - 1)
+                    } else {
+                        newWord = lowercasedWord.subString(at:0, length: index) + letter2 + lowercasedWord.subString(at:index + 1, length: word.length - index - 1)
+                    }
+                    if realmWordList.objects(WordListModel.self).filter("word = %@", GV.actLanguage + newWord).count == 1 {
+                        let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
+                        let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord, doAnimate: true, round: GV.playingRecord.rounds.count)
+                        returnBool = boolValue
+                    }
+                }
+            }
         }
-//        else {
-//            blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
-//        }f
         if !returnBool {
             blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
         }

@@ -35,6 +35,8 @@ class BasicDataModel: Object {
 //    GCEnabledType: 0 = AskForGameCenter, 1 = GameCenterEnabled, 2 = GameCenterSupressed
     @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
     @objc dynamic var startAnimationShown = false
+    @objc dynamic var showingScoreType = 0 // ScoreType
+    @objc dynamic var showingTimeScope = 0 // TimeScope
     let scoreInfos = List<ScoreInfoForDifficulty>()
 
     override  class func primaryKey() -> String {

@@ -171,6 +171,10 @@ let deDictionary: [TextConstants: String] = [
     .tcLocalPlayerNotAuth: "Verbindung fehlgeschlagen!",
     .tcChooseWhatYouWant: "Wähle, was angezeigt werden soll",
     .tcChooseTimeScope: "Wähle den Zeitraum",
+    .tcAll:             "Alle",
+    .tcWeek:            "Woche",
+    .tcToday:           "Heute",
+    .tcCounters:        "Zähler",
 ]
 
 

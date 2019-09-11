@@ -170,4 +170,8 @@ let enDictionary: [TextConstants: String] = [
     .tcLocalPlayerNotAuth: "Local player not authenticated!",
     .tcChooseWhatYouWant: "Choose what to show",
     .tcChooseTimeScope: "Choose time scope",
+    .tcAll:             "All",
+    .tcWeek:            "Week",
+    .tcToday:           "Today",
+    .tcCounters:        "Counters",
 ]

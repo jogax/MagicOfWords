@@ -66,10 +66,10 @@ struct MyDate {
 }
 
 enum ScoreType: Int {
-    case WordCount = 0, Easy, Medium, Hard, VeryHard
+    case Easy = 0, Medium, Hard, VeryHard, WordCount
 }
 enum TimeScope: Int {
-    case Today = 0, ThisWeek, All
+    case All = 0, Week, Today
 }
 struct ScoreForShow {
     var scoreType: ScoreType = ScoreType.WordCount

@@ -169,4 +169,8 @@ let huDictionary: [TextConstants: String] = [
     .tcLocalPlayerNotAuth: "Nem sikerült a kapcsolatfelvétel!",
     .tcChooseWhatYouWant: "Válassz egy táblázatot",
     .tcChooseTimeScope: "Válassz egy időtartamot",
+    .tcAll:             "Összes",
+    .tcWeek:            "Hét",
+    .tcToday:           "Ma",
+    .tcCounters:        "Számlálók",
 ]
