@@ -128,6 +128,9 @@ struct GV {
     static let GameStatusPlaying = 1
     static let GameStatusFinished = 2
     static let GameStatusContinued = 3
+    static var wtScene: WTScene?
+    static var comeBackFromSleeping = false
+
 //    static let ButtonTypeSimple = "S"
 //    static let ButtonTypeElite = "E"
     static var minGameNumber = 0

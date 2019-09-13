@@ -89,3 +89,16 @@ Orosz
 - за каждую сложность свои очки
 - всегда можно начать новую игру
 - вы можете легко переключаться между играми и трудностями
+
+Build 20, Version 1.20 (0.98)
+
+English:
+- The goal of the game is to collect a certain number of words. At the start of each new game, the player can self choose a word count. A game ends when the player has collected the number of words he has selected (Repetition of a given word is not counted in the score).
+
+Német:
+- Das Ziel des Spiels ist es, eine bestimmte Anzahl von Wörtern zu sammeln. Zu Beginn jedes neuen Spiels kann der Spieler selbst eine Wortzahl auswählen. Ein Spiel endet, wenn der Spieler die ausgewählte Anzahl der  Wörter gesammelt hat (die Wiederholung eines bestimmten Wortes wird in der Punktzahl nicht berücksichtigt).
+Magyar:
+- A játék célja adott számú szó összegyűjtése. Minden új játék kezdetén a játékos kiválaszthat magának egy szószámot. Egy játék akkor fejeződik be, ha a játékos összegyűjtötte a kiválasztott szószámot (Egy adott szó ismétlése nem számít bele az eredménybe).
+Orosz:
+- Теперь можно вместо «ё» и букву «е» примениять. (Например вместо «котёнок» он применяет и «котенок»)
+- Цель игры - собрать определенное количество слов. В начале каждой новой игры игрок может самостоятельно выбирать количество слов. Игра заканчивается, когда игрок набрал выбраннoe количество  слов (повторение одного слова не учитывается в счете).

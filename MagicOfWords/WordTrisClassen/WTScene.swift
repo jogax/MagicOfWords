@@ -545,6 +545,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     
     override func didMove(to view: SKView) {
+        if GV.comeBackFromSleeping {
+            GV.comeBackFromSleeping = false
+            return
+        }
 //        wtGameWordList = WTGameWordList(delegate: self)
 //        timeIncreaseValues = [0, 0, 0, 0, 0, 0, iFiveMinutes, iFiveMinutes, iTenMinutes, iTenMinutes, iQuarterHour]
         self.name = "WTScene"
@@ -565,6 +569,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        GV.mandatoryScore = 0
         GV.ownScore = 0
         GV.countBlinkingNodes = 0
+        inDefiningSearchingWord = false
         GV.blinkingNodes.removeAll()
 //        GV.bonusScore = 0
         if GV.generateHelpInfo {
@@ -603,15 +608,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GCHelper.shared.getAllScores(completion: {
             [unowned self] in self.modifyHeader()
         })
+//        searchWords(lettersToSearch: ["a", "b", "m", "a", "g", "l", "f", "a", "r"])
         play()
    }
     
     private func goBackToWTScene(start: StartType) {
-        if player != nil {
-            player!.stop()
-        }
-        playingMusic = false
-        removeAllSubviews()
+//        if player != nil {
+//            player!.stop()
+//        }
+//        playingMusic = false
+//        removeAllSubviews()
         wtSceneDelegate!.gameFinished(start: start)
     }
     
@@ -827,8 +833,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func createVersion() {
 
     }
-    
-
     
     private func createHeader() {
         let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
@@ -3336,6 +3340,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        self.parentViewController!.present(alertController, animated: true, completion: nil)
     }
     
+    public func goBackground() {
+        if showFoundedWordsTableView != nil {
+            doneButton!.removeFromSuperview()
+            questionMarkButton!.removeFromSuperview()
+            starButton!.removeFromSuperview()
+            retypeButton!.removeFromSuperview()
+            sortButton!.removeFromSuperview()
+            showFoundedWordsTableView!.removeFromSuperview()
+            showFoundedWordsTableView = nil
+        }
+
+    }
+    
     private func createCongratulationsAlert(congratulationType: CongratulationType, easy: Bool) {
         var title = ""
         var message = ""
@@ -4160,7 +4177,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let filter1 = "word like %@ and word BEGINSWITH %@"
         let filter2 = " and word CONTAINS %@"
         let filter = filter1 + filter2 + filter2 + filter2 + filter2 + filter2
-        let founded = realmWordList.objects(WordListModel.self).filter(filter, "????????", "hu", "hu", "a", "l", "m", "f")
+        let founded = realmWordList.objects(WordListModel.self).filter(filter, "????????", "hu", "hu", "a", "a", "f", "l", "m")
         for item in founded {
             var counter = 0
             for char in item.word.subString(at: 2, length: item.word.length - 2) {

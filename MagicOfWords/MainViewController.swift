@@ -61,7 +61,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         
 
 
-        if wtScene == nil {
+        if GV.wtScene == nil {
             showMenu()
         } else {
             startGame()
@@ -74,8 +74,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         if animationScene != nil {
             return
         }
-        if wtScene != nil {
-            wtScene!.modifyHeader()
+        if GV.wtScene != nil {
+            GV.wtScene!.modifyHeader()
         } else {
             showMenu()
         }
@@ -205,10 +205,10 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         if let view = self.view as! SKView? {
 //            if !wtSceneStarted {
-                wtScene!.setDelegate(delegate: self)
-                wtScene!.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart, showHelp: showHelp)
-                wtScene!.parentViewController = self
-                view.presentScene(wtScene!)
+                GV.wtScene!.setDelegate(delegate: self)
+                GV.wtScene!.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart, showHelp: showHelp)
+                GV.wtScene!.parentViewController = self
+                view.presentScene(GV.wtScene!)
                 wtSceneStarted = true
 //            }
         }
@@ -333,7 +333,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         #if DEBUG
             GV.debug = true
         #endif
-        wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        GV.wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         showBackgroundPicture()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         myHeight = self.view.frame.size.height
@@ -460,7 +460,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         }
     }
     
-    var wtScene: WTScene?
     var oldConnectedToInternet = false
     
     
@@ -493,7 +492,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     @objc private func waitForAnimationsSceneFinishing(timerX: Timer) {
-        if animationScene != nil || wtScene != nil {
+        if animationScene != nil || GV.wtScene != nil {
             _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
         } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
             GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
