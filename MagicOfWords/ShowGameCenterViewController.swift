@@ -270,7 +270,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     let playersTitle = "Player"
     let allTitle = "All"
     let bestTitle = "Best"
-    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 10)
+    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 8)
     var sortUp = true
     var buttonsCreated = false
 

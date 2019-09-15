@@ -44,6 +44,10 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         })
         alertController.addAction(OKAction)
         present(alertController, animated: true, completion: nil)
+        if showGamesScene != nil {
+            showGamesScene!.goBack()
+        }
+
     }
     
     var tenMinutesTimer: Timer?
@@ -242,6 +246,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //                startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
 //            } else {
             let gameNumber = actPlay.first!.gameNumber
+            GV.comeBackFromSleeping = false
             startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
 //            }
         }
@@ -521,17 +526,17 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                                             preferredStyle: .alert)
         
         //--------------------- StartGameAction ---------------------
-        let startEasyGameAction = UIAlertAction(title: "\(GV.language.getText(.tcStartGame)) ", style: .default, handler: { [unowned self]
+        let startGameAction = UIAlertAction(title: "\(GV.language.getText(.tcStartGame)) ", style: .default, handler: { [unowned self]
             alert -> Void in
                 self.startGame()
         })
-        alertController!.addAction(startEasyGameAction)
+        alertController!.addAction(startGameAction)
         //--------------------- bestScoreAction ---------------------
         let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
             alert -> Void in
             self.showGames(all: true)
         })
-        if GKLocalPlayer.local.isAuthenticated && GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+        if GV.connectedToInternet && GKLocalPlayer.local.isAuthenticated /* && GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue*/ {
             alertController!.addAction(bestScoreAction)
         }
         //--------------------- chooseLanguageAction ---------------------
@@ -549,16 +554,16 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         alertController!.addAction(showHelpAction)
 
         //--------------------- GameCenter on ---------------------
-        var GCTitle = ""
-        var chooseGCAction: UIAlertAction
-        if GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated {
-            GCTitle = GV.language.getText(.tcConnectGC)
-            chooseGCAction = UIAlertAction(title: GCTitle, style: .default, handler: { [unowned self]
-                alert -> Void in
-                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
-            })
-            alertController!.addAction(chooseGCAction)
-       }
+//        var GCTitle = ""
+//        var chooseGCAction: UIAlertAction
+//        if GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated {
+//            GCTitle = GV.language.getText(.tcConnectGC)
+//            chooseGCAction = UIAlertAction(title: GCTitle, style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+//            })
+//            alertController!.addAction(chooseGCAction)
+//       }
 
         #if DEBUG
         let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
@@ -931,42 +936,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //        GCHelper.shared.getAllScores(completion: {})
 //        self.showMenu()
     }
-    
-//    private func chooseDifficulty() {
-//        var currentDifficultyString = ""
-//        switch GV.basicDataRecord.difficulty {
-//        case GameDifficulty.Easy.rawValue:      currentDifficultyString = GV.language.getText(.tcSimpleGame)
-//        case GameDifficulty.Medium.rawValue:    currentDifficultyString = GV.language.getText(.tcMediumGame)
-//        case GameDifficulty.Hard.rawValue:      currentDifficultyString = GV.language.getText(.tcHardGame)
-//        case GameDifficulty.VeryHard.rawValue:  currentDifficultyString = GV.language.getText(.tcVeryHardGame)
-//        default: break
-//        }
-//
-//        let alertController = UIAlertController(title: GV.language.getText(.tcChooseDifficulty),
-//                                                message: "", //GV.language.getText(.tcCurrentDifficulty, values: currentDifficultyString),
-//                                                preferredStyle: .alert)
-//        let simpleGameAction = UIAlertAction(title: GV.language.getText(.tcSimpleGame), style: .default, handler: {
-//            alert -> Void in
-//            self.setDifficulty(difficulty: .Easy)
-//        })
-//        alertController.addAction(simpleGameAction)
-//
-//        let hardGameAction = UIAlertAction(title: GV.language.getText(.tcMediumGame), style: .default, handler: {
-//            alert -> Void in
-//            self.setDifficulty(difficulty: .Medium)
-//        })
-//        alertController.addAction(hardGameAction)
-//
-//        let cancelAction =  UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.showMenu()
-//        })
-//        alertController.addAction(cancelAction)
-//
-//        present(alertController, animated: true, completion: nil)
-//
-//
-//    }
     
     private func generateBasicDataRecordIfNeeded() {
         func createScoreInfo() {

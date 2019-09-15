@@ -134,14 +134,16 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     }
 
     private func removeLabels() {
-        for subView in view!.subviews as [UIView] {
-            if type(of: subView) == UILabel.self {
-                subView.removeFromSuperview()
+        if view != nil {
+            for subView in view!.subviews as [UIView] {
+                if type(of: subView) == UILabel.self {
+                    subView.removeFromSuperview()
+                }
             }
         }
     }
 
-    @objc private func goBack(gameNumberSelected: Bool = false, gameNumber: Int = 0, restart: Bool = false) {
+    @objc public func goBack(gameNumberSelected: Bool = false, gameNumber: Int = 0, restart: Bool = false) {
         removeLabels()
         if showGamesInTableView != nil {
             showGamesInTableView!.isHidden = true

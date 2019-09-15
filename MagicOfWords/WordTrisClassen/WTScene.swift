@@ -1198,6 +1198,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             starButton = nil
             retypeButton = nil
             sortButton = nil
+            
         }
         pieceArray[0].isHidden = hide
         pieceArray[1].isHidden = hide
@@ -1249,122 +1250,129 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            searchingWord.removeFirst()
 //            return nil
 //        }
-        for pos in 0..<searchingWord.length {
-            let actSearchingChar = searchingWord.lowercased().char(at: pos)
-            if actSearchingChar == questionMark {
-                if actString.count > 0 && actString.char(at: 0) != questionMark {
-                    searchingParts.append(actString)
-                    actString = ""
-                }
-                actString += questionMark
-                continue
-            }
-            if actSearchingChar == star {
-                if actString.count > 0 && actString.firstChar() != star {
-                    searchingParts.append(actString)
-                    actString = star
-                }
-                if actString.count == 0 {
-                    actString = star
-                }
-                continue
-            }
-            if actSearchingChar != star && actSearchingChar != questionMark {
-                if actString.count > 0 && (actString.char(at:0) == star || actString.char(at:0) == questionMark) {
-                    searchingParts.append(actString)
-                    actString = ""
-                }
-                actString += actSearchingChar
-                continue
-            }
-        }
-        if actString != "" {
-            searchingParts.append(actString)
-        }
-        if searchingParts.count == 0 {
-            return nil
-        }
-        if searchingParts.first!.firstChar() != star && searchingParts.first!.firstChar() != questionMark {
-            beginswith += searchingParts.first!
-        }
-        if searchingParts.count > 1 && searchingParts.last!.firstChar() != star && searchingParts.last!.firstChar() != questionMark {
-            endswith += searchingParts.last!
-        }
-        for (ind, part) in searchingParts.enumerated() {
-            if ind > 0 && ind < searchingParts.count - 1 && part.char(at: 0) != star && part.char(at: 0) != questionMark {
-                containsParts.append(part)
-            }
-        }
-        var results: Results<WordListModel>?
-        if searchingWord.length > 1 {
-            if containsParts.count > 0 {
-                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word CONTAINS %@", beginswith, containsParts[0])
-            } else if endswith.length > 0 {
-                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word ENDSWITH %@", beginswith, endswith)
-            } else {
-                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", beginswith)
-            }
-        }
-        
-        return results
+        let results1 = realmWordList.objects(WordListModel.self).filter("word LIKE %@", GV.actLanguage + searchingWord.lowercased())
+        return results1
+//        for pos in 0..<searchingWord.length {
+//            let actSearchingChar = searchingWord.lowercased().char(at: pos)
+//            if actSearchingChar == questionMark {
+//                if actString.count > 0 && actString.char(at: 0) != questionMark {
+//                    searchingParts.append(actString)
+//                    actString = ""
+//                }
+//                actString += questionMark
+//                continue
+//            }
+//            if actSearchingChar == star {
+//                if actString.count > 0 && actString.firstChar() != star {
+//                    searchingParts.append(actString)
+//                    actString = star
+//                }
+//                if actString.count == 0 {
+//                    actString = star
+//                }
+//                continue
+//            }
+//            if actSearchingChar != star && actSearchingChar != questionMark {
+//                if actString.count > 0 && (actString.char(at:0) == star || actString.char(at:0) == questionMark) {
+//                    searchingParts.append(actString)
+//                    actString = ""
+//                }
+//                actString += actSearchingChar
+//                continue
+//            }
+//        }
+//        if actString != "" {
+//            searchingParts.append(actString)
+//        }
+//        if searchingParts.count == 0 {
+//            return nil
+//        }
+//        if searchingParts.first!.firstChar() != star && searchingParts.first!.firstChar() != questionMark {
+//            beginswith += searchingParts.first!
+//        }
+//        if searchingParts.count > 1 && searchingParts.last!.firstChar() != star && searchingParts.last!.firstChar() != questionMark {
+//            endswith += searchingParts.last!
+//        }
+//        for (ind, part) in searchingParts.enumerated() {
+//            if ind > 0 && ind < searchingParts.count - 1 && part.char(at: 0) != star && part.char(at: 0) != questionMark {
+//                containsParts.append(part)
+//            }
+//        }
+//        var results: Results<WordListModel>?
+//        if searchingWord.length > 1 {
+//            if containsParts.count > 0 {
+//                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word CONTAINS %@", beginswith, containsParts[0])
+//            } else if endswith.length > 0 {
+//                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word ENDSWITH %@", beginswith, endswith)
+//            } else {
+//                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", beginswith)
+//            }
+//        }
+//
+//        return results
     }
     
-    private func wordFilter(word: String)->LineOfFoundedWords? {
-        if word.length > 18 {
-            return nil
-        }
-        if /*word == "молоко" || word == "молочко" */ word == "kutyaharapás" {
-            print(word)
-        }
-        var starSearchingActiv = false
-//        var lastStarPosition = 0
-//        let beginswith = searchingParts[0]
-        var wordIndex = 0
-        for part in searchingParts {
-            if word.length < wordIndex {
-                return nil
-            }
-            if wordIndex + part.length > word.length {
-                return nil
-            }
-            if part.firstChar() == star {
-                wordIndex += 1
-                starSearchingActiv = true
-            } else if part.firstChar() == questionMark {
-                wordIndex += part.length
-            } else {
-                if starSearchingActiv {
-                    if let index = word.index(from: wordIndex, of: part) {
-                        wordIndex = index + part.length
-                        starSearchingActiv = false
-                        continue
-                    } else {
-                        return nil
-                    }
-                }
-                if word.subString(at: wordIndex, length: part.length) == part {
-                    wordIndex += part.length
-                    continue
-                } else {
-                    return nil
-                }
-            }
-        }
-        if !starSearchingActiv && wordIndex != word.length {
-            return nil
-        }
-        let returnValue = LineOfFoundedWords(word)
-        return returnValue
-    }
+//    private func wordFilter(word: String)->LineOfFoundedWords? {
+//        if word.length > 18 {
+//            return nil
+//        }
+////        let returnValue = LineOfFoundedWords(word)
+//        //        return returnValue
+//        return LineOfFoundedWords(word)
+//
+//        if /*word == "молоко" || word == "молочко" */ word == "kutyaharapás" {
+//            print(word)
+//        }
+//        var starSearchingActiv = false
+////        var lastStarPosition = 0
+////        let beginswith = searchingParts[0]
+//        var wordIndex = 0
+//        for part in searchingParts {
+//            if word.length < wordIndex {
+//                return nil
+//            }
+//            if wordIndex + part.length > word.length {
+//                return nil
+//            }
+//            if part.firstChar() == star {
+//                wordIndex += 1
+//                starSearchingActiv = true
+//            } else if part.firstChar() == questionMark {
+//                wordIndex += part.length
+//            } else {
+//                if starSearchingActiv {
+//                    if let index = word.index(from: wordIndex, of: part) {
+//                        wordIndex = index + part.length
+//                        starSearchingActiv = false
+//                        continue
+//                    } else {
+//                        return nil
+//                    }
+//                }
+//                if word.subString(at: wordIndex, length: part.length) == part {
+//                    wordIndex += part.length
+//                    continue
+//                } else {
+//                    return nil
+//                }
+//            }
+//        }
+//        if !starSearchingActiv && wordIndex != word.length {
+//            return nil
+//        }
+//        let returnValue = LineOfFoundedWords(word)
+////        return returnValue
+//        return LineOfFoundedWords(word)
+//    }
 
     private func showSearchResults() {
         listOfFoundedWords = [LineOfFoundedWords]()
         let filteredWordList = filterWordList()
         if filteredWordList != nil {
             for word in filteredWordList! {
-                if let OKWord = wordFilter(word: word.word.subString(at: 2, length: word.word.length - 2)) {
-                    listOfFoundedWords.append(OKWord)
-                }
+                let OKWord = LineOfFoundedWords(word.word.subString(at: 2, length: word.word.length - 2))  //wordFilter(word: word.word.subString(at: 2, length: word.word.length - 2)) {
+                listOfFoundedWords.append(OKWord)
+                
             }
         }
         if sortUp {
@@ -1818,7 +1826,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let yPosition = self.frame.height * firstButtonLine
             let xPosition = self.frame.size.width * 0.5
             label.position = CGPoint(x: xPosition, y: yPosition)
-            label.fontSize = self.frame.size.height * (GV.onIpad ? 0.04 : 0.03)
+            label.fontSize = self.frame.size.height * (GV.onIpad ? 0.030 : 0.025)
             label.fontColor = .black
             label.text = GV.language.getText((difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay), values: String(number) + ". ")
             label.name = label.text
@@ -1833,6 +1841,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         
         func createButton(difficulty: GameDifficulty, left: Bool) {
             let title = GV.language.getText(difficulty == .Easy ? .tcEasyPlay : .tcMediumPlay)
+
             let wordLength = title.width(font: myTitleFont!)
             //        let wordHeight = title.height(font: myTitleFont!)
             let size = CGSize(width:wordLength * 1.4, height: buttonHeight)
@@ -2049,6 +2058,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     GV.playingRecord.rounds.append(rounds)
                 }
             }
+            activityRoundItem = [ActivityRound]()
             createFixLetters()
             pieceArray = Array(repeating: WTPiece(), count: 3)
 //            roundIndexes.append(0)
@@ -3563,6 +3573,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             
             
             var activityItemsString = ""
+            if activityRoundItem.count == 0 {
+                activityRoundItem.append(ActivityRound())
+                activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
+            }
             let actCount = activityRoundItem[activityRoundItem.count - 1].activityItems.count
             if actCount > 0 {
                 for index in 0..<actCount {
@@ -4077,7 +4091,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var maxLength = 0
     var showingWordsInTable = false
     let myFont = UIFont(name: GV.actLabelFont /*"CourierNewPS-BoldMT"*/, size: GV.onIpad ? 18 : 15)
-    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 18)
+    let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 15)
 
     private func showOwnWordsInTableView() {
         tableType = .ShowAllWords
