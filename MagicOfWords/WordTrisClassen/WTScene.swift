@@ -463,6 +463,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    var timeLabel = SKLabelNode()
     var headerLabel = SKLabelNode()
     var versionLabel = SKLabelNode()
+    var myWordsHeaderLabel = SKLabelNode()
     var myScoreHeaderLabel = SKLabelNode()
     var bestScoreHeaderLabel = SKLabelNode()
     var actScoreHeaderLabel = SKLabelNode()
@@ -528,6 +529,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let versionLabelName = "°°°versionLabel°°°"
     let headerLineName = "°°°headerLine°°°"
     let myScoreName = "°°°myScore°°°"
+    let myWordsName = "°°°myWords°°°"
     let bestScoreName = "°°°bestScore°°°"
     let actScoreName = "°°°actScore°°°"
     let timeName = "°°°timeName°°°"
@@ -556,6 +558,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.view!.subviews.forEach { $0.removeFromSuperview() }
         self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
         self.tilesForGame.removeAll()
+        self.gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
         if self.children.count > 0 {
             for child in self.children {
                 child.removeFromParent()
@@ -590,7 +593,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
 //        }
 //        wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
-        createHeader()
+        getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
         buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
         buttonSize = CGSize(width: buttonHeight, height: buttonHeight)
         createUndo()
@@ -598,12 +601,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         createGoToPreviousGameButton(enabled: hasRecords(before: true))
         createGoToNextGameButton(enabled: hasRecords(before: false))
         createMusicOnOffButton()
-//        createTippButton()
+        //        createTippButton()
         createAllWordsButton()
         createFinishButton()
         createSearchButton()
         createDifficultyButtons(number: calculatePlace())
-        getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
+        createHeader()
         WTGameWordList.shared.clear()
         GCHelper.shared.getAllScores(completion: {
             [unowned self] in self.modifyHeader()
@@ -819,8 +822,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     let gameNumberLinePosition:CGFloat = 0.93
-    let bestScoreLinePosition:CGFloat = 0.91
-    let myScoreLinePosition:CGFloat = 0.89
+    let myWordsLinePosition: CGFloat = 0.91
+    let bestScoreLinePosition:CGFloat = 0.89
+    let myScoreLinePosition:CGFloat = 0.87
 //    let bonusPointsLinePosition:CGFloat = 0.86
     let ownWordsLinePosition:CGFloat = 0.84
     let mandatoryWordsLinePosition:CGFloat = 0.82
@@ -894,6 +898,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             myScoreHeaderLabel.fontColor = SKColor.black
             bgSprite!.addChild(myScoreHeaderLabel)
         }
+        
+        if bgSprite!.childNode(withName: myWordsName) == nil {
+            let YPosition: CGFloat = self.frame.height * myWordsLinePosition
+            let is1000Words = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue
+            var text = ""
+            if is1000Words {
+                text = GV.language.getText(.tcMyWordsHeader1000, values: String(GV.countOfWords), String(GV.countOfWordsMaxValue))
+            } else {
+                text = GV.language.getText(.tcMyWordsHeader250, values: String(GV.countOfLetters), String(GV.countOfWords))
+            }
+            myWordsHeaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
+            myWordsHeaderLabel.text = text
+            myWordsHeaderLabel.name = String(myWordsName)
+            myWordsHeaderLabel.fontSize = fontSize
+            //            myScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * 0.5 /*startPosXForHeaderMultiplier*/, y: YPosition)
+            myWordsHeaderLabel.position = CGPoint(x: headerLabel.frame.minX, y: YPosition)
+            myWordsHeaderLabel.horizontalAlignmentMode = .left
+            myWordsHeaderLabel.fontColor = SKColor.black
+            bgSprite!.addChild(myWordsHeaderLabel)
+        }
+        
         modifyHeader()
    }
 
@@ -913,8 +938,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             bestScore = score
         }
         let rankLength = String(rank).length
+        let is1000Words = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue
+        var myWordsText = ""
+        if is1000Words {
+            myWordsText = GV.language.getText(.tcMyWordsHeader1000, values: String(GV.countOfWords), String(GV.countOfWordsMaxValue))
+        } else {
+            myWordsText = GV.language.getText(.tcMyWordsHeader250, values: String(GV.countOfLetters), String(GV.countOfWords))
+        }
         let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(rank).fixLength(length: rankLength), String(score).fixLength(length:scoreLength), GKLocalPlayer.local.alias)
         let bestScoreText = GV.language.getText(.tcBestScoreHeader, values: String(1).fixLength(length: rankLength),String(bestScore).fixLength(length:scoreLength), bestName)
+        myWordsHeaderLabel.text = myWordsText
         myScoreHeaderLabel.text = scoreText
         bestScoreHeaderLabel.text = bestScoreText
         let scoreWidth = scoreText.width(font: myFont!)
@@ -922,8 +955,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let labelWidth = scoreWidth > bestScoreWidth ? scoreWidth : bestScoreWidth
         let myScoreNewPosition = CGPoint(x: self.frame.midX - labelWidth / 2, y: myScoreHeaderLabel.position.y)
         let bestScoreNewPosition = CGPoint(x: self.frame.midX - labelWidth / 2, y: bestScoreHeaderLabel.position.y)
+        let myWordsNewPosition = CGPoint(x: self.frame.midX - labelWidth / 2, y: myWordsHeaderLabel.position.y)
         myScoreHeaderLabel.position = myScoreNewPosition
-        bestScoreHeaderLabel.position = bestScoreNewPosition    }
+        bestScoreHeaderLabel.position = bestScoreNewPosition
+        myWordsHeaderLabel.position = myWordsNewPosition
+    }
     
     private func calculateRankForScore(score: Int)->Int {
         var lastRank = 0
@@ -1048,6 +1084,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if !returnBool {
             blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
+        } else {
+            if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue  && GV.countOfWords >= GV.countOfWordsMaxValue {
+                congratulations(congratulationType: .AllWordsCollected)
+            }
+            if GV.basicDataRecord.difficulty == GameDifficulty.Medium.rawValue  && GV.countOfLetters >= GV.countOfLettersMaxValue {
+                congratulations(congratulationType: .AllLettersCollected)
+            }
         }
         return returnBool
     }
@@ -1067,6 +1110,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         startUndo()
     }
     @objc func goBackTapped() {
+        switchMusicOnOff(stop: true)
         if self.enabled {
             stopShowingTableIfNeeded()
             if timer != nil {
@@ -1245,7 +1289,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         beginswith = GV.actLanguage
         endswith = ""
         containsParts = [String]()
-        var actString = ""
+//        var actString = ""
 //        if searchingWord.begins(with: star) {
 //            searchingWord.removeFirst()
 //            return nil
@@ -1596,20 +1640,24 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         bgSprite!.addChild(musicOnOffButton!)
     }
     
-    @objc private func switchMusicOnOff() {
-        try! realm.safeWrite() {
-            GV.basicDataRecord.musicOn = !GV.basicDataRecord.musicOn
+    @objc public func switchMusicOnOff(stop: Bool = false) {
+        if stop && !GV.basicDataRecord.musicOn {
+            return
+        }
+        if !stop {
+            try! realm.safeWrite() {
+                GV.basicDataRecord.musicOn = !GV.basicDataRecord.musicOn
+            }
         }
         createMusicOnOffButton()
         if player != nil {
-            if GV.basicDataRecord.musicOn {
+            if GV.basicDataRecord.musicOn && !stop {
                 player!.play()
             } else {
                 player!.stop()
             }
         }
         playingMusic = false
-
     }
     
     private func createAllWordsButton() {
@@ -1902,7 +1950,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var musicOnOffLine: CGFloat = 0.92
     var firstButtonLine: CGFloat = 0.84
     var secondButtonLine: CGFloat = 0.80
-    var lastButtonLine: CGFloat = GV.onIpad ? 0.16 : 0.18
+    var lastButtonLine: CGFloat = GV.onIpad ? 0.09 : 0.18
     
     private func createUndo() {
         if undoButton != nil {
@@ -2017,6 +2065,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GV.playing = true
         timerIsCounting = true
         headerCreated = false
+        GV.countOfWords = 0
+        GV.countOfLetters = 0
         gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
 //        gameNumberForGenerating = newGameNumber
         WTGameWordList.shared.setDelegate(delegate: self)
@@ -2032,8 +2082,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * pieceArrayCenterY)
         }
-//        createSaveDataButton()
-//        createVersion()
         if !new {
             wtGameboard!.setRoundInfos()
             if GV.playingRecord.rounds.count == 1 && GV.playingRecord.rounds[0].gameArray == "" {
@@ -2141,20 +2189,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    let convertValue: CGFloat = 1000
     
     private func createFixLetters() {
+        let lettersProRound = [8, 8, 10, 10, 12, 12, 12, 12, 14, 14, 14, 16, 16, 16, 18, 18, 20, 20]
         if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
             return
         }
         let isDemo = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber
         var fixLetters = [UsedLetter]()
+        let useLettersProRound = GV.playingRecord.created > Date(year: 2019, month: 9, day: 1)
         let gameNumber = GV.playingRecord.gameNumber % 1000
-        let startValue = isDemo ? 8 : 6 // Starts with startValue fixLetters
+        var startValue = 0
+        startValue = isDemo ? 8 : 6 // Starts with startValue fixLetters
         let adderValue = isDemo ? 4 : 2
         let roundCount = GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count
         let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
         let countLettersOnGameboard = wtGameboard!.getCountLetters()
         let maxLetterCount = 50
         let maxFixLetterCount = 32
-        let calculatedFixLetterCount = startValue + roundCount * adderValue
+        var calculatedFixLetterCount = 0
+        if useLettersProRound && !isDemo {
+            calculatedFixLetterCount = lettersProRound[GV.playingRecord.rounds.count - 1]
+        } else {
+            calculatedFixLetterCount = startValue + roundCount * adderValue
+        }
         var countOfLetters = calculatedFixLetterCount
         if !isDemo {
             let remainingFreePlaces = maxLetterCount - countLettersOnGameboard
@@ -2522,7 +2578,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             break
 //            addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishMediumAction))
         case TypeOfTouch.OKFixLettersSolved.rawValue:
-            addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
+//            addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
+            break
         case TypeOfTouch.OKMandatorySolved.rawValue:
             break
 //            addAlertTouched(alertType: .OKMandatorySolvedAlert, action: #selector(self.mandatoryOKAction))
@@ -2533,7 +2590,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         case TypeOfTouch.NoMoreStepsCont.rawValue:
             addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.noActionTapped))
         case TypeOfTouch.FinishGame.rawValue:
-            addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.finishButtonTapped2))
+            addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.newGameButtonTapped))
         default:
             break
         }
@@ -3306,33 +3363,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     enum CongratulationType: Int {
-        case GameFinished
+        case GameFinished, AllWordsCollected, AllLettersCollected
     }
     
-//    private func checkIfGameFinished(showAlert: Bool = true) {
-////        let allFixLettersUsed: Bool = wtGameboard!.checkFixLetters()
-////        let allMandatoryWordsSolved: Bool = WTGameWordList.shared.gameFinished()
-////        switch (allFixLettersUsed) {
-////        case (false): // nothing is solved
-////            if goOnPlaying {
-////                self.saveToGameCenter()
-////                finishButton!.isHidden = true
-////                goOnPlaying = false
-////                try! realm.safeWrite() {
-////                    GV.playingRecord.gameStatus = GV.GameStatusPlaying
-////                    GV.playingRecord.allFixIndicated = false
-////                }
-////            }
-////        case true: // game finished
-//            goOnPlaying = true
-//            finishButton!.isHidden = false
-////            if !goOnPlaying && showAlert {
-////            if !GV.playingRecord.allFixIndicated && showAlert && GV.basicDataRecord.difficulty != GameDifficulty.Easy.rawValue {
-////                congratulations(congratulationType: .GameFinished)
-////                saveToGameCenter()
-////            }
-////        }
-//    }
     
     var goOnPlaying = false
     var congratulationsAlert: MyAlertController?
@@ -3366,57 +3399,42 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func createCongratulationsAlert(congratulationType: CongratulationType, easy: Bool) {
         var title = ""
         var message = ""
-        var finishTitle = ""
-        let showMessage = true
- 
+//        var finishTitle = ""
+//        let showMessage = true
+        let myRank = calculateRankForScore(score: GV.ownScore)
         switch congratulationType {
-//        case .SolvedOnlyFixLetters:
-//                title = GV.language.getText(.tcCongratulationsFix1)
-//                message = GV.language.getText(.tcCongratulationsFix2)
-//                showMessage = GV.basicDataRecord.difficulty == GameDifficulty.Medium.rawValue ? true : false
-        case .GameFinished:
-            if easy {
-                title = GV.language.getText(.tcCongratulationsEasy1)
-            } else {
-                title = GV.language.getText(.tcCongratulations1)
-            }
-            message = GV.language.getText(.tcCongratulations2)
-            finishTitle = GV.language.getText(.tcFinishGame)
+        case .AllWordsCollected:
+            title = GV.language.getText(.tcCongratulationsAllWords, values: String(GV.countOfWords), String(GV.ownScore), String(myRank))
+        case .AllLettersCollected:
+            title = GV.language.getText(.tcCongratulationsAllLetters, values: String(GV.countOfLetters), String(GV.ownScore), String(myRank))
+        default:
+            break
         }
-        if showMessage {
-            let continueTitle = GV.language.getText(.tcContinuePlaying)
-            let OKTitle =  GV.language.getText(.tcOK)
-            let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
-            if congratulationType == .GameFinished {
-                if easy {
-                    myAlert.addAction(text: continueTitle, action: #selector(self.continueEasyAction))
-                    myAlert.addAction(text: finishTitle, action: #selector(self.finishEasyAction))
-                } else {
-                    myAlert.addAction(text: continueTitle, action: #selector(self.continueMediumAction))
-                    myAlert.addAction(text: finishTitle, action: #selector(self.finishMediumAction))
-                }
-            } else {
-//                if congratulationType == .SolvedOnlyFixLetters {
-//                    myAlert.addAction(text: OKTitle, action: #selector(self.fixLettersOKAction))
-//                } else {
-                    myAlert.addAction(text: OKTitle, action: #selector(self.mandatoryOKAction))
-//                }
-            }
-            myAlert.presentAlert()
-            myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-            congratulationsAlert = myAlert
-            congratulationsAlert!.name = myAlertName
-        }
+        saveToFinishedGames()
+        message = GV.language.getText(.tcCongratulationsMessage)
+//        let continueTitle = GV.language.getText(.tcContinuePlaying)
+        let OKTitle =  GV.language.getText(.tcOK)
+        let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
+        myAlert.addAction(text: OKTitle, action: #selector(self.OKAction))
+        myAlert.presentAlert()
+        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+        congratulationsAlert = myAlert
+        congratulationsAlert!.name = myAlertName
     }
     
-    @objc private func continueEasyAction () {
-        self.enabled = true
-        self.gameboardEnabled = true
-        saveHelpInfo(action: .ContinueGameEasy)
-        self.gameboardEnabled = true
-        self.goOnPlaying = true
+    private func saveToFinishedGames() {
+        let finishedGame = FinishedGames()
+        let (bestScore, bestName, _, _) = GV.basicDataRecord.getBestScore()
+        finishedGame.language = GV.actLanguage
+        finishedGame.difficulty = GV.basicDataRecord.difficulty
+        finishedGame.countFixedLetters = GV.countOfLetters
+        finishedGame.countWords = GV.countOfWords
+        finishedGame.myScore = GV.ownScore
+        finishedGame.bestScore = bestScore
+        finishedGame.bestPlayer = bestName
+        finishedGame.myPlace = calculateRankForScore(score: GV.ownScore)
         try! realm.safeWrite() {
-            GV.playingRecord.gameStatus = GV.GameStatusContinued
+            realm.add(finishedGame)
         }
     }
     
@@ -3430,24 +3448,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             GV.playingRecord.gameStatus = GV.GameStatusContinued
         }
     }
-    @objc private func fixLettersOKAction () {
-        self.enabled = true
-        self.gameboardEnabled = true
-        saveHelpInfo(action: .OKFixLettersSolved)
-        self.gameboardEnabled = true
-        try! realm.safeWrite() {
-            GV.playingRecord.gameStatus = GV.GameStatusPlaying
-        }
-    }
+//    @objc private func fixLettersOKAction () {
+//        self.enabled = true
+//        self.gameboardEnabled = true
+//        saveHelpInfo(action: .OKFixLettersSolved)
+//        self.gameboardEnabled = true
+//        try! realm.safeWrite() {
+//            GV.playingRecord.gameStatus = GV.GameStatusPlaying
+//        }
+//    }
     
-    @objc private func mandatoryOKAction () {
-        self.enabled = true
-        self.gameboardEnabled = true
-        saveHelpInfo(action: .OKMandatorySolved)
-        self.gameboardEnabled = true
+    @objc private func OKAction () {
         try! realm.safeWrite() {
-            GV.playingRecord.gameStatus = GV.GameStatusPlaying
+            realm.delete(GV.playingRecord)
         }
+        newGameButtonTapped()
     }
         
     @objc private func finishEasyAction () {
@@ -3516,7 +3531,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let myAlert = MyAlertController(title: title, message: message, target: self, type: .Red)
         //        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        myAlert.addAction(text: action1Title, action: #selector(finishButtonTapped2))
+        myAlert.addAction(text: action1Title, action: #selector(newGameButtonTapped))
         myAlert.addAction(text: action2Title, action: #selector(goBackButtonTapped2))
         myAlert.presentAlert()
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
@@ -3524,7 +3539,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         finishGameAlert!.name = myAlertName
     }
     
-    @objc private func finishButtonTapped2() {
+    @objc private func newGameButtonTapped() {
         gameboardEnabled = true
         enabled = true
         if gameFinishedStatus == .OK {

@@ -464,11 +464,18 @@ public class WTGameWordList {
         let index = allWords.firstIndex(where: {$0.word == mySelectedWord.word})
         if index == nil {
             allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, score: mySelectedWord.score))
+            GV.countOfWords += 1
         } else {
             allWords.append(WordWithCounter(word: mySelectedWord.word, counter: 1, score: mySelectedWord.score))
         }
         if doAnimate { // only when new word added, not in init
             delegate!.showScore(newWord: mySelectedWord, minus: false, doAnimate: doAnimate)
+        }
+        for letter in selectedWord.usedLetters {
+            let item = GV.gameArray[letter.col][letter.row]
+            if item.getCountOccurencesInWords() == 1 && item.fixItem {
+                GV.countOfLetters += 1
+            }
         }
 
     }
@@ -496,11 +503,7 @@ public class WTGameWordList {
             mySelectedWord.setScore(round: GV.playingRecord.rounds.count)
             removeWordFromAllWords(selectedWord: mySelectedWord)
             GV.totalScore -= mySelectedWord.score
-//            if self.isMandatory(word: mySelectedWord.word) {
-//                GV.mandatoryScore -= mySelectedWord.score
-//            } else {
             GV.ownScore -= mySelectedWord.score
-//            }
 
             for (index, letter) in mySelectedWord.usedLetters.enumerated() {
                 if isThisPositionFree(letter: letter) {
@@ -510,8 +513,12 @@ public class WTGameWordList {
                     GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, decrWords: true)
                 }
             }
-//            removeWordFromMyWords(word: selectedWord.word)
-
+            for letter in mySelectedWord.usedLetters {
+                let item = GV.gameArray[letter.col][letter.row]
+                if item.getCountOccurencesInWords() == 0 && item.fixItem {
+                    GV.countOfLetters -= 1
+                }
+            }
             delegate!.showScore(newWord: mySelectedWord, minus: true, doAnimate: true)
         }
         
@@ -549,15 +556,12 @@ public class WTGameWordList {
             if allWords[index].counter > 1 {
                 allWords[index].counter -= 1
             } else {
-//                if allWords[index].mandatory {
-//                    if allWords[index].counter > 1 {
-//                        allWords[index].counter -= 1
-//                    } else {
-//                        allWords.remove(at: index)
-//                    }
-//                } else {
                 allWords.remove(at: index)
-//                }
+                if allWords.firstIndex(where: {$0.word == selectedWord.word}) == nil {
+                    if GV.countOfWords > 0 {
+                        GV.countOfWords -= 1
+                    }
+                }
             }
         }
     }

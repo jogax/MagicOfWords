@@ -97,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 51, // used since 2019-08-30
+            schemaVersion: 55, // used since 2019-08-30
 //            schemaVersion: 30, // optimize BasicDataModel
 //            schemaVersion: 27, // start with Game Center
 //            schemaVersion: 26, // buttontype not needed any more
@@ -120,7 +120,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                 }
         },
-            objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self, ScoreInfoForDifficulty.self, MyWords.self]
+            objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self, ScoreInfoForDifficulty.self, MyWords.self, FinishedGames.self]
 //            objectTypes: [WordListModel.self]
         )
         
@@ -163,6 +163,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationWillEnterForeground(_ application: UIApplication) {
         GV.comeBackFromSleeping = true
+ 
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         
     }

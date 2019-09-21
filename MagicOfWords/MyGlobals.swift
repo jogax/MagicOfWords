@@ -12,7 +12,7 @@ import UIKit
 import RealmSwift
 import GameKit
 
-let actVersion = "0.97" // Build 19
+let actVersion = "0.98" // Build 20
 let exclamationMark = "!"
 public let roundSeparator = "/"
 let itemSeparator = "°"
@@ -133,6 +133,8 @@ struct GV {
 
 //    static let ButtonTypeSimple = "S"
 //    static let ButtonTypeElite = "E"
+    static var countOfWords = 0
+    static var countOfLetters = 0
     static var minGameNumber = 0
     static var maxGameNumber = 0
     static var origDifficulty = 0
@@ -140,6 +142,8 @@ struct GV {
     static let HardGame = 1
     static let DemoEasyGameNumber = 10000
     static let DemoMediumGameNumber = 11000
+    static let countOfWordsMaxValue = 1000
+    static let countOfLettersMaxValue = 250
     static let TimeModifier: Int64 = 10000000000
 //    static let buttonType = ButtonTypeElite
     static let LabelFont = "CourierNewPS-BoldMT"

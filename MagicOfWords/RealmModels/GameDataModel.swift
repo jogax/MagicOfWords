@@ -23,7 +23,7 @@ class GameDataModel: Object {
     @objc dynamic var score = 0  // Score
     @objc dynamic var time = ""
     @objc dynamic var synced = false
-    @objc dynamic var countOfWordsToCollect = 0
+    @objc dynamic var created: Date = Date()
 //    @objc dynamic var randomCounts = 0
     let rounds = List<RoundDataModel>()
     override  class func primaryKey() -> String {
