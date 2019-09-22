@@ -207,6 +207,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let myLightBlue1 = UIColor(red: 204/255, green: 202/255, blue: 255/255, alpha: 1.0)
 
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
+        let textColor:UIColor = .black
         var text: String = ""
         var text0: String = ""
         let lineHeight = title.height(font: myFont!)
@@ -214,14 +215,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var yPos1: CGFloat = 0
         var yPos2: CGFloat = lineHeight
         let view = UIView()
-        var width:CGFloat = title.width(withConstrainedHeight: 0, font: myFont!)
+        var width:CGFloat = title.width(font: myFont!)
         var length: Int = 0
         let widthOfChar = "A".width(font: myFont!)
         let lengthOfTableView = Int(tableView.frame.width / widthOfChar) + 1
         switch tableType {
         case .ShowAllWords:
-            let suffix = " (\(ownWordsForShow!.countWords)/\(ownWordsForShow!.score))"
+            let suffix = " (\(GV.countOfWords)/\(ownWordsForShow!.countWords)/\(ownWordsForShow!.score))"
             text = (GV.language.getText(.tcCollectedOwnWords) + suffix).fixLength(length: lengthOfTableView, center: true)
+            if text.width(font: myFont!) > width {
+                width = text.width(font: myFont!)
+            }
         case .ShowWordsOverPosition:
             text = GV.language.getText(.tcWordsOverLetter).fixLength(length: title.length, center: true)
         case .ShowFoundedWords:
@@ -246,10 +250,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let label1 = UILabel(frame: CGRect(x: 0, y: yPos1, width: width, height: lineHeight))
         label1.font = myFont!
         label1.text = text
+        label1.textColor = textColor
         view.addSubview(label1)
         let label2 = UILabel(frame: CGRect(x: 0, y: yPos2, width: width, height: lineHeight))
         label2.font = myFont!
         label2.text = title
+        label2.textColor = textColor
         view.addSubview(label2)
         if tableType == .ShowFoundedWords {
             view.backgroundColor = myLightBlue
@@ -4116,9 +4122,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         (words, maxLength) = WTGameWordList.shared.getWordsForShow()
         ownWordsForShow = WordsForShow(words: words)
         calculateColumnWidths()
+        let suffix = " (\(GV.countOfWords)/\(ownWordsForShow!.countWords)/\(ownWordsForShow!.score))"
+        let headerText = (GV.language.getText(.tcCollectedOwnWords) + suffix)
+        let actWidth = max(title.width(font: myFont!), headerText.width(font: myFont!)) * 1.2
+
         showOwnWordsTableView?.setDelegate(delegate: self)
         showOwnWordsTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
-        let origin = CGPoint(x: 0.5 * (self.frame.width - title.width(font: myFont!)), y: self.frame.height * 0.08)
+        let origin = CGPoint(x: 0.5 * (self.frame.width - actWidth), y: self.frame.height * 0.08)
         let lineHeight = title.height(font:myFont!)
         let headerframeHeight = lineHeight * 2.3
         var showingWordsHeight = CGFloat(ownWordsForShow!.words.count) * lineHeight
@@ -4132,8 +4142,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if maxLength < GV.language.getText(.tcWord).count {
             maxLength = GV.language.getText(.tcWord).count
         }
-        let width = title.width(font: myFont!)
-        let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
+        let size = CGSize(width: actWidth, height: showingWordsHeight + headerframeHeight)
         showOwnWordsTableView?.frame=CGRect(origin: origin, size: size)
         self.showOwnWordsTableView?.reloadData()
 //        self.scene?.alpha = 0.2

@@ -253,6 +253,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     var widthOfView:CGFloat = 0
 
     func fillHeaderView(tableView: UITableView, section: Int) -> UIView {
+        let textColor: UIColor = .black
         let view = UIView()
         let actType = ScoreType(rawValue: GV.basicDataRecord.showingScoreType)
         let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: widthOfView, height: lineHeight))
@@ -260,6 +261,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
         let textConstant: TextConstants  = actType == .Easy ? .tcTableOfEasyBestscores : actType == .Medium ? .tcTableOfMediumBestscores : .tcTableOfWordCounts
         label1.text = GV.language.getText(textConstant).fixLength(length: title.length, center: true)
         label1.textAlignment = .center
+        label1.textColor = textColor
         view.addSubview(label1)
         
         var labelPos: CGFloat = 0
@@ -270,6 +272,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
             let label = UILabel(frame: CGRect(x: labelPos, y: lineHeight, width: width, height: lineHeight))
             labelPos += width
             label.text = column.text.fixLength(length: column.length, leadingBlanks: false)
+            label.textColor = textColor
             label.font = myFont!
 //            widthOfView += width
             view.addSubview(label)
@@ -288,7 +291,7 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
     }
 
     func getHeightForHeaderInSection(tableView: UITableView, section: Int)->CGFloat {
-        return GV.onIpad ? 48 : 28
+        return GV.onIpad ? 48 : 30
     }
     func setHeaderView(tableView: UITableView, headerView: UIView, section: Int) {
     }

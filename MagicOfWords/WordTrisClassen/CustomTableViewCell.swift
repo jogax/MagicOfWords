@@ -71,7 +71,7 @@ class CustomTableViewCell: UITableViewCell {
 //        let label = UILabel(frame: CGRect(x: xValue, y: boxView.center.y + wordHeight * 0.5, width: wordLength, height: wordHeight))
         label.font = myFont
         label.textAlignment = .left
-        label.textColor = UIColor.black
+        label.textColor = GV.darkMode ? .white : .black
         label.text = text
 //        label.backgroundColor = color
         label.center.y = boxView.center.y

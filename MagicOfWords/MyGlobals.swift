@@ -172,6 +172,7 @@ struct GV {
     static var basicDataRecord = BasicDataModel()
     static var helpInfoRecords: Results<HelpInfo>?
     static let frequencyString = ":freq:"
+    static var darkMode = false
 
     static let language = Language()
     static let size = 10

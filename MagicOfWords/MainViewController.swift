@@ -343,7 +343,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         myHeight = self.view.frame.size.height
         myWidth = self.view.frame.size.width
-        generateBasicDataRecordIfNeeded()
+        if GV.basicDataRecord.actLanguage == "" { //basicDataRecord not loaded yet
+            generateBasicDataRecordIfNeeded()
+        }
         
         if oneMinutesTimer != nil {
             oneMinutesTimer!.invalidate()
@@ -482,6 +484,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         }
         if oldConnectedToInternet != GV.connectedToInternet {
             if GV.connectedToInternet {
+                if GV.basicDataRecord.actLanguage == "" { // BsiacDataRecord not loaded yet
+                    generateBasicDataRecordIfNeeded()
+                }
                 if animationScene != nil {
                     _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
                 } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
@@ -945,6 +950,10 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                     GV.basicDataRecord.scoreInfos.append(difficultyInfo)
                 }
             }
+        }
+        GV.darkMode = false
+        if #available(iOS 12.0, *) {
+            GV.darkMode = traitCollection.userInterfaceStyle == .dark ? true : false
         }
         
         if realm.objects(BasicDataModel.self).count == 0 {
