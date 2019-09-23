@@ -843,6 +843,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } else {
                 GV.playingRecord = nowPlaying.last!
             }
+            try! realm.safeWrite() {
+                if GV.playingRecord.countOfWordsMaxValue == 0 {
+                    GV.playingRecord.countOfWordsMaxValue = 1000
+                }
+                if GV.playingRecord.countOfLettersMaxValue == 0 {
+                    GV.playingRecord.countOfLettersMaxValue = 250
+                }
+            }
             GV.countOfWordsMaxValue = GV.playingRecord.countOfWordsMaxValue
             GV.countOfLettersMaxValue = GV.playingRecord.countOfLettersMaxValue
         }
