@@ -23,6 +23,8 @@ class GameDataModel: Object {
     @objc dynamic var score = 0  // Score
     @objc dynamic var time = ""
     @objc dynamic var synced = false
+    @objc dynamic var countOfWordsMaxValue = 1000
+    @objc dynamic var countOfLettersMaxValue = 250
     @objc dynamic var created: Date = Date()
 //    @objc dynamic var randomCounts = 0
     let rounds = List<RoundDataModel>()

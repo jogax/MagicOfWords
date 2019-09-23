@@ -169,7 +169,11 @@ enum TextConstants: Int {
     tcAll,
     tcWeek,
     tcToday,
-    tcCounters
+    tcCounters,
+    tcChooseGoalForWords,
+    tcChooseGoalForLetters,
+    tcGoalMessageForWords,
+    tcGoalMessageForLetters
 }
 
     let LanguageEN = "en" // index 0

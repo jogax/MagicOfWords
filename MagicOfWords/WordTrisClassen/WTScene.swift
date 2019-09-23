@@ -525,7 +525,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         4: [31, 22],
         5: [32, 221]
     ]
-    let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1.0)
+    let bgColor = GV.darkMode ? SKColor(red: 100/255, green: 100/255, blue: 100/255, alpha: 1.0) : SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1.0)
     let mandatoryWordsHeaderName = "°°°mandatoryWords°°°"
     let ownWordsHeaderName = "°°°ownWords°°°"
 //    let bonusHeaderName = "°°°bonusHeader°°°"
@@ -619,8 +619,85 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         })
 //        searchWords(lettersToSearch: ["a", "b", "m", "a", "g", "l", "f", "a", "r"])
         play()
+        if new {
+            if  !showHelp {
+                let easy = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue
+                let title = GV.language.getText(easy ? .tcChooseGoalForWords : .tcChooseGoalForLetters)
+                let message = GV.language.getText(easy ? .tcGoalMessageForWords : .tcGoalMessageForLetters)
+                let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
+                if easy {
+                    myAlert.addAction(text: "100", action: #selector(self.startEasy100))
+                    myAlert.addAction(text: "250", action: #selector(self.startEasy250))
+                    myAlert.addAction(text: "500", action: #selector(self.startEasy500))
+                    myAlert.addAction(text: "750", action: #selector(self.startEasy750))
+                    myAlert.addAction(text: "1000", action: #selector(self.startEasy1000))
+                } else {
+                    myAlert.addAction(text: "50", action: #selector(self.startMedium50))
+                    myAlert.addAction(text: "100", action: #selector(self.startMedium100))
+                    myAlert.addAction(text: "150", action: #selector(self.startMedium150))
+                    myAlert.addAction(text: "200", action: #selector(self.startMedium200))
+                    myAlert.addAction(text: "250", action: #selector(self.startMedium250))
+                }
+                myAlert.presentAlert()
+                myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+                myAlert.name = self.myAlertName
+                self.bgSprite!.addChild(myAlert)
+            }
+        }
    }
+    private func setCountWords(count: Int, type: GameDifficulty) {
+        try! realm.safeWrite() {
+            if type == .Easy {
+                GV.playingRecord.countOfWordsMaxValue = count
+                GV.countOfWordsMaxValue = count
+            } else {
+                GV.playingRecord.countOfLettersMaxValue = count
+                GV.countOfLettersMaxValue = count
+            }
+        }
+        modifyHeader()
+    }
+    @objc private func startEasy100() {
+        setCountWords(count: 100, type: .Easy)
+    }
     
+    @objc private func startEasy250() {
+        setCountWords(count: 250, type: .Easy)
+    }
+    
+    @objc private func startEasy500() {
+        setCountWords(count: 500, type: .Easy)
+    }
+    
+    @objc private func startEasy750() {
+        setCountWords(count: 750, type: .Easy)
+    }
+    
+    @objc private func startEasy1000() {
+        setCountWords(count: 1000, type: .Easy)
+    }
+    
+    @objc private func startMedium50() {
+        setCountWords(count: 50, type: .Medium)
+    }
+    
+    @objc private func startMedium100() {
+        setCountWords(count: 100, type: .Medium)
+    }
+    
+    @objc private func startMedium150() {
+        setCountWords(count: 150, type: .Medium)
+    }
+    
+    @objc private func startMedium200() {
+        setCountWords(count: 200, type: .Medium)
+    }
+    
+    @objc private func startMedium250() {
+        setCountWords(count: 250, type: .Medium)
+    }
+    
+
     private func goBackToWTScene(start: StartType) {
 //        if player != nil {
 //            player!.stop()
@@ -766,6 +843,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } else {
                 GV.playingRecord = nowPlaying.last!
             }
+            GV.countOfWordsMaxValue = GV.playingRecord.countOfWordsMaxValue
+            GV.countOfLettersMaxValue = GV.playingRecord.countOfLettersMaxValue
         }
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
@@ -912,7 +991,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if is1000Words {
                 text = GV.language.getText(.tcMyWordsHeader1000, values: String(GV.countOfWords), String(GV.countOfWordsMaxValue))
             } else {
-                text = GV.language.getText(.tcMyWordsHeader250, values: String(GV.countOfLetters), String(GV.countOfWords))
+                text = GV.language.getText(.tcMyWordsHeader250, values: String(GV.countOfLetters), String(GV.countOfLettersMaxValue))
             }
             myWordsHeaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
             myWordsHeaderLabel.text = text
@@ -949,7 +1028,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if is1000Words {
             myWordsText = GV.language.getText(.tcMyWordsHeader1000, values: String(GV.countOfWords), String(GV.countOfWordsMaxValue))
         } else {
-            myWordsText = GV.language.getText(.tcMyWordsHeader250, values: String(GV.countOfLetters), String(GV.countOfWords))
+            myWordsText = GV.language.getText(.tcMyWordsHeader250, values: String(GV.countOfLetters), String(GV.countOfLettersMaxValue))
         }
         let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(rank).fixLength(length: rankLength), String(score).fixLength(length:scoreLength), GKLocalPlayer.local.alias)
         let bestScoreText = GV.language.getText(.tcBestScoreHeader, values: String(1).fixLength(length: rankLength),String(bestScore).fixLength(length:scoreLength), bestName)
@@ -2134,7 +2213,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         countTime(timerX: Timer())
         if showHelp {
             startShowHelpDemo()
-//            _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(startShowHelpDemo(timerX: )), userInfo: nil, repeats: false)
         }
     }
     

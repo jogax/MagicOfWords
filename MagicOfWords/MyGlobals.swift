@@ -142,8 +142,8 @@ struct GV {
     static let HardGame = 1
     static let DemoEasyGameNumber = 10000
     static let DemoMediumGameNumber = 11000
-    static let countOfWordsMaxValue = 1000
-    static let countOfLettersMaxValue = 250
+    static var countOfWordsMaxValue = 1000
+    static var countOfLettersMaxValue = 250
     static let TimeModifier: Int64 = 10000000000
 //    static let buttonType = ButtonTypeElite
     static let LabelFont = "CourierNewPS-BoldMT"
@@ -210,10 +210,13 @@ struct GV {
 //    static var myPlace = 0
 //    static var myScore = 0
     static func convertLocaleToInt()->Int {
-        let locale = Locale.current.regionCode!
+        var actLocale = "EN"
+        if Locale.current.regionCode != nil {
+            actLocale = Locale.current.regionCode!
+        }
         let language = actLanguage.uppercased()
-        let letter1 = locale.subString(at:0, length: 1)
-        let letter2 = locale.subString(at:1, length: 1)
+        let letter1 = actLocale.subString(at:0, length: 1)
+        let letter2 = actLocale.subString(at:1, length: 1)
         let letter3 = language.subString(at:0, length: 1)
         let letter4 = language.subString(at:1, length: 1)
         let value = 10000 * (codeTableToInt[letter1]! * 100 + codeTableToInt[letter2]!) + codeTableToInt[letter3]! * 100 + codeTableToInt[letter4]!
