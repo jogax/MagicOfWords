@@ -525,7 +525,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         4: [31, 22],
         5: [32, 221]
     ]
-    let bgColor = GV.darkMode ? SKColor(red: 100/255, green: 100/255, blue: 100/255, alpha: 1.0) : SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1.0)
+    let bgColor = SKColor(red: 223/255, green: 255/255, blue: 216/255, alpha: 1.0)
     let mandatoryWordsHeaderName = "°°°mandatoryWords°°°"
     let ownWordsHeaderName = "°°°ownWords°°°"
 //    let bonusHeaderName = "°°°bonusHeader°°°"
@@ -4049,7 +4049,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     pieceString += letter
                 }
                 pieceString += "°"
-                let newIndex = random.getRandomInt(0, max: tilesForGame.count)
+                let newIndex = showHelp ? random.getRandomInt(0, max: tilesForGame.count) : tilesForGame.count
                 if newIndex == tilesForGame.count || !first || usedWords.count > 6 /*|| GV.playingRecord.gameNumber % 1000 == 0 */{
                     tilesForGame.append(tileForGameItem)
                 } else {
