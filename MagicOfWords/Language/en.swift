@@ -174,4 +174,5 @@ let enDictionary: [TextConstants: String] = [
     .tcChooseGoalForLetters: "Choose how many fixed letters do you want to use",
     .tcGoalMessageForWords: "The game ends when you have collected the selected number of different words",
     .tcGoalMessageForLetters: "The game ends when you have used the selected number of fixed letters",
+    .tcTipp:            "Hint: %",
 ]

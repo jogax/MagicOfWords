@@ -2190,6 +2190,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                print(Date().getDateDiff(start: start))
 //                print("===================================")
                 modifyHeader()
+                
             }
         } else {
             if GV.playingRecord.rounds.count == 0 {
@@ -2213,6 +2214,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         saveActualState()
+        fillTippIndexes()
         
         if timer != nil {
             timer!.invalidate()
@@ -2223,6 +2225,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             startShowHelpDemo()
         }
     }
+    
+    private func fillTippIndexes() {
+        tippIndexes = [:]
+        let words = GV.playingRecord.words.components(separatedBy: "°")
+        let pieces = GV.playingRecord.pieces.components(separatedBy: "°")
+        var wordIndex = 0
+        var searchWord = ""
+        for (pieceIndex, piece) in pieces.enumerated() {
+            if piece != "" {
+                let items = piece.components(separatedBy: "/")
+                searchWord += items[2]
+                if searchWord == words[wordIndex] {
+                    tippIndexes[pieceIndex] = wordIndex
+                    searchWord = ""
+                    wordIndex += 1
+                }
+            }
+        }            
+    }
+    
+    var tippIndexes: [Int:Int] = [:]
     
     private var helpRecordIndex = 0
     private var helpDemoSpeedSlow = false
@@ -2917,18 +2940,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func generateArrayOfWordPieces(new: Bool) {
         if new || GV.playingRecord.pieces.count == 0 {
             try! realm.safeWrite() {
-            //                GV.playingRecord.randomCounts = 0
                 GV.playingRecord.words = ""
-            //                random = MyRandom()
             }
-            // ----------------------
-//            _ = generateArrayOfWordPieces(first: true)
-//            for _ in 0...9 {
-//                _ = generateArrayOfWordPieces(first: false)
-//            }
-//            try! realm.safeWrite() {
-//                GV.playingRecord.words = ""
-//            }
             let pieces = generateArrayOfWordPieces(first: true)
             try! realm.safeWrite() {
                 GV.playingRecord.pieces = pieces
@@ -2947,13 +2960,57 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     GV.playingRecord.pieces = pieces
                 }
                 saveArrayOfPieces()
+                fillTippIndexes()
             }
-            
             tileForGame = tilesForGame[indexOfTilesForGame]
             indexOfTilesForGame += 1
         } while tileForGame.isOnGameboard
 //        indexOfTilesForGame = indexOfTilesForGame >= tilesForGame.count ? 0 : indexOfTilesForGame
+        let actIndex: Int? = tippIndexes[indexOfTilesForGame]
+        if actIndex != nil {
+            let myWords = GV.playingRecord.words.components(separatedBy: "°")
+            print("word for tipp: \(myWords[actIndex! - 1]), indexOfTilesForGame: \(indexOfTilesForGame)")
+            if !showHelp {
+                showTipp(tipp: myWords[actIndex! - 1])
+            }
+        }
         return tileForGame
+
+    }
+    
+    private func showTipp(tipp: String) {
+        let fontSize = GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.04
+        let textOnBalloon = GV.language.getText(.tcTipp, values: tipp)
+        let balloon = SKSpriteNode(imageNamed: "bubbleGoldElite")
+        let width = textOnBalloon.width(font: myFont!) * (GV.onIpad ? 2.0 : 1.5)
+        let height = textOnBalloon.height(font: myFont!) * 2.5
+        balloon.size = CGSize(width: width, height: height)
+        balloon.zPosition = 10
+//        let atY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
+//        let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
+        let startPos = CGPoint(x: self.frame.width * 0.5, y: self.frame.height * 0.2)
+//        let startPosY = startPos.y
+//        let endPosY = score > 0 ? self.frame.size.height * 0.80 : self.frame.size.height * -0.04
+        balloon.position = CGPoint(x: startPos.x, y: startPos.y )
+        bgSprite!.addChild(balloon)
+        let wordLabel = SKLabelNode(fontNamed: GV.actFont)
+        wordLabel.text = textOnBalloon
+        wordLabel.verticalAlignmentMode = .center
+        wordLabel.fontSize = fontSize
+        wordLabel.fontColor = SKColor.blue
+//        balloon.addChild(scoreLabel)
+        balloon.addChild(wordLabel)
+        var actions = Array<SKAction>()
+        let waitAction = SKAction.wait(forDuration: 0.5)
+//        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: endPosY), duration: 5.0)
+        let scaleUpAction = SKAction.scale(by: 2.0, duration: 0.5)
+        let scaleDownAction = SKAction.scale(to: 1.0, duration: 0.5)
+        let fadeAway = SKAction.fadeOut(withDuration: 0.2)
+        let removeNode = SKAction.removeFromParent()
+        actions.append(SKAction.sequence([waitAction, scaleUpAction, scaleDownAction, scaleUpAction, scaleDownAction, scaleUpAction, scaleDownAction, fadeAway, removeNode/*movingAction*/]))
+//        actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))
+        let group = SKAction.group(actions);
+        balloon.run(group)
 
     }
     #if SHOWFINGER
@@ -4015,9 +4072,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for letter in myLetters {
             letterCounters[String(letter)] = 0
         }
-
+        var countSplittedWords = usedWords.count
+        var countPieces = tilesForGame.count
         func splittingWord(word: String) {
             var inputWord = ""
+            countSplittedWords += 1
             let items = word.components(separatedBy: "ß")
             if items.count > 1 {
                 for item in items {
@@ -4063,6 +4122,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 } else {
                     tilesForGame.insert(tileForGameItem, at: newIndex)
                 }
+                countPieces += 1
 
             } while inputWord.length > 0
         }
@@ -4072,6 +4132,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             for word in words {
 //                print(word)
                 splittingWord(word: word)
+                
             }
             
         } else {
@@ -4124,6 +4185,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             } while usedWords.contains(where: {$0 == word}) && countRepeats < counter
              splittingWord(word: word)
+
             
 //            print("letters: \(letters), word: \(word)")
             

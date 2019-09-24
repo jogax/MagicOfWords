@@ -175,5 +175,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcChooseGoalForLetters: "Выбери, сколько неподвижных букв хочешь использовать",
     .tcGoalMessageForWords: "Игра заканчивается, когда ты собрал выбранное количество разных слов",
     .tcGoalMessageForLetters: "Игра заканчивается, когда ты использовал выбранное количество неподвижных букв",
+    .tcTipp:            "Подсказка: %",
 ]
 

@@ -176,6 +176,7 @@ let deDictionary: [TextConstants: String] = [
     .tcChooseGoalForLetters: "Wähle aus, wie viele feste Buchstaben Du verwenden möchtest",
     .tcGoalMessageForWords: "Das Spiel endet, wenn Du die ausgewählte Anzahl verschiedener Wörter gesammelt hast",
     .tcGoalMessageForLetters: "Das Spiel endet, wenn Du die ausgewählte Anzahl fester Buchstaben verwendet hast",
+    .tcTipp:            "Hinweis: %",
 ]
 
 
