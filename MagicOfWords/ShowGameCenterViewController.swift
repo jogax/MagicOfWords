@@ -11,9 +11,12 @@ import RealmSwift
 import GameplayKit
 
 #if DEBUG
-
+public protocol ShowGameCenterViewControllerDelegate: class {
+    func backFromShowGameCenterViewController()
+}
 class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     var showGameCenterView: WTTableView? = WTTableView()
+    var myDelegate: ShowGameCenterViewControllerDelegate?
 //    var headerLine = [String]()
     let color = UIColor(red: 230/255, green: 230/255, blue: 240/255, alpha: 1.0)
     let indexOfOnlineImage = 0
@@ -37,7 +40,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     var showingModus: ShowingModus = .Left
 
     //    var lengthOfOnlineSince = 0
-    let myFont = UIFont(name: GV.actLabelFont, size: GV.onIpad ? 16 : 10)
+    let myFont = UIFont(name: GV.actLabelFont, size: GV.onIpad ? 14 : 8)
     
     func didTappedButton(tableView: UITableView, indexPath: IndexPath, buttonName: String) {
         
@@ -76,41 +79,41 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
 
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
-        let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
+//        let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         let cellWidth = tableView.frame.width
         let cellHeight = " ".height(font: myFont!) * 1.0
         cell.setFont(font: myFont!)
         cell.setCellSize(size: CGSize(width: cellWidth, height: cellHeight))
 //        cell.setCellSize(size: CGSize(width: tableView.frame.width * (GV.onIpad ? 0.040 : 0.010), height: self.view.frame.width * (GV.onIpad ? 0.040 : 0.010)))
-        cell.setBGColor(color: actColor) //showWordsBackgroundColor)
+//        cell.setBGColor(color: actColor) //showWordsBackgroundColor)
         let isOnline = GV.globalInfoTable[indexPath.row].isOnline
         let origImage = UIImage(named: isOnline ? "online.png" : "offline.png")!
         let image = origImage.resizeImage(newWidth: cellHeight * 0.6)
         let index = indexOfAlias
         cell.addButton(image: image, xPos: cellHeight * 0.5, callBack: buttonTapped)
-        cell.addColumn(text: " " + (GV.globalInfoTable[indexPath.row].alias.fixLength(length: lengths[index], leadingBlanks: false)), color: actColor, xPos: cellHeight * 1.0) // WordColumn
+        cell.addColumn(text: " " + (GV.globalInfoTable[indexPath.row].alias.fixLength(length: lengths[index], leadingBlanks: false)), /*color: actColor,*/ xPos: cellHeight * 1.0) // WordColumn
         switch showingModus {
         case .Left:
-            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].device.fixLength(length: lengths[index + 1], leadingBlanks: false)), color: actColor)
-            cell.addColumn(text: GV.globalInfoTable[indexPath.row].version.fixLength(length: lengths[index + 2], leadingBlanks: false), color: actColor)
-            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].land.fixLength(length: lengths[index + 3], leadingBlanks: false)), color: actColor)
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengths[index + 4], leadingBlanks: false), color: actColor)
+            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].device.fixLength(length: lengths[index + 1], leadingBlanks: false))/*, color: actColor*/)
+            cell.addColumn(text: GV.globalInfoTable[indexPath.row].version.fixLength(length: lengths[index + 2], leadingBlanks: false)/*, color: actColor*/)
+            cell.addColumn(text: (GV.globalInfoTable[indexPath.row].land.fixLength(length: lengths[index + 3], leadingBlanks: false))/*, color: actColor*/)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].allTime.HourMin).fixLength(length: lengths[index + 4], leadingBlanks: false)/*, color: actColor*/)
             if GV.onIpad {
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 5], leadingBlanks: false), color: actColor)
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengths[index + 6], leadingBlanks: false), color: actColor)
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 7], leadingBlanks: false), color: actColor)
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].mediumBestScore).fixLength(length: lengths[index + 8], leadingBlanks: false), color: actColor)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 5], leadingBlanks: false)/*, color: actColor*/)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengths[index + 6], leadingBlanks: false)/*, color: actColor*/)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 7], leadingBlanks: false)/*, color: actColor*/)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].mediumBestScore).fixLength(length: lengths[index + 8], leadingBlanks: false)/*, color: actColor*/)
             }
         case .Right:
-            cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 2], leadingBlanks: false), color: actColor)
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengths[index + 3], leadingBlanks: false), color: actColor)
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 4], leadingBlanks: false), color: actColor)
-            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].mediumBestScore).fixLength(length: lengths[index + 5], leadingBlanks: false), color: actColor)
+            cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 2], leadingBlanks: false)/*, color: actColor*/)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengths[index + 3], leadingBlanks: false)/*, color: actColor*/)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 4], leadingBlanks: false)/*, color: actColor*/)
+            cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].mediumBestScore).fixLength(length: lengths[index + 5], leadingBlanks: false)/*, color: actColor*/)
            if GV.onIpad {
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyActScore).fixLength(length: lengths[index + 6], leadingBlanks: false), color: actColor)
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumActScore.fixLength(length: lengths[index + 7], leadingBlanks: false), color: actColor)
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].countPlays.fixLength(length: lengths[index + 8], leadingBlanks: false), color: actColor)
+                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyActScore).fixLength(length: lengths[index + 6], leadingBlanks: false)/*, color: actColor*/)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumActScore.fixLength(length: lengths[index + 7], leadingBlanks: false)/*, color: actColor*/)
+                cell.addColumn(text: GV.globalInfoTable[indexPath.row].countPlays.fixLength(length: lengths[index + 8], leadingBlanks: false)/*, color: actColor*/)
             }
         }
         return cell
@@ -134,6 +137,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
             let label = UILabel(frame: CGRect(x: lastPosX, y: CGFloat(0), width: width, height: height))
             label.text = text
             label.font = myFont!
+            label.textColor = .black
             view.addSubview(label)
             lastPosX += width
             if !GV.onIpad && index == 5 {
@@ -226,26 +230,24 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         let myBackgroundImage = UIImageView (frame: UIScreen.main.bounds)
         myBackgroundImage.image = UIImage(named: "magier")
         myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
+        self.view.frame = UIScreen.main.bounds
         self.view.insertSubview(myBackgroundImage, at: 0)
-        view.addSubview(showGameCenterView!)
+
         showGameCenterView!.setDelegate(delegate: self)
 //        createButtons()
-        GCHelper.shared.getAllGlobalInfos(completion: {self.allGlobalDataLoaded()})
+        GCHelper.shared.getAllGlobalInfos(completion: {self.showPlayerActivity()})
         showingModus = .Left
         buttonsCreated = false
         buttonRadius = self.view.frame.width / 25
 
     }
     
-    @objc private func allGlobalDataLoaded() {
-        showPlayerActivity()
-    }
-    
     @objc func stopShowingTable() {
         showGameCenterView!.isHidden = true
-        dismiss(animated: true, completion: {
-            print("Dismissed")
+        dismiss(animated: false, completion: {
+//            print("Dismissed")
         })
+        myDelegate!.backFromShowGameCenterViewController()
     }
     
     @objc func leftButtonTapped() {
@@ -387,7 +389,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         return newImage!
     }
     
-    private func showPlayerActivity() {
+    @objc private func showPlayerActivity() {
         let textHeight = GV.language.getText(.tcBlank)
         calculateColumnWidths()
         let origin = CGPoint(x: 0, y: 0)
@@ -402,7 +404,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         if !buttonsCreated {
             createButtons()
         }
-//        modifyButtonsPosition()
+        view.addSubview(showGameCenterView!)
         showGameCenterView!.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
         showGameCenterView!.reloadData()
     }

@@ -129,6 +129,7 @@ struct GV {
     static let GameStatusFinished = 2
     static let GameStatusContinued = 3
     static var wtScene: WTScene?
+    static var mainViewController: MainViewController?
     static var comeBackFromSleeping = false
 
 //    static let ButtonTypeSimple = "S"

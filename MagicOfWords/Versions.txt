@@ -93,12 +93,30 @@ Orosz
 Build 20, Version 1.20 (0.98)
 
 English:
-- The goal of the game is to collect a certain number of words. At the start of each new game, the player can self choose a word count. A game ends when the player has collected the number of words he has selected (Repetition of a given word is not counted in the score).
+- Two game types: Collect-Words or Use-Fix-Letters Game. In the Collect-Words game you have to collect a certain number of (different) words, in the Use-Fix-Letters game you have to use a certain number of fixed letters.
+- At the start of each game, the player must specify how many words he wants to collect or how many fixed letters he wants to use
+- The game ends when the player has reached the target
+- New: After using a certain number of word fragments, the game briefly flashed a hint for using those letters.
+- New: There is a speaker icon in the upper right corner of the game board to tap to start playing background music. Tap again to stop music playback.
 
 Német:
-- Das Ziel des Spiels ist es, eine bestimmte Anzahl von Wörtern zu sammeln. Zu Beginn jedes neuen Spiels kann der Spieler selbst eine Wortzahl auswählen. Ein Spiel endet, wenn der Spieler die ausgewählte Anzahl der  Wörter gesammelt hat (die Wiederholung eines bestimmten Wortes wird in der Punktzahl nicht berücksichtigt).
+- Zwei Spieltypen: Sammle-Wörter oder Verwende-Feste-Buchstaben Spiel. Im Sammle-Wörter Spiel der Spieler muss eine bestimmte Anzahl (verschiedener) Wörter sammeln, im Spiel Verwende-Feste-Buchstaben muss er eine bestimmte Anzahl fester Buchstaben verwenden.
+- Zu Beginn jedes Spiels muss der Spieler angeben, wie viele Wörter er sammeln oder wie viele feste Buchstaben er verwenden möchte
+- Das Spiel endet, wenn der Spieler das Ziel erreicht hat
+- Neu: Nach der Verwendung einer bestimmten Anzahl von Wortfragmenten wird im Spiel kurz ein Hinweis zur Verwendung dieser Buchstaben angezeigt.
+- Neu: In der oberen rechten Ecke des Spielfelds befindet sich ein Lautsprechersymbol, auf das Sie tippen können, um die Wiedergabe von Hintergrundmusik zu starten. Tippen Sie erneut, um die Musikwiedergabe zu stoppen.
+
 Magyar:
-- A játék célja adott számú szó összegyűjtése. Minden új játék kezdetén a játékos kiválaszthat magának egy szószámot. Egy játék akkor fejeződik be, ha a játékos összegyűjtötte a kiválasztott szószámot (Egy adott szó ismétlése nem számít bele az eredménybe).
+
+- Két játéktípus: Szógyűjtő játék ill. Fix-Betű játék. A Szógyűjtő játékban adott számú (különböző) szót kell összegyűjteni, a Fix-Betű játékban adott számú fix betűt kell felhasználni.
+- Minden játék elején a játékosnak meg kell határoznia, hogy hány szót akar gyűjteni, vagy hány rögzített betűt szeretne használni
+- A játék akkor ér véget, amikor a játékos elérte a kitüzött célt
+- Új: Bizonyos számú szótöredék felhasználása után a játék rövid ideig felvillant egy tippet az adott betük felhasználására.
+- Új: A játékmező jobb felső sarkában egy hangszóró ikon van, melyre koppintva háttérzene lejátszását indíthatjuk el. Újbóli rákoppintásra a zene lejátszás abbamarad.
+
 Orosz:
-- Теперь можно вместо «ё» и букву «е» примениять. (Например вместо «котёнок» он применяет и «котенок»)
-- Цель игры - собрать определенное количество слов. В начале каждой новой игры игрок может самостоятельно выбирать количество слов. Игра заканчивается, когда игрок набрал выбраннoe количество  слов (повторение одного слова не учитывается в счете).
+- Два типа игры: Собери-Слова или Неподвижные-Буквы игры. В игре Собери-Слова вы должны собрать определенное количество (разных) слов, в игре Неподвижные-Буквы вы должны использовать определенное количество фиксированных букв.
+- В начале каждой игры игрок должен указать, сколько слов он хочет собрать или сколько фиксированных букв он хочет использовать
+- Игра заканчивается, когда игрок достиг цели
+- Новое: после использования определенного количества фрагментов слов в игре кратко вспыхнет подсказка по использованию этих букв.
+- Новое: в правом верхнем углу игрового поля есть значок динамика, чтобы начать воспроизведение фоновой музыки. Нажмите еще раз, чтобы остановить воспроизведение музыки.

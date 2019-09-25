@@ -243,6 +243,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
              let label0 = UILabel(frame: CGRect(x: 0, y: yPos0, width: width, height: lineHeight))
             label0.font = myFont!
             label0.text = text0
+            label0.textColor = .black
             yPos1 = lineHeight
             yPos2 = 2 * lineHeight
             view.addSubview(label0)
@@ -2230,16 +2231,48 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         tippIndexes = [:]
         let words = GV.playingRecord.words.components(separatedBy: "°")
         let pieces = GV.playingRecord.pieces.components(separatedBy: "°")
-        var wordIndex = 0
-        var searchWord = ""
-        for (pieceIndex, piece) in pieces.enumerated() {
+        var firstWord = ""
+        var tippsFromFirst = false
+        for piece in pieces {
             if piece != "" {
                 let items = piece.components(separatedBy: "/")
-                searchWord += items[2]
-                if searchWord == words[wordIndex] {
-                    tippIndexes[pieceIndex] = wordIndex
-                    searchWord = ""
-                    wordIndex += 1
+                firstWord += items[2]
+                if firstWord == words[0] {
+                    tippsFromFirst = true
+                    break
+                }
+                if firstWord.length >= words[0].length {
+                    break
+                }
+            }
+        }
+        let lengthOfFirstSixWords = (words[0] + words[1] + words[2] + words[3] + words[4] + words[5]).length
+        var lengthOfPieces = 0
+        var startPieceIndex = 0
+        var startWordIndex = 0
+        if !tippsFromFirst {
+            for piece in pieces {
+                let items = piece.components(separatedBy: "/")
+                lengthOfPieces += items[2].count
+                startPieceIndex += 1
+                if lengthOfPieces == lengthOfFirstSixWords {
+                    break
+                }
+            }
+            startWordIndex = 6
+        }
+        var wordIndex = startWordIndex
+        var searchWord = ""
+        for (pieceIndex, piece) in pieces.enumerated() {
+            if tippsFromFirst || pieceIndex >= startPieceIndex {
+                if piece != "" {
+                    let items = piece.components(separatedBy: "/")
+                    searchWord += items[2]
+                    if searchWord == words[wordIndex] {
+                        tippIndexes[pieceIndex] = wordIndex
+                        searchWord = ""
+                        wordIndex += 1
+                    }
                 }
             }
         }            
@@ -2969,7 +3002,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let actIndex: Int? = tippIndexes[indexOfTilesForGame]
         if actIndex != nil {
             let myWords = GV.playingRecord.words.components(separatedBy: "°")
-            print("word for tipp: \(myWords[actIndex! - 1]), indexOfTilesForGame: \(indexOfTilesForGame)")
+//            print("word for tipp: \(myWords[actIndex! - 1]), indexOfTilesForGame: \(indexOfTilesForGame)")
             if !showHelp {
                 showTipp(tipp: myWords[actIndex! - 1])
             }
@@ -4377,7 +4410,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         print(founded.count)
     }
-    
+
 
     deinit {
         print("\n THE SCENE \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")

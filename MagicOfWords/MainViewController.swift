@@ -16,7 +16,11 @@ import GameKit
 //import SCLAlertView
 
 
-class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate  {
+class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate,  ShowGameCenterViewControllerDelegate {
+    func backFromShowGameCenterViewController() {
+        showMenu()
+    }
+    
     func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
         gameCenterViewController.dismiss(animated: true, completion: nil)
         showMenu()
@@ -134,6 +138,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     #if DEBUG
     func displayGameCenterViewController() {
         let gameCenterViewController = ShowGameCenterViewController()
+        gameCenterViewController.myDelegate = self
+        gameCenterViewController.modalPresentationStyle = .overFullScreen
         self.present(gameCenterViewController, animated: true, completion: nil)
     }
     #endif
@@ -338,6 +344,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         #if DEBUG
             GV.debug = true
         #endif
+        GV.mainViewController = self
+        setDarkMode()
         GV.wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         showBackgroundPicture()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
@@ -519,6 +527,16 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     var showGlobalDataAction: UIAlertAction?
     var createMandatoryAction: UIAlertAction?
     #endif
+    
+    public func setDarkMode() {
+        GV.darkMode = false
+        if #available(iOS 12.0, *) {
+            GV.darkMode = traitCollection.userInterfaceStyle == .dark ? true : false
+        }
+    }
+    
+
+
     
     func showMenu() {
         if GV.playing {
@@ -951,11 +969,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 }
             }
         }
-        GV.darkMode = false
-        if #available(iOS 12.0, *) {
-            GV.darkMode = traitCollection.userInterfaceStyle == .dark ? true : false
-        }
-        
         if realm.objects(BasicDataModel.self).count == 0 {
 //            minden GC-her felküldött paramétert 10 jegyü timeintervallal kezdeni, hogy ne legyenek azonos értékek!
 //            ezt a sendGlobalInfos modul intézze, a leszedést is!
