@@ -90,7 +90,7 @@ Orosz
 - всегда можно начать новую игру
 - вы можете легко переключаться между играми и трудностями
 
-Build 20, Version 1.20 (0.98)
+Build 21, Version 1.21 (0.98)
 
 English:
 - Two game types: Collect-Words or Use-Fix-Letters Game. In the Collect-Words game you have to collect a certain number of (different) words, in the Use-Fix-Letters game you have to use a certain number of fixed letters.
