@@ -10,7 +10,7 @@ import UIKit
 import RealmSwift
 import GameplayKit
 
-#if DEBUG
+//#if DEBUG
 public protocol ShowGameCenterViewControllerDelegate: class {
     func backFromShowGameCenterViewController()
 }
@@ -430,4 +430,4 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     
     
 }
-#endif
+//#endif

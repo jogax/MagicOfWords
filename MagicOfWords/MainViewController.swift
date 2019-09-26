@@ -15,7 +15,6 @@ import Security
 import GameKit
 //import SCLAlertView
 
-
 class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate,  ShowGameCenterViewControllerDelegate {
     func backFromShowGameCenterViewController() {
         showMenu()
