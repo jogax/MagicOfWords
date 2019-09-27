@@ -13,6 +13,7 @@ import RealmSwift
 import Reachability
 import Security
 import GameKit
+import CloudKit
 //import SCLAlertView
 
 class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate,  ShowGameCenterViewControllerDelegate {
@@ -342,6 +343,21 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         super.viewDidLoad()
         #if DEBUG
             GV.debug = true
+//            let myContainer = CKContainer.default()
+//            let publicDatabase = myContainer.publicCloudDatabase
+//            print("hier")
+//            let newWordsRecordID = CKRecord.ID(recordName: "0")
+//            let newWordsRecord = CKRecord(recordType: "NewWords", recordID: newWordsRecordID)
+//            newWordsRecord["language"] = "hu"
+//            newWordsRecord["word"] = "tökély"
+//            publicDatabase.save(newWordsRecord) {
+//                (record, error) in
+//                if let error = error {
+//                    // Insert error handling
+//                    return
+//                }
+//                print("record inserted")
+//            }
         #endif
         GV.mainViewController = self
         setDarkMode()

@@ -1726,7 +1726,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let center = CGPoint(x:self.frame.width * lastButtonColumn, y:self.frame.height * musicOnOffLine)
         
-        let imageName = GV.basicDataRecord.musicOn ? "MusicOff" : "MusicOn"
+        let imageName = GV.basicDataRecord.musicOn ? "MusicOn" : "MusicOff"
         musicOnOffButton = createMyButton(imageName: imageName, size: buttonSize, center: center, enabled: enabled, newSize: buttonHeight)
         musicOnOffButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.switchMusicOnOff))
         musicOnOffButton!.name = imageName
@@ -3003,7 +3003,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if actIndex != nil {
             let myWords = GV.playingRecord.words.components(separatedBy: "°")
 //            print("word for tipp: \(myWords[actIndex! - 1]), indexOfTilesForGame: \(indexOfTilesForGame)")
-            if !showHelp {
+            if !showHelp && actIndex! > 0 {
                 showTipp(tipp: myWords[actIndex! - 1])
             }
         }
@@ -3068,13 +3068,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var firstTouchedCol = 0
     var firstTouchedRow = 0
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if showHelp && !GV.generateHelpInfo {
-            return
-        }
-        startShapeIndex = -1
-        let touchLocation = touches.first!.location(in: self)
-        if GV.countBlinkingNodes > 0 {
+    private func stopBlinkingNodesIfNeeded( ) {
+         if GV.countBlinkingNodes > 0 {
             for myNode in GV.blinkingNodes {
                 if myNode.hasActions() {
                     myNode.removeAllActions()
@@ -3087,6 +3082,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             GV.blinkingNodes.removeAll()
             GV.countBlinkingNodes = 0
         }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if showHelp && !GV.generateHelpInfo {
+            return
+        }
+        stopBlinkingNodesIfNeeded()
+        startShapeIndex = -1
+        let touchLocation = touches.first!.location(in: self)
         let touchedNodes = analyzeNodes(touchLocation: touchLocation)
         myTouchesBegan(location: touchLocation, touchedNodes: touchedNodes)
     }
@@ -3877,6 +3881,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if !self.enabled {
             return
         }
+        if GV.countBlinkingNodes > 0 {
+            stopBlinkingNodesIfNeeded()
+            return
+        }
+
         func movePieceToPosition(from: WTPiece, to: Int, remove: Bool = false) {
             if remove {
                 pieceArray[to].removeFromParent()
@@ -3888,7 +3897,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             pieceArray[to].setPieceFromPosition(index: to)
             origSize[to] = pieceArray[to].size
         }
-        
+
         if GV.generateHelpInfo {
             saveHelpInfo(action: .UndoButton)
         }

@@ -12,7 +12,7 @@ import UIKit
 import RealmSwift
 import GameKit
 
-let actVersion = "0.98" // Build 21
+let actVersion = "0.99" // Build 22, Version 1.12
 let exclamationMark = "!"
 public let roundSeparator = "/"
 let itemSeparator = "°"

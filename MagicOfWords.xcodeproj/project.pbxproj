@@ -136,6 +136,7 @@
 		208A7E38231AC7CB00B23B6D /* MusicOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 208A7E36231AC7CB00B23B6D /* MusicOff.png */; };
 		208B278F21FB382C007259B6 /* enRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B278E21FB382C007259B6 /* enRestWords.txt */; };
 		208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B279021FB8ED1007259B6 /* ruRestWords.txt */; };
+		208C0F91233D0EF600770B47 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 208C0F90233D0EF600770B47 /* CloudKit.framework */; };
 		2093C4B922B116EE00B16649 /* DarkGreenSprite1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2093C49122B116EB00B16649 /* DarkGreenSprite1.png */; };
 		2093C4BA22B116EE00B16649 /* DarkGoldSprite1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2093C49222B116EB00B16649 /* DarkGoldSprite1.png */; };
 		209739182295779A00360819 /* GoldSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 209739172295779900360819 /* GoldSprite.png */; };
@@ -294,6 +295,8 @@
 		208A7E36231AC7CB00B23B6D /* MusicOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MusicOff.png; sourceTree = "<group>"; };
 		208B278E21FB382C007259B6 /* enRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enRestWords.txt; sourceTree = "<group>"; };
 		208B279021FB8ED1007259B6 /* ruRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruRestWords.txt; sourceTree = "<group>"; };
+		208C0F8F233CD6FC00770B47 /* MagicOfWords.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MagicOfWords.entitlements; sourceTree = "<group>"; };
+		208C0F90233D0EF600770B47 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		2093C49122B116EB00B16649 /* DarkGreenSprite1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DarkGreenSprite1.png; sourceTree = "<group>"; };
 		2093C49222B116EB00B16649 /* DarkGoldSprite1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DarkGoldSprite1.png; sourceTree = "<group>"; };
 		209739172295779900360819 /* GoldSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GoldSprite.png; sourceTree = "<group>"; };
@@ -324,6 +327,7 @@
 				203D250D21F73D65009897BD /* Realm.framework in Frameworks */,
 				203D250B21F73D44009897BD /* RealmSwift.framework in Frameworks */,
 				20437F9A217B793100F16F99 /* Reachability.framework in Frameworks */,
+				208C0F91233D0EF600770B47 /* CloudKit.framework in Frameworks */,
 				2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */,
 				2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */,
 			);
@@ -352,6 +356,7 @@
 		201FB1B020288C2B00EC9F36 /* MagicOfWords */ = {
 			isa = PBXGroup;
 			children = (
+				208C0F8F233CD6FC00770B47 /* MagicOfWords.entitlements */,
 				20439FEE20BC40DB00D44286 /* Versions.txt */,
 				201FB1CF20288CEA00EC9F36 /* Extensions.swift */,
 				201FB1CA20288CE900EC9F36 /* MainViewController.swift */,
@@ -424,6 +429,7 @@
 		2057BA262029F57B000DF337 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				208C0F90233D0EF600770B47 /* CloudKit.framework */,
 				2080737B2242746600BE38E9 /* SCLAlertView.framework */,
 				203D250C21F73D65009897BD /* Realm.framework */,
 				203D250A21F73D44009897BD /* RealmSwift.framework */,
@@ -978,8 +984,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MagicOfWords/MagicOfWords.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = WT499VC842;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -996,7 +1003,7 @@
 				INFOPLIST_FILE = MagicOfWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.21;
+				MARKETING_VERSION = 1.22;
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG GENERATEWORDLISTX GENERATEMANDATORYX SHOWFINGERX CREATEMANDATORYX CREATEWORDLISTX";
@@ -1009,8 +1016,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MagicOfWords/MagicOfWords.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = WT499VC842;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1019,7 +1027,7 @@
 				INFOPLIST_FILE = MagicOfWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.21;
+				MARKETING_VERSION = 1.22;
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
