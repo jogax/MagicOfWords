@@ -484,7 +484,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     override func viewWillAppear(_ animated: Bool) {
         NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: reachability)
         do {
-            try reachability.startNotifier()
+            try reachability!.startNotifier()
         }catch{
             print("could not start reachability notifier")
         }
@@ -503,6 +503,8 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         case .cellular:
             GV.connectedToInternet = true
         case .none:
+            GV.connectedToInternet = false
+        case .unavailable:
             GV.connectedToInternet = false
         }
         if oldConnectedToInternet != GV.connectedToInternet {

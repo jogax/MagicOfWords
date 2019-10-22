@@ -771,19 +771,19 @@ class WTGameboard: SKShapeNode {
         return infoString
     }
     
-    public func checkFixLetters()->Bool {
-        var returnBool = true
+    public func checkFixLetters()->Int {
+        var returnValue = 0
         for col in 0..<countCols {
             for row in 0..<countCols {
                 let item = GV.gameArray[col][row]
                 if item.fixItem && item.status == .Used {
-                    returnBool = false
+                    returnValue += 1
                 }
             }
         }
-        return returnBool
+        return returnValue
     }
-
+    
     public func checkFreePlaceForPiece(piece: WTPiece, rotateIndex: Int)->Bool {
         let form = myForms[piece.myType]![rotateIndex]
         for col in 0..<countCols {

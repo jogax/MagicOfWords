@@ -37,7 +37,7 @@ let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,
     objectTypes: [WordListModel.self])
-let reachability = Reachability()!
+var reachability: Reachability?
 // Open the Realm with the configuration
 let realmWordList:Realm = try! Realm(configuration: wordListConfig)
 
@@ -127,19 +127,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Tell Realm to use this new configuration object for the default Realm
         Realm.Configuration.defaultConfiguration = config
 //        loginToRealmSync()
-        reachability.whenReachable = { reachability in
+        if reachability == nil {
+            try! reachability = Reachability()
+        }
+        reachability!.whenReachable = { reachability in
             if reachability.connection == .wifi {
                 print("Reachable via WiFi")
             } else {
                 print("Reachable via Cellular")
             }
         }
-        reachability.whenUnreachable = { _ in
+        reachability!.whenUnreachable = { _ in
             print("Not reachable")
         }
         
         do {
-            try reachability.startNotifier()
+            try reachability!.startNotifier()
         } catch {
             print("Unable to start notifier")
         }

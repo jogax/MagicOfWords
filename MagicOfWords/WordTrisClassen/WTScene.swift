@@ -1105,49 +1105,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
 
-//    func scrollOwnWords(up: Bool) {
-//        if up {
-//            showingOwnWordsIndex += countWordsInRow
-//            let countOwnWords = WTGameWordList.shared.getCountWords(mandatory: false)
-//            if showingOwnWordsIndex + countShowingOwnWords > countOwnWords {
-//                let countShowedRows = countShowingOwnWords / countWordsInRow
-//                let startRow = countOwnWords / countWordsInRow - countShowedRows + 1
-//                showingOwnWordsIndex =  startRow * countWordsInRow
-//            }
-//        } else {
-//            showingOwnWordsIndex -= countWordsInRow
-//            if showingOwnWordsIndex < 0 {
-//                showingOwnWordsIndex = 0
-//            }
-//        }
-//        showFoundedWords()
-//    }
     func showFoundedWords() {
-//        let myMandatoryWords = WTGameWordList.shared.getMandatoryWords()
-//        for actWord in myMandatoryWords {
-//            let label = bgSprite!.childNode(withName: actWord.word) as? SKLabelNode
-//            if label != nil {
-//                label!.text = actWord.word + " (\(actWord.counter)) "
-//            }
-//        }
-//        
-//        if let label = bgSprite!.childNode(withName: bonusHeaderName)! as? SKLabelNode {
-//            label.text = GV.language.getText(.tcBonusHeader, values: String(GV.bonusScore))
-//        }
-//
-        /*
-        if let label = bgSprite!.childNode(withName: mandatoryWordsHeaderName)! as? SKLabelNode {
-            label.text = GV.language.getText(.tcWordsToCollect, values: String(GV.mandatoryWords.count), String(WTGameWordList.shared.getCountMandatoryWords(founded: true)),
-                String(WTGameWordList.shared.getCountMandatoryWords(founded: false)),
-                String(GV.mandatoryScore))
-        }
-        if let label = bgSprite!.childNode(withName: ownWordsHeaderName)! as? SKLabelNode {
-            label.text = GV.language.getText(.tcOwnWords, values: String(WTGameWordList.shared.getCountOwnWords(founded: true)), String(WTGameWordList.shared.getCountOwnWords(founded: false)),
-                    String(GV.ownScore))
-        }
-        modifyHeader()
- */
-
     }
     
     func addOwnWordNew(word: String, usedLetters: [UsedLetter])->Bool {
@@ -2337,34 +2295,30 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    let convertValue: CGFloat = 1000
     
     private func createFixLetters() {
-        let lettersProRound = [8, 8, 10, 10, 12, 12, 12, 12, 14, 14, 14, 16, 16, 16, 18, 18, 20, 20]
         if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
             return
         }
         let isDemo = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber
+        if isDemo {
+            createFixLettersForDemo()
+        } else {
+            createFixLettersForNormal()
+        }
+    }
+
+    private func createFixLettersForDemo() {
         var fixLetters = [UsedLetter]()
-        let useLettersProRound = GV.playingRecord.created > Date(year: 2019, month: 9, day: 1)
+//        let useLettersProRound = GV.playingRecord.created > Date(year: 2019, month: 9, day: 1)
         let gameNumber = GV.playingRecord.gameNumber % 1000
-        var startValue = 0
-        startValue = isDemo ? 8 : 6 // Starts with startValue fixLetters
-        let adderValue = isDemo ? 4 : 2
+        let startValue = 8
+        let adderValue = 4
         let roundCount = GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count
         let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
-        let countLettersOnGameboard = wtGameboard!.getCountLetters()
-        let maxLetterCount = 50
-        let maxFixLetterCount = 32
-        var calculatedFixLetterCount = 0
-        if useLettersProRound && !isDemo {
-            calculatedFixLetterCount = lettersProRound[GV.playingRecord.rounds.count - 1]
-        } else {
-            calculatedFixLetterCount = startValue + roundCount * adderValue
-        }
-        var countOfLetters = calculatedFixLetterCount
-        if !isDemo {
-            let remainingFreePlaces = maxLetterCount - countLettersOnGameboard
-            countOfLetters = remainingFreePlaces > calculatedFixLetterCount ? calculatedFixLetterCount : remainingFreePlaces
-            countOfLetters = countOfLetters < maxFixLetterCount ? countOfLetters : maxFixLetterCount
-        }
+//        let countLettersOnGameboard = wtGameboard!.getCountLetters()
+//        let maxLetterCount = 100
+//        let maxFixLetterCount = 32
+        let calculatedFixLetterCount = startValue + roundCount * adderValue
+        let countOfLetters = calculatedFixLetterCount
         var remainigLength = countOfLetters
         var myLengths = [Int]()
         repeat {
@@ -2385,8 +2339,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for length in myLengths {
             let likeValue = String(repeating: "?", count: length)
             let words = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %@ and word LIKE %d", GV.actLanguage, likeValue)
-            myLetters += words[random.getRandomInt(0, max: words.count)].word
-//            print("createFixLetters: \(myLetters)")
+            if words.count > 0 {
+                myLetters += words[random.getRandomInt(0, max: words.count)].word
+            }
+        }
+        if myLetters.count == 0 {
+            let letters = GV.language.getText(.tcAlphabet)
+            let maxLength = letters.length - 1
+            for _ in 1...myLengths[0] {
+                myLetters += letters.subString(at: random.getRandomInt(0, max: maxLength), length: 1)
+            }
+            print (myLetters)
         }
         var inputWord = ""
         let items = myLetters.components(separatedBy: "ß")
@@ -2399,92 +2362,146 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             inputWord = myLetters.uppercased()
         }
         myLetters = inputWord
-
         var letterIndex = 0
-        if isDemo {
-            for _ in 1...(countOfLetters + 2) / 4 {
-                var col = 0
-                var row = 0
-                var positionExists = false
-                repeat {
-                    col = random.getRandomInt(0, max: 4)
-                    row = random.getRandomInt(0, max: 4)
-                    positionExists = false
-                    for usedLetter in fixLetters {
-                        if usedLetter.col == col && usedLetter.row == row {
-                            positionExists = true
-                        }
-                    }
-                    if GV.gameArray[col][row].status != .Empty ||
-                       GV.gameArray[9 - col][row].status != .Empty ||
-                       GV.gameArray[col][9 - row].status != .Empty ||
-                       GV.gameArray[9 - col][9 - row].status != .Empty
-                    {
+        for _ in 1...(countOfLetters + 2) / 4 {
+            var col = 0
+            var row = 0
+            var positionExists = false
+            repeat {
+                col = random.getRandomInt(0, max: 4)
+                row = random.getRandomInt(0, max: 4)
+                positionExists = false
+                for usedLetter in fixLetters {
+                    if usedLetter.col == col && usedLetter.row == row {
                         positionExists = true
                     }
-                } while positionExists
-                fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
-                fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
-                if showHelp || roundCount % 2 == 0 || countOfLetters - letterIndex > 4 {
-                    fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
-                    fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
                 }
-                letterIndex += 4
+                if GV.gameArray[col][row].status != .Empty ||
+                   GV.gameArray[9 - col][row].status != .Empty ||
+                   GV.gameArray[col][9 - row].status != .Empty ||
+                   GV.gameArray[9 - col][9 - row].status != .Empty
+                {
+                    positionExists = true
+                }
+            } while positionExists
+            fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
+            fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
+            if showHelp || roundCount % 2 == 0 || countOfLetters - letterIndex > 4 {
+                fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
+                fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
             }
+            letterIndex += 4
+        }
+        wtGameboard!.addFixLettersToGamearray(fixLetters: fixLetters)
+        saveActualState()
+    }
+    
+    private func createFixLettersForNormal() {
+        var fixLetters = [UsedLetter]()
+//        let lettersProRound = [8, 8, 10, 10, 12, 12, 12, 12, 14, 14, 14, 14, 16, 16, 16, 16, 18, 18, 18, 18, 20]
+//        let useLettersProRound = GV.playingRecord.created > Date(year: 2019, month: 9, day: 1)
+        let gameNumber = GV.playingRecord.gameNumber % 1000
+        let startValue = 6 // Starts with startValue fixLetters
+//        let adderValue = 2
+        let roundCount = GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count
+        let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
+//        let countLettersOnGameboard = wtGameboard!.getCountLetters()
+        let maxLetterCount = 50
+        let countActFixLetters = wtGameboard!.checkFixLetters()
+        let actFixCount = startValue + GV.playingRecord.rounds.count * 2 - countActFixLetters
+        let countOfLetters = actFixCount > maxLetterCount ? maxLetterCount : actFixCount
+        var remainigLength = countOfLetters
+        var myLengths = [Int]()
+        repeat {
+            let newLength = random.getRandomInt(5, max: 10)
+            myLengths.append(newLength)
+            remainigLength -= newLength
+        } while remainigLength > 0
+        var myLetters = ""
+        for length in myLengths {
+            let likeValue = String(repeating: "?", count: length)
+            let words = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %@ and word LIKE %d", GV.actLanguage, likeValue)
+            myLetters += words[random.getRandomInt(0, max: words.count)].word
+        }
+//        print (myLetters)
+        var inputWord = ""
+        let items = myLetters.components(separatedBy: "ß")
+        if items.count > 1 {
+            for item in items {
+                inputWord += item.uppercased() + "ß"
+            }
+            inputWord.removeLast()
         } else {
-            let Q1: Int8 = 1
-            let Q2: Int8 = 2
-            let Q3: Int8 = 4
-            let Q4: Int8 = 8
-            var OKPositions = [(col: Int, row: Int, quoters: Int8)]()
-            var countFreePlaces = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            inputWord = myLetters.uppercased()
+        }
+        myLetters = inputWord.subString(at:0, length: countOfLetters)
+
+        var letterIndex = 0
+        let Q1: Int8 = 1
+        let Q2: Int8 = 2
+        let Q3: Int8 = 4
+        let Q4: Int8 = 8
+        var OKPositions = [(col: Int, row: Int, quoters: Int8)]()
+        var countFreePlaces = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 //            Analyse gameArray for free places
-            for col in 0...4 {
-                for row in 0...4 {
-                    var quoters: Int8 = 0
-                    quoters |= GV.gameArray[col][row].status == .Empty ? Q1 : 0
-                    quoters |= GV.gameArray[9 - col][row].status == .Empty ? Q2 : 0
-                    quoters |= GV.gameArray[col][9 - row].status == .Empty ? Q3 : 0
-                    quoters |= GV.gameArray[9 - col][9 - row].status == .Empty ? Q4 : 0
-                    OKPositions.append((col, row, quoters))
+        for col in 0...4 {
+            for row in 0...4 {
+                var quoters: Int8 = 0
+                quoters |= GV.gameArray[col][row].status == .Empty ? Q1 : 0
+                quoters |= GV.gameArray[9 - col][row].status == .Empty ? Q2 : 0
+                quoters |= GV.gameArray[col][9 - row].status == .Empty ? Q3 : 0
+                quoters |= GV.gameArray[9 - col][9 - row].status == .Empty ? Q4 : 0
+                OKPositions.append((col, row, quoters))
+                if quoters > 0 {
                     countFreePlaces[Int(quoters)] += 1
                 }
             }
-            var OKPositionsSorted = OKPositions.sorted(by: {$0.quoters > $1.quoters})
-            repeat {
-                var counter = 0
-                var countFreePlacesIndex = 16
-                repeat {
-                    countFreePlacesIndex -= 1
-                    counter = countFreePlaces[countFreePlacesIndex] - 1
-                } while counter < 0 && countFreePlacesIndex > 0
-                if counter < 0 {
-                    break
-                }
-                let positionIndex = random.getRandomInt(0, max: counter)
-                let col = OKPositionsSorted[positionIndex].col
-                let row = OKPositionsSorted[positionIndex].row
-                let actQouterInfo = OKPositionsSorted[positionIndex].quoters
-                countFreePlaces[countFreePlacesIndex] -= 1
-                OKPositionsSorted.remove(at:positionIndex)
-                if actQouterInfo & Q1 != 0 {
-                    fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
-                    letterIndex += 1
-                }
-                if letterIndex < countOfLetters && actQouterInfo & Q2 != 0 {
-                    fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex)))
-                    letterIndex += 1
-                }
-                if letterIndex < countOfLetters && actQouterInfo & Q3 != 0 {
-                    fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at: letterIndex)))
-                    letterIndex += 1
-                }
-                if letterIndex < countOfLetters  && actQouterInfo & Q4 != 0 {
-                    fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex)))
-                    letterIndex += 1
-                }
-            } while letterIndex < countOfLetters
         }
+        var OKPositionsSorted = OKPositions.sorted(by: {$0.quoters > $1.quoters})
+        repeat {
+            var counter = 0
+            var countFreePlacesIndex = 16
+            repeat {
+                countFreePlacesIndex -= 1
+                counter = countFreePlaces[countFreePlacesIndex] - 1
+            } while counter < 0 && countFreePlacesIndex > 0
+            if counter < 0 {
+                var usedPositions = [(col:Int, row:Int)]()
+                repeat {
+                    let col = random.getRandomInt(0, max: 9)
+                    let row = random.getRandomInt(0, max: 9)
+                    let item = GV.gameArray[col][row]
+                    if usedPositions.firstIndex(where: {$0.col == col && $0.row == row}) == nil && item.status == .Used && !item.fixItem {
+                        fixLetters.append(UsedLetter(col:col, row: row, letter: GV.gameArray[col][row].letter))
+                        usedPositions.append((col: col, row:row))
+                        letterIndex += 1
+                    }
+                } while letterIndex < countOfLetters
+                break
+            }
+            let positionIndex = random.getRandomInt(0, max: counter)
+            let col = OKPositionsSorted[positionIndex].col
+            let row = OKPositionsSorted[positionIndex].row
+            let actQouterInfo = OKPositionsSorted[positionIndex].quoters
+            countFreePlaces[countFreePlacesIndex] -= 1
+            OKPositionsSorted.remove(at:positionIndex)
+            if actQouterInfo & Q1 != 0 {
+                fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
+                letterIndex += 1
+            }
+            if letterIndex < countOfLetters && actQouterInfo & Q2 != 0 {
+                fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex)))
+                letterIndex += 1
+            }
+            if letterIndex < countOfLetters && actQouterInfo & Q3 != 0 {
+                fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at: letterIndex)))
+                letterIndex += 1
+            }
+            if letterIndex < countOfLetters  && actQouterInfo & Q4 != 0 {
+                fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex)))
+                letterIndex += 1
+            }
+        } while letterIndex < countOfLetters
         wtGameboard!.addFixLettersToGamearray(fixLetters: fixLetters)
         saveActualState()
     }

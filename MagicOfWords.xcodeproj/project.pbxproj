@@ -264,6 +264,7 @@
 		208424D72236B7FD00D18A12 /* bubbleGoldElite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bubbleGoldElite.png; sourceTree = "<group>"; };
 		20842DE52031EA910078FFDA /* ruWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruWords.txt; sourceTree = "<group>"; };
 		20846B7522467C1300CD5060 /* bgImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bgImage.png; sourceTree = "<group>"; };
+		20846BB6233E5DF800678857 /* MagicOfWords.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = MagicOfWords.entitlements; sourceTree = "<group>"; };
 		2084C0D52209BF73002B8F2E /* compare2.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = compare2.txt; sourceTree = "<group>"; };
 		2084C0D72209BF8B002B8F2E /* deRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = deRestWords.txt; sourceTree = "<group>"; };
 		2084FA2C221C2523002D29D3 /* Delete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Delete.png; sourceTree = "<group>"; };
@@ -295,7 +296,6 @@
 		208A7E36231AC7CB00B23B6D /* MusicOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MusicOff.png; sourceTree = "<group>"; };
 		208B278E21FB382C007259B6 /* enRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = enRestWords.txt; sourceTree = "<group>"; };
 		208B279021FB8ED1007259B6 /* ruRestWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruRestWords.txt; sourceTree = "<group>"; };
-		208C0F8F233CD6FC00770B47 /* MagicOfWords.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MagicOfWords.entitlements; sourceTree = "<group>"; };
 		208C0F90233D0EF600770B47 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		2093C49122B116EB00B16649 /* DarkGreenSprite1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DarkGreenSprite1.png; sourceTree = "<group>"; };
 		2093C49222B116EB00B16649 /* DarkGoldSprite1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DarkGoldSprite1.png; sourceTree = "<group>"; };
@@ -356,7 +356,7 @@
 		201FB1B020288C2B00EC9F36 /* MagicOfWords */ = {
 			isa = PBXGroup;
 			children = (
-				208C0F8F233CD6FC00770B47 /* MagicOfWords.entitlements */,
+				20846BB6233E5DF800678857 /* MagicOfWords.entitlements */,
 				20439FEE20BC40DB00D44286 /* Versions.txt */,
 				201FB1CF20288CEA00EC9F36 /* Extensions.swift */,
 				201FB1CA20288CE900EC9F36 /* MainViewController.swift */,

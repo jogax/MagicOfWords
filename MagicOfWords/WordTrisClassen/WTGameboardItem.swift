@@ -118,7 +118,7 @@ class WTGameboardItem: SKSpriteNode {
         if letter != emptyLetter && toStatus == .Empty {
             print("hier at problem")
         }
-        if self.status == .Used || self.status == .WholeWord {
+        if (self.status == .Used && toStatus != .FixItem) || self.status == .WholeWord {
             self.origStatus = self.status
             setStatus(toStatus: .Error)
             self.origLetter = label.text!
