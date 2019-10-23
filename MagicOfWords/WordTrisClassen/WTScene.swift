@@ -3532,9 +3532,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        xxx goToPreviousGameButton
 
         startShapeIndex = -1
-        if checkFreePlace() {
-//            checkIfGameFinished()
-        }
+        checkFreePlace()
         return returnBool
     }
     @objc private func startNextRound() {
@@ -3745,6 +3743,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     @objc private func newGameButtonTapped() {
         gameboardEnabled = true
         enabled = true
+//        nextRoundTapped
         if gameFinishedStatus == .OK {
             saveHelpInfo(action: .FinishGame)
 //            try! realm.safeWrite() {
@@ -3818,27 +3817,44 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         hideButtons(hide: false)
     }
     
-    private func checkFreePlace()->Bool {
-        var placeFound = true
+    enum GameStatus: Int {
+        case Playing = 0, NextRondPossible, Finish
+    }
+    private func getGameStatus()->GameStatus {
         for piece in pieceArray {
             for rotateIndex in 0..<4 {
-                placeFound = wtGameboard!.checkFreePlaceForPiece(piece: piece, rotateIndex: rotateIndex)
-                if placeFound {break}
-            }
-            if placeFound {break}
-        }
-        if !placeFound {
-            let greenWordsCount = WTGameWordList.shared.getCountWordsInLastRound()
-            if greenWordsCount > 0 {
-                createNoMoreStepsAlert()
-                bgSprite!.addChild(noMoreStepsAlert!)
-                self.enabled = false
-                self.gameboardEnabled = false
-            } else {
-                showGameFinished(status: .NoMoreSteps)
+                if wtGameboard!.checkFreePlaceForPiece(piece: piece, rotateIndex: rotateIndex) {
+                    return .Playing
+                }
             }
         }
-        return placeFound
+        let greenWordsCount = WTGameWordList.shared.getCountWordsInLastRound()
+        if greenWordsCount > 0 {
+            return .NextRondPossible
+        } else {
+            return .Finish
+        }
+    }
+    
+    private func checkFreePlace() {
+        switch getGameStatus() {
+        case .Playing: return
+        case .NextRondPossible:
+            createNoMoreStepsAlert()
+            bgSprite!.addChild(noMoreStepsAlert!)
+            self.enabled = false
+            self.gameboardEnabled = false
+        case .Finish:
+            showGameFinished(status: .NoMoreSteps)
+        }
+//        if !placeFound {
+//            let greenWordsCount = WTGameWordList.shared.getCountWordsInLastRound()
+//            if greenWordsCount > 0 {
+//                xxx
+//            } else {
+//            }
+//        }
+////        return placeFound
     }
 
     var noMoreStepsAlert: MyAlertController?
