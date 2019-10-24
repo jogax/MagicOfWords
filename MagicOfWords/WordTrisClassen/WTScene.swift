@@ -1784,6 +1784,37 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         bgSprite!.addChild(finishButton!)
     }
     
+        private func modifyfinishButton() {
+            switch gameStatus {
+            case .Playing:
+                finishButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(finishButtonTapped))
+                finishButton!.setButtonLabel(title: GV.language.getText(.tcNewGame), font: myTitleFont!)
+            case .NextRondPossible:
+                finishButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(nextRoundTapped))
+                finishButton!.setButtonLabel(title: GV.language.getText(.tcNextRound), font: myTitleFont!)
+            case .Finish:
+                finishButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(finishButtonTapped))
+                finishButton!.setButtonLabel(title: GV.language.getText(.tcFinishGame), font: myTitleFont!)
+            }
+            
+//            let wordLength = title.width(font: myTitleFont!)
+//            let wordHeight = title.height(font: myTitleFont!)
+//            let size = CGSize(width:wordLength * 1.2, height: buttonHeight)
+//            let ownHeaderYPos = self.frame.height * mybuttonLineCenterY// - ownHeader.frame.maxY + frame.height
+//            let finishButtonCenter = CGPoint(x:self.frame.width * 0.2, y: ownHeaderYPos) //self.frame.height * 0.20)
+//            let radius = frame.height * 0.5
+//            finishButton = createMyButton(title: title, size: size, center: finishButtonCenter, enabled: true )
+//            finishButton!.isHidden = false //goOnPlaying ? false : true
+//            finishButton!.setButtonLabel(title: title, font: myTitleFont!)
+
+//            finishButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(finishButtonTapped))
+
+//            myButton!.addTarget(self, action: #selector(self.finishButtonTapped), for: .touchUpInside)
+//            finishButton?.layer.zPosition = -100
+//            finishButton = myButton
+//            finishButton!.zPosition = self.zPosition + 1
+//            bgSprite!.addChild(finishButton!)
+        }
     @objc private func finishButtonTapped() {
         if self.enabled {
             showGameFinished(status: .OK)
@@ -3820,32 +3851,40 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     enum GameStatus: Int {
         case Playing = 0, NextRondPossible, Finish
     }
-    private func getGameStatus()->GameStatus {
+    
+    var gameStatus: GameStatus = .Playing
+    
+    private func setGameStatus() {
         for piece in pieceArray {
             for rotateIndex in 0..<4 {
                 if wtGameboard!.checkFreePlaceForPiece(piece: piece, rotateIndex: rotateIndex) {
-                    return .Playing
+                    gameStatus = .Playing
+                    return
                 }
             }
         }
         let greenWordsCount = WTGameWordList.shared.getCountWordsInLastRound()
         if greenWordsCount > 0 {
-            return .NextRondPossible
+            gameStatus = .NextRondPossible
         } else {
-            return .Finish
+            gameStatus = .Finish
         }
     }
     
     private func checkFreePlace() {
-        switch getGameStatus() {
+        setGameStatus()
+        modifyfinishButton()
+        switch  gameStatus {
         case .Playing: return
         case .NextRondPossible:
-            createNoMoreStepsAlert()
-            bgSprite!.addChild(noMoreStepsAlert!)
-            self.enabled = false
-            self.gameboardEnabled = false
+            return
+//            createNoMoreStepsAlert()
+//            bgSprite!.addChild(noMoreStepsAlert!)
+//            self.enabled = false
+//            self.gameboardEnabled = false
         case .Finish:
-            showGameFinished(status: .NoMoreSteps)
+            return
+//            showGameFinished(status: .NoMoreSteps)
         }
 //        if !placeFound {
 //            let greenWordsCount = WTGameWordList.shared.getCountWordsInLastRound()
@@ -3854,7 +3893,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            } else {
 //            }
 //        }
-////        return placeFound
     }
 
     var noMoreStepsAlert: MyAlertController?
@@ -3863,8 +3901,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let myAlert = MyAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
                                         message: GV.language.getText(.tcChooseAction) , target: self, type: .Gold)
         myAlert.addAction(text: GV.language.getText(.tcBack), action:#selector(self.startUndoTapped))
-        myAlert.addAction(text: GV.language.getText(.tcNoMoreStepsAnswer2), action:#selector(self.nextRoundTapped))
-        myAlert.addAction(text: GV.language.getText(.tcNoMoreStepsAnswer3), action:#selector(self.noActionTapped))
+        myAlert.addAction(text: GV.language.getText(.tcNextRound), action:#selector(self.nextRoundTapped))
+//        myAlert.addAction(text: GV.language.getText(.tcNoMoreStepsAnswer3), action:#selector(self.noActionTapped))
         myAlert.presentAlert()
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         noMoreStepsAlert = myAlert
@@ -3882,6 +3920,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         stopShowingTableIfNeeded()
         startNextRound()
         modifyHeader()
+        gameStatus = .Playing
+        modifyfinishButton()
     }
     
     @objc private func startUndoTapped() {
