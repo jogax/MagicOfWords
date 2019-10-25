@@ -622,14 +622,32 @@ extension UIColor {
     static public func greenAppleColor()->UIColor {
         return UIColor(red: 0x52/0xff, green: 0xD0/0xff, blue: 0x17/0xff, alpha: 1.0)
     }
-    var rgba:(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        
-        return (red, green, blue, alpha)
+//    var rgba:(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+//        var red: CGFloat = 0
+//        var green: CGFloat = 0
+//        var blue: CGFloat = 0
+//        var alpha: CGFloat = 0
+//        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+//
+//        return (red, green, blue, alpha)
+//    }
+//
+    convenience init(red: Int, green: Int, blue: Int, a: CGFloat = 1.0) {
+        self.init(
+            red: CGFloat(red) / 255.0,
+            green: CGFloat(green) / 255.0,
+            blue: CGFloat(blue) / 255.0,
+            alpha: a
+        )
+    }
+
+    convenience init(rgb: Int, alpha: CGFloat = 1.0) {
+        self.init(
+            red: (rgb >> 16) & 0xFF,
+            green: (rgb >> 8) & 0xFF,
+            blue: rgb & 0xFF,
+            a: alpha
+        )
     }
 }
 
