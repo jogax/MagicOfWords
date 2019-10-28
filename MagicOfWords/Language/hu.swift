@@ -129,7 +129,7 @@ let huDictionary: [TextConstants: String] = [
     .tcGameLine:           "Bejelentő: %, Játék: %",
     .tcWelcomeText1:        "Üdvözöllek a szavak/csodálatos világában!",
     .tcWelcomeText2:        "Érezd jól magad!",
-    .tcWelcomeText3:        "És most lássuk,/hogyan kell játszani/egy Szógyűjtő vagy Fix-Betű/játékot",
+    .tcWelcomeText3:        "És most lássuk,/hogyan kell játszani egy//Szógyűjtő//vagy//Fix-Betű//játékot",
     .tcLater:               "Később",
     .tcShowEasyGame:        "Szógyűjtő",
     .tcShowMediumGame:      "Fix-Betű",

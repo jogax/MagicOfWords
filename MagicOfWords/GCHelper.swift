@@ -408,13 +408,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             infoArray.append(GCInfo(identifier: playingTimeName, value: Int64(GV.basicDataRecord.playingTime)))
             infoArray.append(GCInfo(identifier: playingTimeTodayName, value: Int64(GV.basicDataRecord.playingTimeToday)))
-            if !GV.basicDataRecord.deviceInfoSaved {
-                infoArray.append(GCInfo(identifier: myLandName, value: Int64(GV.basicDataRecord.land)))
-                infoArray.append(GCInfo(identifier: myDeviceName, value: Int64(GV.basicDataRecord.deviceType)))
-                try! realm.safeWrite() {
-                    GV.basicDataRecord.deviceInfoSaved = true
-                }
-            }
+            infoArray.append(GCInfo(identifier: myLandName, value: Int64(GV.basicDataRecord.land)))
+            infoArray.append(GCInfo(identifier: myDeviceName, value: Int64(GV.basicDataRecord.deviceType)))
+//            try! realm.safeWrite() {
+//                GV.basicDataRecord.deviceInfoSaved = true
+//            }
             if GV.basicDataRecord.version != Int(Double(actVersion)! * 100.0) {
                 try! realm.safeWrite() {
                     GV.basicDataRecord.version = Int(Double(actVersion)! * 100.0)

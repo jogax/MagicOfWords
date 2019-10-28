@@ -129,7 +129,7 @@ let enDictionary: [TextConstants: String] = [
     .tcGameLine:           "Notifier: %, GameNumber: %",
     .tcWelcomeText1:        "Welcome to the wonderful/world of Words!",
     .tcWelcomeText2:        "Have a nice time!",
-    .tcWelcomeText3:        "And now let's see/how to play/an Collect-Words or Use-Fixed-Letters game",
+    .tcWelcomeText3:        "And now let's see/how to play a/Collect-Words/or/Use-Fixed-Letters/game",
     .tcLater:               "Later",
     .tcShowEasyGame:        "Collect-Words",
     .tcShowMediumGame:      "Use-Fixed-Letters",

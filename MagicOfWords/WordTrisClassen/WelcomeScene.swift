@@ -58,7 +58,7 @@ class WelcomeScene: SKScene {
         myButton1.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(EasyButtonTapped))
         myButton1.zPosition = self.zPosition + 1
         self.addChild(myButton1)
-        let buttonCenter2 = CGPoint(x:self.frame.maxX * 0.55, y: self.frame.height * 0.05)
+        let buttonCenter2 = CGPoint(x:self.frame.maxX * 0.55, y: self.frame.height * (GV.onIpad ? 0.05 : 0.10))
         let text2 = GV.language.getText(.tcShowMediumGame)
         size.width = text2.width(font: myTitleFont!) * 1.4
         let myButton2 = createMyButton(title: text2, size: size, center: buttonCenter2, enabled: true)
@@ -80,10 +80,10 @@ class WelcomeScene: SKScene {
         let text2 = GV.language.getText(.tcWelcomeText2)
         let text3 = GV.language.getText(.tcWelcomeText3)
         animate(text: text1, wait: 0)
-        var wait = text2.filter { $0 == "/" }.count + 1
+        let wait = text1.filter { $0 == "/" }.count + 1
         animate(text: text2, wait: CGFloat(wait))
-        wait = text3.filter { $0 == "/" }.count + 1
-        animate(text: text3, wait: CGFloat(wait))
+        let wait1 = wait + text2.filter { $0 == "/" }.count + 1
+        animate(text: text3, wait: CGFloat(wait1))
     }
     
     var countLetters = 0

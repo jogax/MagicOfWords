@@ -110,7 +110,7 @@ var wtGameboard: WTGameboard?
 class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableViewDelegate {
     func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord = SelectedWord()) {
         var longWaitAction = SKAction.wait(forDuration: 0.0)
-        let duration = 0.4
+        let duration = 0.3
         for letter in newWord.usedLetters {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showRedAction = SKAction.run({
@@ -426,13 +426,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        balloon.addChild(scoreLabel)
         balloon.addChild(wordLabel)
         var actions = Array<SKAction>()
-        let waitAction = SKAction.wait(forDuration: 0.5)
+        let waitAction = SKAction.wait(forDuration: 0.1)
 //        let movingAction = SKAction.move(to: CGPoint(x: self.frame.size.width * 0.5, y: endPosY), duration: 5.0)
-        let scaleUpAction = SKAction.scale(by: 2.0, duration: 0.5)
+        let scaleUpAction = SKAction.scale(by: 1.5, duration: 0.5)
         let scaleDownAction = SKAction.scale(to: 1.0, duration: 0.5)
         let fadeAway = SKAction.fadeOut(withDuration: 0.2)
         let removeNode = SKAction.removeFromParent()
-        actions.append(SKAction.sequence([waitAction, scaleUpAction, scaleDownAction, scaleUpAction, scaleDownAction, scaleUpAction, scaleDownAction, fadeAway, removeNode/*movingAction*/]))
+        actions.append(SKAction.sequence([waitAction, scaleUpAction, scaleDownAction,
+                                          scaleUpAction, scaleDownAction, scaleUpAction, scaleDownAction,
+                                          fadeAway, removeNode/*movingAction*/]))
 //        actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))
         let group = SKAction.group(actions);
         balloon.run(group)
@@ -1177,7 +1179,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var searchingWord = ""
     var wtGameboardMovedBy: CGFloat = 0
     
-    @objc func wordListTapped() {
+    @objc func searchButtonTappod() {
         if !self.enabled {
             return
         }
@@ -1302,12 +1304,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         goToPreviousGameButton!.isHidden = hide
         goToNextGameButton!.isHidden = hide
         searchButton!.isHidden = hide
+        finishButton!.isHidden = hide
+        if startEasyGameButton != nil {
+            startEasyGameButton!.isHidden = hide
+        }
+        if startMediumGameButton != nil {
+            startMediumGameButton!.isHidden = hide
+        }
+        musicOnOffButton!.isHidden = hide
         allWordsButton!.isHidden = hide
         goBackButton!.isHidden = hide
         searchButton!.isHidden = hide
-//        if undoButton != nil {
-//            undoButton!.isHidden = hide
-//        }
+        if undoButton != nil {
+            undoButton!.isHidden = hide
+        }
    }
     
     private func addLetterToSearchingWord(letter: String) {
@@ -1787,10 +1797,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func modifyfinishButton() {
         switch gameStatus {
         case .Playing:
+            finishButton!.removeAllActions()
             let colorBackAction = SKAction.colorize(with: .clear, colorBlendFactor: 0, duration: 0)
             finishButton!.run(colorBackAction)
             colorIndex = 0
-            finishButton!.removeAllActions()
             finishButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(finishButtonTapped))
             finishButton!.setButtonLabel(title: GV.language.getText(.tcNewGame), font: myTitleFont!)
         case .NextRondPossible:
@@ -1854,11 +1864,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let image = UIImage(named: "search")
         let newSize = allWordsButton!.size.height
         let myButton = createMyButton(imageName: "search", size: size, center: center, enabled: true, newSize: newSize)
-        myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(wordListTapped))
+        myButton.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(searchButtonTappod))
         //        allWordsButton?.addTarget(self, action: #selector(self.showAllWordsInTableView), for: .touchUpInside)
         myButton.zPosition = self.zPosition + 1
         searchButton = myButton
-//        searchButton!.addTarget(self, action: #selector(self.wordListTapped), for: .touchUpInside)
+//        searchButton!.addTarget(self, action: #selector(self.searchButtonTappod), for: .touchUpInside)
         bgSprite!.addChild(searchButton!)
     }
     
@@ -3866,7 +3876,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }        
         modifyDifficultyLabels(number: calculatePlace())
-        hideButtons(hide: false)
+//        hideButtons(hide: false)
     }
     
     enum GameStatus: Int {
