@@ -132,31 +132,45 @@ Magyar:
 Orosz:
 - Исправление ошибок
 
-Build 23, Version 1.23 (0.991)
+Build 24, Version 1.24 (0.991)
 
 Angol:
-- If there is no space left on the game board to get letters from bottom, then
+If there is no space left on the game board to get letters from bottom, then
      - if there is already at least one selected word on the game board then only the "new game" button changes to "new round",
        the player can continue to select words. Pressing the "New round" button starts a new round.
      - if no word has been selected yet, the "new game" button changes to "Finish" and by pressing the game will be finished.
      In both cases, the changed button vibrates in different colors.
 Német:
-- Wenn auf dem Spielfeld kein Platz mehr für den Empfang von Buchstaben von unten, dann
+Wenn auf dem Spielfeld kein Platz mehr für den Empfang von Buchstaben von unten, dann
     - Wenn sich bereits mindestens ein ausgewähltes Wort auf dem Spielfeld befindet, ändert sich nur die Schaltfläche "Neues Spiel"
       in "Neue Runde". Der Spieler kann weiterhin Wörter auswählen. Beim Klick auf die Schaltfläche Neue Runde beginnt eine neue Runde.
     - Wenn noch kein Wort ausgewählt wurde, ändert sich die Schaltfläche "Neues Spiel" in "Beenden", und wenn die Schaltfläche gedrückt wird, wird das Spiel beendet.
     In beiden Fällen vibriert die geänderte Taste in verschiedenen Farben.
 
 Magyar:
-- Ha játékmezőn már nincs hely betűk felhúzására, akkor
+Ha játékmezőn már nincs hely betűk felhúzására, akkor
     - ha van már kijelölt szó a játékmezőn akkor csak az "új játék" nyomógomb változik "új kör"-re, a játékos továbbra is
       jelölhet ki szavakat. Megnyomásakor új kör kezdődik.
     - ha még nincs kijelölt szó, akkor az "új játék" nyomógomb "Befejezés"-re változik, megnyomásakor a játék befejeződik.
     A megváltozott nyomógomb mindkét esetben különböző színekben vibrál.
 
 Orosz:
-- Если на игровом поле не осталось места для получения букв снизу, то
+Если на игровом поле не осталось места для получения букв снизу, то
     - если на игровом поле уже есть хотя бы одно выбранное слово, то только кнопка «новая игра» изменится на «новый круг»,
       игрок может продолжать выбирать слова. При нажатии кнопки «Новый круг» начинается новый круг.
     - если ни одно слово еще не выбрано, кнопка «новая игра» изменится на «Закончить», и при нажатии кнопки игра будет завершена.
-    В обоих случаях измененная кнопка вибрирует разными цветами.
+В обоих случаях измененная кнопка вибрирует разными цветами.
+
+Build 25, Version 1.25 (1.0)
+Angol:
+- Bugfixing
+- If the player completes the task, the game will not be completed automatically, the player gets the opportunity to continue the game.
+Német:
+- Fehlerbehebung
+- Wenn der Spieler die Aufgabe erledigt, wird das Spiel nicht automatisch beendet, sondern er kann das Spiel fortsetzen.
+Magyar:
+- Kisebb hibák javítása
+- Ha a játékos teljesítette a feladatot, akkor a játék nem fejeződik be automatikusan, hanem lehetősége nyílik a játék folytatására.
+Orosz:
+- Исправление ошибок
+- Если игрок выполнит задание, игра не будет завершена автоматически, игрок получает возможность продолжить игру.

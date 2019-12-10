@@ -12,7 +12,8 @@ import UIKit
 import RealmSwift
 import GameKit
 
-let actVersion = "0.991" // Build 23, Version 1.23
+//let actVersion = "0.991" // Build 23, Version 1.23
+let actVersion = "1.0" // Build 25, Version 1.25
 let exclamationMark = "!"
 public let roundSeparator = "/"
 let itemSeparator = "°"
@@ -141,6 +142,7 @@ struct GV {
     static var origDifficulty = 0
     static let SimpleGame = 0
     static let HardGame = 1
+    static var actLetter = ""
     static let DemoEasyGameNumber = 10000
     static let DemoMediumGameNumber = 11000
     static var countOfWordsMaxValue = 1000

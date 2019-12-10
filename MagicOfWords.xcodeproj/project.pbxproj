@@ -31,9 +31,6 @@
 		2038F26722317AFE0028372D /* BalloonElite.png in Resources */ = {isa = PBXBuildFile; fileRef = 2038F26622317AFE0028372D /* BalloonElite.png */; };
 		20395F5D21A2FE4E00947D7F /* retype.png in Resources */ = {isa = PBXBuildFile; fileRef = 20395F5C21A2FE4E00947D7F /* retype.png */; };
 		20395F5F21A31D4300947D7F /* search.png in Resources */ = {isa = PBXBuildFile; fileRef = 20395F5E21A31D4300947D7F /* search.png */; };
-		203D250B21F73D44009897BD /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250A21F73D44009897BD /* RealmSwift.framework */; };
-		203D250D21F73D65009897BD /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250C21F73D65009897BD /* Realm.framework */; };
-		20437F9A217B793100F16F99 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20437F99217B793100F16F99 /* Reachability.framework */; };
 		20439FEF20BC40DB00D44286 /* Versions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20439FEE20BC40DB00D44286 /* Versions.txt */; };
 		20469BD021A43F4E00743EB1 /* sortdown.png in Resources */ = {isa = PBXBuildFile; fileRef = 20469BCE21A43F4E00743EB1 /* sortdown.png */; };
 		20469BD121A43F4E00743EB1 /* sortup.png in Resources */ = {isa = PBXBuildFile; fileRef = 20469BCF21A43F4E00743EB1 /* sortup.png */; };
@@ -69,7 +66,6 @@
 		205627ED214AA716006B9357 /* BestScoreSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205627EC214AA716006B9357 /* BestScoreSync.swift */; };
 		205627EF214AA9E9006B9357 /* PlayerActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205627EE214AA9E9006B9357 /* PlayerActivity.swift */; };
 		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
-		2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		205850F42170D2C900D89B9A /* RealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205850F32170D2C900D89B9A /* RealmManager.swift */; };
 		205BF79A21E4D952006633C6 /* huMandatory.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205BF79921E4D952006633C6 /* huMandatory.txt */; };
 		205CF7EB2129A21000C1B89D /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EA2129A21000C1B89D /* finger.png */; };
@@ -136,7 +132,6 @@
 		208A7E38231AC7CB00B23B6D /* MusicOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 208A7E36231AC7CB00B23B6D /* MusicOff.png */; };
 		208B278F21FB382C007259B6 /* enRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B278E21FB382C007259B6 /* enRestWords.txt */; };
 		208B279121FB8ED1007259B6 /* ruRestWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 208B279021FB8ED1007259B6 /* ruRestWords.txt */; };
-		208C0F91233D0EF600770B47 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 208C0F90233D0EF600770B47 /* CloudKit.framework */; };
 		2093C4B922B116EE00B16649 /* DarkGreenSprite1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2093C49122B116EB00B16649 /* DarkGreenSprite1.png */; };
 		2093C4BA22B116EE00B16649 /* DarkGoldSprite1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2093C49222B116EB00B16649 /* DarkGoldSprite1.png */; };
 		209739182295779A00360819 /* GoldSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 209739172295779900360819 /* GoldSprite.png */; };
@@ -144,6 +139,13 @@
 		209739202295BE3C00360819 /* whiteSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 2097391F2295BE3B00360819 /* whiteSprite.png */; };
 		2098BB8E20601B0B00C3641B /* magier.png in Resources */ = {isa = PBXBuildFile; fileRef = 2098BB8D20601B0B00C3641B /* magier.png */; };
 		209F69CB22DDF8E90013F67D /* PlayerScore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209F69CA22DDF8E90013F67D /* PlayerScore.swift */; };
+		20A0415D236DBC59009C3C9F /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 208C0F90233D0EF600770B47 /* CloudKit.framework */; };
+		20A04160236DBC5C009C3C9F /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
+		20A04162236DBC5F009C3C9F /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20437F99217B793100F16F99 /* Reachability.framework */; };
+		20A04168236DBD89009C3C9F /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250A21F73D44009897BD /* RealmSwift.framework */; };
+		20A04169236DBD89009C3C9F /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250A21F73D44009897BD /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		20A0416B236DBD9F009C3C9F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250C21F73D65009897BD /* Realm.framework */; };
+		20A0416C236DBD9F009C3C9F /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250C21F73D65009897BD /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A604B22035D93A00DC48F0 /* MyRandom.swift */; };
 		20A6913D203088FF00AB47C0 /* enWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20A6913C203088FF00AB47C0 /* enWords.txt */; };
 		20A6914020309B9F00AB47C0 /* WTPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6913F20309B9F00AB47C0 /* WTPiece.swift */; };
@@ -158,6 +160,21 @@
 		20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		20A0416A236DBD89009C3C9F /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				20A0416C236DBD9F009C3C9F /* Realm.framework in Embed Frameworks */,
+				20A04169236DBD89009C3C9F /* RealmSwift.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		20009AF82260C47900D34ACD /* HelpInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpInfo.swift; sourceTree = "<group>"; };
@@ -324,12 +341,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				203D250D21F73D65009897BD /* Realm.framework in Frameworks */,
-				203D250B21F73D44009897BD /* RealmSwift.framework in Frameworks */,
-				20437F9A217B793100F16F99 /* Reachability.framework in Frameworks */,
-				208C0F91233D0EF600770B47 /* CloudKit.framework in Frameworks */,
+				20A0416B236DBD9F009C3C9F /* Realm.framework in Frameworks */,
+				20A04162236DBC5F009C3C9F /* Reachability.framework in Frameworks */,
+				20A04168236DBD89009C3C9F /* RealmSwift.framework in Frameworks */,
+				20A04160236DBC5C009C3C9F /* GameKit.framework in Frameworks */,
+				20A0415D236DBC59009C3C9F /* CloudKit.framework in Frameworks */,
 				2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */,
-				2057BA2A2029F591000DF337 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -606,6 +623,7 @@
 				201FB1AB20288C2B00EC9F36 /* Frameworks */,
 				201FB1AC20288C2B00EC9F36 /* Resources */,
 				20F1760A21626C6000AF37D7 /* ShellScript */,
+				20A0416A236DBD89009C3C9F /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -994,11 +1012,7 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"GENERATEWORDLIST=1",
-					"GENERATEMANDATORY=1",
 					"SHOWFINGER=1",
-					"CREATEMANDATORY=1",
-					"CREATEWORDLIST=1",
 				);
 				INFOPLIST_FILE = MagicOfWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -1006,7 +1020,7 @@
 				MARKETING_VERSION = 1.24;
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG GENERATEWORDLISTX GENERATEMANDATORYX SHOWFINGERX CREATEMANDATORYX CREATEWORDLISTX";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUGX SHOWFINGER";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

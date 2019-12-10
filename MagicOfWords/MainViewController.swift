@@ -55,6 +55,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     var tenMinutesTimer: Timer?
+    var inMenu = false
 
     func localPlayerAuthenticated() {
         if GV.basicDataRecord.GameCenterEnabled != GCEnabledType.GameCenterEnabled.rawValue {
@@ -72,7 +73,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         if GV.wtScene == nil {
             showMenu()
         } else {
-            startGame()
+            if !inMenu {
+                startGame()
+            }
         }
     }
     
@@ -108,11 +111,11 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
             animationScene = nil
         }
         showBackgroundPicture()
-        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue && GV.connectedToInternet {
-            manageGameCenter()
-        } else {
+//        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue && GV.connectedToInternet {
+//            manageGameCenter()
+//        } else {
             self.showMenu()
-        }
+//        }
     }
     
     func showHowToPlay(difficulty: Int) {
@@ -342,7 +345,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
         #if DEBUG
-            GV.debug = true
+//            GV.debug = true
 //            let myContainer = CKContainer.default()
 //            let publicDatabase = myContainer.publicCloudDatabase
 //            print("hier")
@@ -354,6 +357,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //                (record, error) in
 //                if let error = error {
 //                    // Insert error handling
+//                    print("Error by save: \(error)")
 //                    return
 //                }
 //                print("record inserted")
@@ -433,9 +437,9 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
     }
     
     @objc private func startDemoOrMenu() {
-        if !GV.basicDataRecord.startAnimationShown {
-            startWelcomeScene()
-        } else {
+//        if !GV.basicDataRecord.startAnimationShown {
+//            startWelcomeScene()
+//        } else {
             if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue && GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated && GV.connectedToInternet {
                     GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
                 _ = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(startPlaying(timerX: )), userInfo: nil, repeats: false)
@@ -447,7 +451,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 //            } else {
 //                showMenu()
 //            }
-        }
+//        }
     }
     
     @objc func startPlaying(timerX: Timer) {
@@ -559,8 +563,6 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         if GV.playing {
             return
         }
-//        getRecordCounts()
-//        let gameDifficulty = GameDifficulty(rawValue: GV.basicDataRecord.difficulty)
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
                                             message: "", //GV.language.getText(.tcActDifficulty, values: gameDifficulty!.description()),
                                             preferredStyle: .alert)
@@ -568,12 +570,14 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         //--------------------- StartGameAction ---------------------
         let startGameAction = UIAlertAction(title: "\(GV.language.getText(.tcStartGame)) ", style: .default, handler: { [unowned self]
             alert -> Void in
+            self.inMenu = false
                 self.startGame()
         })
         alertController!.addAction(startGameAction)
         //--------------------- bestScoreAction ---------------------
         let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
             alert -> Void in
+            self.inMenu = false
             self.showGames(all: true)
         })
         if GV.connectedToInternet && GKLocalPlayer.local.isAuthenticated /* && GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue*/ {
@@ -582,6 +586,7 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         //--------------------- chooseLanguageAction ---------------------
         let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
             alert -> Void in
+            self.inMenu = false
             self.chooseLanguage()
         })
         alertController!.addAction(chooseLanguageAction)
@@ -589,11 +594,25 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
         let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
             alert -> Void in
             //            self.showHowToPlay()
+            self.inMenu = false
             self.startWelcomeScene()
         })
+        inMenu = true
         alertController!.addAction(showHelpAction)
 
-        //--------------------- GameCenter on ---------------------
+// --------------------- Show GameCenter Question ---------------------
+        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterSupressed.rawValue {
+            let askForGameCenterAction = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default, handler: { [unowned self]
+                alert -> Void in
+                    if GCHelper.shared.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
+                        GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+                    }
+                self.inMenu = false
+                self.showMenu()
+            })
+            inMenu = true
+            alertController!.addAction(askForGameCenterAction)
+        }
 //        var GCTitle = ""
 //        var chooseGCAction: UIAlertAction
 //        if GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated {

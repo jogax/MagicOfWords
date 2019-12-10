@@ -676,6 +676,7 @@ class WTGameboard: SKShapeNode {
                 showingWords = true
                 if choosedWord.usedLetters[0].letter != emptyLetter {
                     if choosedWord.usedLetters[0].col == col && choosedWord.usedLetters[0].row == row {
+                        GV.actLetter = choosedWord.usedLetters[0].letter
                         WTGameWordList.shared.showWordsContainingThisLetter(choosedWord: choosedWord)
                     }
                 }

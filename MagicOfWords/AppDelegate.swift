@@ -9,6 +9,7 @@
 import UIKit
 import RealmSwift
 import Reachability
+import AVFoundation
 
 // for Standard Using
 //#if !GENERATEWORDLIST && !GENERATEMANDATORY
@@ -146,6 +147,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Unable to start notifier")
         }
+        
+//        let session = AVAudioSession.sharedInstance()
+//        do {
+//            try session.setCategory(AVAudioSession.Category.playback)
+//        }
+//        catch {
+//            print("hier in setBackground")
+//        }
+//
 //        realmSync = RealmService
 
         return true

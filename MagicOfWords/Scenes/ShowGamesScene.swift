@@ -23,7 +23,11 @@ class ShowGamesScene: SKScene, WTTableViewDelegate {
 
     override func didMove(to view: SKView) {        
         try! realm.safeWrite() {
-            GV.basicDataRecord.showingScoreType = ScoreType.Easy.rawValue
+            if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
+                GV.basicDataRecord.showingScoreType = ScoreType.Easy.rawValue
+            } else {
+                GV.basicDataRecord.showingScoreType = ScoreType.Medium.rawValue
+            }
             GV.basicDataRecord.showingTimeScope = TimeScope.All.rawValue
         }
         

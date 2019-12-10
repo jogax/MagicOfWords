@@ -227,7 +227,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 width = text.width(font: myFont!)
             }
         case .ShowWordsOverPosition:
-            text = GV.language.getText(.tcWordsOverLetter).fixLength(length: title.length, center: true)
+            text = GV.language.getText(.tcWordsOverLetter, values: GV.actLetter).fixLength(length: title.length, center: true)
         case .ShowFoundedWords:
             let header0 = GV.language.getText(.tcSearchingWord, values: searchingWord)
             let header1 = GV.language.getText(.tcShowWordlistHeader, values: String(listOfFoundedWords.count))
@@ -901,7 +901,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 realm.add(GV.playingRecord)
             }
         }
-        hideButtons(hide: false)
+//        hideButtons(hide: false)
     }
 
 
@@ -1073,12 +1073,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var createNextRound = false
     
     override func update(_ currentTime: TimeInterval) {
-//        if !syncedRecordsOK && realmSync != nil {
-//            if !waitingForSynceRecords {
-//                getSyncedRecords()
-//                waitingForSynceRecords = true
-//            }
-//        }
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
@@ -1604,8 +1598,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var buttonSize = CGSize(width: CGFloat(0), height: CGFloat(0))
     
     func hideButtons(hide: Bool) {
-        goToPreviousGameButton!.isEnabled = hide ? false : hasRecords(before: true)
-        goToNextGameButton!.isEnabled = hide ? false : hasRecords(before: false)
+        if goToPreviousGameButton != nil {
+            goToPreviousGameButton!.isEnabled = hide ? false : hasRecords(before: true)
+        }
+        if goToNextGameButton != nil {
+            goToNextGameButton!.isEnabled = hide ? false : hasRecords(before: false)
+        }
 //        tippButton!.isEnabled = !hide
         allWordsButton!.isEnabled = !hide
         finishButton!.isEnabled = !hide
@@ -1939,7 +1937,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 // Fallback on earlier versions
             }
             try AVAudioSession.sharedInstance().setActive(true)
-            
+            do {
+               try AVAudioSession.sharedInstance().setCategory(.ambient)
+               try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+            } catch {
+               NSLog(error.localizedDescription)
+            }
             /* The following line is required for the player to work on iOS 11. Change the file type accordingly*/
             player = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
             
@@ -2460,14 +2463,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let lettersProRound = [8, 8, 10, 10, 12, 12, 12, 12, 14, 14, 14, 14, 16, 16, 16, 16, 18, 18, 18, 18, 20]
 //        let useLettersProRound = GV.playingRecord.created > Date(year: 2019, month: 9, day: 1)
         let gameNumber = GV.playingRecord.gameNumber % 1000
-        let startValue = 6 // Starts with startValue fixLetters
+        let startValue = 7 // Starts with startValue fixLetters
 //        let adderValue = 2
         let roundCount = GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count
         let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
 //        let countLettersOnGameboard = wtGameboard!.getCountLetters()
-        let maxLetterCount = 50
+        let maxLetterCount = 32
         let countActFixLetters = wtGameboard!.checkFixLetters()
-        let actFixCount = startValue + GV.playingRecord.rounds.count * 2 - countActFixLetters
+        let actFixCount = startValue + GV.playingRecord.rounds.count - countActFixLetters
         let countOfLetters = actFixCount > maxLetterCount ? maxLetterCount : actFixCount
         var remainigLength = countOfLetters
         var myLengths = [Int]()
@@ -3179,6 +3182,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if wtSceneDelegate == nil {
             return
         }
+        #if SHOWFINGER
+        if finger != nil {
+            finger?.removeFromParent()
+            finger = nil
+        }
+        #endif
+
         movedFromBottom = false
         inChoosingOwnWord = false
 //        ownWordsScrolling = false
@@ -3208,6 +3218,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let sizeDivider = GV.onIpad ? CGFloat(6) : CGFloat(12)
         finger?.size = CGSize(width: (finger?.size.width)! / sizeDivider, height: (finger?.size.height)! / sizeDivider)
         finger?.position = firstTouchLocation + CGPoint(x: 0, y: fingerAdder)
+        finger?.zPosition = 1000
         bgSprite!.addChild(finger!)
         #endif
         stopShowingTableIfNeeded()
@@ -3443,6 +3454,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let touchLocation = location //firstTouch!.location(in: self)
         #if SHOWFINGER
         finger?.removeFromParent()
+        finger = nil
         #endif
 //        let nodes = self.nodes(at: touchLocation)
         let lastIndex = pieceArray.count - 1
@@ -3668,17 +3680,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         switch congratulationType {
         case .AllWordsCollected:
             title = GV.language.getText(.tcCongratulationsAllWords, values: String(GV.countOfWords), String(GV.ownScore), String(myRank))
+            message = GV.language.getText(.tcCongratulationsMessageEasy, values: String(GV.countOfWordsMaxValue + 100))
         case .AllLettersCollected:
             title = GV.language.getText(.tcCongratulationsAllLetters, values: String(GV.countOfLetters), String(GV.ownScore), String(myRank))
+            message = GV.language.getText(.tcCongratulationsMessageMedium, values: String(GV.countOfLettersMaxValue + 50))
         default:
             break
         }
-        saveToFinishedGames()
-        message = GV.language.getText(.tcCongratulationsMessage)
+//        saveToFinishedGames()
 //        let continueTitle = GV.language.getText(.tcContinuePlaying)
-        let OKTitle =  GV.language.getText(.tcOK)
+        let newTitle = GV.language.getText(.tcNewGame)
+        let continueTitle = GV.language.getText(.tcContinueGame)
         let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
-        myAlert.addAction(text: OKTitle, action: #selector(self.OKAction))
+        myAlert.addAction(text: continueTitle, action: #selector(self.continueAction))
+        myAlert.addAction(text: newTitle, action: #selector(self.newAction))
         myAlert.presentAlert()
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         congratulationsAlert = myAlert
@@ -3711,21 +3726,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             GV.playingRecord.gameStatus = GV.GameStatusContinued
         }
     }
-//    @objc private func fixLettersOKAction () {
-//        self.enabled = true
-//        self.gameboardEnabled = true
-//        saveHelpInfo(action: .OKFixLettersSolved)
-//        self.gameboardEnabled = true
-//        try! realm.safeWrite() {
-//            GV.playingRecord.gameStatus = GV.GameStatusPlaying
-//        }
-//    }
-    
-    @objc private func OKAction () {
+
+    @objc private func newAction () {
+        saveToFinishedGames()
         try! realm.safeWrite() {
             realm.delete(GV.playingRecord)
         }
         newGameButtonTapped()
+    }
+        
+    @objc private func continueAction () {
+        if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
+            setCountWords(count: GV.countOfWordsMaxValue + 100, type: GameDifficulty.Easy)
+        }
+        if GV.basicDataRecord.difficulty == GameDifficulty.Medium.rawValue {
+            setCountWords(count: GV.countOfLettersMaxValue + 50, type: GameDifficulty.Medium)
+        }
+        saveActualState()
+        self.enabled = true
+        self.gameboardEnabled = true
+
     }
         
     @objc private func finishEasyAction () {
@@ -3987,7 +4007,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if GV.countBlinkingNodes > 0 {
             stopBlinkingNodesIfNeeded()
-            return
+//            return
         }
 
         func movePieceToPosition(from: WTPiece, to: Int, remove: Bool = false) {
