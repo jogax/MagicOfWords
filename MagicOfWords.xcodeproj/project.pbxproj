@@ -143,9 +143,7 @@
 		20A04160236DBC5C009C3C9F /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
 		20A04162236DBC5F009C3C9F /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20437F99217B793100F16F99 /* Reachability.framework */; };
 		20A04168236DBD89009C3C9F /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250A21F73D44009897BD /* RealmSwift.framework */; };
-		20A04169236DBD89009C3C9F /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250A21F73D44009897BD /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		20A0416B236DBD9F009C3C9F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250C21F73D65009897BD /* Realm.framework */; };
-		20A0416C236DBD9F009C3C9F /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250C21F73D65009897BD /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A604B22035D93A00DC48F0 /* MyRandom.swift */; };
 		20A6913D203088FF00AB47C0 /* enWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20A6913C203088FF00AB47C0 /* enWords.txt */; };
 		20A6914020309B9F00AB47C0 /* WTPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6913F20309B9F00AB47C0 /* WTPiece.swift */; };
@@ -160,21 +158,6 @@
 		20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		20A0416A236DBD89009C3C9F /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				20A0416C236DBD9F009C3C9F /* Realm.framework in Embed Frameworks */,
-				20A04169236DBD89009C3C9F /* RealmSwift.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		20009AF82260C47900D34ACD /* HelpInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpInfo.swift; sourceTree = "<group>"; };
@@ -623,7 +606,6 @@
 				201FB1AB20288C2B00EC9F36 /* Frameworks */,
 				201FB1AC20288C2B00EC9F36 /* Resources */,
 				20F1760A21626C6000AF37D7 /* ShellScript */,
-				20A0416A236DBD89009C3C9F /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1004,7 +986,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MagicOfWords/MagicOfWords.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = WT499VC842;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1017,10 +999,10 @@
 				INFOPLIST_FILE = MagicOfWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.24;
+				MARKETING_VERSION = 1.25;
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUGX SHOWFINGER";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG SHOWFINGER";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1032,7 +1014,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MagicOfWords/MagicOfWords.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = WT499VC842;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1041,7 +1023,7 @@
 				INFOPLIST_FILE = MagicOfWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.24;
+				MARKETING_VERSION = 1.25;
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

@@ -1936,6 +1936,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } else {
                 // Fallback on earlier versions
             }
+            if AVAudioSession.sharedInstance().isOtherAudioPlaying {
+                return
+            }
             try AVAudioSession.sharedInstance().setActive(true)
             do {
                try AVAudioSession.sharedInstance().setCategory(.ambient)
