@@ -43,6 +43,7 @@ struct ActivityItem {
     var fromBottomIndex: Int
     var movingItem: MovingItem
     var choosedWord: FoundedWord
+    
     init(type: ActivityType, fromBottomIndex: Int = 0, movingItem: MovingItem = MovingItem(), countSteps: Int = 0, choosedWord: FoundedWord = FoundedWord(), roundIndex: Int = 0) {
         self.type = type
         self.fromBottomIndex = fromBottomIndex
