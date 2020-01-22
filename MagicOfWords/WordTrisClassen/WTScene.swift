@@ -6,6 +6,7 @@
 //  Copyright © 2018 Jozsef Romhanyi. All rights reserved.
 //
 
+import CloudKit
 import Foundation
 import GameplayKit
 import RealmSwift
@@ -109,10 +110,12 @@ let iFiveMinutes = 300
 var wtGameboard: WTGameboard?
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableViewDelegate {
+    var bonusForReportProLetter:Int = 5000
+
     func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord = SelectedWord()) {
         var longWaitAction = SKAction.wait(forDuration: 0.0)
         let duration = 0.3
-        for letter in newWord.usedLetters {
+        for (letterIndex, letter) in newWord.usedLetters.enumerated() {
             let myNode = GV.gameArray[letter.col][letter.row]
             let showRedAction = SKAction.run({
                 myNode.setStatus(toStatus: .Error)
@@ -123,15 +126,30 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 myNode.setStatus(toStatus: .OrigStatus)
             })
             var sequence = [SKAction]()
-            for _ in 1...3 {
+            for index in 1...3 {
                 sequence.append(showRedAction)
                 sequence.append(waitAction)
                 sequence.append(showOrigAction)
                 sequence.append(waitAction)
+                if index == 3 && foundedWord.usedLetters.count == 0 && letterIndex == newWord.usedLetters.count - 1 {
+//                    when a missing word, after last action, open a dialog "do you want to send this word..."
+                    let alertAction = SKAction.run({
+                        GV.wordToSend = newWord.word
+                        let title = GV.language.getText(.tcShouldReport, values: newWord.word)
+                        let message = GV.language.getText(.tcReportDescription, values: String(newWord.word.count * self.bonusForReportProLetter))
+                        let myAlert = MyAlertController(title: title, message: message, target: self, type: .White)
+                        myAlert.addAction(text: GV.language.getText(.tcYes), action: #selector(self.sendWordToCloud))
+                        myAlert.addAction(text: GV.language.getText(.tcCancel), action: #selector(self.noOperation))
+                        myAlert.presentAlert()
+                        self.bgSprite!.addChild(myAlert)
+                    })
+                    sequence.append(alertAction)
+                }
+
             }
             GV.blinkingNodes.append(myNode)
             GV.countBlinkingNodes += 1
-            myNode.run(SKAction.sequence(sequence))
+            myNode.run(SKAction.sequence(sequence), withKey: "RedBlink")
         }
         longWaitAction = SKAction.wait(forDuration: 3 * 2 * duration)
         for letter in foundedWord.usedLetters {
@@ -152,10 +170,48 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 sequence.append(showOrigAction)
                 sequence.append(waitAction)
             }
-            myNode.run(SKAction.sequence(sequence))
+            myNode.run(SKAction.sequence(sequence), withKey: "GreenBlink")
         }
 
     }
+    
+    @objc private func sendWordToCloud() {
+        let myContainer = CKContainer.default()
+        let publicDatabase = myContainer.publicCloudDatabase
+        let ID = String(GV.getTimeIntervalSince20190101())
+        let newWordsRecordID = CKRecord.ID(recordName: ID)
+        let status = "pending"
+        let newWordsRecord = CKRecord(recordType: "NewWords", recordID: newWordsRecordID)
+        newWordsRecord["language"] = GV.actLanguage
+        newWordsRecord["word"] = GV.wordToSend
+        newWordsRecord["status"] = status // accepted - OK, declined - not OK
+        publicDatabase.save(newWordsRecord) {
+            (record, error) in
+            let realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+            if let error = error {
+                // Insert error handling
+                print("Error by save: \(error)")
+                return
+            }
+            let myReportedWord = MyReportedWords()
+            myReportedWord.ID = ID
+            myReportedWord.word = GV.wordToSend
+            myReportedWord.status = status
+            myReportedWord.bonus = GV.wordToSend.count * self.bonusForReportProLetter
+            try! realm.safeWrite() {
+                realm.add(myReportedWord)
+            }
+        }
+
+        print("word to send: \(GV.wordToSend)")
+        GV.wordToSend = ""
+        
+    }
+    
+    @objc private func noOperation() {
+        
+    }
+    
     
     func setLettersMoved(fromLetters: [UsedLetter], toLetters: [UsedLetter]) {
         let movingItem = MovingItem(fromLetters: fromLetters, toLetters: toLetters)
@@ -1133,6 +1189,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if !returnBool {
             blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
+            if GV.gameArray[usedLetters[0].col][usedLetters[0].row].action(forKey: "GreenBlink") == nil {
+                print("should send")
+            }
         } else {
             if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue  && GV.countOfWords >= GV.countOfWordsMaxValue {
                 congratulations(congratulationType: .AllWordsCollected)

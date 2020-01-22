@@ -175,4 +175,7 @@ let huDictionary: [TextConstants: String] = [
     .tcGoalMessageForWords: "A játék akkor fejeződik be, a megjelölt számú különböző szót kiraktad",
     .tcGoalMessageForLetters: "A játék akkor fejeződik be, ha a megjelölt számú fix betűt felhasználtad",
     .tcTipp:            "Tipp: %",
+    .tcShouldReport:    "Közölni szeretnéd a(z) \"%\" szót a fejlesztővel?",
+    .tcReportDescription: "Ha ez tényleg egy hiányzó szó, akkor % jutalompontot kapsz!",
+    .tcYes:             "Igen",
 ]

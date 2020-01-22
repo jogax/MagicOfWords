@@ -179,6 +179,9 @@ let deDictionary: [TextConstants: String] = [
     .tcGoalMessageForWords: "Das Spiel endet, wenn Du die ausgewählte Anzahl verschiedener Wörter gesammelt hast",
     .tcGoalMessageForLetters: "Das Spiel endet, wenn Du die ausgewählte Anzahl fester Buchstaben verwendet hast",
     .tcTipp:            "Hinweis: %",
+    .tcShouldReport:    "Möchtest Du dem Entwickler das Wort \"%\" mitteilen?",
+    .tcReportDescription: "Wenn es wirklich ein fehlendes Wort ist, erhaltest Du % Bonuspunkte!",
+    .tcYes:             "Js",
 ]
 
 

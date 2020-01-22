@@ -175,7 +175,10 @@ enum TextConstants: Int {
     tcChooseGoalForLetters,
     tcGoalMessageForWords,
     tcGoalMessageForLetters,
-    tcTipp
+    tcTipp,
+    tcShouldReport,
+    tcReportDescription,
+    tcYes
 }
 
     let LanguageEN = "en" // index 0

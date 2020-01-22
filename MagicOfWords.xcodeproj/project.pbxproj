@@ -148,6 +148,7 @@
 		20E70EA0233281A300185ECE /* FinishedGames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E70E9F233281A300185ECE /* FinishedGames.swift */; };
 		20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
+		D04D82D723D8B0FA002B1023 /* MyReportedWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -299,6 +300,7 @@
 		20E70E9F233281A300185ECE /* FinishedGames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishedGames.swift; sourceTree = "<group>"; };
 		20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruMandatoryIgor.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
+		D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyReportedWords.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -397,6 +399,7 @@
 				2081931F202B472900406D9A /* GameDataModel.swift */,
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
+				D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */,
 				2049784122F0C3FF003E2D37 /* ScoreInfoForDifficulty.swift */,
 				205E601920C02BB800A5AB39 /* WordDBGenerator.swift */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
@@ -787,6 +790,7 @@
 				20531C6820B6EA5400E060E2 /* ShowGamesScene.swift in Sources */,
 				20A6E83520AEDB4B000F5950 /* MyTimer.swift in Sources */,
 				20B28AE220330E73001682B2 /* BasicDataModel.swift in Sources */,
+				D04D82D723D8B0FA002B1023 /* MyReportedWords.swift in Sources */,
 				20CDA669214FFEBF00160DC6 /* ShowGameCenterViewController.swift in Sources */,
 				20858645223A89EF0097B62A /* MyButton.swift in Sources */,
 				20B28AE620333273001682B2 /* WTTableView.swift in Sources */,

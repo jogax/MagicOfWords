@@ -895,11 +895,12 @@ class WTGameboard: SKShapeNode {
         }
     }
     
-    public func getCountLetters()->Int {
+    public func getCountLetters(empty: Bool = false)->Int {
         var returnValue = 0
+        let adder = empty ? 0 : 1
         for row in 0..<countCols {
             for col in 0..<countCols {
-                returnValue += GV.gameArray[col][row].status != .Empty ? 1 : 0
+                returnValue += GV.gameArray[col][row].status != .Empty ? adder : 1 - adder
             }
         }
         return returnValue
