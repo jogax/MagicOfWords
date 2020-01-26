@@ -180,8 +180,11 @@ let deDictionary: [TextConstants: String] = [
     .tcGoalMessageForLetters: "Das Spiel endet, wenn Du die ausgewählte Anzahl fester Buchstaben verwendet hast",
     .tcTipp:            "Hinweis: %",
     .tcShouldReport:    "Möchtest Du dem Entwickler das Wort \"%\" mitteilen?",
-    .tcReportDescription: "Wenn es wirklich ein fehlendes Wort ist, erhaltest Du % Bonuspunkte!",
-    .tcYes:             "Js",
+    .tcReportDescription: "Wenn es wirklich ein existierendes Wort ist, erhaltest Du % Bonuspunkte!",
+    .tcYes:             "Ja",
+    .tcShowWordReports: "Zeige neue Wörter in der Cloud",
+    .tcNoNewWords:      "Es sind keine Wörter zu verarbeiten",
+    .tcStatus:          "Status",
 ]
 
 

@@ -110,7 +110,7 @@ let iFiveMinutes = 300
 var wtGameboard: WTGameboard?
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableViewDelegate {
-    var bonusForReportProLetter:Int = 5000
+    var bonusForReportProLetter:Int = 1000
 
     func blinkWords(newWord: SelectedWord, foundedWord: SelectedWord = SelectedWord()) {
         var longWaitAction = SKAction.wait(forDuration: 0.0)
@@ -136,7 +136,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     let alertAction = SKAction.run({
                         GV.wordToSend = newWord.word
                         let title = GV.language.getText(.tcShouldReport, values: newWord.word)
-                        let message = GV.language.getText(.tcReportDescription, values: String(newWord.word.count * self.bonusForReportProLetter))
+                        var multiplier = 0
+                        for i in 1...newWord.word.count {
+                            multiplier += i
+                        }
+                        GV.bonusForReport = multiplier * self.bonusForReportProLetter
+                        let message = GV.language.getText(.tcReportDescription, values: String(GV.bonusForReport))
                         let myAlert = MyAlertController(title: title, message: message, target: self, type: .White)
                         myAlert.addAction(text: GV.language.getText(.tcYes), action: #selector(self.sendWordToCloud))
                         myAlert.addAction(text: GV.language.getText(.tcCancel), action: #selector(self.noOperation))
@@ -197,7 +202,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             myReportedWord.ID = ID
             myReportedWord.word = GV.wordToSend
             myReportedWord.status = status
-            myReportedWord.bonus = GV.wordToSend.count * self.bonusForReportProLetter
+            myReportedWord.bonus = GV.bonusForReport
             try! realm.safeWrite() {
                 realm.add(myReportedWord)
             }
@@ -1183,12 +1188,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
                         let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord, doAnimate: true, round: GV.playingRecord.rounds.count)
                         returnBool = boolValue
+                    } else {
+                        blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
                     }
                 }
             }
-        }
-        if !returnBool {
+        } else {
             blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
+        }
+        
+        if !returnBool {
+//            blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
             if GV.gameArray[usedLetters[0].col][usedLetters[0].row].action(forKey: "GreenBlink") == nil {
                 print("should send")
             }

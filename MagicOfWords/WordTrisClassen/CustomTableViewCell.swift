@@ -78,7 +78,7 @@ class CustomTableViewCell: UITableViewCell {
         boxView.addSubview(label)
     }
     
-    public func addButton(image: UIImage? = nil, text: String = "", color: UIColor = .white, xPos: CGFloat = -1, callBack: @escaping (_ indexPath: IndexPath)->()) {
+    public func addButton(image: UIImage? = nil, text: String = "", color: UIColor = .white, xPos: CGFloat = -1, callBack: @escaping (_ indexPath: IndexPath)->(), indexPath: IndexPath? = nil) {
         var posForColumn: CGFloat = 2
         for subView in boxView.subviews {
             posForColumn += subView.frame.width
@@ -107,6 +107,7 @@ class CustomTableViewCell: UITableViewCell {
             button.frame = CGRect(x: posForColumn, y: 3, width: text.width(font: myFont), height: text.height(font: myFont))
         }
 //        button.backgroundColor = UIColor.blue
+        button.tag = indexPath!.row
         button.setTitleColor(.black, for: .normal)
         button.titleLabel!.font = myFont //(UIFont(name: YourfontName, size: 20))
         switch buttonCount {
@@ -118,16 +119,19 @@ class CustomTableViewCell: UITableViewCell {
         boxView.addSubview(button)
     }
 
-    @objc private func button1Tapped() {
-        callBackArray[0](indexPath!)
+    @objc private func button1Tapped(sender: UIButton) {
+        let indexPath = IndexPath(row: sender.tag, section: 0)
+        callBackArray[0](indexPath)
     }
     
-    @objc private func button2Tapped() {
-        callBackArray[1](indexPath!)
+    @objc private func button2Tapped(sender: UIButton) {
+        let indexPath = IndexPath(row: sender.tag, section: 0)
+        callBackArray[1](indexPath)
     }
     
-    @objc private func button3Tapped() {
-        callBackArray[2](indexPath!)
+    @objc private func button3Tapped(sender: UIButton) {
+        let indexPath = IndexPath(row: sender.tag, section: 0)
+        callBackArray[2](indexPath)
     }
     
 

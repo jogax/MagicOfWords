@@ -177,6 +177,9 @@ let enDictionary: [TextConstants: String] = [
     .tcGoalMessageForLetters: "The game ends when you have used the selected number of fixed letters",
     .tcTipp:            "Hint: %",
     .tcShouldReport:    "Do you want to report the word \"%\" to the developer?",
-    .tcReportDescription: "If it's really a missing word, you'll get % bonus points!",
+    .tcReportDescription: "If it's really an existing word, you'll get % bonus points!",
     .tcYes:             "Yes",
+    .tcShowWordReports: "Show new words in Cloud",
+    .tcNoNewWords:      "There are no words to process",
+    .tcStatus:          "Status",
 ]

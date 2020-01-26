@@ -16,7 +16,8 @@ import GameKit
 import CloudKit
 //import SCLAlertView
 
-class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate,  ShowGameCenterViewControllerDelegate {
+class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate,  ShowGameCenterViewControllerDelegate,
+ShowNewWordsInCloudSceneDelegate {
     func backFromShowGameCenterViewController() {
         showMenu()
     }
@@ -716,6 +717,12 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
                 self.present(gcVC, animated: true, completion: nil)
         })
         alertController.addAction(showGameCenterAction)
+        let showSavedWordsInCloudAction = UIAlertAction(title: GV.language.getText(.tcShowWordReports), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.startShowNewWordsInCloudScene()
+        })
+        alertController.addAction(showSavedWordsInCloudAction)
+
         let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
             alert -> Void in
             self.areYouSure()
@@ -739,6 +746,15 @@ class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegat
 
         present(alertController, animated: true, completion: nil)
 
+    }
+    
+    var showNewWordsInCloudScene: ShowNewWordsInCloudScene?
+    private func startShowNewWordsInCloudScene() {
+        showNewWordsInCloudScene = ShowNewWordsInCloudScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        showNewWordsInCloudScene?.setDelegate(delegate: self)
+        if let view = self.view as! SKView? {
+            view.presentScene(showNewWordsInCloudScene)
+        }
     }
     
     private func areYouSure() {

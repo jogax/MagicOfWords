@@ -132,7 +132,8 @@ struct GV {
     static var wtScene: WTScene?
     static var mainViewController: MainViewController?
     static var comeBackFromSleeping = false
-    static var wordToSend: String = ""
+    static var wordToSend = ""
+    static var bonusForReport = 0
 
 //    static let ButtonTypeSimple = "S"
 //    static let ButtonTypeElite = "E"

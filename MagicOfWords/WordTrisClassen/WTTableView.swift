@@ -66,26 +66,30 @@ class WTTableView: UITableView,UITableViewDelegate,UITableViewDataSource  {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return self.myDelegate!.getHeightForHeaderInSection(tableView: tableView, section: section)
     }
-
-    var firstTouch = CGPoint(x: 0, y: 0)
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        firstTouch = touches.first!.location(in: self)
-        if firstTouch.y < frame.height * 0.05 {
-            isScrollEnabled = false
-        }
+    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        print("hier")
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let touchLocation = touches.first!.location(in: self)
-        let delta = CGPoint(x: touchLocation.x - firstTouch.x, y: 0)
-        self.frame.origin = self.frame.origin + delta
-    }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        isScrollEnabled = true
-    }
-    
+//    var firstTouch = CGPoint(x: 0, y: 0)
+//
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        firstTouch = touches.first!.location(in: self)
+//        if firstTouch.y < frame.height * 0.05 {
+//            isScrollEnabled = false
+//        }
+//    }
+//
+//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        let touchLocation = touches.first!.location(in: self)
+//        let delta = CGPoint(x: touchLocation.x - firstTouch.x, y: 0)
+//        self.frame.origin = self.frame.origin + delta
+//    }
+//
+//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        isScrollEnabled = true
+//    }
+//
 
 }
 

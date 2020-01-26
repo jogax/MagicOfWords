@@ -170,7 +170,9 @@ class MyAlertController: SKSpriteNode {
             if newFragmentWidth + adderWidth < maxLength {
                 newFragment += fragment + " "
             } else {
-                newFragment.removeLast()
+                if newFragment.count > 0 {
+                    newFragment.removeLast()
+                }
                 returnArray.append(newFragment)
                 newFragment = fragment + " "
             }
