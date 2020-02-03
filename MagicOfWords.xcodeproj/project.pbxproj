@@ -149,6 +149,7 @@
 		20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 		D016FAB023D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */; };
+		D047E98523DF26900047F124 /* WordsFromCloud.swift in Sources */ = {isa = PBXBuildFile; fileRef = D047E98423DF26900047F124 /* WordsFromCloud.swift */; };
 		D04D82D723D8B0FA002B1023 /* MyReportedWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */; };
 /* End PBXBuildFile section */
 
@@ -302,6 +303,7 @@
 		20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruMandatoryIgor.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
 		D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNewWordsInCloudScene.swift; sourceTree = "<group>"; };
+		D047E98423DF26900047F124 /* WordsFromCloud.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsFromCloud.swift; sourceTree = "<group>"; };
 		D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyReportedWords.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -403,6 +405,7 @@
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
 				D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */,
+				D047E98423DF26900047F124 /* WordsFromCloud.swift */,
 				2049784122F0C3FF003E2D37 /* ScoreInfoForDifficulty.swift */,
 				205E601920C02BB800A5AB39 /* WordDBGenerator.swift */,
 				20819323202B4A7100406D9A /* GenerateGameData.swift */,
@@ -777,6 +780,7 @@
 				20A6914220309CC500AB47C0 /* WTGamebord.swift in Sources */,
 				20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */,
 				2081F47223194B43004C2FE9 /* MyWords.swift in Sources */,
+				D047E98523DF26900047F124 /* WordsFromCloud.swift in Sources */,
 				201FB1DE20288CEA00EC9F36 /* en.swift in Sources */,
 				201FB1DA20288CEA00EC9F36 /* hu.swift in Sources */,
 				2020D8E522B29A03005A026C /* CopyRealm.swift in Sources */,

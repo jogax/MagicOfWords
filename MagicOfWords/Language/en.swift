@@ -177,9 +177,15 @@ let enDictionary: [TextConstants: String] = [
     .tcGoalMessageForLetters: "The game ends when you have used the selected number of fixed letters",
     .tcTipp:            "Hint: %",
     .tcShouldReport:    "Do you want to report the word \"%\" to the developer?",
-    .tcReportDescription: "If it's really an existing word, you'll get % bonus points!",
+    .tcReportDescription: "If it's really an existing word (singular noun), you'll get % bonus points every time you use it! Verification will take a few days and you will be notified when the word is accepted!",
     .tcYes:             "Yes",
     .tcShowWordReports: "Show new words in Cloud",
     .tcNoNewWords:      "There are no words to process",
     .tcStatus:          "Status",
+    .tcDeniedReport:    "The word \"%\" you have reported to the developer does not exist!",
+    .tcDeniedDescription: "Next time, make sure you only report missing singular nouns!",
+    .tcAcceptedReport:    "Congratulations! The word \"%\" you have reported to the developer exists!",
+    .tcAcceptedDescription: "You get % bonus points for each using!",
+    .tcWordReportedTitle:    "The word has been sent to the developer!",
+    .tcWordReportedMessage: "Please wait patiently for the answer!"
 ]

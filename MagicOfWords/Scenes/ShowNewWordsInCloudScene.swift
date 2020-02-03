@@ -366,6 +366,7 @@ class ShowNewWordsInCloudScene: SKScene, WTTableViewDelegate {
             if let record = record, error == nil {
 
                 record["status"] = newStatus
+                record["lastChanged"] = Date()
 
                 container.publicCloudDatabase.save(record) { _, error in
                     self.getNewWordsFromCloud(completion: self.showTable)
@@ -376,11 +377,11 @@ class ShowNewWordsInCloudScene: SKScene, WTTableViewDelegate {
     }
     
     func acceptButtonTapped(indexPath: IndexPath) {
-        modifyRecord(recordID: foundedRecords[indexPath.row].name, newStatus: "accepted")
+        modifyRecord(recordID: foundedRecords[indexPath.row].name, newStatus: GV.accepted)
     }
     
     func declineButtonTapped(indexPath: IndexPath) {
-        modifyRecord(recordID: foundedRecords[indexPath.row].name, newStatus: "declined")
+        modifyRecord(recordID: foundedRecords[indexPath.row].name, newStatus: GV.denied)
     }
 
     func getNumberOfSections() -> Int {

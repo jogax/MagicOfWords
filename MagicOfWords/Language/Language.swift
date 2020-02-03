@@ -181,7 +181,13 @@ enum TextConstants: Int {
     tcYes,
     tcShowWordReports,
     tcNoNewWords,
-    tcStatus
+    tcStatus,
+    tcDeniedReport,
+    tcDeniedDescription,
+    tcAcceptedReport,
+    tcAcceptedDescription,
+    tcWordReportedTitle,
+    tcWordReportedMessage
 }
 
     let LanguageEN = "en" // index 0

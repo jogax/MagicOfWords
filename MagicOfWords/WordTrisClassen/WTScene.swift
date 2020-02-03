@@ -134,7 +134,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 if index == 3 && foundedWord.usedLetters.count == 0 && letterIndex == newWord.usedLetters.count - 1 {
 //                    when a missing word, after last action, open a dialog "do you want to send this word..."
                     let alertAction = SKAction.run({
-                        GV.wordToSend = newWord.word
+                        GV.wordToSend = newWord.word.lowercased()
                         let title = GV.language.getText(.tcShouldReport, values: newWord.word)
                         var multiplier = 0
                         for i in 1...newWord.word.count {
@@ -181,6 +181,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc private func sendWordToCloud() {
+//        check if word is reported
+        if realm.objects(MyReportedWords.self).filter("word = %@", GV.actLanguage + GV.wordToSend).count > 0 {
+            return
+        }
         let myContainer = CKContainer.default()
         let publicDatabase = myContainer.publicCloudDatabase
         let ID = String(GV.getTimeIntervalSince20190101())
@@ -200,16 +204,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             let myReportedWord = MyReportedWords()
             myReportedWord.ID = ID
-            myReportedWord.word = GV.wordToSend
+            myReportedWord.word = GV.actLanguage + GV.wordToSend
+            GV.wordToSend = ""
             myReportedWord.status = status
             myReportedWord.bonus = GV.bonusForReport
             try! realm.safeWrite() {
                 realm.add(myReportedWord)
             }
+            let title = GV.language.getText(.tcWordReportedTitle)
+            let message = GV.language.getText(.tcWordReportedMessage)
+            let myAlert = MyAlertController(title: title, message: message, target: self, type: .White)
+            myAlert.addAction(text: GV.language.getText(.tcOK), action: #selector(self.noOperation))
+            myAlert.presentAlert()
+            self.bgSprite!.addChild(myAlert)
+
         }
 
         print("word to send: \(GV.wordToSend)")
-        GV.wordToSend = ""
         
     }
     
@@ -1175,6 +1186,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
             let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord, doAnimate: true, round: GV.playingRecord.rounds.count)
             returnBool = boolValue
+        } else if realm.objects(WordsFromCloud.self).filter("word = %@", GV.actLanguage + lowercasedWord).count == 1 {
+            let selectedWord = SelectedWord(word: word, usedLetters: usedLetters)
+            let boolValue = WTGameWordList.shared.addWord(selectedWord: selectedWord, doAnimate: true, round: GV.playingRecord.rounds.count)
+            returnBool = boolValue
         } else if GV.actLanguage == "ru" && lowercasedWord.firstIndex(where: {$0 == "е"}) != nil {
             for (index, char) in lowercasedWord.enumerated() {
                 var newWord = ""
@@ -1200,7 +1215,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if !returnBool {
 //            blinkWords(newWord: SelectedWord(word: word, usedLetters: usedLetters))
             if GV.gameArray[usedLetters[0].col][usedLetters[0].row].action(forKey: "GreenBlink") == nil {
-                print("should send")
+//                print("should send")
             }
         } else {
             if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue  && GV.countOfWords >= GV.countOfWordsMaxValue {

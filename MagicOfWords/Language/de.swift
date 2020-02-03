@@ -180,11 +180,17 @@ let deDictionary: [TextConstants: String] = [
     .tcGoalMessageForLetters: "Das Spiel endet, wenn Du die ausgewählte Anzahl fester Buchstaben verwendet hast",
     .tcTipp:            "Hinweis: %",
     .tcShouldReport:    "Möchtest Du dem Entwickler das Wort \"%\" mitteilen?",
-    .tcReportDescription: "Wenn es wirklich ein existierendes Wort ist, erhaltest Du % Bonuspunkte!",
+    .tcReportDescription: "Wenn es wirklich ein existierendes Wort ist (singular Substantive), erhaltest Du bei jeder seiner Verwendung  % Bonuspunkte! Der Überprüfungsprozess dauert einige Tage und Du wirst benachrichtigt, wenn das Wort akzeptiert wird.",
     .tcYes:             "Ja",
     .tcShowWordReports: "Zeige neue Wörter in der Cloud",
     .tcNoNewWords:      "Es sind keine Wörter zu verarbeiten",
     .tcStatus:          "Status",
+    .tcDeniedReport:    "Das Wort \"%\", das Du dem Entwickler geschickt hast, existiert nicht!",
+    .tcDeniedDescription: "Stelle beim nächsten Mal sicher, dass Du nur fehlende singular Substantive meldest!",
+    .tcAcceptedReport:    "Herzlichen Glückwunsch! Das Wort \"%\", das Du dem Entwickler gemeldet hast, existiert!",
+    .tcAcceptedDescription: "Du bekommst % Bonuspunkte für jede Verwendung!",
+    .tcWordReportedTitle:    "Das Wort wurde an den Entwickler gesendet!",
+    .tcWordReportedMessage: "Warte geduldig auf die Antwort!",
 ]
 
 

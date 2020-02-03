@@ -9,6 +9,7 @@
 
 import Foundation
 import GameplayKit
+import RealmSwift
 let maxScore = 2000
 let pointsForLetter = 10
 let maxUsedLength = 25
@@ -56,6 +57,12 @@ public struct SelectedWord {
     public mutating func setScore(round: Int) {
         let multiplier = countFixLetters > 0 ? countFixLetters + round : 1
         self.score = (word.length > 25 ? maxScore : pointsForWord[word.length]!) * multiplier + bonus(plus: true)
+        let realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+        let searchWord = GV.actLanguage + self.word.lowercased()
+        let foundedRecords = realm.objects(MyReportedWords.self).filter("word = %@ and status = %@", searchWord, GV.accepted)
+        if foundedRecords.count == 1 {
+            self.score += foundedRecords.first!.bonus
+        }
     }
 //    var creationIndex = 0
 //    var round = 0

@@ -121,7 +121,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                 }
         },
-            objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self, ScoreInfoForDifficulty.self, MyWords.self, FinishedGames.self, MyReportedWords.self]
+            objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self, ScoreInfoForDifficulty.self, MyWords.self, FinishedGames.self, MyReportedWords.self, WordsFromCloud.self]
 //            objectTypes: [WordListModel.self]
         )
         

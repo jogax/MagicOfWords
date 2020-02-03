@@ -150,6 +150,9 @@ struct GV {
     static var countOfWordsMaxValue = 1000
     static var countOfLettersMaxValue = 250
     static let TimeModifier: Int64 = 10000000000
+    static let accepted = "accepted"
+    static let pending = "pending"
+    static let denied = "denied"
 //    static let buttonType = ButtonTypeElite
     static let LabelFont = "CourierNewPS-BoldMT"
 //    static let LabelFontSimple = "CourierNewPS-BoldMT"
@@ -200,8 +203,9 @@ struct GV {
     static let sizeOfGrid = 10
 //    static var mandatoryScore = 0
     static var ownScore = 0
-//    static var bonusScore = 0
+    static var bonusScore = 0
     static var totalScore = 0
+//    static var myBonusMalus = 0
     static var generateHelpInfo = false
     static var mandatoryWords = [String]()
     static var blinkingNodes = [WTGameboardItem]()

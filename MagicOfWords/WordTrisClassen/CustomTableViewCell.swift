@@ -107,7 +107,9 @@ class CustomTableViewCell: UITableViewCell {
             button.frame = CGRect(x: posForColumn, y: 3, width: text.width(font: myFont), height: text.height(font: myFont))
         }
 //        button.backgroundColor = UIColor.blue
-        button.tag = indexPath!.row
+        if indexPath != nil {
+            button.tag = indexPath!.row
+        }
         button.setTitleColor(.black, for: .normal)
         button.titleLabel!.font = myFont //(UIFont(name: YourfontName, size: 20))
         switch buttonCount {

@@ -345,25 +345,7 @@ ShowNewWordsInCloudSceneDelegate {
     var oneMinutesTimer: Timer?
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
-        #if DEBUG
-//            GV.debug = true
-//            let myContainer = CKContainer.default()
-//            let publicDatabase = myContainer.publicCloudDatabase
-//            print("hier")
-//            let newWordsRecordID = CKRecord.ID(recordName: "0")
-//            let newWordsRecord = CKRecord(recordType: "NewWords", recordID: newWordsRecordID)
-//            newWordsRecord["language"] = "hu"
-//            newWordsRecord["word"] = "tökély"
-//            publicDatabase.save(newWordsRecord) {
-//                (record, error) in
-//                if let error = error {
-//                    // Insert error handling
-//                    print("Error by save: \(error)")
-//                    return
-//                }
-//                print("record inserted")
-//            }
-        #endif
+
         GV.mainViewController = self
         setDarkMode()
         GV.wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
@@ -381,9 +363,113 @@ ShowNewWordsInCloudSceneDelegate {
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
         convertIfNeeded()
+        checkReportedWordsInCloud()
+        checkNewWordsInCloud()
+//        checkMyBonusMalus()
         _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
     }
     
+    private func checkReportedWordsInCloud() {
+        let pendingWords = realm.objects(MyReportedWords.self).filter("status = %@", GV.pending)
+        if pendingWords.count > 0 {
+            let pendingWord = pendingWords.first!
+//            let actWord = pendingWord.word
+//            let actBonus = pendingWord.bonus
+            let IDInCloud = CKRecord.ID(recordName: pendingWord.ID)
+            let pendingWordID = pendingWord.ID
+            let predicate = NSPredicate(format: "recordID = %@", IDInCloud)
+            let query = CKQuery(recordType: "NewWords", predicate: predicate)
+            let container = CKContainer.default()
+            container.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
+                print("count: \(results!.count)")
+                if results!.count > 0 {
+                    switch results![0].object(forKey: "status") as! String {
+                    case GV.accepted:
+                        let realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+                        let actPendingWord = realm.objects(MyReportedWords.self).filter("ID = %@", pendingWordID)[0]
+                        try! realm.safeWrite {
+                            actPendingWord.status = GV.accepted
+                        }
+//                        self.checkMyBonusMalus()
+                        let title = GV.language.getText(.tcAcceptedReport, values: String(actPendingWord.word.endingSubString(at: 2).uppercased()))
+                        let message = GV.language.getText(.tcAcceptedDescription, values: String(actPendingWord.bonus))
+                        let alertController = UIAlertController(title: title,
+                                                            message: message,
+                                                            preferredStyle: .alert)
+                        
+                        let acceptedAction = UIAlertAction(title: "\(GV.language.getText(.tcOK)) ", style: .default, handler: {
+                            alert -> Void in
+                        })
+                        alertController.addAction(acceptedAction)
+                        DispatchQueue.main.async {
+                            self.present(alertController, animated: true, completion: nil)
+                        }
+                    case GV.pending:
+                        print("pending - wait for Developer")
+                    case GV.denied:
+                        let realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+                        let actPendingWord = realm.objects(MyReportedWords.self).filter("ID = %@", pendingWordID)[0]
+                        try! realm.safeWrite {
+                            actPendingWord.status = GV.denied
+                        }
+//                        self.checkMyBonusMalus()
+                        let title = GV.language.getText(.tcDeniedReport, values: String(actPendingWord.word.endingSubString(at: 2)))
+                        let message = GV.language.getText(.tcDeniedDescription)
+                        let alertController = UIAlertController(title: title,
+                                                            message: message,
+                                                            preferredStyle: .alert)
+                        
+                        let deniedAction = UIAlertAction(title: "\(GV.language.getText(.tcOK)) ", style: .default, handler: {
+                            alert -> Void in
+                        })
+                        alertController.addAction(deniedAction)
+                        DispatchQueue.main.async {
+                            self.present(alertController, animated: true, completion: nil)
+                        }
+
+                    default:
+                        print("nothing to do")
+                    }
+                } else {
+                    print("record in Cloud not found! - delete: \(IDInCloud)")
+                }
+            }
+        }
+    }
+    
+    @objc private func alertOK() {
+        
+    }
+    
+    private func checkNewWordsInCloud() {
+        var lastTimeStamp = Date()
+        if realm.objects(WordsFromCloud.self).sorted(byKeyPath: "timeStamp", ascending: false).count > 0 {
+            lastTimeStamp = realm.objects(WordsFromCloud.self).sorted(byKeyPath: "timeStamp", ascending: false).first!.timeStamp
+        } else {
+            lastTimeStamp = Date(year: 2020, month: 1, day: 1, hour: 0, minute: 1)
+        }
+        let predicate = NSPredicate(format: "status = %@ and lastChanged > %@", GV.accepted, lastTimeStamp as NSDate)
+        let query = CKQuery(recordType: "NewWords", predicate: predicate)
+        let container = CKContainer.default()
+        container.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
+             if results!.count > 0 {
+                for result in results! {
+                    if result.modificationDate! > lastTimeStamp {
+                        let language = result.object(forKey: "language") as! String
+                        let word = result.object(forKey: "word") as! String
+                        let modified = result.object(forKey: "lastChanged")
+                        let recordToSave = WordsFromCloud()
+                        recordToSave.word = language + word
+                        recordToSave.timeStamp = modified as! Date
+                        let realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+                        try! realm.safeWrite {
+                            realm.add(recordToSave)
+                        }
+                    }
+                }
+            }
+        }
+    }
     @objc private func oneMinutesTimer(timerX: Timer) {
 //        print("oneMinutesTimer actTime: \(Date())")
         try! realm.safeWrite() {
