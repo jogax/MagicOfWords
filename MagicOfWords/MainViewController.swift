@@ -371,11 +371,35 @@ ShowNewWordsInCloudSceneDelegate {
     
     private func checkReportedWordsInCloud() {
         let today = Date()
-        let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: today)!
+        let weekAgo = Calendar.current.date(byAdding: .day, value: -1, to: today)!
         let waitingWords = realm.objects(MyReportedWords.self).filter("status = %@ and modifiedAt < %@", GV.waiting, weekAgo)
         if waitingWords.count > 0 {
             try! realm.safeWrite {
                 realm.delete(waitingWords)
+            }
+        }
+        let deniedWords = realm.objects(MyReportedWords.self).filter("status = %@", GV.denied)
+        if deniedWords.count > 0 {
+            for deniedWord in deniedWords {
+                let deniedWordID = deniedWord.ID
+                let IDInCloud = CKRecord.ID(recordName: deniedWord.ID)
+                let container = CKContainer.default()
+                container.publicCloudDatabase.delete(withRecordID: IDInCloud) { (recordID, error) in
+                        guard let recordID = recordID else {
+                        let realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+                        let recordToDelete = realm.objects(MyReportedWords.self).filter("ID = %@", deniedWordID)
+                        try! realm.safeWrite {
+                            realm.delete(recordToDelete)
+                        }
+                            return
+                    }
+                    print("Record \(recordID) was successfully deleted")
+                    let realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+                    let recordToDelete = realm.objects(MyReportedWords.self).filter("ID = %@", deniedWordID)
+                    try! realm.safeWrite {
+                        realm.delete(recordToDelete)
+                    }
+                }
             }
         }
         let pendingWords = realm.objects(MyReportedWords.self).filter("status = %@", GV.pending)
