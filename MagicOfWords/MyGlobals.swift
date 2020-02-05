@@ -153,6 +153,7 @@ struct GV {
     static let accepted = "accepted"
     static let pending = "pending"
     static let denied = "denied"
+    static let waiting = "wait"
 //    static let buttonType = ButtonTypeElite
     static let LabelFont = "CourierNewPS-BoldMT"
 //    static let LabelFontSimple = "CourierNewPS-BoldMT"

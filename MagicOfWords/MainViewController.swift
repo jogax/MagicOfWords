@@ -370,6 +370,14 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     private func checkReportedWordsInCloud() {
+        let today = Date()
+        let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: today)!
+        let waitingWords = realm.objects(MyReportedWords.self).filter("status = %@ and modifiedAt < %@", GV.waiting, weekAgo)
+        if waitingWords.count > 0 {
+            try! realm.safeWrite {
+                realm.delete(waitingWords)
+            }
+        }
         let pendingWords = realm.objects(MyReportedWords.self).filter("status = %@", GV.pending)
         if pendingWords.count > 0 {
             let pendingWord = pendingWords.first!

@@ -16,6 +16,8 @@ class MyReportedWords: Object {
     @objc dynamic var word = ""
     @objc dynamic var bonus = 0
     @objc dynamic var status = ""
+    @objc dynamic var counter = 0
+    @objc dynamic var modifiedAt = Date()
     
     override  class func primaryKey() -> String {
         return "ID"

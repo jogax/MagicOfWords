@@ -140,13 +140,36 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         for i in 1...newWord.word.count {
                             multiplier += i
                         }
-                        GV.bonusForReport = multiplier * self.bonusForReportProLetter
-                        let message = GV.language.getText(.tcReportDescription, values: String(GV.bonusForReport))
-                        let myAlert = MyAlertController(title: title, message: message, target: self, type: .White)
-                        myAlert.addAction(text: GV.language.getText(.tcYes), action: #selector(self.sendWordToCloud))
-                        myAlert.addAction(text: GV.language.getText(.tcCancel), action: #selector(self.noOperation))
-                        myAlert.presentAlert()
-                        self.bgSprite!.addChild(myAlert)
+                        let reportedWord = realm.objects(MyReportedWords.self).filter("word = %@", GV.actLanguage + GV.wordToSend)
+                        if reportedWord.count == 0 {
+                            let myReportedWord = MyReportedWords()
+                            myReportedWord.ID = String(GV.getTimeIntervalSince20190101())
+                            myReportedWord.word = GV.actLanguage + GV.wordToSend
+                            myReportedWord.counter = 1
+                            myReportedWord.status = GV.waiting
+                            myReportedWord.modifiedAt = Date()
+                            try! realm.safeWrite() {
+                                realm.add(myReportedWord)
+                            }
+                            return
+                        } else if reportedWord[0].counter == 1 {
+                            try! realm.safeWrite() {
+                                reportedWord[0].counter = 2
+                                reportedWord[0].modifiedAt = Date()
+                            }
+                            return
+                        } else if reportedWord[0].counter == 2 && reportedWord[0].status != GV.waiting  {
+                            return
+                        } else {
+                            GV.wordToSend = newWord.word.lowercased()
+                            GV.bonusForReport = multiplier * self.bonusForReportProLetter
+                            let message = GV.language.getText(.tcReportDescription, values: String(GV.bonusForReport))
+                            let myAlert = MyAlertController(title: title, message: message, target: self, type: .White)
+                            myAlert.addAction(text: GV.language.getText(.tcYes), action: #selector(self.sendWordToCloud))
+                            myAlert.addAction(text: GV.language.getText(.tcCancel), action: #selector(self.deleteFromRealm))
+                            myAlert.presentAlert()
+                            self.bgSprite!.addChild(myAlert)
+                        }
                     })
                     sequence.append(alertAction)
                 }
@@ -182,34 +205,29 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     @objc private func sendWordToCloud() {
 //        check if word is reported
-        if realm.objects(MyReportedWords.self).filter("word = %@", GV.actLanguage + GV.wordToSend).count > 0 {
+        let realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+        let reportedWord = realm.objects(MyReportedWords.self).filter("word = %@", GV.actLanguage + GV.wordToSend)
+        if reportedWord.count == 0 || reportedWord[0].status != GV.waiting {
             return
+        }
+        try! realm.safeWrite() {
+            reportedWord[0].status = GV.pending
+            reportedWord[0].bonus = GV.bonusForReport
+            reportedWord[0].modifiedAt = Date()
         }
         let myContainer = CKContainer.default()
         let publicDatabase = myContainer.publicCloudDatabase
-        let ID = String(GV.getTimeIntervalSince20190101())
-        let newWordsRecordID = CKRecord.ID(recordName: ID)
-        let status = "pending"
+        let newWordsRecordID = CKRecord.ID(recordName: reportedWord[0].ID)
         let newWordsRecord = CKRecord(recordType: "NewWords", recordID: newWordsRecordID)
         newWordsRecord["language"] = GV.actLanguage
         newWordsRecord["word"] = GV.wordToSend
-        newWordsRecord["status"] = status // accepted - OK, declined - not OK
+        newWordsRecord["status"] = GV.pending // accepted - OK, declined - not OK
         publicDatabase.save(newWordsRecord) {
             (record, error) in
-            let realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
             if let error = error {
                 // Insert error handling
                 print("Error by save: \(error)")
                 return
-            }
-            let myReportedWord = MyReportedWords()
-            myReportedWord.ID = ID
-            myReportedWord.word = GV.actLanguage + GV.wordToSend
-            GV.wordToSend = ""
-            myReportedWord.status = status
-            myReportedWord.bonus = GV.bonusForReport
-            try! realm.safeWrite() {
-                realm.add(myReportedWord)
             }
             let title = GV.language.getText(.tcWordReportedTitle)
             let message = GV.language.getText(.tcWordReportedMessage)
@@ -219,16 +237,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             self.bgSprite!.addChild(myAlert)
 
         }
-
-        print("word to send: \(GV.wordToSend)")
-        
+        GV.wordToSend = ""
+    }
+    
+    @objc private func deleteFromRealm() {
+        let realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
+        let reportedWord = realm.objects(MyReportedWords.self).filter("word = %@", GV.actLanguage + GV.wordToSend)
+        if reportedWord.count == 0 || reportedWord[0].status != GV.waiting {
+            return
+        }
+        try! realm.safeWrite {
+            realm.delete(reportedWord[0])
+        }
+        GV.wordToSend = ""
     }
     
     @objc private func noOperation() {
         
     }
     
-    
+
     func setLettersMoved(fromLetters: [UsedLetter], toLetters: [UsedLetter]) {
         let movingItem = MovingItem(fromLetters: fromLetters, toLetters: toLetters)
         let activityItem = ActivityItem(type: .Moving, movingItem: movingItem)
@@ -1423,141 +1451,30 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var endswith = ""
     var containsParts = [String]()
     
-    private func filterWordList()->Results<WordListModel>? {
+    private func filterWordList()->(Results<WordListModel>?, Results<WordsFromCloud>?) {
 
-//        var containsIndex = 0
         searchingParts = [String]()
         beginswith = GV.actLanguage
         endswith = ""
         containsParts = [String]()
-//        var actString = ""
-//        if searchingWord.begins(with: star) {
-//            searchingWord.removeFirst()
-//            return nil
-//        }
         let results1 = realmWordList.objects(WordListModel.self).filter("word LIKE %@", GV.actLanguage + searchingWord.lowercased())
-        return results1
-//        for pos in 0..<searchingWord.length {
-//            let actSearchingChar = searchingWord.lowercased().char(at: pos)
-//            if actSearchingChar == questionMark {
-//                if actString.count > 0 && actString.char(at: 0) != questionMark {
-//                    searchingParts.append(actString)
-//                    actString = ""
-//                }
-//                actString += questionMark
-//                continue
-//            }
-//            if actSearchingChar == star {
-//                if actString.count > 0 && actString.firstChar() != star {
-//                    searchingParts.append(actString)
-//                    actString = star
-//                }
-//                if actString.count == 0 {
-//                    actString = star
-//                }
-//                continue
-//            }
-//            if actSearchingChar != star && actSearchingChar != questionMark {
-//                if actString.count > 0 && (actString.char(at:0) == star || actString.char(at:0) == questionMark) {
-//                    searchingParts.append(actString)
-//                    actString = ""
-//                }
-//                actString += actSearchingChar
-//                continue
-//            }
-//        }
-//        if actString != "" {
-//            searchingParts.append(actString)
-//        }
-//        if searchingParts.count == 0 {
-//            return nil
-//        }
-//        if searchingParts.first!.firstChar() != star && searchingParts.first!.firstChar() != questionMark {
-//            beginswith += searchingParts.first!
-//        }
-//        if searchingParts.count > 1 && searchingParts.last!.firstChar() != star && searchingParts.last!.firstChar() != questionMark {
-//            endswith += searchingParts.last!
-//        }
-//        for (ind, part) in searchingParts.enumerated() {
-//            if ind > 0 && ind < searchingParts.count - 1 && part.char(at: 0) != star && part.char(at: 0) != questionMark {
-//                containsParts.append(part)
-//            }
-//        }
-//        var results: Results<WordListModel>?
-//        if searchingWord.length > 1 {
-//            if containsParts.count > 0 {
-//                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word CONTAINS %@", beginswith, containsParts[0])
-//            } else if endswith.length > 0 {
-//                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@ and word ENDSWITH %@", beginswith, endswith)
-//            } else {
-//                results = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH %@", beginswith)
-//            }
-//        }
-//
-//        return results
+        let results2 = realm.objects(WordsFromCloud.self).filter("word LIKE %@", GV.actLanguage + searchingWord.lowercased())
+        return (results1, results2)
     }
     
-//    private func wordFilter(word: String)->LineOfFoundedWords? {
-//        if word.length > 18 {
-//            return nil
-//        }
-////        let returnValue = LineOfFoundedWords(word)
-//        //        return returnValue
-//        return LineOfFoundedWords(word)
-//
-//        if /*word == "молоко" || word == "молочко" */ word == "kutyaharapás" {
-//            print(word)
-//        }
-//        var starSearchingActiv = false
-////        var lastStarPosition = 0
-////        let beginswith = searchingParts[0]
-//        var wordIndex = 0
-//        for part in searchingParts {
-//            if word.length < wordIndex {
-//                return nil
-//            }
-//            if wordIndex + part.length > word.length {
-//                return nil
-//            }
-//            if part.firstChar() == star {
-//                wordIndex += 1
-//                starSearchingActiv = true
-//            } else if part.firstChar() == questionMark {
-//                wordIndex += part.length
-//            } else {
-//                if starSearchingActiv {
-//                    if let index = word.index(from: wordIndex, of: part) {
-//                        wordIndex = index + part.length
-//                        starSearchingActiv = false
-//                        continue
-//                    } else {
-//                        return nil
-//                    }
-//                }
-//                if word.subString(at: wordIndex, length: part.length) == part {
-//                    wordIndex += part.length
-//                    continue
-//                } else {
-//                    return nil
-//                }
-//            }
-//        }
-//        if !starSearchingActiv && wordIndex != word.length {
-//            return nil
-//        }
-//        let returnValue = LineOfFoundedWords(word)
-////        return returnValue
-//        return LineOfFoundedWords(word)
-//    }
-
     private func showSearchResults() {
         listOfFoundedWords = [LineOfFoundedWords]()
-        let filteredWordList = filterWordList()
-        if filteredWordList != nil {
-            for word in filteredWordList! {
+        let (filteredWordList1, filteredWordList2) = filterWordList()
+        if filteredWordList1 != nil {
+            for word in filteredWordList1! {
                 let OKWord = LineOfFoundedWords(word.word.subString(at: 2, length: word.word.length - 2))  //wordFilter(word: word.word.subString(at: 2, length: word.word.length - 2)) {
                 listOfFoundedWords.append(OKWord)
-                
+            }
+        }
+        if filteredWordList2 != nil {
+            for word in filteredWordList2! {
+                let OKWord = LineOfFoundedWords(word.word.subString(at: 2, length: word.word.length - 2))  //wordFilter(word: word.word.subString(at: 2, length: word.word.length - 2)) {
+                listOfFoundedWords.append(OKWord)
             }
         }
         if sortUp {
