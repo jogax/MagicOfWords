@@ -178,14 +178,14 @@ Orosz:
 Build 27, Version 1.27 (1.1)
 Angol:
 - Bugfixing
-- Selecting words unknown to the game the player can report missing words (singular nouns) to the developer. If accepted, the player will receive bonus points each time he use the reported words.
+- Three-time selection of words unknown to the game allows the player to inform the developer about the missing words (singular nouns only). If they are accepted by the developer, the player will receive bonus points each time he use the reported words.
 Német:
 - Fehlerbehebung
-- Das Auswählen von Wörtern, die dem Spiel unbekannt sind, ermöglicht es dem Spieler, dem Entwickler fehlende Wörter (singular Substantive) zu melden. Wenn sie akzeptiert werden, erhält der Spieler Belohnungspunkte jedes Mal, wenn er die gemeldete Wörter verwendet.
+- Das  dreimalige Auswählen von Wörtern, die dem Spiel unbekannt sind, ermöglicht es dem Spieler, dem Entwickler fehlende Wörter (nur singular Substantive) zu melden. Wenn sie vom Entwickler akzeptiert werden, erhält der Spieler Belohnungspunkte jedes Mal, wenn er die gemeldete Wörter verwendet.
 Magyar:
 - Kisebb hibák javítása
-- A játék által nem ismert szavak kijelölésekor a játékosnak lehetősége nyílik a hiányzó szavak (egyes számú főnevek) bejelendtésére a fejlesztő felé. Elfogadás esetén a játékos a bejelentett szavak minden felhasználásakor jutalompontokat kap.
+- A játék által nem ismert szavak háromszori kijelölésekor a játékosnak lehetősége nyílik a hiányzó szavak (csak egyes számú főnevek) bejelendtésére a fejlesztő felé. A fejlesztő általi elfogadás esetén a játékos a bejelentett szavak minden felhasználásakor jutalompontokat kap.
 Orosz:
 - Исправление ошибок
-- Выбор слов, неизвестных игре, позволяет игроку сообщать разработчику о неизвестных игре словах (существительные в единственном числе). Если они будут приняты, игрок будет получать призовые очки каждый раз, когда он использует такие слова
+- Трехкратный выбор слов, неизвестных игре, позволяет игроку сообщать разработчику о неизвестных игре словах (только существительные в единственном числе). В случае принятия разработчиком, игрок будет получать призовые очки каждый раз, когда он использует такие слова
 
