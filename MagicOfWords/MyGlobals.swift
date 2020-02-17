@@ -18,6 +18,7 @@ let exclamationMark = "!"
 public let roundSeparator = "/"
 let itemSeparator = "°"
 let itemInnerSeparator = "^"
+let itemExternSeparator = "|"
 
 
 enum GameType: Int {

@@ -332,20 +332,24 @@ ShowNewWordsInCloudSceneDelegate {
         present(alertController, animated: true, completion: nil)
     }
     
-//    override func viewDidLoad() {
-//    var countMandatory = 0
-//    var countExistingGames = 0
-//    var countContinueGames = 0
-//
-//    private func getRecordCounts() {
-//        countMandatory = realmMandatory.objects(MandatoryModel.self).filter("language = %@ and gameNumber < 1000", GV.actLanguage).count
-//        countExistingGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).count
-//        countContinueGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and (gameStatus = %@ or gameStatus = %@)", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber, GV.GameStatusPlaying, GV.GameStatusContinued).count
-//    }
-    var oneMinutesTimer: Timer?
+        var oneMinutesTimer: Timer?
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
-
+//        delete temporary files
+        let path = NSTemporaryDirectory()
+        let subDirs = FileManager().subpaths(atPath: NSTemporaryDirectory())
+        for file in subDirs! {
+            print("file: \(file)")
+            if file.count > 30 {
+                do {
+                    try FileManager().removeItem(at: URL(fileURLWithPath: path + file))
+                }
+                catch {
+                    print(error)
+                }
+            }
+        }
+//        let subDirsAfter = FileManager().subpaths(atPath: NSTemporaryDirectory())
         GV.mainViewController = self
         setDarkMode()
         GV.wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))

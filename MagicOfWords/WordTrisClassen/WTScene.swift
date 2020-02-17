@@ -1195,7 +1195,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
         }
         createFixLetters()
-//        checkIfGameFinished()
         saveActualState()
         createNextRound = false
         GV.nextRoundAnimationFinished = false
@@ -2178,6 +2177,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         print("cancel")
     }
     private func play() {
+//        let subDirs = FileManager().subpaths(atPath: NSTemporaryDirectory())
+//        print("Dir: \(String(describing: subDirs))")
         playSound()
         GV.playing = true
         timerIsCounting = true
@@ -2205,16 +2206,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 createFixLetters()
             } else {
                 WTGameWordList.shared.restoreFromPlayingRecord()
-//                print(Date().getDateDiff(start: start))
-//                start = Date()
                 restoreGameArray()
-//                print(Date().getDateDiff(start: start))
-//                start = Date()
                 showFoundedWords()
-//                print(Date().getDateDiff(start: start))
-//                print("===================================")
                 modifyHeader()
-                
             }
         } else {
             if GV.playingRecord.rounds.count == 0 {
@@ -3873,8 +3867,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            rounds.infos = wtGameboard!.roundInfosToString(all:false)
             rounds.infos = WTGameWordList.shared.toStringLastRound()
             rounds.gameArray  = wtGameboard!.gameArrayToString()
-    //        GV.playingRecord.roundGameArrays = wtGameboard!.gameArrayToString()
-            
+//            GV.playingRecord.allWordsString = WTGameWordList.shared.allWordsToString()
+            GV.playingRecord.wordsInRoundString = WTGameWordList.shared.wordsInRoundToString()
             
             var activityItemsString = ""
             if activityRoundItem.count == 0 {
@@ -4149,7 +4143,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
         }
-//        createFixLetters()
         if GV.playingRecord.rounds.count > 0 {
             actRound = GV.playingRecord.rounds.count
             if GV.playingRecord.rounds.last!.gameArray.count > 0 {

@@ -157,6 +157,10 @@ class WTGameboardItem: SKSpriteNode {
     public func getCountOccurencesInWords()->Int {
         return countOccurencesInWords
     }
+    
+    public func incrementCountOccurencesInWords() {
+        countOccurencesInWords += 1
+    }
 //    public func setColorByState() {
 //        switch status {
 //        case .used:
