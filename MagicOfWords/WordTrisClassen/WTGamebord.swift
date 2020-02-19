@@ -738,13 +738,26 @@ class WTGameboard: SKShapeNode {
         }
         return gameArrayString
     }
+    var timer = Date()
+    private func setFirstTime() {
+        timer = Date()
+    }
+    
+    private func showTime(string: String) {
+        let date = Date()
+        print("time at \(string): \((date.timeIntervalSince(timer) * 1000).nDecimals(10))")
+        timer = Date()
+    }
+    
+
     
     public func stringToGameArray(string: String) {
-        
+        setFirstTime()
         for index in 0..<countCols * countCols {
             let col = index / countCols
             let row = index % countCols
             GV.gameArray[col][row].restore(from: string.subString(at: 2 * index, length: 2))
+//            showTime(string: "col: \(col), row: \(row)")
         }
     }
     

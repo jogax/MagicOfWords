@@ -327,6 +327,18 @@ class WTGameboardItem: SKSpriteNode {
     
     var lastCol = 0
     var lastRow = 0
+    var timer = Date()
+    private func setFirstTime() {
+        timer = Date()
+    }
+    
+    private func showTime(string: String) {
+        let date = Date()
+        print("time at \(string): \((date.timeIntervalSince(timer) * 1000).nDecimals(10))")
+        timer = Date()
+    }
+    
+
     
     private func setTexture() {
         var connectionName = "Connection"
@@ -378,11 +390,9 @@ class WTGameboardItem: SKSpriteNode {
 //        var color: MyColor = .myWhiteColor
         var status: ItemStatus = .Empty
         var letter = emptyLetter
+        setFirstTime()
         remove(all: true)
-//        if fixItem {
-//            self.status = .Empty
-//            self.letter = emptyLetter
-//        }
+//        showTime(string: "remove")
         if let rawStatus = Int(from.firstChar()) {
             if let itemStatus = ItemStatus(rawValue: rawStatus) {
                 switch itemStatus {
@@ -398,7 +408,9 @@ class WTGameboardItem: SKSpriteNode {
             }
         }
         letter = from.subString(at: 1, length: 1)
+//        showTime(string: "from.subString")
         _ = setLetter(letter: letter, toStatus: status, calledFrom: "restore")
+//        showTime(string: "setLetter")
         origLetter = emptyLetter
         origStatus = .Empty
         doubleUsed = false

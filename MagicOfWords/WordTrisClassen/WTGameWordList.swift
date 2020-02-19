@@ -27,13 +27,6 @@ public struct ConnectionType {
         self.right = right
         self.bottom = bottom
     }
-    func toString()->String {
-        var returnValue = left ? "1" : "0"
-        returnValue += top ? "1" : "0"
-        returnValue += right ? "1" : "0"
-        returnValue += bottom ? "1" : "0"
-        return returnValue
-    }
 }
 
 public struct LineOfFoundedWords {
@@ -105,10 +98,10 @@ public struct SelectedWord {
         return countFixLetters
     }
     
-//    public func totalScore(plus: Bool)->Int {
-//        return self.score/* + self.bonus(plus: plus)*/
-//    }
-//
+    public func totalScore(plus: Bool)->Int {
+        return self.score/* + self.bonus(plus: plus)*/
+    }
+
     public func bonus(plus: Bool)->Int {
         var returnValue = 0
         for letter in usedLetters {
@@ -123,7 +116,7 @@ public struct SelectedWord {
         }
         return returnValue
     }
-//
+    
     public func isMandatory()->Bool {
         for word in GV.mandatoryWords {
             if word == self.word {
@@ -169,34 +162,11 @@ public struct SelectedWord {
         if colRowString.length > 1 {
             colRowString.removeLast()
         }
-        return word + itemInnerSeparator + colRowString
+        return word +
+//            itemInnerSeparator + (mandatory ? "1" : "0") +
+//            itemInnerSeparator + String(creationIndex) +
+            itemInnerSeparator + colRowString
     }
-    func toStringAllFields()->String {
-        var returnValue = word + itemSeparator
-        for letter in usedLetters {
-            returnValue += letter.toString() + itemInnerSeparator
-        }
-        returnValue.removeLast()
-        returnValue += itemSeparator
-        returnValue += String(countFixLetters) + itemSeparator
-        returnValue += String(score)
-        return returnValue
-    }
-    init(wholeFrom: String) {
-        let items = wholeFrom.components(separatedBy: itemSeparator)
-        word = items[0]
-        let letters = items[1].components(separatedBy: itemInnerSeparator)
-        usedLetters = [UsedLetter]()
-        for letter in letters {
-            let usedLetter = UsedLetter(col: Int(letter.firstChar())!, row: Int(letter.subString(at: 1, length: 1))!, letter: letter.lastChar())
-            usedLetters.append(usedLetter)
-        }
-        countFixLetters = Int(items[2])!
-//        let connections = items[3].components(separatedBy: itemInnerSeparator)
-        connectionTypes = setConnectionTypes()
-        score = Int(items[3])!
-    }
-
 }
 
 extension SelectedWord: Equatable {
@@ -225,9 +195,6 @@ public struct WordWithCounter {
 //        self.mandatory = mandatory
 //        self.countFixLetters = countFixLetters
         self.score = score
-    }
-    public func toString()->String {
-        return word + itemInnerSeparator + String(counter) + itemInnerSeparator + String(score)
     }
 }
 
@@ -274,10 +241,55 @@ public class WTGameWordList {
         self.delegate = delegate
     }
     
+//    public func setMandatoryWords() {
+//        mandatoryWords = GV.playingRecord.mandatoryWords.uppercased().components(separatedBy: itemSeparator)
+//        GV.mandatoryWords.removeAll()
+//        for word in mandatoryWords {
+//            allWords.append(WordWithCounter(word: word, counter: 0, mandatory: true, score: 0))
+//            GV.mandatoryWords.append(word)
+//        }
+//    }
+//
+//    public func getMandatoryWords()->[WordWithCounter] {
+//        var returnArray = [WordWithCounter]()
+//        let mandatorySorted = allWords.filter({$0.mandatory == true}).sorted(by: {
+//            $0.word.length < $1.word.length ||
+//            $0.word.length == $1.word.length && $0.word < $1.word ||
+//            $0.word == $1.word && $0.counter < $1.counter})
+//        for (index, mandatoryWord) in mandatorySorted.enumerated() {
+////            print(mandatoryWord)
+//            if !(mandatoryWord.counter == 0 && index < mandatorySorted.count - 1 && mandatoryWord.word == mandatorySorted[index + 1].word)
+//            {
+//                returnArray.append(mandatoryWord)
+//            }
+//        }
+//        return returnArray
+//
+//    }
+    
+//    public func gameFinished()->Bool {
+//        var counter = 0
+//        let myMandatoryWords = allWords.filter({$0.mandatory == true && $0.counter > 0})
+//        for mandatoryWord in GV.mandatoryWords {
+//            counter += myMandatoryWords.filter({$0.word == mandatoryWord}).count > 0 ? 1 : 0
+//        }
+//        return counter == GV.mandatoryWords.count
+//    }
+    
     public func getCountWords()->Int {
             return allWords.count
     }
     
+//    public func getMinutesForWord(word: String)->Int {
+//        if word.length < minutesForWord.count {
+//            return minutesForWord[word.length]!
+//        } else {
+//            return minutesForWord[minutesForWord.count - 1]!
+//        }
+//    }
+//
+//
+//
     public func getCountOwnWords(founded: Bool)->(Int) {
         var returnValue = 0
         var lastWord = ""
@@ -299,89 +311,22 @@ public class WTGameWordList {
     }
     
     public func restoreFromPlayingRecord() {
-        allWords = [WordWithCounter]()
-//        var testAllWords = [WordWithCounter]()
-        wordsInRound = [WordInRound]()
-        if GV.playingRecord.wordsInRoundString != "" {
+        clearWordsInGame()
+        for (index, round) in GV.playingRecord.rounds.enumerated() {
+            print("round: \(index + 1)")
+            setFirstTime()
             cleanGameArray()
+//            showTime(string: "cleanGameArray")
             resetOccurencesInWords()
-            let wordsInRoundTab = GV.playingRecord.wordsInRoundString.components(separatedBy: roundSeparator)
-            for item in wordsInRoundTab {
-                var roundInfo = [SelectedWord]()
-                let itemTab = item.components(separatedBy: itemExternSeparator)
-                for word in itemTab {
-                    let selectedWord = SelectedWord(wholeFrom: word)
-                    roundInfo.append(selectedWord)
-                    let wordWithCounter = WordWithCounter(word: selectedWord.word, counter: 1, score: selectedWord.score)
-                    allWords.append(wordWithCounter)
-                }
-                var wordInRound = WordInRound()
-                wordInRound.wordsInGame = roundInfo
-                wordsInRound.append(wordInRound)
-            }
-            wtGameboard!.stringToGameArray(string: GV.playingRecord.rounds.last!.gameArray)
-            setConnectionsInGameArray()
-            GV.totalScore = GV.playingRecord.score
-        } else {
-            clearWordsInGame()
-            for (index, round) in GV.playingRecord.rounds.enumerated() {
-                cleanGameArray()
-                resetOccurencesInWords()
-                wordsInRound.append(WordInRound())
-                wtGameboard!.stringToGameArray(string: round.gameArray)
-                initFromString(from: round.infos, round: index + 1)
-            }
+//            showTime(string: "resetOccurencesInWords")
+            wordsInRound.append(WordInRound())
+            wtGameboard!.stringToGameArray(string: round.gameArray)
+//            showTime(string: "stringToGameArray")
+            initFromString(from: round.infos, round: index + 1)
+            showTime(string: "initFromString")
         }
-//        for index in 0..<allWords.count {
-//            if !(allWords[index].word == testAllWords[index].word && allWords[index].counter == testAllWords[index].counter && allWords[index].score == testAllWords[index].score) {
-//                print("error by compare at index \(index)")
-//            }
-//        }
-    }
-    
-    private func setConnectionsInGameArray() {
-        let wordsInLastRound = wordsInRound.last!.wordsInGame
-        for word in wordsInLastRound {
-            for index in 0..<word.usedLetters.count {
-                let col = word.usedLetters[index].col
-                let row = word.usedLetters[index].row
-                let connectionType = word.connectionTypes[index]
-                if GV.gameArray[col][row].letter == word.usedLetters[index].letter {
-                    GV.gameArray[col][row].setConnectionType(connectionType: connectionType)
-                    GV.gameArray[col][row].incrementCountOccurencesInWords()
-                }
-            }
-        }
-    }
-    
-    public func wordsInRoundToString()->String {
-        var returnValue = ""
-        for roundInfos in wordsInRound {
-            for word in roundInfos.wordsInGame {
-                returnValue += word.toStringAllFields() + itemExternSeparator
-            }
-            if returnValue.count > 0 {
-                returnValue.removeLast()
-                returnValue += roundSeparator
-            }
-        }
-        if returnValue.count > 0 {
-            returnValue.removeLast()
-        }
-        return returnValue        
     }
      
-    public func allWordsToString()->String {
-        var returnValue = ""
-        for word in allWords {
-            returnValue += word.toString() + itemSeparator
-        }
-        if returnValue.count > 0 {
-            returnValue.removeLast()
-        }
-        return returnValue
-    }
-    
     private func resetOccurencesInWords() {
         for col in 0..<GV.size {
             for row in 0..<GV.size {
@@ -412,9 +357,21 @@ public class WTGameWordList {
         }
     }
     
+    var timer = Date()
+    private func setFirstTime() {
+        timer = Date()
+    }
+    
+    private func showTime(string: String) {
+        let date = Date()
+        print("time at \(string): \((date.timeIntervalSince(timer) * 1000).nDecimals(10))")
+        timer = Date()
+    }
+    
     public func getPreviousRound() {
         wordsInRound.removeLast()
     }
+
 
     public func addWord(selectedWord: SelectedWord, doAnimate: Bool, round: Int)->Bool {
 //        var mySelectedWord = selectedWord
@@ -425,45 +382,42 @@ public class WTGameWordList {
             wordsInRound.append(WordInRound())
         }
         let wordsInGame = wordsInRound.last!.wordsInGame
-        for index1 in 0..<selectedWord.usedLetters.count - 1 {
-            // check if a letter is 2x used in the word
-            for index2 in index1 + 1..<selectedWord.usedLetters.count {
-                if selectedWord.usedLetters[index1].col == selectedWord.usedLetters[index2].col &&
-                    selectedWord.usedLetters[index1].row == selectedWord.usedLetters[index2].row {
-                    noCommonLetter = false
-                }
-            }
-            // check if in the word is using the diagonal way from one letter to the other
-            let index2 = index1 + 1
-            if selectedWord.usedLetters[index1].col != selectedWord.usedLetters[index2].col &&
-                selectedWord.usedLetters[index1].row != selectedWord.usedLetters[index2].row {
-                noDiagonal = false
-            }
-        }
-        for savedSelectedWord in wordsInGame{
-            // check if there is the same word in the table with one or more letters with the same position
-            if savedSelectedWord.word == selectedWord.word {
-                for savedLetterIndex in 0..<savedSelectedWord.word.length {
-                    for selectedLetterIndex in 0..<selectedWord.word.length {
-                        if savedSelectedWord.usedLetters[savedLetterIndex].col == selectedWord.usedLetters[selectedLetterIndex].col &&
-                            savedSelectedWord.usedLetters[savedLetterIndex].row == selectedWord.usedLetters[selectedLetterIndex].row &&
-                            savedSelectedWord.usedLetters[savedLetterIndex].letter == selectedWord.usedLetters[selectedLetterIndex].letter {
-                            commonLetters.append(savedSelectedWord.usedLetters[savedLetterIndex])
-                            noCommonLetter = false
-                        }
+        if doAnimate {
+            for index1 in 0..<selectedWord.usedLetters.count - 1 {
+                // check if a letter is 2x used in the word
+                for index2 in index1 + 1..<selectedWord.usedLetters.count {
+                    if selectedWord.usedLetters[index1].col == selectedWord.usedLetters[index2].col &&
+                        selectedWord.usedLetters[index1].row == selectedWord.usedLetters[index2].row {
+                        noCommonLetter = false
                     }
                 }
-                if !noCommonLetter {
-                    delegate!.blinkWords(newWord: selectedWord, foundedWord: savedSelectedWord)
+                // check if in the word is using the diagonal way from one letter to the other
+                let index2 = index1 + 1
+                if selectedWord.usedLetters[index1].col != selectedWord.usedLetters[index2].col &&
+                    selectedWord.usedLetters[index1].row != selectedWord.usedLetters[index2].row {
+                    noDiagonal = false
+                }
+            }
+            for savedSelectedWord in wordsInGame{
+                // check if there is the same word in the table with one or more letters with the same position
+                if savedSelectedWord.word == selectedWord.word {
+                    for savedLetterIndex in 0..<savedSelectedWord.word.length {
+                        for selectedLetterIndex in 0..<selectedWord.word.length {
+                            if savedSelectedWord.usedLetters[savedLetterIndex].col == selectedWord.usedLetters[selectedLetterIndex].col &&
+                                savedSelectedWord.usedLetters[savedLetterIndex].row == selectedWord.usedLetters[selectedLetterIndex].row &&
+                                savedSelectedWord.usedLetters[savedLetterIndex].letter == selectedWord.usedLetters[selectedLetterIndex].letter {
+                                commonLetters.append(savedSelectedWord.usedLetters[savedLetterIndex])
+                                noCommonLetter = false
+                            }
+                        }
+                    }
+                    if !noCommonLetter {
+                        delegate!.blinkWords(newWord: selectedWord, foundedWord: savedSelectedWord)
+                    }
                 }
             }
         }
         if noCommonLetter && noDiagonal {
-//            var oldScore = 0
-//            var newScore = 0
-//            if doAnimate {
-//                oldScore = getActualScore()
-//            }
 
             for index in 0..<selectedWord.usedLetters.count {
 //            for letter in selectedWord.usedLetters {
@@ -472,12 +426,12 @@ public class WTGameWordList {
                 GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, incrWords: true)
             }
             addWordToAllWords(selectedWord: selectedWord, doAnimate: doAnimate, round: round)
-            addWordToMyUniqueWords(word: selectedWord.word)
+            addWordToMyWords(word: selectedWord.word)
         }
         return noCommonLetter && noDiagonal
     }
     
-    private func addWordToMyUniqueWords(word: String) {
+    private func addWordToMyWords(word: String) {
         let foundedWord = realm.objects(MyWords.self).filter("word = %@", GV.actLanguage + word.lowercased())
         if foundedWord.count == 0 {
             let wordToInsert = MyWords()
@@ -516,6 +470,7 @@ public class WTGameWordList {
                 GV.countOfLetters += 1
             }
         }
+
     }
     
     
@@ -678,7 +633,7 @@ public class WTGameWordList {
         allWords = [WordWithCounter]()
     }
     
-    private func clearWordsInGame(changeGameArray: Bool = true) {
+    public func clearWordsInGame(changeGameArray: Bool = true) {
         if changeGameArray {
             for item in wordsInRound {
                 for selectedWord in item.wordsInGame {

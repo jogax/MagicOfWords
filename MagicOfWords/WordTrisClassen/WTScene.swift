@@ -3868,7 +3868,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             rounds.infos = WTGameWordList.shared.toStringLastRound()
             rounds.gameArray  = wtGameboard!.gameArrayToString()
 //            GV.playingRecord.allWordsString = WTGameWordList.shared.allWordsToString()
-            GV.playingRecord.wordsInRoundString = WTGameWordList.shared.wordsInRoundToString()
+//            GV.playingRecord.wordsInRoundString = WTGameWordList.shared.wordsInRoundToString()
             
             var activityItemsString = ""
             if activityRoundItem.count == 0 {
