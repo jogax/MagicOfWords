@@ -367,10 +367,79 @@ ShowNewWordsInCloudSceneDelegate {
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
         convertIfNeeded()
+        checkDeviceRecordInCloud()
         checkReportedWordsInCloud()
         checkNewWordsInCloud()
 //        checkMyBonusMalus()
         _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
+    }
+    
+    private func checkDeviceRecordInCloud() {
+        let actPlayingTime = GV.basicDataRecord.playingTime
+        let actPlayingTimeToday = GV.basicDataRecord.playingTimeToday
+        let actLastPlayingDay = GV.basicDataRecord.lastPlayingDay
+
+        var deviceRecordID = String(GV.getTimeIntervalSince20190101())
+        if GV.basicDataRecord.deviceRecordInCloudID != "" {
+            deviceRecordID = GV.basicDataRecord.deviceRecordInCloudID
+        } else {
+            try! realm.safeWrite {
+                GV.basicDataRecord.deviceRecordInCloudID = deviceRecordID
+            }
+        }
+
+        let recordID = CKRecord.ID(recordName: deviceRecordID)
+        let predicate = NSPredicate(format: "recordID = %@", recordID)
+        let query = CKQuery(recordType: "DeviceRecord", predicate: predicate)
+        let container = CKContainer.default()
+        container.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
+//            if error != nil {
+//                return
+//            }
+            if results!.count == 0 {
+                let deviceRecord = CKRecord(recordType: "DeviceRecord", recordID: recordID)
+                deviceRecord["deviceType"] = UIDevice().convertIntToModelName(value: UIDevice().getModelCode())
+                deviceRecord["land"] = Locale.current.regionCode == nil ? "HU" : Locale.current.regionCode
+                deviceRecord["language"] = GV.actLanguage
+                deviceRecord["playingTime"] = 0
+                deviceRecord["lastPlayingTime"] = 0
+                deviceRecord["lastPlayed"] = Date().yearMonthDay
+                deviceRecord["version"] = actVersion
+                deviceRecord["playerID"] = ""
+                container.publicCloudDatabase.save(deviceRecord) {
+                    (record, error) in
+                    if let error = error {
+                        // Insert error handling
+                        print("Error by save: \(error)")
+                        return
+                    }
+                    print("OK")
+                }
+
+            } else {
+                let deviceRecord = results![0]
+                deviceRecord["playingTime"] = actPlayingTime
+                deviceRecord["lastPlayingTime"] = actPlayingTimeToday
+                if deviceRecord["lastPlayed"] != Date().yearMonthDay {
+                    deviceRecord["lastPlayed"] = Date().yearMonthDay
+                }
+                
+                if deviceRecord["playerID"] == "" && GKLocalPlayer.local.playerID != "" {
+                    deviceRecord["playerID"] = GKLocalPlayer.local.playerID
+                }
+                container.publicCloudDatabase.save(deviceRecord) {
+                    (record, error) in
+                    if let error = error {
+                        // Insert error handling
+                        print("Error by save: \(error)")
+                        return
+                    }
+                    print("OK")
+                }
+
+            }
+        }
+
     }
     
     private func checkReportedWordsInCloud() {
@@ -519,6 +588,7 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     @objc private func tenMinutesTimer(timerX: Timer) {
+        checkDeviceRecordInCloud()
         tenMinutesTimer = Timer.scheduledTimer(timeInterval: 600.0, target: self, selector: #selector(tenMinutesTimer(timerX: )), userInfo: nil, repeats: false)
     }
     

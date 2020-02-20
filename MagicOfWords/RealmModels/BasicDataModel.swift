@@ -32,11 +32,11 @@ class BasicDataModel: Object {
     @objc dynamic var countPlays = 0
     @objc dynamic var musicOn = false
     @objc dynamic var deviceInfoSaved = false
-//    GCEnabledType: 0 = AskForGameCenter, 1 = GameCenterEnabled, 2 = GameCenterSupressed
     @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
     @objc dynamic var startAnimationShown = false
     @objc dynamic var showingScoreType = 0 // ScoreType
     @objc dynamic var showingTimeScope = 0 // TimeScope
+    @objc dynamic var deviceRecordInCloudID = ""
     let scoreInfos = List<ScoreInfoForDifficulty>()
 
     override  class func primaryKey() -> String {

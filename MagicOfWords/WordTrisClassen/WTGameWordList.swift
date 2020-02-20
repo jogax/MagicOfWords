@@ -313,7 +313,7 @@ public class WTGameWordList {
     public func restoreFromPlayingRecord() {
         clearWordsInGame()
         for (index, round) in GV.playingRecord.rounds.enumerated() {
-            print("round: \(index + 1)")
+//            print("round: \(index + 1)")
             setFirstTime()
             cleanGameArray()
 //            showTime(string: "cleanGameArray")
@@ -323,7 +323,7 @@ public class WTGameWordList {
             wtGameboard!.stringToGameArray(string: round.gameArray)
 //            showTime(string: "stringToGameArray")
             initFromString(from: round.infos, round: index + 1)
-            showTime(string: "initFromString")
+//            showTime(string: "initFromString")
         }
     }
      
