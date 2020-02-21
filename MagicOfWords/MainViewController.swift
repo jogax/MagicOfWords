@@ -367,7 +367,7 @@ ShowNewWordsInCloudSceneDelegate {
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
         convertIfNeeded()
-        checkDeviceRecordInCloud()
+//        checkDeviceRecordInCloud()
         checkReportedWordsInCloud()
         checkNewWordsInCloud()
 //        checkMyBonusMalus()
@@ -377,7 +377,6 @@ ShowNewWordsInCloudSceneDelegate {
     private func checkDeviceRecordInCloud() {
         let actPlayingTime = GV.basicDataRecord.playingTime
         let actPlayingTimeToday = GV.basicDataRecord.playingTimeToday
-        let actLastPlayingDay = GV.basicDataRecord.lastPlayingDay
 
         var deviceRecordID = String(GV.getTimeIntervalSince20190101())
         if GV.basicDataRecord.deviceRecordInCloudID != "" {
@@ -393,9 +392,9 @@ ShowNewWordsInCloudSceneDelegate {
         let query = CKQuery(recordType: "DeviceRecord", predicate: predicate)
         let container = CKContainer.default()
         container.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
-//            if error != nil {
-//                return
-//            }
+            if error != nil {
+                return
+            }
             if results!.count == 0 {
                 let deviceRecord = CKRecord(recordType: "DeviceRecord", recordID: recordID)
                 deviceRecord["deviceType"] = UIDevice().convertIntToModelName(value: UIDevice().getModelCode())
@@ -434,7 +433,6 @@ ShowNewWordsInCloudSceneDelegate {
                         print("Error by save: \(error)")
                         return
                     }
-                    print("OK")
                 }
 
             }
