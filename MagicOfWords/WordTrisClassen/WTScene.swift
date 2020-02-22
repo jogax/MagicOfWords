@@ -3830,7 +3830,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                GV.playingRecord.gameStatus = GV.GameStatusFinished
 //            }
 //            if !showHelp {
-//                self.startNewGame()
+            self.startNewGame()
 //            }
         } else {
             self.restartThisGame()
