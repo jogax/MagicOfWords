@@ -212,7 +212,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         func decreaseCountFinished() {
             self.countFinished -= 1
             if self.countFinished == 0 {
-                print("at end!!!")
+//                print("at end!!!")
                 completion()
             }
         }

@@ -24,6 +24,10 @@ let itemExternSeparator = "|"
 enum GameType: Int {
     case WordTris = 1, SearchWords, NoMoreGames
 }
+enum LettersColor: String {
+    case NoColor = "NoColor", Red = "Red", Green = "Green"
+}
+
 
 enum GameDifficulty: Int {
     case Easy = 0, Medium, Hard, VeryHard
@@ -180,7 +184,7 @@ struct GV {
     static var playing = false
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()
-    static var helpInfoRecords: Results<HelpInfo>?
+//    static var helpInfoRecords: Results<HelpInfo>?
     static let frequencyString = ":freq:"
     static var darkMode = false
 
@@ -208,7 +212,7 @@ struct GV {
     static var bonusScore = 0
     static var totalScore = 0
 //    static var myBonusMalus = 0
-    static var generateHelpInfo = false
+//    static var generateHelpInfo = false
     static var mandatoryWords = [String]()
     static var blinkingNodes = [WTGameboardItem]()
     static var countBlinkingNodes = 0
@@ -334,6 +338,23 @@ struct GV {
 //    static let NEW_REALM_URL = URL(string: "realms://\(MY_INSTANCE_ADDRESS)/MagicOfWordsRealm")!
 
 }
+var timer = [Date]()
+public func setFirstTime()->Int {
+    let time = Date()
+    timer.append(time)
+    return timer.count - 1
+}
+
+public func showTime(num: Int, string: String) {
+    let date = Date()
+    print("time at \(string): \((date.timeIntervalSince(timer[num]) * 1000).nDecimals(10))")
+    timer[num] = Date()
+}
+
+public func stopTime() {
+    timer.removeLast()
+}
+
 
 
 

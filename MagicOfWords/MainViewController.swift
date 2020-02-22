@@ -16,7 +16,7 @@ import GameKit
 import CloudKit
 //import SCLAlertView
 
-class MainViewController: UIViewController, WelcomeSceneDelegate, WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate,  ShowGameCenterViewControllerDelegate,
+class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate,  ShowGameCenterViewControllerDelegate,
 ShowNewWordsInCloudSceneDelegate {
     func backFromShowGameCenterViewController() {
         showMenu()
@@ -83,9 +83,9 @@ ShowNewWordsInCloudSceneDelegate {
     
     
     func callModifyHeader() {
-        if animationScene != nil {
-            return
-        }
+//        if animationScene != nil {
+//            return
+//        }
         if GV.wtScene != nil {
             GV.wtScene!.modifyHeader()
         } else {
@@ -106,37 +106,37 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     
-    func backFromAnimation() {
-        if let view = self.view as! SKView? {
-            view.presentScene(nil)
-            animationScene = nil
-        }
-        showBackgroundPicture()
-//        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue && GV.connectedToInternet {
-//            manageGameCenter()
-//        } else {
-            self.showMenu()
+//    func backFromAnimation() {
+//        if let view = self.view as! SKView? {
+//            view.presentScene(nil)
+//            animationScene = nil
 //        }
-    }
+//        showBackgroundPicture()
+////        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue && GV.connectedToInternet {
+////            manageGameCenter()
+////        } else {
+//            self.showMenu()
+////        }
+//    }
     
-    func showHowToPlay(difficulty: Int) {
-        if let view = self.view as! SKView? {
-            view.presentScene(nil)
-            animationScene = nil
-        }
-        showBackgroundPicture()
-        GV.origDifficulty = GV.basicDataRecord.difficulty
-        try! realm.safeWrite() {
-            GV.basicDataRecord.difficulty = difficulty
-        }
-        GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage).sorted(byKeyPath: "counter")
-        let gameNumber = difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
-        if GV.helpInfoRecords!.count > 0 {
-            startWTScene(new: true, next: StartType.GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
-        } else {
-            self.showMenu()
-        }
-    }
+//    func showHowToPlay(difficulty: Int) {
+//        if let view = self.view as! SKView? {
+//            view.presentScene(nil)
+//            animationScene = nil
+//        }
+//        showBackgroundPicture()
+//        GV.origDifficulty = GV.basicDataRecord.difficulty
+//        try! realm.safeWrite() {
+//            GV.basicDataRecord.difficulty = difficulty
+//        }
+//        GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage).sorted(byKeyPath: "counter")
+//        let gameNumber = difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
+//        if GV.helpInfoRecords!.count > 0 {
+//            startWTScene(new: true, next: StartType.GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
+//        } else {
+//            self.showMenu()
+//        }
+//    }
     
     
     #if DEBUG
@@ -180,7 +180,7 @@ ShowNewWordsInCloudSceneDelegate {
     
     func gameFinished(start: StartType) {
         GV.playing = false
-        GV.generateHelpInfo = false
+//        GV.generateHelpInfo = false
         if let view = self.view as! SKView? {
             view.presentScene(nil)
             wtSceneStarted = false
@@ -220,7 +220,7 @@ ShowNewWordsInCloudSceneDelegate {
         if let view = self.view as! SKView? {
 //            if !wtSceneStarted {
                 GV.wtScene!.setDelegate(delegate: self)
-                GV.wtScene!.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart, showHelp: showHelp)
+                GV.wtScene!.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
                 GV.wtScene!.parentViewController = self
                 view.presentScene(GV.wtScene!)
                 wtSceneStarted = true
@@ -651,17 +651,17 @@ ShowNewWordsInCloudSceneDelegate {
         }
     }
     
-    var animationScene: WelcomeScene?
+//    var animationScene: WelcomeScene?
 
-    @objc private func startWelcomeScene() {
-        animationScene = WelcomeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        if let view = self.view as! SKView? {
-            animationScene!.setDelegate(delegate: self)
-            //                wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
-            //                wtScene.parentViewController = self
-            view.presentScene(animationScene!)
-        }
-    }
+//    @objc private func startWelcomeScene() {
+//        animationScene = WelcomeScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+//        if let view = self.view as! SKView? {
+//            animationScene!.setDelegate(delegate: self)
+//            //                wtScene.setGameArt(new: new, next: next, gameNumber: gameNumber, restart: restart)
+//            //                wtScene.parentViewController = self
+//            view.presentScene(animationScene!)
+//        }
+//    }
     
     @objc private func firstButton () {
         print("firstButton tapped")
@@ -707,9 +707,10 @@ ShowNewWordsInCloudSceneDelegate {
                 if GV.basicDataRecord.actLanguage == "" { // BsiacDataRecord not loaded yet
                     generateBasicDataRecordIfNeeded()
                 }
-                if animationScene != nil {
-                    _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
-                } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+//                if animationScene != nil {
+//                    _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
+//                } else
+                if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
                     GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
                 } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue {
                     manageGameCenter()
@@ -721,16 +722,16 @@ ShowNewWordsInCloudSceneDelegate {
         }
     }
     
-    @objc private func waitForAnimationsSceneFinishing(timerX: Timer) {
-        if animationScene != nil || GV.wtScene != nil {
-            _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
-        } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-            GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
-        } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue {
-            manageGameCenter()
-        }
-    }
-
+//    @objc private func waitForAnimationsSceneFinishing(timerX: Timer) {
+//        if animationScene != nil || GV.wtScene != nil {
+//            _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForAnimationsSceneFinishing(timerX: )), userInfo: nil, repeats: false)
+//        } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+//            GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+//        } else if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue {
+//            manageGameCenter()
+//        }
+//    }
+//
     var alertController: UIAlertController?
     var nickNameAction: UIAlertAction?
     var collectMandatoryAction: UIAlertAction?
@@ -782,14 +783,14 @@ ShowNewWordsInCloudSceneDelegate {
         })
         alertController!.addAction(chooseLanguageAction)
         //--------------------- showHelpAction ---------------------
-        let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
-            alert -> Void in
-            //            self.showHowToPlay()
-            self.inMenu = false
-            self.startWelcomeScene()
-        })
-        inMenu = true
-        alertController!.addAction(showHelpAction)
+//        let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            //            self.showHowToPlay()
+//            self.inMenu = false
+//            self.startWelcomeScene()
+//        })
+//        inMenu = true
+//        alertController!.addAction(showHelpAction)
 
 // --------------------- Show GameCenter Question ---------------------
         if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterSupressed.rawValue {
@@ -884,8 +885,8 @@ ShowNewWordsInCloudSceneDelegate {
     var realmHelpInfo: Realm?
     #if DEBUG
     @objc private func developerMenuChoosed() {
-        initiateHelpModel()
-        let countContinueGames = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).count
+//        initiateHelpModel()
+//        let countContinueGames = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).count
 
         let alertController = UIAlertController(title: GV.language.getText(.tcDeveloperMenu),
                                             message: "",
@@ -913,21 +914,21 @@ ShowNewWordsInCloudSceneDelegate {
         })
         alertController.addAction(showSavedWordsInCloudAction)
 
-        let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.areYouSure()
-        })
-        alertController.addAction(newGenHelpAction)
-        if countContinueGames > 0 {
-            let continueGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenContinue), style: .default, handler: { [unowned self]
-                alert -> Void in
-                GV.generateHelpInfo = true
-                let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
-                self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
-            })
-            alertController.addAction(continueGenHelpAction)
-
-        }
+//        let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.areYouSure()
+//        })
+//        alertController.addAction(newGenHelpAction)
+//        if countContinueGames > 0 {
+//            let continueGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenContinue), style: .default, handler: { [unowned self]
+//                alert -> Void in
+////                GV.generateHelpInfo = true
+//                let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
+//                self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
+//            })
+//            alertController.addAction(continueGenHelpAction)
+//
+//        }
         let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
             alert -> Void in
             self.showMenu()
@@ -947,26 +948,26 @@ ShowNewWordsInCloudSceneDelegate {
         }
     }
     
-    private func areYouSure() {
-        let alertController = UIAlertController(title: GV.language.getText(.tcAreYouSureForNewDemo),
-                                                message: GV.language.getText(.tcAreYouSureMessage),
-                                                preferredStyle: .alert)
-        
-        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.showMenu()
-        })
-        alertController.addAction(cancelAction)
-
-        let OKAction = UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: { [unowned self]
-            alert -> Void in
-            GV.generateHelpInfo = true
-            let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
-            self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber)
-        })
-        alertController.addAction(OKAction)
-        present(alertController, animated: true, completion: nil)
-    }
+//    private func areYouSure() {
+//        let alertController = UIAlertController(title: GV.language.getText(.tcAreYouSureForNewDemo),
+//                                                message: GV.language.getText(.tcAreYouSureMessage),
+//                                                preferredStyle: .alert)
+//
+//        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.showMenu()
+//        })
+//        alertController.addAction(cancelAction)
+//
+//        let OKAction = UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: { [unowned self]
+//            alert -> Void in
+////            GV.generateHelpInfo = true
+//            let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
+//            self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber)
+//        })
+//        alertController.addAction(OKAction)
+//        present(alertController, animated: true, completion: nil)
+//    }
     
     #endif
 
@@ -1072,12 +1073,12 @@ ShowNewWordsInCloudSceneDelegate {
 //        }
 //        myAlertController.addAction(chooseGCAction)
        //--------------------- showHelpAction ---------------------
-        let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
-            alert -> Void in
-//            self.showHowToPlay()
-            self.startWelcomeScene()
-        })
-        myAlertController.addAction(showHelpAction)
+//        let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
+//            alert -> Void in
+////            self.showHowToPlay()
+//            self.startWelcomeScene()
+//        })
+//        myAlertController.addAction(showHelpAction)
        //--------------------- choose Style action -----------------------
 //        let chooseStyleAction =  UIAlertAction(title: GV.language.getText(.tcChooseStyle), style: .default, handler: { [unowned self]
 //            alert -> Void in
@@ -1352,47 +1353,47 @@ ShowNewWordsInCloudSceneDelegate {
             }
         }
     }
-    private func initiateHelpModel() {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let helpInfoURL = documentsURL.appendingPathComponent("HelpInfo.realm")
-        let config1 = Realm.Configuration(
-            fileURL: helpInfoURL,
-            shouldCompactOnLaunch: { totalBytes, usedBytes in
-                // totalBytes refers to the size of the file on disk in bytes (data + free space)
-                // usedBytes refers to the number of bytes used by data in the file
-                
-                // Compact if the file is over 100MB in size and less than 50% 'used'
-                let oneMB = 10 * 1024 * 1024
-                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
-        },
-            objectTypes: [HelpInfo.self])
-        do {
-            // Realm is compacted on the first open if the configuration block conditions were met.
-            _ = try Realm(configuration: config1)
-        } catch {
-            print("error")
-            // handle error compacting or opening Realm
-        }
-        let helpInfoConfig = Realm.Configuration(
-            fileURL: helpInfoURL,
-            schemaVersion: 0, // new item words
-            // Set the block which will be called automatically when opening a Realm with
-            // a schema version lower than the one set above
-            migrationBlock: { migration, oldSchemaVersion in
-                switch oldSchemaVersion {
-//                case 0...3:
-//                    migration.deleteData(forType: HelpModel.className())
-//                    
-                default: migration.enumerateObjects(ofType: BasicDataModel.className())
-                { oldObject, newObject in
-                    }
-                }
-        },
-            objectTypes: [HelpInfo.self])
-        
-        realmHelpInfo = try! Realm(configuration: helpInfoConfig)
-        
-    }
+//    private func initiateHelpModel() {
+//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//        let helpInfoURL = documentsURL.appendingPathComponent("HelpInfo.realm")
+//        let config1 = Realm.Configuration(
+//            fileURL: helpInfoURL,
+//            shouldCompactOnLaunch: { totalBytes, usedBytes in
+//                // totalBytes refers to the size of the file on disk in bytes (data + free space)
+//                // usedBytes refers to the number of bytes used by data in the file
+//                
+//                // Compact if the file is over 100MB in size and less than 50% 'used'
+//                let oneMB = 10 * 1024 * 1024
+//                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+//        },
+//            objectTypes: [HelpInfo.self])
+//        do {
+//            // Realm is compacted on the first open if the configuration block conditions were met.
+//            _ = try Realm(configuration: config1)
+//        } catch {
+//            print("error")
+//            // handle error compacting or opening Realm
+//        }
+//        let helpInfoConfig = Realm.Configuration(
+//            fileURL: helpInfoURL,
+//            schemaVersion: 0, // new item words
+//            // Set the block which will be called automatically when opening a Realm with
+//            // a schema version lower than the one set above
+//            migrationBlock: { migration, oldSchemaVersion in
+//                switch oldSchemaVersion {
+////                case 0...3:
+////                    migration.deleteData(forType: HelpModel.className())
+////                    
+//                default: migration.enumerateObjects(ofType: BasicDataModel.className())
+//                { oldObject, newObject in
+//                    }
+//                }
+//        },
+//            objectTypes: [HelpInfo.self])
+//        
+//        realmHelpInfo = try! Realm(configuration: helpInfoConfig)
+//        
+//    }
     
     deinit {
         print("deinit of mainViewController")

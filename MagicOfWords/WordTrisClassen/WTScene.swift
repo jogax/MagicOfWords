@@ -599,7 +599,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var nextGame: StartType = .NoMore
     var newGameNumber: Int = 0
     var restart: Bool = false
-    var showHelp: Bool = false
+//    var showHelp: Bool = false
     var startTouchedNodes = TouchedNodes()
 //    var wtGameFinishedSprite = WTGameFinished()
 
@@ -685,14 +685,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         inDefiningSearchingWord = false
         GV.blinkingNodes.removeAll()
 //        GV.bonusScore = 0
-        if GV.generateHelpInfo {
-            initiateHelpModel()
-            if !showHelp {
-                resetHelpInfo()
-            }
-        } else if showHelp {
-            
-        }
+//        if GV.generateHelpInfo {
+//            initiateHelpModel()
+//            if !showHelp {
+//                resetHelpInfo()
+//            }
+//        } else if showHelp {
+//
+//        }
         self.backgroundColor = bgColor
 //        if restart {
 //            let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, newGameNumber)
@@ -703,7 +703,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
 //        }
 //        wtGameboard = WTGameboard(countCols: GV.sizeOfGrid, parentScene: self, delegate: self, yCenter: gameboardCenterY)
-        getPlayingRecord(next: nextGame, gameNumber: newGameNumber, showHelp: showHelp)
+        getPlayingRecord(next: nextGame, gameNumber: newGameNumber)
         buttonHeight = self.frame.width * (GV.onIpad ? 0.08 : 0.125)
         buttonSize = CGSize(width: buttonHeight, height: buttonHeight)
         createUndo()
@@ -724,29 +724,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        searchWords(lettersToSearch: ["a", "b", "m", "a", "g", "l", "f", "a", "r"])
         play()
         if new {
-            if  !showHelp {
-                let easy = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue
-                let title = GV.language.getText(easy ? .tcChooseGoalForWords : .tcChooseGoalForLetters)
-                let message = GV.language.getText(easy ? .tcGoalMessageForWords : .tcGoalMessageForLetters)
-                let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
-                if easy {
-                    myAlert.addAction(text: "100", action: #selector(self.startEasy100))
-                    myAlert.addAction(text: "250", action: #selector(self.startEasy250))
-                    myAlert.addAction(text: "500", action: #selector(self.startEasy500))
-                    myAlert.addAction(text: "750", action: #selector(self.startEasy750))
-                    myAlert.addAction(text: "1000", action: #selector(self.startEasy1000))
-                } else {
-                    myAlert.addAction(text: "50", action: #selector(self.startMedium50))
-                    myAlert.addAction(text: "100", action: #selector(self.startMedium100))
-                    myAlert.addAction(text: "150", action: #selector(self.startMedium150))
-                    myAlert.addAction(text: "200", action: #selector(self.startMedium200))
-                    myAlert.addAction(text: "250", action: #selector(self.startMedium250))
-                }
-                myAlert.presentAlert()
-                myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-                myAlert.name = self.myAlertName
-                self.bgSprite!.addChild(myAlert)
+            let easy = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue
+            let title = GV.language.getText(easy ? .tcChooseGoalForWords : .tcChooseGoalForLetters)
+            let message = GV.language.getText(easy ? .tcGoalMessageForWords : .tcGoalMessageForLetters)
+            let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
+            if easy {
+                myAlert.addAction(text: "100", action: #selector(self.startEasy100))
+                myAlert.addAction(text: "250", action: #selector(self.startEasy250))
+                myAlert.addAction(text: "500", action: #selector(self.startEasy500))
+                myAlert.addAction(text: "750", action: #selector(self.startEasy750))
+                myAlert.addAction(text: "1000", action: #selector(self.startEasy1000))
+            } else {
+                myAlert.addAction(text: "50", action: #selector(self.startMedium50))
+                myAlert.addAction(text: "100", action: #selector(self.startMedium100))
+                myAlert.addAction(text: "150", action: #selector(self.startMedium150))
+                myAlert.addAction(text: "200", action: #selector(self.startMedium200))
+                myAlert.addAction(text: "250", action: #selector(self.startMedium250))
             }
+            myAlert.presentAlert()
+            myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+            myAlert.name = self.myAlertName
+            self.bgSprite!.addChild(myAlert)
         }
    }
     private func setCountWords(count: Int, type: GameDifficulty) {
@@ -846,7 +844,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
 //    }
 //
-    private func getPlayingRecord(next: StartType, gameNumber: Int, showHelp: Bool = false) {
+    private func getPlayingRecord(next: StartType, gameNumber: Int/*, showHelp: Bool = false*/) {
         func setMandatoryWords() {
             if GV.playingRecord.mandatoryWords == "" {
                 let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", GV.playingRecord.gameNumber, GV.actLanguage).first!
@@ -891,20 +889,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
 
-        if showHelp {
-            if gameNumber >= gameNumberForGenerating {
-                let difficulty = GV.basicDataRecord.difficulty
-                if GV.generateHelpInfo {
-                    GV.helpInfoRecords = realmHelpInfo!.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
-                } else {
-                    GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
-                }
-            }
-            createPlayingRecord(gameNumber: gameNumber)
-        } else if GV.generateHelpInfo && new {
-            deleteGameDataRecord(gameNumber: gameNumber)
-            createPlayingRecord(gameNumber: gameNumber)
-        } else if new {
+//        if showHelp {
+//            if gameNumber >= gameNumberForGenerating {
+//                let difficulty = GV.basicDataRecord.difficulty
+//                if GV.generateHelpInfo {
+//                    GV.helpInfoRecords = realmHelpInfo!.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
+//                } else {
+//                    GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d and difficulty = %d", GV.actLanguage, difficulty).sorted(byKeyPath: "counter")
+//                }
+//            }
+//            createPlayingRecord(gameNumber: gameNumber)
+//        } else if GV.generateHelpInfo && new {
+//            deleteGameDataRecord(gameNumber: gameNumber)
+//            createPlayingRecord(gameNumber: gameNumber)
+//        } else
+        if new {
             let emptyRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and score = 0", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
             if emptyRecords.count > 0 {
                 try! realm.safeWrite() {
@@ -965,9 +964,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func calculatePlace()->Int {
-        if showHelp {
-            return 1
-        }
+//        if showHelp {
+//            return 1
+//        }
         let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "score", ascending: false)
         for (index, record) in actGames.enumerated() {
             if record.combinedKey == GV.playingRecord.combinedKey {
@@ -1010,12 +1009,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         wtSceneDelegate = delegate
     }
     
-    public func setGameArt(new: Bool = false, next: StartType = .NoMore, gameNumber: Int = 0, restart: Bool, showHelp: Bool) {
+    public func setGameArt(new: Bool = false, next: StartType = .NoMore, gameNumber: Int = 0, restart: Bool/*, showHelp: Bool*/) {
         self.new = new
         self.nextGame = next
         self.newGameNumber = gameNumber
         self.restart = restart
-        self.showHelp = showHelp
+//        self.showHelp = showHelp
     }
     
     let gameNumberLinePosition:CGFloat = 0.93
@@ -1177,9 +1176,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-        if showHelpDemoActive && lastHelpDemoStepReady && !createNextRound {
-            showHelpStepByStep()
-        }
+//        if showHelpDemoActive && lastHelpDemoStepReady && !createNextRound {
+//            showHelpStepByStep()
+//        }
     }
     
     private func afterNextRoundAnimation() {
@@ -1576,9 +1575,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     @objc func showAllWordsInTableView() {
         if self.enabled {
-            if GV.generateHelpInfo {
-                saveHelpInfo(action: .ShowMyWordsButton)
-            }
+//            if GV.generateHelpInfo {
+//                saveHelpInfo(action: .ShowMyWordsButton)
+//            }
             stopShowingTableIfNeeded()
             showOwnWordsInTableView()
             showingWordsInTable = true
@@ -1608,7 +1607,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        tippButton!.isEnabled = !hide
         allWordsButton!.isEnabled = !hide
         finishButton!.isEnabled = !hide
-        goBackButton!.isEnabled = showHelp ? true : !hide
+        goBackButton!.isEnabled = !hide
         searchButton!.isEnabled = !hide
         if startEasyGameButton != nil {
             startEasyGameButton!.isEnabled = !hide
@@ -1622,7 +1621,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            tippButton!.alpha = 0.2
             allWordsButton!.alpha = 0.2
             finishButton!.alpha = 0.2
-            goBackButton!.alpha = showHelp ? 1.0 : 0.2
+            goBackButton!.alpha = 0.2
             searchButton!.alpha = 0.2
             if startEasyGameButton != nil {
                 startEasyGameButton!.alpha = 0.2
@@ -1843,7 +1842,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     @objc private func finishButtonTapped() {
         if self.enabled {
             showGameFinished(status: .OK)
-            saveHelpInfo(action: .FinishButton)
+//            saveHelpInfo(action: .FinishButton)
         }
     }
     
@@ -2240,9 +2239,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
         countTime(timerX: Timer())
         setGameStatus()
-        if showHelp {
-            startShowHelpDemo()
-        }
+//        if showHelp {
+//            startShowHelpDemo()
+//        }
         
     }
     
@@ -2299,12 +2298,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var tippIndexes: [Int:Int] = [:]
     
-    private var helpRecordIndex = 0
-    private var helpDemoSpeedSlow = false
-    private var showHelpDemoActive = false
-    private var lastHelpDemoStepReady = false
-    private var generateHelpInfoActive = false
-    private var helpDemoDuration = 0.0
+//    private var helpRecordIndex = 0
+//    private var helpDemoSpeedSlow = false
+//    private var showHelpDemoActive = false
+//    private var lastHelpDemoStepReady = false
+//    private var generateHelpInfoActive = false
+//    private var helpDemoDuration = 0.0
     private var fingerActions = [SKAction]()
     private var lastTouchedPosition = CGPoint(x: 0, y: 0)
     private var fingerSprite: SKSpriteNode?
@@ -2317,34 +2316,34 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         case TouchesBegan, TouchesMoved, TouchesEnded, NoMore
     }
     
-    private func startShowHelpDemo() {
-        helpRecordIndex = 0
-        hideButtons(hide: true)
-        gameFinished = false
-        helpDemoSpeedSlow = true
-        generateHelpInfoActive = GV.generateHelpInfo
-        GV.generateHelpInfo = false
-        helpDemoDuration = 0.0//1
-        let texture = SKTexture(imageNamed: "finger1")
-        fingerSprite = SKSpriteNode(texture: texture)
-        fingerSprite!.zPosition = 1001
-        let multiplier: CGFloat = 0.1
-        let width = self.frame.width * multiplier
-        let fingerSize = CGSize(width: width, height: width)
-        startPosition = CGPoint(x: self.frame.midX, y: self.frame.minY)
-        fingerSprite!.size = fingerSize
-        fingerSprite!.position = startPosition
-        fingerSprite!.zPosition = 100
-        gridStartPosition = CGPoint(x: wtGameboard!.grid!.frame.minX, y:wtGameboard!.grid!.frame.minY)
-        gridSize = wtGameboard!.grid!.frame.width
-        fingerPositionModifier = CGPoint(x: wtGameboard!.blockSize! * 0.5, y: wtGameboard!.blockSize! * 0.5)
-//        var startFromGamearray = false
-//        var countMoves = 0
-
-        lastHelpDemoStepReady = true
-        showHelpDemoActive = true
-//        helpDemoTimer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(startShowHelpDemo), userInfo: nil, repeats: false)
-    }
+//    private func startShowHelpDemo() {
+//        helpRecordIndex = 0
+//        hideButtons(hide: true)
+//        gameFinished = false
+//        helpDemoSpeedSlow = true
+//        generateHelpInfoActive = GV.generateHelpInfo
+////        GV.generateHelpInfo = false
+//        helpDemoDuration = 0.0//1
+//        let texture = SKTexture(imageNamed: "finger1")
+//        fingerSprite = SKSpriteNode(texture: texture)
+//        fingerSprite!.zPosition = 1001
+//        let multiplier: CGFloat = 0.1
+//        let width = self.frame.width * multiplier
+//        let fingerSize = CGSize(width: width, height: width)
+//        startPosition = CGPoint(x: self.frame.midX, y: self.frame.minY)
+//        fingerSprite!.size = fingerSize
+//        fingerSprite!.position = startPosition
+//        fingerSprite!.zPosition = 100
+//        gridStartPosition = CGPoint(x: wtGameboard!.grid!.frame.minX, y:wtGameboard!.grid!.frame.minY)
+//        gridSize = wtGameboard!.grid!.frame.width
+//        fingerPositionModifier = CGPoint(x: wtGameboard!.blockSize! * 0.5, y: wtGameboard!.blockSize! * 0.5)
+////        var startFromGamearray = false
+////        var countMoves = 0
+//
+//        lastHelpDemoStepReady = true
+//        showHelpDemoActive = true
+////        helpDemoTimer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(startShowHelpDemo), userInfo: nil, repeats: false)
+//    }
 //    var helpDemoTimer = Timer()
     
 
@@ -2447,7 +2446,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } while positionExists
             fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
             fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
-            if showHelp || roundCount % 2 == 0 || countOfLetters - letterIndex > 4 {
+            if roundCount % 2 == 0 || countOfLetters - letterIndex > 4 {
                 fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
                 fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
             }
@@ -2567,317 +2566,317 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         saveActualState()
     }
     
-    private func showHelpStepByStep() {
-        //----------------------------------------------------------------------------
-        func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0, index: Int = 0) {
-            fingerActions.append(SKAction.move(to: touchPosition - fingerPositionModifier, duration: duration))
-            switch type {
-            case .TouchesBegan:
-                let beganAction = SKAction.run({
-                    self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
-                })
-                fingerActions.append(beganAction)
-            case .TouchesMoved:
-                let moveAction = SKAction.run({
-                    self.myTouchesMoved(location: touchPosition, touchedNodes: touchedNodes)
-                    
-                })
-                fingerActions.append(moveAction)
-            case .TouchesEnded:
-                let endedAction = SKAction.run({
-                    //                    if counter == 89 {
-                    //                        print("at \(counter)")
-                    //                    }
-                    let OK = self.myTouchesEnded(location: touchPosition, touchedNodes: touchedNodes, checkLetters: letters)
-                    if !OK {
-                        print("error by replay at: \(counter), letters: \(letters)")
-                    }
-                })
-                fingerActions.append(endedAction)
-                lastTouchedPosition = touchPosition
-            default:
-                break
-            }
-        }
-        //----------------------------------------------------------------------------
-        func addButtonTouchedAction(button: MyButton) {
-            let waitAction = SKAction.wait(forDuration: 0.025)
-            let zielPosition = button.position
-            let point = zielPosition - lastTouchedPosition
-            let distance = point.length()
-            let counter = Int(distance / 10)
-            let xAdder = point.x / CGFloat(counter)
-            let yAdder = point.y / CGFloat(counter)
-            for index in 0..<counter {
-                if button == undoButton {
-                    let enableAction = SKAction.run({
-                        self.setUndoButton(enabled: true)
-                    })
-                    fingerActions.append(enableAction)
-                }
-                fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
-                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: helpDemoDuration))
-                fingerActions.append(waitAction)
-            }
-            let buttonAction = SKAction.run({
-                button.myTouchesEnded(touchLocation: zielPosition)
-                if button == self.undoButton {
-                    self.setUndoButton(enabled: false)
-                }
-            })
-            fingerActions.append(buttonAction)
-            fingerActions.append(waitAction)
-        }
-        //----------------------------------------------------------------------------
-        enum AlertType: Int {
-            case ContinueGameEasyAlert = 0, ContinueGameMediumAlert, FinishGameEasyAlert, FinishGameMediumAlert, OKFixLettersSolvedAlert, OKMandatorySolvedAlert, NoMoreStepsAlert, FinishGameAlert
-        }
-        //----------------------------------------------------------------------------
-        func addAlertTouched(alertType: AlertType, action: Selector) {
-            var zielPosition: CGPoint?
-            switch alertType {
-            case .ContinueGameEasyAlert:
-//                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
-                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
-//            case .ContinueGameMediumAlert:
-//                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
-                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
-//            case .FinishGameEasyAlert:
-//                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
-                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
-            case .FinishGameMediumAlert:
-//                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
-                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
-            case .OKFixLettersSolvedAlert:
-//                createCongratulationsAlert(congratulationType: .SolvedOnlyFixLetters, easy: false)
-                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
-//            case .OKMandatorySolvedAlert:
-//                createCongratulationsAlert(congratulationType: .SolvedOnlyMandatoryWords, easy: false)
-//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
-            case .NoMoreStepsAlert:
-//                createNoMoreStepsAlert()
-                zielPosition = noMoreStepsAlert!.getPositionForAction(action: action)
-            case .FinishGameAlert:
-                if finishGameAlert == nil {
-                    createFinishGameAlert(status: .OK)
-                }
-                zielPosition = finishGameAlert!.getPositionForAction(action: action)
-            default: break
-            }
-            let point = zielPosition! - lastTouchedPosition
-            let distance = point.length()
-            let counter = Int(distance / 10)
-            let xAdder = point.x / CGFloat(counter)
-            let yAdder = point.y / CGFloat(counter)
-            fingerActions.append(SKAction.wait(forDuration: 1.0))
-            for index in 0..<counter {
-                fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
-                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: helpDemoDuration))
-                fingerActions.append(SKAction.wait(forDuration: 0.05))
-            }
-            let beganAction = SKAction.run({
-                switch alertType {
-                case .ContinueGameEasyAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
-                case .ContinueGameMediumAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
-                case .FinishGameEasyAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
-                case .FinishGameMediumAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
-                case .OKFixLettersSolvedAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
-                case .OKMandatorySolvedAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
-                case .NoMoreStepsAlert: self.noMoreStepsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
-                case .FinishGameAlert: self.finishGameAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
-                }
-            })
-            let endedAction = SKAction.run({
-                switch alertType {
-                case .ContinueGameEasyAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
-                case .ContinueGameMediumAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
-                case .FinishGameEasyAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
-                case .FinishGameMediumAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
-                case .OKFixLettersSolvedAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
-                case .OKMandatorySolvedAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
-                case .NoMoreStepsAlert:
-                    self.noMoreStepsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
-                case .FinishGameAlert:
-                    self.finishGameAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
-                    self.gameFinished = true
-                    
-                }
-            })
-            fingerActions.append(beganAction)
-            fingerActions.append(SKAction.wait(forDuration: 0.5))
-            fingerActions.append(endedAction)
-//            let removeAlertAction = SKAction.run ({
-//                self.removeNodesWith(name: self.myAlertName)
-//                if self.congratulationsAlert != nil {
-//                    self.congratulationsAlert = nil
+//    private func showHelpStepByStep() {
+//        //----------------------------------------------------------------------------
+//        func addTouchAction(type: ActionType, touchPosition: CGPoint, touchedNodes: TouchedNodes, letters: String = "", duration: Double, counter: Int = 0, index: Int = 0) {
+//            fingerActions.append(SKAction.move(to: touchPosition - fingerPositionModifier, duration: duration))
+//            switch type {
+//            case .TouchesBegan:
+//                let beganAction = SKAction.run({
+//                    self.myTouchesBegan(location: touchPosition, touchedNodes: touchedNodes)
+//                })
+//                fingerActions.append(beganAction)
+//            case .TouchesMoved:
+//                let moveAction = SKAction.run({
+//                    self.myTouchesMoved(location: touchPosition, touchedNodes: touchedNodes)
+//
+//                })
+//                fingerActions.append(moveAction)
+//            case .TouchesEnded:
+//                let endedAction = SKAction.run({
+//                    //                    if counter == 89 {
+//                    //                        print("at \(counter)")
+//                    //                    }
+//                    let OK = self.myTouchesEnded(location: touchPosition, touchedNodes: touchedNodes, checkLetters: letters)
+//                    if !OK {
+//                        print("error by replay at: \(counter), letters: \(letters)")
+//                    }
+//                })
+//                fingerActions.append(endedAction)
+//                lastTouchedPosition = touchPosition
+//            default:
+//                break
+//            }
+//        }
+//        //----------------------------------------------------------------------------
+//        func addButtonTouchedAction(button: MyButton) {
+//            let waitAction = SKAction.wait(forDuration: 0.025)
+//            let zielPosition = button.position
+//            let point = zielPosition - lastTouchedPosition
+//            let distance = point.length()
+//            let counter = Int(distance / 10)
+//            let xAdder = point.x / CGFloat(counter)
+//            let yAdder = point.y / CGFloat(counter)
+//            for index in 0..<counter {
+//                if button == undoButton {
+//                    let enableAction = SKAction.run({
+//                        self.setUndoButton(enabled: true)
+//                    })
+//                    fingerActions.append(enableAction)
+//                }
+//                fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
+//                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: helpDemoDuration))
+//                fingerActions.append(waitAction)
+//            }
+//            let buttonAction = SKAction.run({
+//                button.myTouchesEnded(touchLocation: zielPosition)
+//                if button == self.undoButton {
+//                    self.setUndoButton(enabled: false)
 //                }
 //            })
-//            fingerActions.append(removeAlertAction)
-            fingerActions.append(SKAction.wait(forDuration: 0.5))
-//            if alertType == .NoMoreStepsAlert && action == #selector(self.nextRoundTapped) {
-//                fingerActions.append(SKAction.wait(forDuration: 0.5))
-//            } else {
-//                fingerActions.append(SKAction.wait(forDuration: 0.5))
+//            fingerActions.append(buttonAction)
+//            fingerActions.append(waitAction)
+//        }
+//        //----------------------------------------------------------------------------
+//        enum AlertType: Int {
+//            case ContinueGameEasyAlert = 0, ContinueGameMediumAlert, FinishGameEasyAlert, FinishGameMediumAlert, OKFixLettersSolvedAlert, OKMandatorySolvedAlert, NoMoreStepsAlert, FinishGameAlert
+//        }
+//        //----------------------------------------------------------------------------
+//        func addAlertTouched(alertType: AlertType, action: Selector) {
+//            var zielPosition: CGPoint?
+//            switch alertType {
+//            case .ContinueGameEasyAlert:
+////                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+////            case .ContinueGameMediumAlert:
+////                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+////            case .FinishGameEasyAlert:
+////                createCongratulationsAlert(congratulationType: .GameFinished, easy: true)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+//            case .FinishGameMediumAlert:
+////                createCongratulationsAlert(congratulationType: .GameFinished, easy: false)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+//            case .OKFixLettersSolvedAlert:
+////                createCongratulationsAlert(congratulationType: .SolvedOnlyFixLetters, easy: false)
+//                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+////            case .OKMandatorySolvedAlert:
+////                createCongratulationsAlert(congratulationType: .SolvedOnlyMandatoryWords, easy: false)
+////                zielPosition = congratulationsAlert!.getPositionForAction(action: action)
+//            case .NoMoreStepsAlert:
+////                createNoMoreStepsAlert()
+//                zielPosition = noMoreStepsAlert!.getPositionForAction(action: action)
+//            case .FinishGameAlert:
+//                if finishGameAlert == nil {
+//                    createFinishGameAlert(status: .OK)
+//                }
+//                zielPosition = finishGameAlert!.getPositionForAction(action: action)
+//            default: break
 //            }
-        }
-        //----------------------------------------------------------------------------
-        var startFromGamearray = false
-        var lastActionWasMarkingWord = false
-        fingerActions.removeAll()
-        lastHelpDemoStepReady = false
-        setUndoButton(enabled: false)
-        if helpRecordIndex == 0 {
-            bgSprite!.addChild(fingerSprite!)
-        }
-        let record = GV.helpInfoRecords![helpRecordIndex]
-//        for (index, record) in GV.helpInfoRecords!.enumerated() {
-        let countMoves = record.movedInfo.components(separatedBy: "°").count
-        var duration: Double = (helpDemoSpeedSlow ? 0.25 : 0.05) / Double(countMoves)
-        func getAbsPosition(relPosX: CGFloat, relPosY: CGFloat)->CGPoint {
-            return gridStartPosition + CGPoint(x: relPosX, y: relPosY) * gridSize
-        }
-        func callTouchAction(info: String, type: ActionType, index: Int = 0, letters: String = "") {
-            let data = MovedInfoData(from: info)
-            let onGameArray = data.onGameArray
-            let touchPosition = getAbsPosition(relPosX: data.relPosX, relPosY: data.relPosY)
-            var touchedNodes = analyzeNodes(touchLocation: touchPosition)
-            if onGameArray {
-                touchedNodes.col = data.col
-                touchedNodes.row = data.row
-                touchedNodes.GRow = data.GRow
-            }
-            addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: letters, duration: duration, counter: record.counter, index: index)
-        }
-        
-        switch record.typeOfTouch {
-        //                FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
-        case TypeOfTouch.FromBottom.rawValue, TypeOfTouch.FromGameArray.rawValue:
-            startFromGamearray = true
-            if helpDemoSpeedSlow {
-                lastActionWasMarkingWord = record.letters.endsWith(LettersColor.Green.rawValue) ? true : lastActionWasMarkingWord
-                helpDemoSpeedSlow = lastActionWasMarkingWord ? false : helpDemoSpeedSlow
-            }
-            if record.beganInfo != "" {
-                if record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
-                    let shapeIndex = Int(record.beganInfo)
-                    startShapeIndex = shapeIndex!
-                    let touchPosition = pieceArray[shapeIndex!].position
-                    let touchedNodes = analyzeNodes(touchLocation: touchPosition)
-                    addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
-                } else {
-                    startShapeIndex = NoValue
-                    callTouchAction(info: record.beganInfo, type: .TouchesBegan, letters: record.letters)
-                }
-                let moves = record.movedInfo.components(separatedBy: "°")
-                var countMoves = 0
-                for (index, move) in moves.enumerated() {
-                    if move.length > 0 {
-                        callTouchAction(info: move, type: .TouchesMoved, index: index)
-                        countMoves += 1
-                    }
-                }
-                if countMoves == 0 && record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
-                    let touchPosition = pieceArray[startShapeIndex].position
-                    let touchedNodes = analyzeNodes(touchLocation: touchPosition)
-                    addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: record.letters, duration: Double(duration), counter: record.counter)
-                } else {
-                    callTouchAction(info: record.endedInfo, type: .TouchesEnded, letters: record.letters)
-                }
-            }
-        case TypeOfTouch.UndoButton.rawValue:
-            addButtonTouchedAction(button: undoButton!)
-        case TypeOfTouch.ShowMyWordsButton.rawValue:
-            addButtonTouchedAction(button: allWordsButton!)
-        case TypeOfTouch.FinishButton.rawValue:
-            addButtonTouchedAction(button: finishButton!)
-        case TypeOfTouch.ContinueGameEasy.rawValue:
-            break
-//            addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
-        case TypeOfTouch.ContinueGameMedium.rawValue:
-            break
+//            let point = zielPosition! - lastTouchedPosition
+//            let distance = point.length()
+//            let counter = Int(distance / 10)
+//            let xAdder = point.x / CGFloat(counter)
+//            let yAdder = point.y / CGFloat(counter)
+//            fingerActions.append(SKAction.wait(forDuration: 1.0))
+//            for index in 0..<counter {
+//                fingerActions.append(SKAction.move(to: CGPoint(x: lastTouchedPosition.x + CGFloat(index) * xAdder,
+//                                                               y: lastTouchedPosition.y + CGFloat(index) * yAdder) - fingerPositionModifier, duration: helpDemoDuration))
+//                fingerActions.append(SKAction.wait(forDuration: 0.05))
+//            }
+//            let beganAction = SKAction.run({
+//                switch alertType {
+//                case .ContinueGameEasyAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .ContinueGameMediumAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameEasyAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameMediumAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .OKFixLettersSolvedAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .OKMandatorySolvedAlert: self.congratulationsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .NoMoreStepsAlert: self.noMoreStepsAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameAlert: self.finishGameAlert!.myTouchesBegan(touchLocation: zielPosition!, absolutLocation: true)
+//                }
+//            })
+//            let endedAction = SKAction.run({
+//                switch alertType {
+//                case .ContinueGameEasyAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .ContinueGameMediumAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameEasyAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameMediumAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .OKFixLettersSolvedAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .OKMandatorySolvedAlert: self.congratulationsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .NoMoreStepsAlert:
+//                    self.noMoreStepsAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                case .FinishGameAlert:
+//                    self.finishGameAlert!.myTouchesEnded(touchLocation: zielPosition!, absolutLocation: true)
+//                    self.gameFinished = true
+//
+//                }
+//            })
+//            fingerActions.append(beganAction)
+//            fingerActions.append(SKAction.wait(forDuration: 0.5))
+//            fingerActions.append(endedAction)
+////            let removeAlertAction = SKAction.run ({
+////                self.removeNodesWith(name: self.myAlertName)
+////                if self.congratulationsAlert != nil {
+////                    self.congratulationsAlert = nil
+////                }
+////            })
+////            fingerActions.append(removeAlertAction)
+//            fingerActions.append(SKAction.wait(forDuration: 0.5))
+////            if alertType == .NoMoreStepsAlert && action == #selector(self.nextRoundTapped) {
+////                fingerActions.append(SKAction.wait(forDuration: 0.5))
+////            } else {
+////                fingerActions.append(SKAction.wait(forDuration: 0.5))
+////            }
+//        }
+//        //----------------------------------------------------------------------------
+//        var startFromGamearray = false
+//        var lastActionWasMarkingWord = false
+//        fingerActions.removeAll()
+//        lastHelpDemoStepReady = false
+//        setUndoButton(enabled: false)
+//        if helpRecordIndex == 0 {
+//            bgSprite!.addChild(fingerSprite!)
+//        }
+//        let record = GV.helpInfoRecords![helpRecordIndex]
+////        for (index, record) in GV.helpInfoRecords!.enumerated() {
+//        let countMoves = record.movedInfo.components(separatedBy: "°").count
+//        var duration: Double = (helpDemoSpeedSlow ? 0.25 : 0.05) / Double(countMoves)
+//        func getAbsPosition(relPosX: CGFloat, relPosY: CGFloat)->CGPoint {
+//            return gridStartPosition + CGPoint(x: relPosX, y: relPosY) * gridSize
+//        }
+//        func callTouchAction(info: String, type: ActionType, index: Int = 0, letters: String = "") {
+//            let data = MovedInfoData(from: info)
+//            let onGameArray = data.onGameArray
+//            let touchPosition = getAbsPosition(relPosX: data.relPosX, relPosY: data.relPosY)
+//            var touchedNodes = analyzeNodes(touchLocation: touchPosition)
+//            if onGameArray {
+//                touchedNodes.col = data.col
+//                touchedNodes.row = data.row
+//                touchedNodes.GRow = data.GRow
+//            }
+//            addTouchAction(type: type, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: letters, duration: duration, counter: record.counter, index: index)
+//        }
+//
+//        switch record.typeOfTouch {
+//        //                FromBottom = 0, FromGameArray, Undo, AllWords, Continue, Finish
+//        case TypeOfTouch.FromBottom.rawValue, TypeOfTouch.FromGameArray.rawValue:
+//            startFromGamearray = true
+//            if helpDemoSpeedSlow {
+//                lastActionWasMarkingWord = record.letters.endsWith(LettersColor.Green.rawValue) ? true : lastActionWasMarkingWord
+//                helpDemoSpeedSlow = lastActionWasMarkingWord ? false : helpDemoSpeedSlow
+//            }
+//            if record.beganInfo != "" {
+//                if record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
+//                    let shapeIndex = Int(record.beganInfo)
+//                    startShapeIndex = shapeIndex!
+//                    let touchPosition = pieceArray[shapeIndex!].position
+//                    let touchedNodes = analyzeNodes(touchLocation: touchPosition)
+//                    addTouchAction(type: .TouchesBegan, touchPosition: touchPosition, touchedNodes: touchedNodes,duration: Double(duration), counter: record.counter)
+//                } else {
+//                    startShapeIndex = NoValue
+//                    callTouchAction(info: record.beganInfo, type: .TouchesBegan, letters: record.letters)
+//                }
+//                let moves = record.movedInfo.components(separatedBy: "°")
+//                var countMoves = 0
+//                for (index, move) in moves.enumerated() {
+//                    if move.length > 0 {
+//                        callTouchAction(info: move, type: .TouchesMoved, index: index)
+//                        countMoves += 1
+//                    }
+//                }
+//                if countMoves == 0 && record.typeOfTouch == TypeOfTouch.FromBottom.rawValue {
+//                    let touchPosition = pieceArray[startShapeIndex].position
+//                    let touchedNodes = analyzeNodes(touchLocation: touchPosition)
+//                    addTouchAction(type: .TouchesEnded, touchPosition: touchPosition, touchedNodes: touchedNodes, letters: record.letters, duration: Double(duration), counter: record.counter)
+//                } else {
+//                    callTouchAction(info: record.endedInfo, type: .TouchesEnded, letters: record.letters)
+//                }
+//            }
+//        case TypeOfTouch.UndoButton.rawValue:
+//            addButtonTouchedAction(button: undoButton!)
+//        case TypeOfTouch.ShowMyWordsButton.rawValue:
+//            addButtonTouchedAction(button: allWordsButton!)
+//        case TypeOfTouch.FinishButton.rawValue:
+//            addButtonTouchedAction(button: finishButton!)
+//        case TypeOfTouch.ContinueGameEasy.rawValue:
+//            break
+////            addAlertTouched(alertType: .ContinueGameEasyAlert, action: #selector(self.continueEasyAction))
+//        case TypeOfTouch.ContinueGameMedium.rawValue:
+//            break
+////            addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
+//        case TypeOfTouch.ContinueGameMedium.rawValue:
 //            addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
-        case TypeOfTouch.ContinueGameMedium.rawValue:
-            addAlertTouched(alertType: .ContinueGameMediumAlert, action: #selector(self.continueMediumAction))
-        case TypeOfTouch.FinishGameEasy.rawValue:
-            addAlertTouched(alertType: .FinishGameEasyAlert, action: #selector(self.finishEasyAction))
-        case TypeOfTouch.FinishGameMedium.rawValue:
-            break
-//            addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishMediumAction))
-        case TypeOfTouch.OKFixLettersSolved.rawValue:
-//            addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
-            break
-        case TypeOfTouch.OKMandatorySolved.rawValue:
-            break
-//            addAlertTouched(alertType: .OKMandatorySolvedAlert, action: #selector(self.mandatoryOKAction))
-        case TypeOfTouch.NoMoreStepsBack.rawValue:
-            addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.startUndoTapped))
-        case TypeOfTouch.NoMoreStepsNext.rawValue:
-            addButtonTouchedAction(button: finishButton!)
-//            addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.nextRoundTapped))
-        case TypeOfTouch.NoMoreStepsCont.rawValue:
-            break
-//            addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.noActionTapped))
-        case TypeOfTouch.FinishGame.rawValue:
-            addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.newGameButtonTapped))
-        default:
-            break
-        }
-        if helpRecordIndex == GV.helpInfoRecords!.count - 1 {
-            let removeAction = SKAction.run ({
-                GV.generateHelpInfo = self.generateHelpInfoActive
-                try! realm.safeWrite() {
-                    GV.basicDataRecord.difficulty = GV.origDifficulty
-                }
-            })
-            fingerActions.append(removeAction)
-            if !generateHelpInfoActive {
-                let lastWaitAction = SKAction.wait(forDuration: 1)
-                fingerActions.append(lastWaitAction)
-                let lastAction = SKAction.run({
-                    if self.gameFinished {
-                        try! realm.safeWrite() {
-                            GV.basicDataRecord.startAnimationShown = true
-                        }
-                        self.timerIsCounting = false
-                        let title = GV.language.getText(.tcDemoFinishedTitle)
-                        let message = GV.language.getText(.tcDemoFinishedMessage)
-                        let newGameText = GV.language.getText(.tcDemoFinishedStartNewGame)
-                        let menuText = GV.language.getText(.tcDemoFinishedGoToMenu)
-                        let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
-                        myAlert.addAction(text: newGameText, action: #selector(self.startNewGame))
-                        myAlert.addAction(text: menuText, action: #selector(self.goBackTapped))
-                        myAlert.presentAlert()
-                        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-                        myAlert.name = self.myAlertName
-                        self.fingerSprite!.removeFromParent()
-                        self.bgSprite!.addChild(myAlert)
-                    }
-                })
-                fingerActions.append(lastAction)
-            } else {
-                let lastAction = SKAction.run({
-                    self.fingerSprite!.removeFromParent()
-                    self.hideButtons(hide: false)
-                    self.setUndoButton(enabled: true)
-                })
-                fingerActions.append(lastAction)
-            }
-        }
-        let lastAction = SKAction.run ({
-            self.helpRecordIndex += 1
-//            if record.counter == 95 {
-//                print("hier")
+//        case TypeOfTouch.FinishGameEasy.rawValue:
+//            addAlertTouched(alertType: .FinishGameEasyAlert, action: #selector(self.finishEasyAction))
+//        case TypeOfTouch.FinishGameMedium.rawValue:
+//            break
+////            addAlertTouched(alertType: .FinishGameMediumAlert, action: #selector(self.finishMediumAction))
+//        case TypeOfTouch.OKFixLettersSolved.rawValue:
+////            addAlertTouched(alertType: .OKFixLettersSolvedAlert, action: #selector(self.fixLettersOKAction))
+//            break
+//        case TypeOfTouch.OKMandatorySolved.rawValue:
+//            break
+////            addAlertTouched(alertType: .OKMandatorySolvedAlert, action: #selector(self.mandatoryOKAction))
+//        case TypeOfTouch.NoMoreStepsBack.rawValue:
+//            addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.startUndoTapped))
+//        case TypeOfTouch.NoMoreStepsNext.rawValue:
+//            addButtonTouchedAction(button: finishButton!)
+////            addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.nextRoundTapped))
+//        case TypeOfTouch.NoMoreStepsCont.rawValue:
+//            break
+////            addAlertTouched(alertType: .NoMoreStepsAlert, action: #selector(self.noActionTapped))
+//        case TypeOfTouch.FinishGame.rawValue:
+//            addAlertTouched(alertType: .FinishGameAlert, action: #selector(self.newGameButtonTapped))
+//        default:
+//            break
+//        }
+//        if helpRecordIndex == GV.helpInfoRecords!.count - 1 {
+//            let removeAction = SKAction.run ({
+//                GV.generateHelpInfo = self.generateHelpInfoActive
+//                try! realm.safeWrite() {
+//                    GV.basicDataRecord.difficulty = GV.origDifficulty
+//                }
+//            })
+//            fingerActions.append(removeAction)
+//            if !generateHelpInfoActive {
+//                let lastWaitAction = SKAction.wait(forDuration: 1)
+//                fingerActions.append(lastWaitAction)
+//                let lastAction = SKAction.run({
+//                    if self.gameFinished {
+//                        try! realm.safeWrite() {
+//                            GV.basicDataRecord.startAnimationShown = true
+//                        }
+//                        self.timerIsCounting = false
+//                        let title = GV.language.getText(.tcDemoFinishedTitle)
+//                        let message = GV.language.getText(.tcDemoFinishedMessage)
+//                        let newGameText = GV.language.getText(.tcDemoFinishedStartNewGame)
+//                        let menuText = GV.language.getText(.tcDemoFinishedGoToMenu)
+//                        let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
+//                        myAlert.addAction(text: newGameText, action: #selector(self.startNewGame))
+//                        myAlert.addAction(text: menuText, action: #selector(self.goBackTapped))
+//                        myAlert.presentAlert()
+//                        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+//                        myAlert.name = self.myAlertName
+//                        self.fingerSprite!.removeFromParent()
+//                        self.bgSprite!.addChild(myAlert)
+//                    }
+//                })
+//                fingerActions.append(lastAction)
+//            } else {
+//                let lastAction = SKAction.run({
+//                    self.fingerSprite!.removeFromParent()
+//                    self.hideButtons(hide: false)
+//                    self.setUndoButton(enabled: true)
+//                })
+//                fingerActions.append(lastAction)
 //            }
-            if self.helpRecordIndex == GV.helpInfoRecords!.count {
-                self.showHelpDemoActive = false
-            } else {
-                self.lastHelpDemoStepReady = true
-            }
-        })
-        fingerActions.append(lastAction)
-        let sequence = SKAction.sequence(fingerActions)
-        fingerSprite!.run(SKAction.sequence([sequence]))
-    }
+//        }
+//        let lastAction = SKAction.run ({
+//            self.helpRecordIndex += 1
+////            if record.counter == 95 {
+////                print("hier")
+////            }
+//            if self.helpRecordIndex == GV.helpInfoRecords!.count {
+//                self.showHelpDemoActive = false
+//            } else {
+//                self.lastHelpDemoStepReady = true
+//            }
+//        })
+//        fingerActions.append(lastAction)
+//        let sequence = SKAction.sequence(fingerActions)
+//        fingerSprite!.run(SKAction.sequence([sequence]))
+//    }
 
     
     var gameFinished = false
@@ -2926,63 +2925,63 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        }
     }
     
-    var realmHelpInfo: Realm?
+//    var realmHelpInfo: Realm?
     
-    private func initiateHelpModel() {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let helpInfoURL = documentsURL.appendingPathComponent("HelpInfo.realm")
-        let config1 = Realm.Configuration(
-            fileURL: helpInfoURL,
-            shouldCompactOnLaunch: { totalBytes, usedBytes in
-                // totalBytes refers to the size of the file on disk in bytes (data + free space)
-                // usedBytes refers to the number of bytes used by data in the file
-                
-                // Compact if the file is over 100MB in size and less than 50% 'used'
-                let oneMB = 10 * 1024 * 1024
-                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
-        },
-            objectTypes: [HelpInfo.self])
-        do {
-            // Realm is compacted on the first open if the configuration block conditions were met.
-            _ = try Realm(configuration: config1)
-        } catch {
-            print("error")
-            // handle error compacting or opening Realm
-        }
-        let helpInfoConfig = Realm.Configuration(
-            fileURL: helpInfoURL,
-            schemaVersion: 0, // new item words
-            // Set the block which will be called automatically when opening a Realm with
-            // a schema version lower than the one set above
-            migrationBlock: { migration, oldSchemaVersion in
-                switch oldSchemaVersion {
-//                case 0...3:
-//                    migration.deleteData(forType: HelpModel.className())
+//    private func initiateHelpModel() {
+//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//        let helpInfoURL = documentsURL.appendingPathComponent("HelpInfo.realm")
+//        let config1 = Realm.Configuration(
+//            fileURL: helpInfoURL,
+//            shouldCompactOnLaunch: { totalBytes, usedBytes in
+//                // totalBytes refers to the size of the file on disk in bytes (data + free space)
+//                // usedBytes refers to the number of bytes used by data in the file
 //
-                default: migration.enumerateObjects(ofType: BasicDataModel.className())
-                    { oldObject, newObject in
-                    }
-                }
-            },
-            objectTypes: [HelpInfo.self])
-        
-        realmHelpInfo = try! Realm(configuration: helpInfoConfig)
-
-    }
+//                // Compact if the file is over 100MB in size and less than 50% 'used'
+//                let oneMB = 10 * 1024 * 1024
+//                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+//        },
+//            objectTypes: [HelpInfo.self])
+//        do {
+//            // Realm is compacted on the first open if the configuration block conditions were met.
+//            _ = try Realm(configuration: config1)
+//        } catch {
+//            print("error")
+//            // handle error compacting or opening Realm
+//        }
+//        let helpInfoConfig = Realm.Configuration(
+//            fileURL: helpInfoURL,
+//            schemaVersion: 0, // new item words
+//            // Set the block which will be called automatically when opening a Realm with
+//            // a schema version lower than the one set above
+//            migrationBlock: { migration, oldSchemaVersion in
+//                switch oldSchemaVersion {
+////                case 0...3:
+////                    migration.deleteData(forType: HelpModel.className())
+////
+//                default: migration.enumerateObjects(ofType: BasicDataModel.className())
+//                    { oldObject, newObject in
+//                    }
+//                }
+//            },
+//            objectTypes: [HelpInfo.self])
+//
+//        realmHelpInfo = try! Realm(configuration: helpInfoConfig)
+//
+//    }
     
-    private func resetHelpInfo() {
-        let difficulty = GV.basicDataRecord.difficulty
-        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, difficulty)
-        if records.count > 0 {
-            try! realmHelpInfo!.safeWrite() {
-                realmHelpInfo!.delete(records)
-            }
-        }
-    }
+//    private func resetHelpInfo() {
+//        let difficulty = GV.basicDataRecord.difficulty
+//        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, difficulty)
+//        if records.count > 0 {
+//            try! realmHelpInfo!.safeWrite() {
+//                realmHelpInfo!.delete(records)
+//            }
+//        }
+//    }
     var lastCol = NoValue
     var lastRow = NoValue
     var countOfMoves = 0
-    var helpInfo = HelpInfo()
+//    var helpInfo = HelpInfo()
     
     let UndoButtonHelpInfo = "UndoButton"
     let ShowMyWordsButtonHelpInfo = "ShowMyWordsButton"
@@ -3000,39 +2999,39 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
 
     
-    private func saveHelpInfo(action: TypeOfTouch) {
-        if !GV.generateHelpInfo {
-            return
-        }
-        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, GV.basicDataRecord.difficulty).sorted(byKeyPath: "counter")
-        let counter = records.count > 0 ? records.last!.counter + 1 : 1
-        let sDifficulty = String(GV.basicDataRecord.difficulty)
-        let helpInfo = HelpInfo()
-        helpInfo.difficulty = GV.basicDataRecord.difficulty
-        helpInfo.typeOfTouch = action.rawValue
-        helpInfo.combinedKey = GV.actLanguage + "°" + String(counter) + "°" + sDifficulty
-        helpInfo.language = GV.actLanguage
-        helpInfo.counter = counter
-        switch action {
-        case .UndoButton: helpInfo.letters = UndoButtonHelpInfo
-        case .ShowMyWordsButton: helpInfo.letters = ShowMyWordsButtonHelpInfo
-        case .FinishButton: helpInfo.letters = FinishButtonHelpInfo
-        case .ContinueGameEasy: helpInfo.letters = ContinueGameEasyHelpInfo
-        case .ContinueGameMedium: helpInfo.letters = ContinueGameMediumHelpInfo
-        case .FinishGameEasy: helpInfo.letters = FinishGameEasyHelpInfo
-        case .FinishGameMedium: helpInfo.letters = FinishGameMediumHelpInfo
-        case .OKFixLettersSolved: helpInfo.letters = OKFixLettersEasyHelpInfo
-        case .OKMandatorySolved: helpInfo.letters = OKMandatorySolvedHelpInfo
-        case .NoMoreStepsBack: helpInfo.letters = NoMoreStepsBackHelpInfo
-        case .NoMoreStepsNext: helpInfo.letters = NoMoreStepsNextHelpInfo
-        case .NoMoreStepsCont: helpInfo.letters = NoMoreStepsContHelpInfo
-        case .FinishGame: helpInfo.letters = FinishGameHelpInfo
-        default: break
-        }
-        try! realmHelpInfo!.safeWrite() {
-            realmHelpInfo!.add(helpInfo)
-        }
-    }
+//    private func saveHelpInfo(action: TypeOfTouch) {
+//        if !GV.generateHelpInfo {
+//            return
+//        }
+//        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, GV.basicDataRecord.difficulty).sorted(byKeyPath: "counter")
+//        let counter = records.count > 0 ? records.last!.counter + 1 : 1
+//        let sDifficulty = String(GV.basicDataRecord.difficulty)
+//        let helpInfo = HelpInfo()
+//        helpInfo.difficulty = GV.basicDataRecord.difficulty
+//        helpInfo.typeOfTouch = action.rawValue
+//        helpInfo.combinedKey = GV.actLanguage + "°" + String(counter) + "°" + sDifficulty
+//        helpInfo.language = GV.actLanguage
+//        helpInfo.counter = counter
+//        switch action {
+//        case .UndoButton: helpInfo.letters = UndoButtonHelpInfo
+//        case .ShowMyWordsButton: helpInfo.letters = ShowMyWordsButtonHelpInfo
+//        case .FinishButton: helpInfo.letters = FinishButtonHelpInfo
+//        case .ContinueGameEasy: helpInfo.letters = ContinueGameEasyHelpInfo
+//        case .ContinueGameMedium: helpInfo.letters = ContinueGameMediumHelpInfo
+//        case .FinishGameEasy: helpInfo.letters = FinishGameEasyHelpInfo
+//        case .FinishGameMedium: helpInfo.letters = FinishGameMediumHelpInfo
+//        case .OKFixLettersSolved: helpInfo.letters = OKFixLettersEasyHelpInfo
+//        case .OKMandatorySolved: helpInfo.letters = OKMandatorySolvedHelpInfo
+//        case .NoMoreStepsBack: helpInfo.letters = NoMoreStepsBackHelpInfo
+//        case .NoMoreStepsNext: helpInfo.letters = NoMoreStepsNextHelpInfo
+//        case .NoMoreStepsCont: helpInfo.letters = NoMoreStepsContHelpInfo
+//        case .FinishGame: helpInfo.letters = FinishGameHelpInfo
+//        default: break
+//        }
+//        try! realmHelpInfo!.safeWrite() {
+//            realmHelpInfo!.add(helpInfo)
+//        }
+//    }
     private func saveArrayOfPieces() {
 //        tilesForGame.removeAll()
         let piecesToPlay = GV.playingRecord.pieces.components(separatedBy: "°")
@@ -3083,7 +3082,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if actIndex != nil {
             let myWords = GV.playingRecord.words.components(separatedBy: "°")
 //            print("word for tipp: \(myWords[actIndex! - 1]), indexOfTilesForGame: \(indexOfTilesForGame)")
-            if !showHelp && actIndex! > 0 {
+            if actIndex! > 0 {
                 showTipp(tipp: myWords[actIndex! - 1])
             }
         }
@@ -3165,9 +3164,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if showHelp && !GV.generateHelpInfo {
-            return
-        }
+//        if showHelp && !GV.generateHelpInfo {
+//            return
+//        }
         stopBlinkingNodesIfNeeded()
         startShapeIndex = -1
         let touchLocation = touches.first!.location(in: self)
@@ -3194,22 +3193,22 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let firstTouch = touches.first
         firstTouchLocation = location//firstTouch!.location(in: self)
 //      ----------------------------------
-        if GV.generateHelpInfo {
-            relativPosition = (firstTouchLocation - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
-            helpInfo = HelpInfo()
-            var counter = 0
-            let info = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, GV.basicDataRecord.difficulty).sorted(byKeyPath: "counter", ascending: true)
-            if info.count > 0 {
-                counter = info.last!.counter + 1
-            }
-//            let counter =  realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true).last!.counter + 1
-            
-            let sDifficulty = String(GV.basicDataRecord.difficulty)
-            helpInfo.difficulty = GV.basicDataRecord.difficulty
-            helpInfo.combinedKey = GV.actLanguage + "°" + String(counter) + "°" + sDifficulty
-            helpInfo.language = GV.actLanguage
-            helpInfo.counter = counter
-        }
+//        if GV.generateHelpInfo {
+//            relativPosition = (firstTouchLocation - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
+//            helpInfo = HelpInfo()
+//            var counter = 0
+//            let info = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, GV.basicDataRecord.difficulty).sorted(byKeyPath: "counter", ascending: true)
+//            if info.count > 0 {
+//                counter = info.last!.counter + 1
+//            }
+////            let counter =  realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "counter", ascending: true).last!.counter + 1
+//
+//            let sDifficulty = String(GV.basicDataRecord.difficulty)
+//            helpInfo.difficulty = GV.basicDataRecord.difficulty
+//            helpInfo.combinedKey = GV.actLanguage + "°" + String(counter) + "°" + sDifficulty
+//            helpInfo.language = GV.actLanguage
+//            helpInfo.counter = counter
+//        }
 //      ----------------------------------
         #if SHOWFINGER
         let texture = SKTexture(imageNamed: "finger")
@@ -3235,23 +3234,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             startShapeIndex = touchedNodes.shapeIndex
             pieceArray[touchedNodes.shapeIndex].zPosition = 10
             wtGameboard!.clear()
-            if GV.generateHelpInfo {
-                helpInfo.typeOfTouch = TypeOfTouch.FromBottom.rawValue
-                helpInfo.beganInfo = "\(touchedNodes.shapeIndex)"
-                var letters = ""
-                for letter in pieceArray[touchedNodes.shapeIndex].letters {
-                    letters += letter
-                }
-                helpInfo.letters = letters
-            }
+//            if GV.generateHelpInfo {
+//                helpInfo.typeOfTouch = TypeOfTouch.FromBottom.rawValue
+//                helpInfo.beganInfo = "\(touchedNodes.shapeIndex)"
+//                var letters = ""
+//                for letter in pieceArray[touchedNodes.shapeIndex].letters {
+//                    letters += letter
+//                }
+//                helpInfo.letters = letters
+//            }
         } else if touchedNodes.GCol.between(min: 0, max: GV.sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: GV.sizeOfGrid - 1){
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
-            if GV.generateHelpInfo {
-                helpInfo.typeOfTouch = TypeOfTouch.FromGameArray.rawValue
-                let beganInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.GCol, row: touchedNodes.GRow, GRow: touchedNodes.GRow).toString()
-                helpInfo.beganInfo = "\(beganInfoData)"
-            }
+//            if GV.generateHelpInfo {
+//                helpInfo.typeOfTouch = TypeOfTouch.FromGameArray.rawValue
+//                let beganInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.GCol, row: touchedNodes.GRow, GRow: touchedNodes.GRow).toString()
+//                helpInfo.beganInfo = "\(beganInfoData)"
+//            }
         }
 
     }
@@ -3260,40 +3259,40 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         movingSprite = true
     }
     
-    struct MovedInfoData {
-        var onGameArray = false
-        var relPosX: CGFloat = 0
-        var relPosY: CGFloat = 0
-        var col = NoValue
-        var row = NoValue
-        var GRow = NoValue
-        init(onGameArray: Bool = false, relPosX: CGFloat = 0, relPosY: CGFloat = 0, col: Int = NoValue, row: Int = NoValue, GRow: Int = NoValue) {
-            self.onGameArray = onGameArray
-            self.relPosX = relPosX
-            self.relPosY = relPosY
-            self.col = col
-            self.row = row
-            self.GRow = GRow
-        }
-        init(from: String) {
-            let values = from.components(separatedBy: "/")
-            self.onGameArray = Int(values[0]) == 0 ? false : true
-            self.relPosX = CGFloat(Float(values[1])!)
-            self.relPosY = CGFloat(Float(values[2])!)
-            self.col = Int(values[3])!
-            self.row = Int(values[4])!
-            self.GRow = Int(values[5])!
-        }
-        func toString()->String {
-            return "\(onGameArray ? "1" : "0")/\(relPosX.nDecimals(n: 3))/\(relPosY.nDecimals(n: 3))/\(col)/\(row)/\(GRow)"
-        }
-    }
+//    struct MovedInfoData {
+//        var onGameArray = false
+//        var relPosX: CGFloat = 0
+//        var relPosY: CGFloat = 0
+//        var col = NoValue
+//        var row = NoValue
+//        var GRow = NoValue
+//        init(onGameArray: Bool = false, relPosX: CGFloat = 0, relPosY: CGFloat = 0, col: Int = NoValue, row: Int = NoValue, GRow: Int = NoValue) {
+//            self.onGameArray = onGameArray
+//            self.relPosX = relPosX
+//            self.relPosY = relPosY
+//            self.col = col
+//            self.row = row
+//            self.GRow = GRow
+//        }
+//        init(from: String) {
+//            let values = from.components(separatedBy: "/")
+//            self.onGameArray = Int(values[0]) == 0 ? false : true
+//            self.relPosX = CGFloat(Float(values[1])!)
+//            self.relPosY = CGFloat(Float(values[2])!)
+//            self.col = Int(values[3])!
+//            self.row = Int(values[4])!
+//            self.GRow = Int(values[5])!
+//        }
+//        func toString()->String {
+//            return "\(onGameArray ? "1" : "0")/\(relPosX.nDecimals(n: 3))/\(relPosY.nDecimals(n: 3))/\(col)/\(row)/\(GRow)"
+//        }
+//    }
     
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if showHelp && !GV.generateHelpInfo {
-            return
-        }
+//        if showHelp && !GV.generateHelpInfo {
+//            return
+//        }
         let touchLocation = touches.first!.location(in: self)
         let touchedNodes = analyzeNodes(touchLocation: touchLocation)
         myTouchesMoved(location: touchLocation, touchedNodes: touchedNodes)
@@ -3305,9 +3304,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 
         let touchLocation = location //firstTouch!.location(in: self)
-        if GV.generateHelpInfo {
-            relativPosition = (touchLocation - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
-        }
+//        if GV.generateHelpInfo {
+//            relativPosition = (touchLocation - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
+//        }
 
         #if SHOWFINGER
         finger?.position = touchLocation + CGPoint(x: 0, y: fingerAdder)
@@ -3315,7 +3314,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let nodes = self.nodes(at: touchLocation)
 //        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
 //        let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .Move)
-        var onGameArray = true
+//        var onGameArray = true
         if inDefiningSearchingWord {
             //            let origLocation = CGPoint(x: touchLocation.x, y: touchLocation.y + wtGameboardMovedBy)
             //            touchedNodes = analyzeNodes(touchLocation: origLocation, calledFrom: .stop)
@@ -3336,13 +3335,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow) {  // true says moving finished
                 if touchedNodes.row == GV.sizeOfGrid { // when at bottom
                     sprite.alpha = 1.0
-                    onGameArray = false
+//                    onGameArray = false
                 }
             }
-            if GV.generateHelpInfo {
-                let movedInfoData = MovedInfoData(onGameArray: onGameArray, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString() + "°"
-                helpInfo.movedInfo += movedInfoData
-            }
+//            if GV.generateHelpInfo {
+//                let movedInfoData = MovedInfoData(onGameArray: onGameArray, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString() + "°"
+//                helpInfo.movedInfo += movedInfoData
+//            }
 
         } else if inChoosingOwnWord {
             if movingSprite {
@@ -3358,12 +3357,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 if wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 2, GRow: touchedNodes.GRow) {
 //                    _ = wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 1, GRow: touchedNodes.GRow)
                 }
-                onGameArray = true
+//                onGameArray = true
             }
-            if GV.generateHelpInfo {
-                let movedInfoData = MovedInfoData(onGameArray: onGameArray, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString() + "°"
-                helpInfo.movedInfo += movedInfoData
-            }
+//            if GV.generateHelpInfo {
+//                let movedInfoData = MovedInfoData(onGameArray: onGameArray, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString() + "°"
+//                helpInfo.movedInfo += movedInfoData
+//            }
         } else  {
             if touchedNodes.shapeIndex >= 0 {
                 pieceArray[touchedNodes.shapeIndex].position = touchLocation
@@ -3376,12 +3375,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     movedIndex = touchedNodes.shapeIndex
                 }
             } else {
-                onGameArray = false
+//                onGameArray = false
             }
-            if GV.generateHelpInfo {
-                let movedInfoData = MovedInfoData(onGameArray: onGameArray, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString() + "°"
-                helpInfo.movedInfo += movedInfoData
-            }
+//            if GV.generateHelpInfo {
+//                let movedInfoData = MovedInfoData(onGameArray: onGameArray, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString() + "°"
+//                helpInfo.movedInfo += movedInfoData
+//            }
         }
     
     }
@@ -3432,9 +3431,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let MyQuestionName = "MyQuestion"
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if showHelp && !GV.generateHelpInfo {
-            return
-        }
+//        if showHelp && !GV.generateHelpInfo {
+//            return
+//        }
         let touchLocation = touches.first!.location(in: self)
         let touchedNodes = analyzeNodes(touchLocation: touchLocation)
         _ = myTouchesEnded(location: touchLocation, touchedNodes: touchedNodes)
@@ -3447,9 +3446,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         var returnBool = false
         var lettersForCheck = ""
-        if GV.generateHelpInfo {
-            relativPosition = (location - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
-        }
+//        if GV.generateHelpInfo {
+//            relativPosition = (location - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
+//        }
         let touchLocation = location //firstTouch!.location(in: self)
         #if SHOWFINGER
         finger?.removeFromParent()
@@ -3473,14 +3472,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else if inChoosingOwnWord {
             var letters = ""
             var word: FoundedWord?
-            var saveRecord = false
+//            var saveRecord = false
             if movingSprite {
                 movingSprite = false
                 let row = touchedNodes.row + 2 == 10 ? 9 : touchedNodes.row + 2
                 (_, letters) = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: row, fromBottom: false)
                 if letters != "" {
                     lettersForCheck = letters + "/" + LettersColor.Red.rawValue
-                    saveRecord = true
+//                    saveRecord = true
                 }
             } else {
                 word = wtGameboard!.endChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
@@ -3492,26 +3491,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     saveActualState()
                     saveToGameCenter()
                     setUndoButton(enabled: true)
-                    saveRecord = true
+//                    saveRecord = true
                     modifyHeader()
                 } else {
                     
                 }
             }
             returnBool = checkLetters == "" || checkLetters == lettersForCheck
-            if GV.generateHelpInfo {
-                let endedInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
-                helpInfo.endedInfo = endedInfoData
-                if helpInfo.movedInfo.length > 0 {
-                    helpInfo.movedInfo.removeLast()
-                }
-                helpInfo.letters = lettersForCheck
-                if saveRecord {
-                    try! realmHelpInfo!.safeWrite() {
-                        realmHelpInfo!.add(helpInfo)
-                    }
-                }
-            }
+//            if GV.generateHelpInfo {
+//                let endedInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
+//                helpInfo.endedInfo = endedInfoData
+//                if helpInfo.movedInfo.length > 0 {
+//                    helpInfo.movedInfo.removeLast()
+//                }
+//                helpInfo.letters = lettersForCheck
+//                if saveRecord {
+//                    try! realmHelpInfo!.safeWrite() {
+//                        realmHelpInfo!.add(helpInfo)
+//                    }
+//                }
+//            }
 
         } else if movedFromBottom {
             for piece in pieceArray {
@@ -3556,19 +3555,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 lettersForCheck = letters + "/" + LettersColor.Red.rawValue
                 returnBool = checkLetters == "" || checkLetters == lettersForCheck
-                if GV.generateHelpInfo {
-                    let movedInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
-                    helpInfo.endedInfo = movedInfoData
-                    helpInfo.movedInfo.removeLast()
-                    helpInfo.letters = lettersForCheck
-                    if helpInfo.beganInfo == "" {
-                        print("Hier at error: at fixed, counter: \(helpInfo.counter)")
-                        helpInfo.beganInfo = String(movedIndex)
-                    }
-                    try! realmHelpInfo!.safeWrite() {
-                        realmHelpInfo!.add(helpInfo)
-                    }
-                }
+//                if GV.generateHelpInfo {
+//                    let movedInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
+//                    helpInfo.endedInfo = movedInfoData
+//                    helpInfo.movedInfo.removeLast()
+//                    helpInfo.letters = lettersForCheck
+//                    if helpInfo.beganInfo == "" {
+//                        print("Hier at error: at fixed, counter: \(helpInfo.counter)")
+//                        helpInfo.beganInfo = String(movedIndex)
+//                    }
+//                    try! realmHelpInfo!.safeWrite() {
+//                        realmHelpInfo!.add(helpInfo)
+//                    }
+//                }
                saveActualState()
             } else {
                 pieceArray[movedIndex].position = origPosition[movedIndex]
@@ -3585,15 +3584,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 returnBool = letters == checkLetters
                 pieceArray[touchedNodes.shapeIndex].rotate()
                 pieceArray[touchedNodes.shapeIndex].position = origPosition[touchedNodes.shapeIndex]
-                if GV.generateHelpInfo {
-                    let endedInfoData = MovedInfoData(onGameArray: false, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
-                    helpInfo.endedInfo += endedInfoData
-                    helpInfo.movedInfo = ""
-                    helpInfo.letters = letters
-                    try! realmHelpInfo!.safeWrite() {
-                        realmHelpInfo!.add(helpInfo)
-                    }
-                }
+//                if GV.generateHelpInfo {
+//                    let endedInfoData = MovedInfoData(onGameArray: false, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
+//                    helpInfo.endedInfo += endedInfoData
+//                    helpInfo.movedInfo = ""
+//                    helpInfo.letters = letters
+//                    try! realmHelpInfo!.safeWrite() {
+//                        realmHelpInfo!.add(helpInfo)
+//                    }
+//                }
             } else {
                 if !goBackButton!.isEnabled {
                     self.hideButtons(hide: false)
@@ -3715,16 +3714,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    @objc private func continueMediumAction () {
-        self.enabled = true
-        self.gameboardEnabled = true
-        saveHelpInfo(action: .ContinueGameMedium)
-        self.gameboardEnabled = true
-        self.goOnPlaying = true
-        try! realm.safeWrite() {
-            GV.playingRecord.gameStatus = GV.GameStatusContinued
-        }
-    }
+//    @objc private func continueMediumAction () {
+//        self.enabled = true
+//        self.gameboardEnabled = true
+//        saveHelpInfo(action: .ContinueGameMedium)
+//        self.gameboardEnabled = true
+//        self.goOnPlaying = true
+//        try! realm.safeWrite() {
+//            GV.playingRecord.gameStatus = GV.GameStatusContinued
+//        }
+//    }
 
     @objc private func newAction () {
         saveToFinishedGames()
@@ -3747,23 +3746,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     }
         
-    @objc private func finishEasyAction () {
-        self.enabled = true
-        self.gameboardEnabled = true
-        saveHelpInfo(action: .FinishGameEasy)
-        self.gameboardEnabled = true
-        self.finishButtonTapped()
-        self.saveToGameCenter()
-    }
+//    @objc private func finishEasyAction () {
+//        self.enabled = true
+//        self.gameboardEnabled = true
+//        saveHelpInfo(action: .FinishGameEasy)
+//        self.gameboardEnabled = true
+//        self.finishButtonTapped()
+//        self.saveToGameCenter()
+//    }
     
-    @objc private func finishMediumAction () {
-        self.enabled = true
-        self.gameboardEnabled = true
-        saveHelpInfo(action: .FinishGameMedium)
-        self.gameboardEnabled = true
-        self.finishButtonTapped()
-        self.saveToGameCenter()
-    }
+//    @objc private func finishMediumAction () {
+//        self.enabled = true
+//        self.gameboardEnabled = true
+//        saveHelpInfo(action: .FinishGameMedium)
+//        self.gameboardEnabled = true
+//        self.finishButtonTapped()
+//        self.saveToGameCenter()
+//    }
     var gameFinishedStatus: GameFinishedStatus = .OK
     
     private func showGameFinished(status: GameFinishedStatus) {
@@ -3826,20 +3825,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         enabled = true
 //        nextRoundTapped
         if gameFinishedStatus == .OK {
-            saveHelpInfo(action: .FinishGame)
+//            saveHelpInfo(action: .FinishGame)
 //            try! realm.safeWrite() {
 //                GV.playingRecord.gameStatus = GV.GameStatusFinished
 //            }
-            if !showHelp {
-                self.startNewGame()
-            }
+//            if !showHelp {
+//                self.startNewGame()
+//            }
         } else {
             self.restartThisGame()
         }
     }
     
     @objc private func goBackButtonTapped2() {
-        saveHelpInfo(action: .ContinueGameEasy)
+//        saveHelpInfo(action: .ContinueGameEasy)
         gameboardEnabled = true
         enabled = true
     }
@@ -3947,26 +3946,26 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     var noMoreStepsAlert: MyAlertController?
 
-    private func createNoMoreStepsAlert() {
-        let myAlert = MyAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
-                                        message: GV.language.getText(.tcChooseAction) , target: self, type: .Gold)
-        myAlert.addAction(text: GV.language.getText(.tcBack), action:#selector(self.startUndoTapped))
-        myAlert.addAction(text: GV.language.getText(.tcNextRound), action:#selector(self.nextRoundTapped))
-//        myAlert.addAction(text: GV.language.getText(.tcNoMoreStepsAnswer3), action:#selector(self.noActionTapped))
-        myAlert.presentAlert()
-        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-        noMoreStepsAlert = myAlert
-        noMoreStepsAlert!.name = myAlertName
-    }
+//    private func createNoMoreStepsAlert() {
+//        let myAlert = MyAlertController(title: GV.language.getText(.tcNoMoreStepsQuestion1),
+//                                        message: GV.language.getText(.tcChooseAction) , target: self, type: .Gold)
+//        myAlert.addAction(text: GV.language.getText(.tcBack), action:#selector(self.startUndoTapped))
+//        myAlert.addAction(text: GV.language.getText(.tcNextRound), action:#selector(self.nextRoundTapped))
+////        myAlert.addAction(text: GV.language.getText(.tcNoMoreStepsAnswer3), action:#selector(self.noActionTapped))
+//        myAlert.presentAlert()
+//        myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+//        noMoreStepsAlert = myAlert
+//        noMoreStepsAlert!.name = myAlertName
+//    }
     
-    @objc private func noActionTapped() {
-        self.enabled = true
-        saveHelpInfo(action: .NoMoreStepsCont)
-    }
+//    @objc private func noActionTapped() {
+//        self.enabled = true
+//        saveHelpInfo(action: .NoMoreStepsCont)
+//    }
     
     @objc private func nextRoundTapped() {
         self.enabled = true
-        saveHelpInfo(action: .NoMoreStepsNext)
+//        saveHelpInfo(action: .NoMoreStepsNext)
         stopShowingTableIfNeeded()
         startNextRound()
         modifyHeader()
@@ -3976,7 +3975,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     @objc private func startUndoTapped() {
         self.enabled = true
-        saveHelpInfo(action: .NoMoreStepsBack)
+//        saveHelpInfo(action: .NoMoreStepsBack)
         startUndo()
     }
     
@@ -4021,9 +4020,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             origSize[to] = pieceArray[to].size
         }
 
-        if GV.generateHelpInfo {
-            saveHelpInfo(action: .UndoButton)
-        }
+//        if GV.generateHelpInfo {
+//            saveHelpInfo(action: .UndoButton)
+//        }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 {
             actRound = GV.playingRecord.rounds.count - 1
             if activityRoundItem.count > 0 {
@@ -4106,9 +4105,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             saveToGameCenter()
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 && activityRoundItem.count == 1 {
-            if GV.generateHelpInfo {
-                resetHelpInfo()
-            }
+//            if GV.generateHelpInfo {
+//                resetHelpInfo()
+//            }
             setUndoButton(enabled: false)
             GV.totalScore = 0
             wtGameboard!.clearGameArray()
@@ -4184,7 +4183,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             activityRoundItem.append(ActivityRound())
             activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
         }
-        if activityRoundItem[0].activityItems.count > 0 && !showHelp {
+        if activityRoundItem[0].activityItems.count > 0 {
             setUndoButton(enabled: true)
         }
         timeForGame = TimeForGame(from: GV.playingRecord.time)
@@ -4195,8 +4194,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let date = Date()
         let calendar = Calendar.current
         let theDayOfMonth = calendar.component(.day, from: date)
-        let gameNumberForSelect = (GV.generateHelpInfo || showHelp) ? gameNumberForGenerating : GV.playingRecord.gameNumber % 1000
-        let gameNumberForRandom = (GV.generateHelpInfo || showHelp) ? gameNumberForGenerating : GV.playingRecord.gameNumber * theDayOfMonth
+        let gameNumberForSelect = GV.playingRecord.gameNumber % 1000
+        let gameNumberForRandom = GV.playingRecord.gameNumber * theDayOfMonth
         let random = MyRandom(gameNumber: gameNumberForRandom, modifier: GV.playingRecord.words.count)
         var tileType = MyShapes.NotUsed
         var letters = [String]()
@@ -4280,7 +4279,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     pieceString += letter
                 }
                 pieceString += "°"
-                let newIndex = showHelp ? random.getRandomInt(0, max: tilesForGame.count) : tilesForGame.count
+                let newIndex = tilesForGame.count
                 if newIndex == tilesForGame.count || !first || usedWords.count > 6 /*|| GV.playingRecord.gameNumber % 1000 == 0 */{
                     tilesForGame.append(tileForGameItem)
                 } else {

@@ -314,16 +314,17 @@ public class WTGameWordList {
         clearWordsInGame()
         for (index, round) in GV.playingRecord.rounds.enumerated() {
 //            print("round: \(index + 1)")
-            setFirstTime()
+//            let num = setFirstTime()
             cleanGameArray()
-//            showTime(string: "cleanGameArray")
+//            showTime(num: num, string: "cleanGameArray")
             resetOccurencesInWords()
-//            showTime(string: "resetOccurencesInWords")
+//            showTime(num: num, string: "resetOccurencesInWords")
             wordsInRound.append(WordInRound())
             wtGameboard!.stringToGameArray(string: round.gameArray)
-//            showTime(string: "stringToGameArray")
+//            showTime(num: num, string: "stringToGameArray")
             initFromString(from: round.infos, round: index + 1)
-//            showTime(string: "initFromString")
+//            showTime(num: num, string: "initFromString")
+//            stopTime()
         }
     }
      
@@ -357,17 +358,17 @@ public class WTGameWordList {
         }
     }
     
-    var timer = Date()
-    private func setFirstTime() {
-        timer = Date()
-    }
-    
-    private func showTime(string: String) {
-        let date = Date()
-        print("time at \(string): \((date.timeIntervalSince(timer) * 1000).nDecimals(10))")
-        timer = Date()
-    }
-    
+//    var timer = Date()
+//    private func setFirstTime() {
+//        timer = Date()
+//    }
+//
+//    private func showTime(string: String) {
+//        let date = Date()
+//        print("time at \(string): \((date.timeIntervalSince(timer) * 1000).nDecimals(10))")
+//        timer = Date()
+//    }
+//
     public func getPreviousRound() {
         wordsInRound.removeLast()
     }
@@ -425,8 +426,12 @@ public class WTGameWordList {
                 let connectionType = selectedWord.connectionTypes[index]
                 GV.gameArray[letter.col][letter.row].setStatus(toStatus: .WholeWord, connectionType: connectionType, incrWords: true)
             }
+//            let num = setFirstTime()
             addWordToAllWords(selectedWord: selectedWord, doAnimate: doAnimate, round: round)
+//            showTime(num: num, string: "addWordToAllWords: \(selectedWord.word)")
             addWordToMyWords(word: selectedWord.word)
+//            showTime(num: num, string: "addWordToMyWords")
+//            stopTime()
         }
         return noCommonLetter && noDiagonal
     }
