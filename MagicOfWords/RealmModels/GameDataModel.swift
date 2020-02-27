@@ -21,6 +21,7 @@ class GameDataModel: Object {
     @objc dynamic var pieces = ""
     @objc dynamic var words = ""
     @objc dynamic var score = 0  // Score
+    @objc dynamic var hintTable = ""
     @objc dynamic var time = ""
     @objc dynamic var synced = false
     @objc dynamic var countOfWordsMaxValue = 1000

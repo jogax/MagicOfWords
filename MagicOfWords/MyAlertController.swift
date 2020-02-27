@@ -13,7 +13,7 @@ enum AlertType: Int {
     case Gold = 0, Red, Green, White
 }
 class MyAlertController: SKSpriteNode {
-    let separator = "°"
+//    let separator = "°"
     var myLabels = [SKLabelNode]()
     var myBackgrounds = [SKSpriteNode]()
     let myTarget: AnyObject

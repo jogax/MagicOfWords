@@ -294,6 +294,19 @@ class WTPiece: SKSpriteNode {
         return size
     }
     
+    public func getMaxColRow()->(col:Int, row:Int) {
+        let form = myForms[myType]![rotateIndex]
+        var maxCol = 0
+        var maxRow = 0
+        for index in 0..<form.points.count {
+            let col = form.points[index] / 10
+            let row = form.points[index] % 10
+            maxCol = col > maxCol ? col : maxCol
+            maxRow = row > maxRow ? row : maxRow
+        }
+        return (col: maxCol, row: maxRow)
+    }
+    
     private func generateNameArray()->[String] {
         let form = myForms[myType]![rotateIndex]
         var nameArray = [String]()

@@ -790,7 +790,7 @@ class WTGameboard: SKShapeNode {
         for col in 0..<countCols {
             for row in 0..<countCols {
                 let item = GV.gameArray[col][row]
-                if item.fixItem && item.status == .Used {
+                if item.fixItem /* && item.status == .Used*/ {
                     returnValue += 1
                 }
             }
@@ -820,6 +820,19 @@ class WTGameboard: SKShapeNode {
             }
         }
         return false
+    }
+    
+    public func getCountFreePlaces()->Int {
+        var returnValue = 0
+        for col in 0..<countCols {
+            for row in 0..<countCols {
+                if GV.gameArray[col][row].status == .Empty {
+                    returnValue += 1
+                }
+            }
+        }
+        return returnValue
+
     }
     var countReadyAnimations = 0
     

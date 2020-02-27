@@ -150,8 +150,8 @@ struct GV {
     static let SimpleGame = 0
     static let HardGame = 1
     static var actLetter = ""
-    static let DemoEasyGameNumber = 10000
-    static let DemoMediumGameNumber = 11000
+//    static let DemoEasyGameNumber = 10000
+//    static let DemoMediumGameNumber = 11000
     static var countOfWordsMaxValue = 1000
     static var countOfLettersMaxValue = 250
     static let TimeModifier: Int64 = 10000000000
@@ -187,6 +187,7 @@ struct GV {
 //    static var helpInfoRecords: Results<HelpInfo>?
     static let frequencyString = ":freq:"
     static var darkMode = false
+    static var hintTable = [String]()
 
     static let language = Language()
     static let size = 10
