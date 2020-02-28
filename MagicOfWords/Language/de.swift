@@ -191,6 +191,7 @@ let deDictionary: [TextConstants: String] = [
     .tcAcceptedDescription: "Du bekommst % Bonuspunkte für jede Verwendung!",
     .tcWordReportedTitle:    "Das Wort wurde an den Entwickler gesendet!",
     .tcWordReportedMessage: "Warte geduldig auf die Antwort!",
+    .tcHintsWithRedLetters: "Einige Tipps für rote Buchstaben",
 ]
 
 

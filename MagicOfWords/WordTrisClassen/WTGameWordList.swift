@@ -280,16 +280,10 @@ public class WTGameWordList {
             return allWords.count
     }
     
-//    public func getMinutesForWord(word: String)->Int {
-//        if word.length < minutesForWord.count {
-//            return minutesForWord[word.length]!
-//        } else {
-//            return minutesForWord[minutesForWord.count - 1]!
-//        }
-//    }
-//
-//
-//
+    public func getScoreForWord(word: String)->Int {
+        return word.length > 25 ? maxScore : pointsForWord[word.length]!
+    }
+
     public func getCountOwnWords(founded: Bool)->(Int) {
         var returnValue = 0
         var lastWord = ""

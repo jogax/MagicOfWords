@@ -337,6 +337,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             length = length < optimalLength ? optimalLength : length
             text = header1.fixLength(length: length, center: true)
             text0 = header0.fixLength(length: length, center: true)
+        case .ShowHints:
+            text = hintHeaderLine
         default:
             break
         }
@@ -424,6 +426,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let restLength = Int(tableView.frame.width / "A".width(font:myFont!)) - lengthOfWord - lengthOfLength - lengthOfScore
             let spaces = " "
             cell.addColumn(text: spaces.fixLength(length: restLength), color: myLightBlue)
+        case .ShowHints:
+            cell.addColumn(text: "   " + hintsTableForShow[indexPath.row].hint.fixLength(length: lengthOfWord, leadingBlanks: false), color: myLightBlue)
+            cell.addColumn(text: String(hintsTableForShow[indexPath.row].hint.count).fixLength(length: lengthOfLength), color: myLightBlue)
+            cell.addColumn(text: String(hintsTableForShow[indexPath.row].score).fixLength(length: lengthOfScore), color: myLightBlue)
         default:
             break
         }
@@ -1587,6 +1593,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
+    @objc private func showHintTable() {
+        stopShowingTableIfNeeded()
+        showHintsInTableView()
+
+    }
+        
+
+    
     var saveDataButton: MyButton?
     var finishButton: MyButton?
     var allWordsButton: MyButton?
@@ -1759,10 +1773,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         bgSprite!.addChild(hintButton!)
     }
     
-    @objc private func showHintTable() {
-        
-    }
-        
     private func createMyButton(imageName: String = "", title: String = "", size: CGSize, center: CGPoint, enabled: Bool, newSize: CGFloat = 0)->MyButton {
         var button: MyButton
         if imageName != "" {
@@ -2026,11 +2036,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
             let wordLength = title.width(font: myTitleFont!)
             //        let wordHeight = title.height(font: myTitleFont!)
-            let size = CGSize(width:wordLength * 1.4, height: buttonHeight)
+            let size = CGSize(width:wordLength * 1.1, height: buttonHeight)
             let ownHeaderYPos = self.frame.height * secondButtonLine
             let buttonCenter = CGPoint(x:self.frame.width * 0.5, y: ownHeaderYPos)
             //        let radius = frame.height * 0.5
             let button = createMyButton(title: title, size: size, center: buttonCenter, enabled: true )
+            button.size = size
             button.isHidden = false
             if difficulty == .Easy {
                 button.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(startEasyGame))
@@ -2218,6 +2229,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for index in 0..<3 {
             origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * pieceArrayCenterY)
         }
+        GV.hintTable.removeAll()
         if !new {
             wtGameboard!.setRoundInfos()
             if GV.playingRecord.rounds.count == 1 && GV.playingRecord.rounds[0].gameArray == "" {
@@ -2227,6 +2239,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 restoreGameArray()
                 showFoundedWords()
                 modifyHeader()
+                let hints = GV.playingRecord.hintTable.components(separatedBy: itemSeparator)
+                for hint in hints {
+                    if hint != "" {
+                        GV.hintTable.append(hint)
+                    }
+                }
                 let countFixLetters =  wtGameboard!.checkFixLetters()
                 var targetLetterCount = startValueForFixLetters + GV.playingRecord.rounds.count
                 targetLetterCount = (targetLetterCount > maxLetterCountForFixLetters) ? maxLetterCountForFixLetters : targetLetterCount
@@ -2256,7 +2274,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 bgSprite!.addChild(pieceArray[index])
             }
         }
-        saveActualState()
+//        saveActualState()
         fillTippIndexes()
         movePiecesToGameArray()
         saveActualState()
@@ -2349,9 +2367,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 for index in 0...lastIndex {
                     bgSprite!.addChild(pieceArray[index])
                 }
-                print("piece: \(piece.letters)")
             } while remainingLength > 0
-            print("actWord: \(actWord)")
             GV.hintTable.append(actWord)
         }
         while wtGameboard!.getCountFreePlaces() > 50 {
@@ -3256,10 +3272,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if showingWordsInTable /* && !touchedNodes.showOwnWordsButton */ {
             WTGameWordList.shared.stopShowingWords()
             showingWordsInTable = false
-            if tableType == .ShowAllWords {
-                showOwnWordsTableView!.removeFromSuperview()
-            } else {
-                showWordsOverPositionTableView?.removeFromSuperview()
+            switch tableType {
+            case .ShowAllWords:
+                showOwnWordsTablSeView!.removeFromSuperview()
+            case .ShowFoundedWords:
+                showFoundedWordsTableView!.removeFromSuperview()
+            case .ShowHints:
+                showHintsTableView!.removeFromSuperview()
+            case .ShowWordsOverPosition:
+                showWordsOverPositionTableView!.removeFromSuperview()
+            default:
+                break
             }
             timerIsCounting = true
             self.hideButtons(hide: false)
@@ -4014,6 +4037,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 activityItemsString.removeLast()
                 rounds.activityItems = activityItemsString
             }
+            var hintTable = ""
+            if GV.hintTable.count > 0 {
+                for word in GV.hintTable {
+                    hintTable += word + itemSeparator
+                }
+                if hintTable != "" {
+                    hintTable.removeLast()
+                }
+                GV.playingRecord.hintTable = hintTable
+            }
         }        
         modifyDifficultyLabels(number: calculatePlace())
 //        hideButtons(hide: false)
@@ -4526,7 +4559,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     
-    var showOwnWordsTableView: WTTableView?
+    var showOwnWordsTablSeView: WTTableView?
+    var showHintsTableView: WTTableView?
     struct WordsForShow {
         var words = [FoundedWordWithCounter]()
         var countWords = 0
@@ -4549,7 +4583,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     private func showOwnWordsInTableView() {
         tableType = .ShowAllWords
-        showOwnWordsTableView = WTTableView()
+        showOwnWordsTablSeView = WTTableView()
         timerIsCounting = false
         var words: [FoundedWordWithCounter]
         (words, maxLength) = WTGameWordList.shared.getWordsForShow()
@@ -4559,8 +4593,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let headerText = (GV.language.getText(.tcCollectedOwnWords) + suffix)
         let actWidth = max(title.width(font: myFont!), headerText.width(font: myFont!)) * 1.2
 
-        showOwnWordsTableView?.setDelegate(delegate: self)
-        showOwnWordsTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
+        showOwnWordsTablSeView?.setDelegate(delegate: self)
+        showOwnWordsTablSeView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
         let origin = CGPoint(x: 0.5 * (self.frame.width - actWidth), y: self.frame.height * 0.08)
         let lineHeight = title.height(font:myFont!)
         let headerframeHeight = lineHeight * 2.3
@@ -4576,10 +4610,63 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             maxLength = GV.language.getText(.tcWord).count
         }
         let size = CGSize(width: actWidth, height: showingWordsHeight + headerframeHeight)
-        showOwnWordsTableView?.frame=CGRect(origin: origin, size: size)
-        self.showOwnWordsTableView?.reloadData()
+        showOwnWordsTablSeView?.frame=CGRect(origin: origin, size: size)
+        self.showOwnWordsTablSeView?.reloadData()
 //        self.scene?.alpha = 0.2
-        self.scene?.view?.addSubview(showOwnWordsTableView!)
+        self.scene?.view?.addSubview(showOwnWordsTablSeView!)
+        self.hideButtons(hide: true)
+    }
+    
+    private func getHintsForShow()->([String], Int) {
+        var returnArray = [String]()
+        var returnValue = 0
+        for hint in GV.hintTable {
+            returnValue = returnValue < hint.length ? hint.length : returnValue
+            returnArray.append(hint)
+        }
+        return (returnArray, returnValue)
+    }
+    
+    var hintsTableForShow = [HintForShow]()
+    var hintHeaderLine = ""
+    private func showHintsInTableView() {
+        tableType = .ShowHints
+        showHintsTableView = WTTableView()
+        timerIsCounting = false
+        var maxLength = 0
+        for item in GV.hintTable {
+            let score = WTGameWordList.shared.getScoreForWord(word: item)
+            if item.length > maxLength {
+                maxLength = item.length
+            }
+            hintsTableForShow.append(HintForShow(hint: item, score: score))
+        }
+//        ownWordsForShow = WordsForShow(words: words)
+        calculateColumnWidths(showCount: false)
+        hintHeaderLine = (GV.language.getText(.tcHintsWithRedLetters))
+        let actWidth = max(title.width(font: myFont!), hintHeaderLine.width(font: myFont!))//* 1.2
+
+        showHintsTableView?.setDelegate(delegate: self)
+        showHintsTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
+        let origin = CGPoint(x: 0.5 * (self.frame.width - actWidth), y: self.frame.height * 0.08)
+        let lineHeight = title.height(font:myFont!)
+        let headerframeHeight = lineHeight * 2.3
+        var showingWordsHeight = CGFloat(hintsTableForShow.count) * lineHeight
+        if showingWordsHeight  > self.frame.height * 0.8 {
+            var counter = CGFloat(hintsTableForShow.count)
+            repeat {
+                counter -= 1
+                showingWordsHeight = lineHeight * counter
+            } while showingWordsHeight + headerframeHeight > self.frame.height * 0.8
+        }
+        if maxLength < GV.language.getText(.tcWord).count {
+            maxLength = GV.language.getText(.tcWord).count
+        }
+        let size = CGSize(width: actWidth, height: showingWordsHeight + headerframeHeight)
+        showHintsTableView?.frame=CGRect(origin: origin, size: size)
+        self.showHintsTableView?.reloadData()
+//        self.scene?.alpha = 0.2
+        self.scene?.view?.addSubview(showHintsTableView!)
         self.hideButtons(hide: true)
     }
     

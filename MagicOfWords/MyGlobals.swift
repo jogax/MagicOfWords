@@ -93,6 +93,14 @@ struct ScoreForShow {
         self.me = me
     }
 }
+struct HintForShow {
+    var hint: String
+    var score: Int
+    init(hint: String, score: Int) {
+        self.hint = hint
+        self.score = score
+    }
+}
 
 let NoValue = -1
 var myWidth: CGFloat = 0
@@ -181,6 +189,7 @@ struct GV {
             return PieceFont
         }
     }
+    
     static var playing = false
     static var playingRecord = GameDataModel()
     static var basicDataRecord = BasicDataModel()

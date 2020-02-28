@@ -189,5 +189,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcAcceptedDescription: "За это ты получишь % бонусных очков!",
     .tcWordReportedTitle:    "Слово отправлено разработчику!",
     .tcWordReportedMessage:   "Пожалуйста, жди терпеливо ответа!",
+    .tcHintsWithRedLetters: "Несколько подсказок для красных букв",
 ]
 
