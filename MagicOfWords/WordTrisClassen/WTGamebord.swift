@@ -31,6 +31,19 @@ public struct UsedLetter {
     }
 }
 
+public struct UsedLetterWithCounter {
+    var col: Int = 0
+    var row: Int = 0
+    var letter: String = emptyLetter
+    var freeCount: Int = 0
+    init(col: Int, row: Int, letter: String, freeCount: Int) {
+        self.col = col
+        self.row = row
+        self.letter = letter
+        self.freeCount = freeCount
+    }
+}
+
 public struct MovingItem {
     let fromToSeparator = "|"
     let dataSeparator = "?"
@@ -832,8 +845,75 @@ class WTGameboard: SKShapeNode {
             }
         }
         return returnValue
-
     }
+    
+    public func getRedLetters()->[String] {
+        var returnValue = [String]()
+        for col in 0..<countCols {
+            for row in 0..<countCols {
+                if GV.gameArray[col][row].status == .Used && !GV.gameArray[col][row].fixItem {
+                    returnValue.append(GV.gameArray[col][row].letter)
+                }
+            }
+        }
+        return returnValue
+    }
+    public func getFreeFixLetters()->[UsedLetterWithCounter] {
+        var returnValue = [UsedLetterWithCounter]()
+        for col in 0..<countCols {
+            for row in 0..<countCols {
+                if GV.gameArray[col][row].status == .Used && GV.gameArray[col][row].fixItem {
+                    let usedLetter = setCounterForItem(col: col, row: row)
+                    if usedLetter.freeCount > 0 {
+                        returnValue.append(usedLetter)
+                    }
+                }
+            }
+        }
+        return returnValue
+    }
+
+    public func getFreeGreenLetters()->[UsedLetterWithCounter] {
+        var returnValue = [UsedLetterWithCounter]()
+        for col in 0..<countCols {
+            for row in 0..<countCols {
+                if GV.gameArray[col][row].status == .WholeWord {
+                    let usedLetter = setCounterForItem(col: col, row: row)
+                    if usedLetter.freeCount > 0 {
+                        returnValue.append(usedLetter)
+                    }
+                }
+            }
+        }
+        return returnValue
+    }
+
+
+    private func setCounterForItem(col: Int, row: Int)->UsedLetterWithCounter {
+        var returnValue = UsedLetterWithCounter(col: col, row: row, letter: GV.gameArray[col][row].letter, freeCount: 0)
+        if col > 0 {
+            if GV.gameArray[col - 1][row].status == .Empty || (GV.gameArray[col - 1][row].status == .Used && !GV.gameArray[col - 1][row].fixItem) {
+                returnValue.freeCount += 1
+            }
+        }
+        if col < 9 {
+            if GV.gameArray[col + 1][row].status == .Empty || (GV.gameArray[col + 1][row].status == .Used && !GV.gameArray[col + 1][row].fixItem) {
+                returnValue.freeCount += 1
+            }
+        }
+        if row > 0 {
+            if GV.gameArray[col][row - 1].status == .Empty || (GV.gameArray[col][row - 1].status == .Used && !GV.gameArray[col][row - 1].fixItem) {
+                returnValue.freeCount += 1
+            }
+        }
+        if row < 9 {
+            if GV.gameArray[col][row + 1].status == .Empty || (GV.gameArray[col][row + 1].status == .Used && !GV.gameArray[col][row + 1].fixItem) {
+                returnValue.freeCount += 1
+            }
+        }
+        return returnValue
+    }
+    
     var countReadyAnimations = 0
     
     public func clearGreenFieldsForNextRound() {

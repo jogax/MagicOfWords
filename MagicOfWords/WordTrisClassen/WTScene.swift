@@ -732,29 +732,29 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         })
 //        searchWords(lettersToSearch: ["a", "b", "m", "a", "g", "l", "f", "a", "r"])
         play()
-        if new {
-            let easy = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue
-            let title = GV.language.getText(easy ? .tcChooseGoalForWords : .tcChooseGoalForLetters)
-            let message = GV.language.getText(easy ? .tcGoalMessageForWords : .tcGoalMessageForLetters)
-            let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
-            if easy {
-                myAlert.addAction(text: "100", action: #selector(self.startEasy100))
-                myAlert.addAction(text: "250", action: #selector(self.startEasy250))
-                myAlert.addAction(text: "500", action: #selector(self.startEasy500))
-                myAlert.addAction(text: "750", action: #selector(self.startEasy750))
-                myAlert.addAction(text: "1000", action: #selector(self.startEasy1000))
-            } else {
-                myAlert.addAction(text: "50", action: #selector(self.startMedium50))
-                myAlert.addAction(text: "100", action: #selector(self.startMedium100))
-                myAlert.addAction(text: "150", action: #selector(self.startMedium150))
-                myAlert.addAction(text: "200", action: #selector(self.startMedium200))
-                myAlert.addAction(text: "250", action: #selector(self.startMedium250))
-            }
-            myAlert.presentAlert()
-            myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-            myAlert.name = self.myAlertName
-            self.bgSprite!.addChild(myAlert)
-        }
+//        if new {
+//            let easy = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue
+//            let title = GV.language.getText(easy ? .tcChooseGoalForWords : .tcChooseGoalForLetters)
+//            let message = GV.language.getText(easy ? .tcGoalMessageForWords : .tcGoalMessageForLetters)
+//            let myAlert = MyAlertController(title: title, message: message, target: self, type: .Green)
+//            if easy {
+//                myAlert.addAction(text: "100", action: #selector(self.startEasy100))
+//                myAlert.addAction(text: "250", action: #selector(self.startEasy250))
+//                myAlert.addAction(text: "500", action: #selector(self.startEasy500))
+//                myAlert.addAction(text: "750", action: #selector(self.startEasy750))
+//                myAlert.addAction(text: "1000", action: #selector(self.startEasy1000))
+//            } else {
+//                myAlert.addAction(text: "50", action: #selector(self.startMedium50))
+//                myAlert.addAction(text: "100", action: #selector(self.startMedium100))
+//                myAlert.addAction(text: "150", action: #selector(self.startMedium150))
+//                myAlert.addAction(text: "200", action: #selector(self.startMedium200))
+//                myAlert.addAction(text: "250", action: #selector(self.startMedium250))
+//            }
+//            myAlert.presentAlert()
+//            myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
+//            myAlert.name = self.myAlertName
+//            self.bgSprite!.addChild(myAlert)
+//        }
    }
     private func setCountWords(count: Int, type: GameDifficulty) {
         try! realm.safeWrite() {
@@ -768,45 +768,45 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         modifyHeader()
     }
-    @objc private func startEasy100() {
-        setCountWords(count: 100, type: .Easy)
-    }
-    
-    @objc private func startEasy250() {
-        setCountWords(count: 250, type: .Easy)
-    }
-    
-    @objc private func startEasy500() {
-        setCountWords(count: 500, type: .Easy)
-    }
-    
-    @objc private func startEasy750() {
-        setCountWords(count: 750, type: .Easy)
-    }
-    
-    @objc private func startEasy1000() {
-        setCountWords(count: 1000, type: .Easy)
-    }
-    
-    @objc private func startMedium50() {
-        setCountWords(count: 50, type: .Medium)
-    }
-    
-    @objc private func startMedium100() {
-        setCountWords(count: 100, type: .Medium)
-    }
-    
-    @objc private func startMedium150() {
-        setCountWords(count: 150, type: .Medium)
-    }
-    
-    @objc private func startMedium200() {
-        setCountWords(count: 200, type: .Medium)
-    }
-    
-    @objc private func startMedium250() {
-        setCountWords(count: 250, type: .Medium)
-    }
+//    @objc private func startEasy100() {
+//        setCountWords(count: 100, type: .Easy)
+//    }
+//
+//    @objc private func startEasy250() {
+//        setCountWords(count: 250, type: .Easy)
+//    }
+//
+//    @objc private func startEasy500() {
+//        setCountWords(count: 500, type: .Easy)
+//    }
+//
+//    @objc private func startEasy750() {
+//        setCountWords(count: 750, type: .Easy)
+//    }
+//
+//    @objc private func startEasy1000() {
+//        setCountWords(count: 1000, type: .Easy)
+//    }
+//
+//    @objc private func startMedium50() {
+//        setCountWords(count: 50, type: .Medium)
+//    }
+//
+//    @objc private func startMedium100() {
+//        setCountWords(count: 100, type: .Medium)
+//    }
+//
+//    @objc private func startMedium150() {
+//        setCountWords(count: 150, type: .Medium)
+//    }
+//
+//    @objc private func startMedium200() {
+//        setCountWords(count: 200, type: .Medium)
+//    }
+//
+//    @objc private func startMedium250() {
+//        setCountWords(count: 250, type: .Medium)
+//    }
     
 
     private func goBackToWTScene(start: StartType) {
@@ -1253,6 +1253,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                print("should send")
             }
         } else {
+            createHints()
             if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue  && GV.countOfWords >= GV.countOfWordsMaxValue {
                 congratulations(congratulationType: .AllWordsCollected)
             }
@@ -1263,9 +1264,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         return returnBool
     }
     
-//    private func addOwnWord(ownWord: WordToCheck) {
-//        _ = addOwnWordOld(word: ownWord.word, creationIndex: ownWord.creationIndex, check: false)
-//    }
+    private func checkHintsTable() {
+        let redLetters = wtGameboard!.getRedLetters()
+        var wordsToDeleteFromHintTable = [String]()
+        for word in GV.hintTable {
+            for letter in word.lowercased() {
+                if !redLetters.contains(String(letter)) {
+                    wordsToDeleteFromHintTable.append(word)
+                    break
+                }
+            }
+        }
+        if wordsToDeleteFromHintTable.count > 0 {
+            repeat {
+                let wordToDelete = wordsToDeleteFromHintTable.last!
+                let index = GV.hintTable.firstIndex(of: wordToDelete)
+                if index != nil {
+                    GV.hintTable.remove(at: index!)
+                }
+                wordsToDeleteFromHintTable.removeLast()
+            } while wordsToDeleteFromHintTable.count > 0
+        }
+    }
     
     private func removeAllSubviews() {
         for subView in self.view!.subviews {
@@ -1589,7 +1609,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
             stopShowingTableIfNeeded()
             showOwnWordsInTableView()
-            showingWordsInTable = true
+            showingInTableViewActive = true
         }
     }
     
@@ -2277,6 +2297,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        saveActualState()
         fillTippIndexes()
         movePiecesToGameArray()
+        createHints()
         saveActualState()
         
         if timer != nil {
@@ -2342,11 +2363,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
                 setUndoButton(enabled: true)
-    //                activityItems.append(activityItem)
-    //                setUndoButton(enabled: true)
-    //                undoSprite.alpha = 1.0
-    //                let fixedName = "Pos\(movedIndex)"
-    //                removeNodesWith(name: fixedName)
                 let lastIndex = pieceArray.count - 1
                 for index in 0...lastIndex {
                     removeNodesWith(name: "Pos\(String(index))")
@@ -3269,9 +3285,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     #endif
     
     private func stopShowingTableIfNeeded() {
-        if showingWordsInTable /* && !touchedNodes.showOwnWordsButton */ {
+        if showingInTableViewActive /* && !touchedNodes.showOwnWordsButton */ {
             WTGameWordList.shared.stopShowingWords()
-            showingWordsInTable = false
+            showingInTableViewActive = false
             switch tableType {
             case .ShowAllWords:
                 showOwnWordsTablSeView!.removeFromSuperview()
@@ -3713,6 +3729,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                        realmHelpInfo!.add(helpInfo)
 //                    }
 //                }
+               createHints()
                saveActualState()
             } else {
                 pieceArray[movedIndex].position = origPosition[movedIndex]
@@ -4577,7 +4594,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     var ownWordsForShow: WordsForShow?
     var maxLength = 0
-    var showingWordsInTable = false
+    var showingInTableViewActive = false
     let myFont = UIFont(name: GV.actLabelFont /*"CourierNewPS-BoldMT"*/, size: GV.onIpad ? 18 : 15)
     let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 15)
 
@@ -4632,8 +4649,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func showHintsInTableView() {
         tableType = .ShowHints
         showHintsTableView = WTTableView()
+        showingInTableViewActive = true
         timerIsCounting = false
         var maxLength = 0
+        hintsTableForShow.removeAll()
         for item in GV.hintTable {
             let score = WTGameWordList.shared.getScoreForWord(word: item)
             if item.length > maxLength {
@@ -4676,7 +4695,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         tableType = .ShowWordsOverPosition
         showWordsOverPositionTableView = WTTableView()
-        showingWordsInTable = true
+        showingInTableViewActive = true
         self.wordList = wordList
         timerIsCounting = false
         maxLength = 0
@@ -4729,6 +4748,81 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             print(infoLine)
         }
         print(line)
+    }
+    
+    private func createHints() {
+        checkHintsTable()
+        if GV.hintTable.count > 9 {
+            return
+        }
+        var usedRedLetters = [String]()
+        var redLetters = wtGameboard!.getRedLetters()
+        let fixLetters = wtGameboard!.getFreeFixLetters()
+        let freeGreenLetters = wtGameboard!.getFreeGreenLetters()
+        let like = "word Like %@ OR "
+        var formatString = "language = %@ AND ("
+        for _ in 0..<6 {
+            formatString += like
+        }
+        formatString.removeLast()
+        formatString.removeLast()
+        formatString.removeLast()
+        formatString.removeLast()
+        formatString += ")"
+        var OKWords = [String]()
+        let like1 = "?????"
+        let like2 = "??????"
+        let like3 = "???????"
+        let like4 = "????????"
+        let like5 = "?????????"
+        let like6 = "??????????"
+        let results = realmMandatoryList.objects(MandatoryListModel.self).filter(formatString, GV.actLanguage, like1, like2, like3, like4, like5, like6)
+        var countCycles = 0
+        let maxCountCycles = 10000
+        repeat {
+            repeat {
+                var wordOK = true
+                let index = Int.random(in: 0 ..< results.count)
+                let word = results[index].word
+                var temporaryRedLetters = [String]()
+                for letter in word.uppercased() {
+                    if !redLetters.contains(String(letter)) {
+                        wordOK = false
+                        break
+                    } else {
+                        temporaryRedLetters.append(String(letter))
+                        let index = redLetters.firstIndex(of: String(letter))
+                        if index != nil {
+                            redLetters.remove(at: index!)
+                        }
+                    }
+                }
+                if wordOK {
+                    if !OKWords.contains(word) {
+                        OKWords.append(word)
+                        for temporaryLetter in temporaryRedLetters {
+                            usedRedLetters.append(temporaryLetter)
+                        }
+                    }
+                } else {
+                    for temporaryLetter in temporaryRedLetters {
+                        redLetters.append(temporaryLetter)
+                    }
+                }
+                countCycles += 1
+            } while OKWords.count < 10 && countCycles < maxCountCycles
+            for word in OKWords {
+                let formattedWord = word.uppercased()
+                if !GV.hintTable.contains(formattedWord) {
+                    GV.hintTable.append(formattedWord)
+                    if GV.hintTable.count == 10 {
+                        break
+                    }
+                }
+            }
+        } while GV.hintTable.count < 10 && countCycles < maxCountCycles
+//        print("count: \(results.count)")
+        
     }
     
     private func searchWords(lettersToSearch: [String]) {
