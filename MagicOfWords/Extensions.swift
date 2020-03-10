@@ -598,13 +598,17 @@ extension String {
         
         return ceil(boundingBox.width)
     }
-    
-//    public func index(of char: Character) -> Int? {
-//        if let idx = self.index(of: char) {
-//            return idx
-//        }
-//        return nil
-//    }
+    public func changeChars(at: Int, by: String)->String {
+        var result = ""
+        if at > 0 {
+            result += self.subString(at: 0, length: at)
+        }
+        result += by
+        if result.length < self.length {
+            result += self.subString(at: result.length, length: self.length - result.length)
+        }
+        return result
+    }
 
 }
 extension NSAttributedString {

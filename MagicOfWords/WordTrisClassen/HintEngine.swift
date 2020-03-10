@@ -38,6 +38,18 @@ class HintEngine {
         return returnValue5_10
     }
     
+    private func find(value searchValue: String, inArray: [UsedLetterWithCounter]) -> Int?
+    {
+//        var returnValue = 0
+        for (index, value) in inArray.enumerated()
+        {
+            if value.letter == searchValue && value.freeCount > 0 {
+                return index
+            }
+        }
+        return nil
+    }
+    
     public func createHints() {
         let countHints = 20
         checkHintsTable()
@@ -46,18 +58,39 @@ class HintEngine {
         }
         var usedRedLetters = [String]()
         var redLetters = wtGameboard!.getRedLetters()
-        let fixLetters = wtGameboard!.getFreeFixLetters()
+        let fixLetters = wtGameboard!.getFixLetters()
         let freeGreenLetters = wtGameboard!.getFreeGreenLetters()
-        let results5_10 = getAllWords()
+        let freeArrays = wtGameboard!.getFreeArrays()
+        let results = getAllWords()
         var OKWords = [String]()
         var countCycles = 0
-
-        var resultIndex = results5_10.count - 1
+        var maxWordLength = 0
+        for array in freeArrays {
+            if array.countFree > maxWordLength {
+                maxWordLength = array.countFree
+            }
+            if maxWordLength >= 10 {
+                break
+            }
+        }
+        var resultIndex = results.count - 1
+        var stopCycle = false
+        repeat {
+            if results[resultIndex][0].word.length <= maxWordLength {
+                stopCycle = true
+            } else {
+                resultIndex -= 1
+            }
+        } while !stopCycle && resultIndex >= 0
+        if resultIndex < 0 {
+            GV.hintTable.removeAll()
+            return
+        }
         var maxCountCycles = 0
         repeat {
             repeat {
                 countCycles = 0
-                let actResults = results5_10[resultIndex]
+                let actResults = results[resultIndex]
                 maxCountCycles = actResults.count
                 var wordIndexes = [Int]()
                 for index in 0..<actResults.count {
@@ -68,30 +101,63 @@ class HintEngine {
                     let index = Int.random(in: 0 ..< wordIndexes.count)
                     let ind = wordIndexes[index]
                     wordIndexes.remove(at: index)
-                    let word = results5_10[resultIndex][ind].word
-                    var temporaryRedLetters = [String]()
-                    for letter in word.uppercased() {
-                        if !redLetters.contains(String(letter)) {
-                            wordOK = false
-                            break
-                        } else {
-                            temporaryRedLetters.append(String(letter))
-                            let index = redLetters.firstIndex(of: String(letter))
-                            if index != nil {
-                                redLetters.remove(at: index!)
+                    let word = results[resultIndex][ind].word
+//     checking fix letters Start
+                    //     checking fix letters End
+                    var temporaryRedLetters = [(letter:String, index:Int)]()
+//                    var letterIndexes = [Int]()
+//                    var temporaryFixLetters = [(letter: UsedLetterWithCounter, index: Int)]()
+//                    for (letterIndex, letter) in word.uppercased().enumerated() {
+//                        let fixLetterIndex = find(value: String(letter), inArray: fixLetters)
+//                        if fixLetterIndex != nil {
+//                            temporaryFixLetters.append((fixLetters[fixLetterIndex!], letterIndex))
+//                                letterIndexes.append(letterIndex)
+//                        }
+//                    }
+//                    var wordToCheck = "".fill(with: "?", toLength: word.count)
+                    
+//                    itt ellenőrizni, hogy egy fix letter ki lehet e rakni a szót, redLetterssel ellenőrizni! és eltárolni a
+//                    for (index, temporaryFixLetter) in temporaryFixLetters.enumerated() {
+//                        var nextItem = temporaryFixLetter
+//                        if index < temporaryFixLetters.count - 1 {
+//                            nextItem = temporaryFixLetters[index + 1]
+//                        }
+//                        let lettersBetween = nextItem.index - temporaryFixLetter.index - 1
+//                        let fixLetterDistance = abs(nextItem.letter.col - temporaryFixLetter.letter.col) + abs(nextItem.letter.row - temporaryFixLetter.letter.row) - 1
+//                        if lettersBetween > 0 && lettersBetween == fixLetterDistance {
+//                            wordToCheck = wordToCheck.changeChars(at: temporaryFixLetter.index - 1, by: temporaryFixLetter.letter.letter)
+//                            break
+//                        } else {
+//                            wordToCheck = wordToCheck.changeChars(at: temporaryFixLetter.index - 1, by: temporaryFixLetter.letter.letter)
+//                            break
+//                        }
+//                    }
+//                    print("wordToInsert:\(wordToCheck), word: \(word)")
+                    for (letterIndex, letter) in word.uppercased().enumerated() {
+//                        if wordToCheck.char(at: letterIndex) == "?" {
+                            if !redLetters.contains(String(letter)) {
+                                wordOK = false
+                                break
+                            } else {
+                                temporaryRedLetters.append((String(letter), letterIndex))
+                                let index = redLetters.firstIndex(of: String(letter))
+                                if index != nil {
+                                    redLetters.remove(at: index!)
+                                }
                             }
-                        }
+//                        }
                     }
                     if wordOK {
+//                        print("temporaryFixLetters: \(temporaryFixLetters)")
                         if !OKWords.contains(word) {
                             OKWords.append(word)
                             for temporaryLetter in temporaryRedLetters {
-                                usedRedLetters.append(temporaryLetter)
+                                usedRedLetters.append(temporaryLetter.letter)
                             }
                         }
                     }
                     for temporaryLetter in temporaryRedLetters {
-                            redLetters.append(temporaryLetter)
+                        redLetters.append(temporaryLetter.letter)
                     }
                     countCycles += 1
                 } while OKWords.count < countHints && countCycles < maxCountCycles

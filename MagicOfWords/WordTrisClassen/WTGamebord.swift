@@ -214,6 +214,46 @@ public struct GameArrayPositions {
     var col: Int
     var row: Int
 }
+enum ConnectionTo: Int {
+   case up, down, left, right
+}
+
+public struct GameArrayPositionsWithRelations {
+    var col: Int = 0
+    var row: Int = 0
+    var free: Bool = false
+    var up: Bool = false
+    var down: Bool = false
+    var left: Bool = false
+    var right: Bool = false
+    var countConnections = 0
+    init(col: Int, row: Int) {
+        self.col = col
+        self.row = row
+    }
+}
+
+extension GameArrayPositionsWithRelations: Equatable {}
+
+public func ==(lhs: GameArrayPositionsWithRelations, rhs: GameArrayPositionsWithRelations) -> Bool {
+    let areEqual = lhs.col == rhs.col &&
+        lhs.row == rhs.row &&
+        lhs.free == rhs.free &&
+        lhs.up == rhs.up &&
+        lhs.down == rhs.down &&
+        lhs.left == rhs.left &&
+        lhs.right == rhs.right &&
+        lhs.countConnections == rhs.countConnections
+
+    return areEqual
+}
+
+public struct FreeArray {
+    var countFree = 0
+    var numberOfFreeArray = 0
+    var freePlaces = [GameArrayPositionsWithRelations]()
+}
+
 
 public struct RoundInfos {
     var words = [FoundedWordWithCounter]()
@@ -858,16 +898,112 @@ class WTGameboard: SKShapeNode {
         }
         return returnValue
     }
-    public func getFreeFixLetters()->[UsedLetterWithCounter] {
+    public func getFixLetters()->[UsedLetterWithCounter] {
         var returnValue = [UsedLetterWithCounter]()
         for col in 0..<countCols {
             for row in 0..<countCols {
-                if GV.gameArray[col][row].status == .Used && GV.gameArray[col][row].fixItem {
+                if GV.gameArray[col][row].fixItem {
                     let usedLetter = setCounterForItem(col: col, row: row)
-                    if usedLetter.freeCount > 0 {
-                        returnValue.append(usedLetter)
+                    returnValue.append(usedLetter)
+                }
+            }
+        }
+        return returnValue
+    }
+    
+    public func getFreeArrays()->[FreeArray] {
+        var returnValue = [FreeArray]()
+        for index in 0...15 {
+            let freeArray = FreeArray(countFree: 0, numberOfFreeArray: index, freePlaces: [GameArrayPositionsWithRelations]())
+            returnValue.append(freeArray)
+        }
+        for col in 0..<countCols {
+            for row in 0..<countCols {
+                var connections = GameArrayPositionsWithRelations(col: col, row: row)
+                func setConnection(toDirection: ConnectionTo) {
+                    switch toDirection {
+                    case .up:
+                        if row > 0 && (GV.gameArray[col][row - 1].status == .Used && !GV.gameArray[col][row - 1].fixItem || GV.gameArray[col][row - 1].status == .Empty) {
+                            connections.up = true
+                            connections.countConnections += 1
+                            connections.free = true
+                        }
+                    case .down:
+                        if row < countCols - 1 && (GV.gameArray[col][row + 1].status == .Used && !GV.gameArray[col][row + 1].fixItem || GV.gameArray[col][row + 1].status == .Empty) {
+                            connections.down = true
+                            connections.countConnections += 1
+                            connections.free = true
+                        }
+                    case .left:
+                        if col > 0 && (GV.gameArray[col - 1][row].status == .Used && !GV.gameArray[col - 1][row].fixItem || GV.gameArray[col - 1][row].status == .Empty) {
+                            connections.left = true
+                            connections.countConnections += 1
+                            connections.free = true
+                        }
+                    case .right:
+                        if col < countCols - 1 && (GV.gameArray[col + 1][row].status == .Used && !GV.gameArray[col + 1][row].fixItem || GV.gameArray[col + 1][row].status == .Empty) {
+                            connections.right = true
+                            connections.countConnections += 1
+                            connections.free = true
+                        }
                     }
                 }
+                var foundedInFreeArray = [Int]()
+                func addToAnArray(item: GameArrayPositionsWithRelations) {
+                    var itemSaved = false
+                    outerLoop: for index in 0..<returnValue.count {
+                        if returnValue[index].countFree > 0 {
+                            for searchIndex in 0..<returnValue[index].freePlaces.count {
+                                if (returnValue[index].freePlaces[searchIndex].col == item.col - 1 && returnValue[index].freePlaces[searchIndex].row == item.row) ||
+                                    (returnValue[index].freePlaces[searchIndex].col == item.col + 1 && returnValue[index].freePlaces[searchIndex].row == item.row) ||
+                                    (returnValue[index].freePlaces[searchIndex].col == item.col && returnValue[index].freePlaces[searchIndex].row - 1 == item.row) ||
+                                    (returnValue[index].freePlaces[searchIndex].col == item.col && returnValue[index].freePlaces[searchIndex].row + 1 == item.row) {
+                                    returnValue[index].freePlaces.append(item)
+                                    returnValue[index].countFree += 1
+                                    foundedInFreeArray.append(index)
+                                    itemSaved = true
+                                    break
+                                }
+                            }
+                        } else if !itemSaved {
+                            returnValue[index].freePlaces.append(item)
+                            returnValue[index].countFree += 1
+                            foundedInFreeArray.append(index)
+                            break outerLoop
+                        } else {
+                            break outerLoop
+                        }
+                    }
+                }
+                if GV.gameArray[col][row].status == .Used && !GV.gameArray[col][row].fixItem || GV.gameArray[col][row].status == .Empty {
+                    setConnection(toDirection: .up)
+                    setConnection(toDirection: .down)
+                    setConnection(toDirection: .left)
+                    setConnection(toDirection: .right)
+                }
+                if connections.free {
+                    addToAnArray(item: connections)
+                    if foundedInFreeArray.count > 1 {
+                        let toIndex = foundedInFreeArray[0]
+                        for index in 1..<foundedInFreeArray.count {
+                            let fromIndex = foundedInFreeArray[index]
+                            for moveIndex in 0..<returnValue[fromIndex].freePlaces.count {
+                                let item = returnValue[fromIndex].freePlaces[moveIndex]
+                                if !returnValue[toIndex].freePlaces.contains(item) {
+                                    returnValue[toIndex].freePlaces.append(returnValue[fromIndex].freePlaces[moveIndex])
+                                    returnValue[toIndex].countFree += 1
+                                }
+                            }
+                            returnValue[fromIndex].freePlaces.removeAll()
+                            returnValue[fromIndex].countFree = 0
+                        }
+                    }
+                }
+            }
+        }
+        for index in 0..<returnValue.count {
+            if returnValue[index].freePlaces.count > 0 {
+                returnValue[index].freePlaces.sort(by: {$0.col < $1.col || $0.col == $1.col && $0.row < $1.row})
             }
         }
         return returnValue
