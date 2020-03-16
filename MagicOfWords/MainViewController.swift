@@ -338,6 +338,24 @@ ShowNewWordsInCloudSceneDelegate {
 //        delete temporary files
         let path = NSTemporaryDirectory()
         let subDirs = FileManager().subpaths(atPath: NSTemporaryDirectory())
+//        let myMandatoryList = realmMandatoryList.objects(MandatoryListModel.self)
+//        for mandat in myMandatoryList {
+//            try! hintRealm.safeWrite {
+//                let newMandat = HintsModel()
+//                newMandat.word = mandat.language + mandat.word
+//                if hintRealm.objects(HintsModel.self).filter("word = %@", newMandat.word).count == 0 {
+//                    hintRealm.add(newMandat)
+//                }
+//            }
+//        }
+//        let myWords = realmWordList.objects(WordListModel.self).filter("word like %@ or word like %@", "?????", "??????")
+//        for word in myWords {
+//            try! hintRealm.safeWrite {
+//                let newMandat = HintsModel()
+//                newMandat.word = word.word
+//                hintRealm.add(newMandat)
+//            }
+//        }
         for file in subDirs! {
             print("file: \(file)")
             if file.count > 30 {

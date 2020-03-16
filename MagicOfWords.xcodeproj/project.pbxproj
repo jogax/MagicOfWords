@@ -151,6 +151,7 @@
 		D016FAB023D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */; };
 		D043788324127B0E001DD098 /* HintEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D043788224127B0E001DD098 /* HintEngine.swift */; };
 		D047E98523DF26900047F124 /* WordsFromCloud.swift in Sources */ = {isa = PBXBuildFile; fileRef = D047E98423DF26900047F124 /* WordsFromCloud.swift */; };
+		D04BC2C1241D3ABC005DFC75 /* HintsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04BC2C0241D3ABC005DFC75 /* HintsModel.swift */; };
 		D04D82D723D8B0FA002B1023 /* MyReportedWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */; };
 /* End PBXBuildFile section */
 
@@ -306,6 +307,7 @@
 		D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNewWordsInCloudScene.swift; sourceTree = "<group>"; };
 		D043788224127B0E001DD098 /* HintEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintEngine.swift; sourceTree = "<group>"; };
 		D047E98423DF26900047F124 /* WordsFromCloud.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsFromCloud.swift; sourceTree = "<group>"; };
+		D04BC2C0241D3ABC005DFC75 /* HintsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintsModel.swift; sourceTree = "<group>"; };
 		D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyReportedWords.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -403,6 +405,7 @@
 				201FB1CD20288CEA00EC9F36 /* WordListModel.swift */,
 				20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */,
 				208528F4220DB99E009ED02B /* MandatoryListModel.swift */,
+				D04BC2C0241D3ABC005DFC75 /* HintsModel.swift */,
 				2081931F202B472900406D9A /* GameDataModel.swift */,
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
@@ -776,6 +779,7 @@
 				201FB1D520288CEA00EC9F36 /* MyGlobals.swift in Sources */,
 				206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */,
 				2085C9E722E1F4E700575AB7 /* GCHelper.swift in Sources */,
+				D04BC2C1241D3ABC005DFC75 /* HintsModel.swift in Sources */,
 				201FB1DF20288CEA00EC9F36 /* de.swift in Sources */,
 				20819320202B472900406D9A /* GameDataModel.swift in Sources */,
 				201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */,

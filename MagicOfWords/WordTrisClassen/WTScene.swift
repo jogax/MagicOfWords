@@ -1204,7 +1204,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         createFixLetters()
         movePiecesToGameArray()
-        createHints()
+        HintEngine.shared.createHints()
         saveActualState()
         createNextRound = false
         GV.nextRoundAnimationFinished = false
@@ -1255,7 +1255,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                print("should send")
             }
         } else {
-            createHints()
+            HintEngine.shared.createHints()
+            saveActualState()
             if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue  && GV.countOfWords >= GV.countOfWordsMaxValue {
                 congratulations(congratulationType: .AllWordsCollected)
             }
@@ -2276,7 +2277,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        saveActualState()
         fillTippIndexes()
         movePiecesToGameArray()
-        createHints()
+        HintEngine.shared.createHints()
         saveActualState()
         
         if timer != nil {
@@ -2284,7 +2285,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countTime(timerX: )), userInfo: nil, repeats: true)
         countTime(timerX: Timer())
-        setGameStatus()
+//        setGameStatus()
     }
     
     private func movePiecesToGameArray() {
@@ -3708,7 +3709,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                        realmHelpInfo!.add(helpInfo)
 //                    }
 //                }
-               createHints()
+               HintEngine.shared.createHints()
                saveActualState()
             } else {
                 pieceArray[movedIndex].position = origPosition[movedIndex]
@@ -4479,6 +4480,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             var index = 0
             var counter = 0
             var allRecords: Results<MandatoryListModel>
+//            var allRecords: Results<HintsModel>
             repeat {
                 allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[index].lowercased())
                 counter = allRecords.count
@@ -4727,82 +4729,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             print(infoLine)
         }
         print(line)
-    }
-    
-    private func createHints() {
-        HintEngine.shared.createHints()
-//        checkHintsTable()
-//        if GV.hintTable.count > 9 {
-//            return
-//        }
-//        var usedRedLetters = [String]()
-//        var redLetters = wtGameboard!.getRedLetters()
-//        let fixLetters = wtGameboard!.getFreeFixLetters()
-//        let freeGreenLetters = wtGameboard!.getFreeGreenLetters()
-//        let like = "word Like %@ OR "
-//        var formatString = "language = %@ AND ("
-//        for _ in 0..<6 {
-//            formatString += like
-//        }
-//        formatString.removeLast()
-//        formatString.removeLast()
-//        formatString.removeLast()
-//        formatString.removeLast()
-//        formatString += ")"
-//        var OKWords = [String]()
-//        let like1 = "?????"
-//        let like2 = "??????"
-//        let like3 = "???????"
-//        let like4 = "????????"
-//        let like5 = "?????????"
-//        let like6 = "??????????"
-//        let results = realmMandatoryList.objects(MandatoryListModel.self).filter(formatString, GV.actLanguage, like1, like2, like3, like4, like5, like6)
-//        var countCycles = 0
-//        let maxCountCycles = 10000
-//        repeat {
-//            repeat {
-//                var wordOK = true
-//                let index = Int.random(in: 0 ..< results.count)
-//                let word = results[index].word
-//                var temporaryRedLetters = [String]()
-//                for letter in word.uppercased() {
-//                    if !redLetters.contains(String(letter)) {
-//                        wordOK = false
-//                        break
-//                    } else {
-//                        temporaryRedLetters.append(String(letter))
-//                        let index = redLetters.firstIndex(of: String(letter))
-//                        if index != nil {
-//                            redLetters.remove(at: index!)
-//                        }
-//                    }
-//                }
-//                if wordOK {
-//                    if !OKWords.contains(word) {
-//                        OKWords.append(word)
-//                        for temporaryLetter in temporaryRedLetters {
-//                            usedRedLetters.append(temporaryLetter)
-//                        }
-//                    }
-//                } else {
-//                    for temporaryLetter in temporaryRedLetters {
-//                        redLetters.append(temporaryLetter)
-//                    }
-//                }
-//                countCycles += 1
-//            } while OKWords.count < 10 && countCycles < maxCountCycles
-//            for word in OKWords {
-//                let formattedWord = word.uppercased()
-//                if !GV.hintTable.contains(formattedWord) {
-//                    GV.hintTable.append(formattedWord)
-//                    if GV.hintTable.count == 10 {
-//                        break
-//                    }
-//                }
-//            }
-//        } while GV.hintTable.count < 10 && countCycles < maxCountCycles
-////        print("count: \(results.count)")
-//
     }
     
     private func searchWords(lettersToSearch: [String]) {

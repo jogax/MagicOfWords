@@ -42,6 +42,58 @@ public struct UsedLetterWithCounter {
         self.letter = letter
         self.freeCount = freeCount
     }
+    func freeDistance(to: UsedLetterWithCounter)->Int {
+        
+        let distance = abs(self.col - to.col) + abs(self.row - to.row) - 1
+        var colAdder = self.col == to.col ? 0 : (self.col < to.col ? 1 : -1)
+        var rowAdder = self.row == to.row ? 0 : (self.row < to.row ? 1 : -1)
+        var actCol = self.col
+        var actRow = self.row
+        repeat {
+            if colAdder != 0 {
+                actCol += colAdder
+                if actCol == to.col && actRow == to.row {
+                    return distance
+                }
+                if !(GV.gameArray[actCol][actRow].status == .Empty || (GV.gameArray[actCol][actRow].status == .Used && !GV.gameArray[actCol][actRow].fixItem)) {
+                    actCol -= colAdder
+                    if rowAdder == 0 {
+                        return 0
+                    }
+                    actRow += rowAdder
+                    if !(GV.gameArray[actCol][actRow].status == .Empty || (GV.gameArray[actCol][actRow].status == .Used && !GV.gameArray[actCol][actRow].fixItem)) {
+                        return 0
+                    }
+                }
+            } else {
+                actRow += rowAdder
+                if actCol == to.col && actRow == to.row {
+                    return distance
+                }
+                if !(GV.gameArray[actCol][actRow].status == .Empty || (GV.gameArray[actCol][actRow].status == .Used && !GV.gameArray[actCol][actRow].fixItem)) {
+                    actRow -= rowAdder
+                    if colAdder == 0 {
+                        return 0
+                    }
+                    actCol += colAdder
+                    if !(GV.gameArray[actCol][actRow].status == .Empty || (GV.gameArray[actCol][actRow].status == .Used && !GV.gameArray[actCol][actRow].fixItem)) {
+                        return 0
+                    }
+                }
+            }
+            colAdder = actCol == to.col ? 0 : colAdder
+            rowAdder = actRow == to.row ? 0 : rowAdder
+
+        } while !(actCol == to.col && actRow == to.row)
+        return distance
+    }
+}
+extension UsedLetterWithCounter: Equatable {}
+
+public func ==(lhs: UsedLetterWithCounter, rhs: UsedLetterWithCounter) -> Bool {
+    let areEqual = lhs.col == rhs.col && lhs.row == rhs.row
+
+    return areEqual
 }
 
 public struct MovingItem {
@@ -236,14 +288,7 @@ public struct GameArrayPositionsWithRelations {
 extension GameArrayPositionsWithRelations: Equatable {}
 
 public func ==(lhs: GameArrayPositionsWithRelations, rhs: GameArrayPositionsWithRelations) -> Bool {
-    let areEqual = lhs.col == rhs.col &&
-        lhs.row == rhs.row &&
-        lhs.free == rhs.free &&
-        lhs.up == rhs.up &&
-        lhs.down == rhs.down &&
-        lhs.left == rhs.left &&
-        lhs.right == rhs.right &&
-        lhs.countConnections == rhs.countConnections
+    let areEqual = lhs.col == rhs.col && lhs.row == rhs.row
 
     return areEqual
 }
@@ -911,7 +956,7 @@ class WTGameboard: SKShapeNode {
         return returnValue
     }
     
-    public func getFreeArrays()->[FreeArray] {
+    public func getFreeArrays()->(Int, [FreeArray]) {
         var returnValue = [FreeArray]()
         for index in 0...15 {
             let freeArray = FreeArray(countFree: 0, numberOfFreeArray: index, freePlaces: [GameArrayPositionsWithRelations]())
@@ -1006,7 +1051,27 @@ class WTGameboard: SKShapeNode {
                 returnValue[index].freePlaces.sort(by: {$0.col < $1.col || $0.col == $1.col && $0.row < $1.row})
             }
         }
-        return returnValue
+        var maxWordLength = 0
+        for array in returnValue {
+            if array.countFree > maxWordLength {
+                maxWordLength = array.countFree
+                var itemsWithOneConnection = 0
+                for item in array.freePlaces {
+                    if item.countConnections == 1 {
+                        itemsWithOneConnection += 1
+                    }
+                }
+                if itemsWithOneConnection > 2 {
+                    maxWordLength = maxWordLength - itemsWithOneConnection + 2
+                }
+            }
+            if maxWordLength >= 10 {
+                maxWordLength = 10
+                break
+            }
+        }
+
+        return (maxWordLength, returnValue)
     }
 
     public func getFreeGreenLetters()->[UsedLetterWithCounter] {

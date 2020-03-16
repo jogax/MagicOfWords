@@ -34,6 +34,33 @@ var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfigur
 //var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
 //var realmSync: Realm? = RealmService
 
+//func setDefaultRealmForUser()->URL {
+//    var config = Realm.Configuration()
+//
+//    // Use the default directory, but replace the filename with the username
+//    config.fileURL = config.fileURL!.deletingLastPathComponent().appendingPathComponent("Mandatory.realm")
+//
+//    // Set this as the configuration used for the default Realm
+//    return config.fileURL!
+//}
+//
+//var myHintConfig = RealmConfiguration.hintsConfiguration()
+    // Get the URL to the bundled file
+    // Open the file in read-only mode as application bundles are not writeable
+
+//// Open the Realm with the configuration
+//let realmHints = try! Realm(configuration: myHintConfig)
+//
+//class RealmConfiguration {
+//    static func hintsConfiguration() -> Realm.Configuration {
+//        var config = Realm.Configuration(
+//            objectTypes: [HintsModel.self]
+//        )
+//        config.fileURL = config.fileURL!.deletingLastPathComponent().appendingPathComponent("HintsModel.realm")
+//        return config
+//    }
+//}
+
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,
@@ -59,7 +86,7 @@ let mandatoryListConfig  = Realm.Configuration(
     readOnly: true,
     objectTypes: [MandatoryListModel.self])
 
-// Open the Realm with the configuration
+//// Open the Realm with the configuration
 let realmMandatoryList: Realm = try! Realm(configuration: mandatoryListConfig)
 
 //let helpInfoConfig  = Realm.Configuration(
@@ -98,7 +125,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 67, // used since 2020-02-19
+            schemaVersion: 70, // used since 2020-02-19
 //            schemaVersion: 60, // used since 2020-02-05
 //            schemaVersion: 59, // used since 2019-08-30
 //            schemaVersion: 30, // optimize BasicDataModel

@@ -15,7 +15,8 @@ class MandatoryListModel: Object {
     override  class func primaryKey() -> String {
         return "word"
     }
+}
+
 //  override static func ignoredProperties() -> [String] {
 //    return []
 //  }
-}
