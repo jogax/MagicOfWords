@@ -338,22 +338,34 @@ ShowNewWordsInCloudSceneDelegate {
 //        delete temporary files
         let path = NSTemporaryDirectory()
         let subDirs = FileManager().subpaths(atPath: NSTemporaryDirectory())
-//        let myMandatoryList = realmMandatoryList.objects(MandatoryListModel.self)
-//        for mandat in myMandatoryList {
-//            try! hintRealm.safeWrite {
-//                let newMandat = HintsModel()
-//                newMandat.word = mandat.language + mandat.word
-//                if hintRealm.objects(HintsModel.self).filter("word = %@", newMandat.word).count == 0 {
-//                    hintRealm.add(newMandat)
+//        let languages = ["en", "de", "hu", "ru"]
+//        let likes = ["?????", "??????", "???????", "????????", "?????????", "??????????"]
+//        for language in languages {
+//            for like in likes {
+//                let myHints = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %@ and word like %@", language, like).sorted(byKeyPath: "word")
+//                for hint in myHints {
+//                    try! realmHints.safeWrite {
+//                        let newHint = HintModel()
+//                        newHint.languageWord = hint.language + hint.word
+//                        newHint.language = hint.language
+//                        newHint.word = hint.word
+//                        realmHints.add(newHint)
+//                    }
 //                }
 //            }
 //        }
-//        let myWords = realmWordList.objects(WordListModel.self).filter("word like %@ or word like %@", "?????", "??????")
-//        for word in myWords {
-//            try! hintRealm.safeWrite {
-//                let newMandat = HintsModel()
-//                newMandat.word = word.word
-//                hintRealm.add(newMandat)
+//        for language in languages {
+//            let myWords = realmWordList.objects(WordListModel.self).filter("word beginswith %@ and word like %@", language, "??????").sorted(byKeyPath: "word")
+//            for hint in myWords {
+//                try! realmHints.safeWrite {
+//                    let newHint = HintModel()
+//                    let language = hint.word.startingSubString(length: 2)
+//                    let word = hint.word.endingSubString(at: 2)
+//                    newHint.languageWord = hint.word
+//                    newHint.language = language
+//                    newHint.word = word
+//                    realmHints.add(newHint)
+//                }
 //            }
 //        }
         for file in subDirs! {

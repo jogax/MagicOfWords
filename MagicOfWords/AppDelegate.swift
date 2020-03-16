@@ -11,44 +11,11 @@ import RealmSwift
 import Reachability
 import AVFoundation
 
-// for Standard Using
-//#if !GENERATEWORDLIST && !GENERATEMANDATORY
-//let defaultConfig = Realm.Configuration(
-//    objectTypes: [GameDataModel.self, RoundDataModel.self, BasicDataModel.self])
-
-// for Generating WordList DB
-//let defaultConfig = Realm.Configuration(
-//    objectTypes: [WordListModel.self])
-
-// for generating Mandatory Words
-//let defaultConfig = Realm.Configuration(
-//    objectTypes: [MandatoryModel.self])
-//var realm: Realm = try! Realm(configuration: defaultConfig)
-//#endif
-//
-#if !GENERATELETTERFREQUENCY && !GENERATEWORDLIST && !GENERATEMANDATORY && !CREATEMANDATORY && !CREATEWORDLIST
+//#if !GENERATELETTERFREQUENCY && !GENERATEWORDLIST && !GENERATEMANDATORY && !CREATEMANDATORY && !CREATEWORDLIST
 
 var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfiguration)
-#endif
-//var playerActivity: Results<PlayerActivity>? // = realmSync.objects(PlayerActivity.self).filter("name = %@", GV.basicDataRecord.myName)
-//var realmSync: Realm? // = try! Realm(configuration: Realm.Configuration(syncConfiguration: syncConfig, objectTypes:[BestScoreSync.self, PlayerActivity.self]))
-//var realmSync: Realm? = RealmService
+//#endif
 
-//func setDefaultRealmForUser()->URL {
-//    var config = Realm.Configuration()
-//
-//    // Use the default directory, but replace the filename with the username
-//    config.fileURL = config.fileURL!.deletingLastPathComponent().appendingPathComponent("Mandatory.realm")
-//
-//    // Set this as the configuration used for the default Realm
-//    return config.fileURL!
-//}
-//
-//var myHintConfig = RealmConfiguration.hintsConfiguration()
-    // Get the URL to the bundled file
-    // Open the file in read-only mode as application bundles are not writeable
-
-//// Open the Realm with the configuration
 //let realmHints = try! Realm(configuration: myHintConfig)
 //
 //class RealmConfiguration {
@@ -81,22 +48,15 @@ let realmMandatory: Realm = try! Realm(configuration: mandatoryConfig)
 
 let mandatoryListConfig  = Realm.Configuration(
     // Get the path to the bundled file
-    fileURL: URL(string: Bundle.main.path(forResource: "MandatoryList", ofType:"realm")!),
+//    fileURL: URL(string: Bundle.main.path(forResource: "MandatoryList", ofType:"realm")!),
+    fileURL: URL(string: Bundle.main.path(forResource: "Hints", ofType:"realm")!),
     // Open the file in read-only mode as application bundles are not writeable
     readOnly: true,
-    objectTypes: [MandatoryListModel.self])
+    objectTypes: [HintModel.self])
 
 //// Open the Realm with the configuration
 let realmMandatoryList: Realm = try! Realm(configuration: mandatoryListConfig)
 
-//let helpInfoConfig  = Realm.Configuration(
-//    // Get the path to the bundled file
-//    fileURL: URL(string: Bundle.main.path(forResource: "HelpInfo", ofType:"realm")!),
-//    readOnly: true, schemaVersion: 0,
-//    objectTypes: [HelpInfo.self])
-
-// Open the Realm with the configuration
-//let realmHelp: Realm = try! Realm(configuration: helpInfoConfig)
 
 
 @UIApplicationMain

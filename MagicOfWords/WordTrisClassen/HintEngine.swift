@@ -20,22 +20,16 @@ class HintEngine {
         
     }
     
-    private func getAllWords()->[Results<MandatoryListModel>] {
-        var returnValue5_10 = [Results<MandatoryListModel>]()
-        var returnValue3_4 = [Results<WordListModel>]()
-        let formatString5_10 = "language = %@ AND word Like %@"
-        let formatString3_4 = "word beginswith %@ AND word Like %@"
-        let like = ""
-        for count in 3...4 {
-            let results = realmWordList.objects(WordListModel.self).filter(formatString3_4, GV.actLanguage, like.fill(with: "?", toLength: count))
-            returnValue3_4.append(results)
-        }
-        for count in 5...10 {
-            let results = realmMandatoryList.objects(MandatoryListModel.self).filter(formatString5_10, GV.actLanguage, like.fill(with: "?", toLength: count))
-            returnValue5_10.append(results)
+    private func getAllWords()->[Results<HintModel>] {
+        var returnValue = [Results<HintModel>]()
+        let formatString = "language = %@ AND word Like %@"
+        let likes = ["????", "?????", "??????", "???????", "????????", "?????????", "??????????"]
+        for like in likes {
+            let results = realmMandatoryList.objects(HintModel.self).filter(formatString, GV.actLanguage, like)
+            returnValue.append(results)
         }
 
-        return returnValue5_10
+        return returnValue
     }
     
     private func find(value searchValue: String, inArray: [UsedLetterWithCounter]) -> Int?
@@ -54,7 +48,7 @@ class HintEngine {
     var fixLetters = [UsedLetterWithCounter]()
     var freeGreenLetters = [UsedLetterWithCounter]()
     var freeArrays = [FreeArray]()
-    var results = [Results<MandatoryListModel>]()
+    var results = [Results<HintModel>]()
     var maxWordLength = 0
     let maxCountWords = 10
     var searchWord = ""
@@ -62,7 +56,7 @@ class HintEngine {
 
     private func findWordsWithOneFixletter() {
         OKWords = [String]()
-        for myIndex in 0..<results.count - 1 {
+        for myIndex in 0..<results.count {
             let resultIndex = results.count - 1 - myIndex
             if maxWordLength < results[resultIndex].first!.word.length {
                 continue

@@ -2614,7 +2614,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var myLetters = ""
         for length in myLengths {
             let likeValue = String(repeating: "?", count: length)
-            let words = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %@ and word LIKE %d", GV.actLanguage, likeValue)
+            let words = realmMandatoryList.objects(HintModel.self).filter("language = %@ and word LIKE %d", GV.actLanguage, likeValue)
             myLetters += words[random.getRandomInt(0, max: words.count)].word
         }
 //        print (myLetters)
@@ -4479,10 +4479,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             var index = 0
             var counter = 0
-            var allRecords: Results<MandatoryListModel>
+            var allRecords: Results<HintModel>
 //            var allRecords: Results<HintsModel>
             repeat {
-                allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[index].lowercased())
+                allRecords = realmMandatoryList.objects(HintModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[index].lowercased())
                 counter = allRecords.count
                 if counter < 10 {
                     letters.remove(at: index)

@@ -82,7 +82,6 @@
 		2078EE6522CA340000502C7C /* MandatoryList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6122CA33FF00502C7C /* MandatoryList.realm */; };
 		2078EE6622CA340000502C7C /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6222CA33FF00502C7C /* WordList.realm */; };
 		2078EE6722CA340000502C7C /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6322CA340000502C7C /* Mandatory.realm */; };
-		2078EE6822CA340000502C7C /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6422CA340000502C7C /* HelpInfo.realm */; };
 		207B678A2243C9F8001456C8 /* save.png in Resources */ = {isa = PBXBuildFile; fileRef = 207B67892243C9F7001456C8 /* save.png */; };
 		208073802242933700BE38E9 /* WelcomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2080737F2242933700BE38E9 /* WelcomeScene.swift */; };
 		208173E12103577900960800 /* BalloonSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = 208173E02103577800960800 /* BalloonSimple.png */; };
@@ -151,8 +150,10 @@
 		D016FAB023D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */; };
 		D043788324127B0E001DD098 /* HintEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D043788224127B0E001DD098 /* HintEngine.swift */; };
 		D047E98523DF26900047F124 /* WordsFromCloud.swift in Sources */ = {isa = PBXBuildFile; fileRef = D047E98423DF26900047F124 /* WordsFromCloud.swift */; };
-		D04BC2C1241D3ABC005DFC75 /* HintsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04BC2C0241D3ABC005DFC75 /* HintsModel.swift */; };
 		D04D82D723D8B0FA002B1023 /* MyReportedWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */; };
+		D0576F1A241FB9770095943D /* HintModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0576F19241FB9770095943D /* HintModel.swift */; };
+		D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1B241FC8BD0095943D /* HelpInfo.realm */; };
+		D0576F1E241FC8F30095943D /* Hints.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1D241FC8F30095943D /* Hints.realm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -239,7 +240,6 @@
 		2078EE6122CA33FF00502C7C /* MandatoryList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = MandatoryList.realm; sourceTree = "<group>"; };
 		2078EE6222CA33FF00502C7C /* WordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = WordList.realm; sourceTree = "<group>"; };
 		2078EE6322CA340000502C7C /* Mandatory.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mandatory.realm; sourceTree = "<group>"; };
-		2078EE6422CA340000502C7C /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
 		207B67892243C9F7001456C8 /* save.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = save.png; sourceTree = "<group>"; };
 		2080737B2242746600BE38E9 /* SCLAlertView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SCLAlertView.framework; path = Carthage/Build/iOS/SCLAlertView.framework; sourceTree = "<group>"; };
 		2080737F2242933700BE38E9 /* WelcomeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeScene.swift; sourceTree = "<group>"; };
@@ -307,8 +307,10 @@
 		D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNewWordsInCloudScene.swift; sourceTree = "<group>"; };
 		D043788224127B0E001DD098 /* HintEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintEngine.swift; sourceTree = "<group>"; };
 		D047E98423DF26900047F124 /* WordsFromCloud.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsFromCloud.swift; sourceTree = "<group>"; };
-		D04BC2C0241D3ABC005DFC75 /* HintsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintsModel.swift; sourceTree = "<group>"; };
 		D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyReportedWords.swift; sourceTree = "<group>"; };
+		D0576F19241FB9770095943D /* HintModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModel.swift; sourceTree = "<group>"; };
+		D0576F1B241FC8BD0095943D /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
+		D0576F1D241FC8F30095943D /* Hints.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Hints.realm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -405,7 +407,6 @@
 				201FB1CD20288CEA00EC9F36 /* WordListModel.swift */,
 				20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */,
 				208528F4220DB99E009ED02B /* MandatoryListModel.swift */,
-				D04BC2C0241D3ABC005DFC75 /* HintsModel.swift */,
 				2081931F202B472900406D9A /* GameDataModel.swift */,
 				206664A720A45A3000C6C5E4 /* RoundDataModel.swift */,
 				20B28AE120330E73001682B2 /* BasicDataModel.swift */,
@@ -417,6 +418,7 @@
 				20009AF82260C47900D34ACD /* HelpInfo.swift */,
 				2081F47123194B43004C2FE9 /* MyWords.swift */,
 				20E70E9F233281A300185ECE /* FinishedGames.swift */,
+				D0576F19241FB9770095943D /* HintModel.swift */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -511,7 +513,8 @@
 		2074A64120C051780075432A /* ReadOnlyDB */ = {
 			isa = PBXGroup;
 			children = (
-				2078EE6422CA340000502C7C /* HelpInfo.realm */,
+				D0576F1D241FC8F30095943D /* Hints.realm */,
+				D0576F1B241FC8BD0095943D /* HelpInfo.realm */,
 				2078EE6322CA340000502C7C /* Mandatory.realm */,
 				2078EE6122CA33FF00502C7C /* MandatoryList.realm */,
 				2078EE6222CA33FF00502C7C /* WordList.realm */,
@@ -649,6 +652,7 @@
 			files = (
 				2051004922944816008521E7 /* DarkGreenSprite.png in Resources */,
 				205211342221B37A00B25072 /* UnDelete.png in Resources */,
+				D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */,
 				2086F3FD228EEE8A00D845B7 /* Connection1010.png in Resources */,
 				204D760A221B26A900DBB1B5 /* Minus.png in Resources */,
 				205EC41C222EAD380080D4ED /* LightBlueSprite.png in Resources */,
@@ -662,6 +666,7 @@
 				205184F920615B3100E7FAF4 /* deGameData.txt in Resources */,
 				20469BD121A43F4E00743EB1 /* sortup.png in Resources */,
 				2038F26422316CF40028372D /* BackSimple.png in Resources */,
+				D0576F1E241FC8F30095943D /* Hints.realm in Resources */,
 				20842DE62031EA910078FFDA /* ruWords.txt in Resources */,
 				2084C0D62209BF73002B8F2E /* compare2.txt in Resources */,
 				20A6913D203088FF00AB47C0 /* enWords.txt in Resources */,
@@ -730,7 +735,6 @@
 				2048259921E8CC59000933B3 /* deWords.txt in Resources */,
 				208326D523180166008F9C26 /* MagicOfWords.mp3 in Resources */,
 				20895E6D228D951900506685 /* LilaSprite.png in Resources */,
-				2078EE6822CA340000502C7C /* HelpInfo.realm in Resources */,
 				2086F400228EEE8A00D845B7 /* Connection1011.png in Resources */,
 				205184FB20615B5C00E7FAF4 /* enGameData.txt in Resources */,
 				201FB1C220288C2B00EC9F36 /* LaunchScreen.storyboard in Resources */,
@@ -775,11 +779,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0576F1A241FB9770095943D /* HintModel.swift in Sources */,
 				20A6914020309B9F00AB47C0 /* WTPiece.swift in Sources */,
 				201FB1D520288CEA00EC9F36 /* MyGlobals.swift in Sources */,
 				206664A820A45A3000C6C5E4 /* RoundDataModel.swift in Sources */,
 				2085C9E722E1F4E700575AB7 /* GCHelper.swift in Sources */,
-				D04BC2C1241D3ABC005DFC75 /* HintsModel.swift in Sources */,
 				201FB1DF20288CEA00EC9F36 /* de.swift in Sources */,
 				20819320202B472900406D9A /* GameDataModel.swift in Sources */,
 				201FB1B220288C2B00EC9F36 /* AppDelegate.swift in Sources */,
