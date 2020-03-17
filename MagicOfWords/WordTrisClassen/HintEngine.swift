@@ -107,7 +107,7 @@ class HintEngine {
                     break
                 }
                 interval = Date().timeIntervalSince(startTime)
-                if interval > 0.25 {
+                if interval > maxInterval {
                     break
                 }
 
@@ -118,12 +118,14 @@ class HintEngine {
                     GV.hintTable.append(uppercasedWord)
                 }
             }
-            if interval > 0.25 {
+            if interval > maxInterval {
                 break
             }
             OKWords.removeAll()
         }
     }
+    
+    let maxInterval = 0.05
     
     private func findWordsWithTwoFixLetters() {
         let startTime = Date()
@@ -177,7 +179,7 @@ class HintEngine {
                                         let word = foundedWord.word
                                         var temporaryRedLetters = [(letter:String, index:Int)]()
                                         var wordOK = true
-                                        for letterIndex in 0..<word.length - 1 {
+                                        for letterIndex in 0..<word.length {
                                             if searchWord.char(at: letterIndex) == "?" {
                                                 if !redLetters.contains(word.char(at: letterIndex).uppercased()) {
                                                     wordOK = false
@@ -211,7 +213,7 @@ class HintEngine {
                 }
                 let actTime = Date()
                 let interval = actTime.timeIntervalSince(startTime)
-                if interval > 0.25 {
+                if interval > maxInterval {
                     break
                 }
 
