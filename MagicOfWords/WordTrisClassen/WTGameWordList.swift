@@ -430,6 +430,17 @@ public class WTGameWordList {
         return noCommonLetter && noDiagonal
     }
     
+    public func roundContainsWord(word: String)->Bool {
+        if wordsInRound.count > 0 {
+            for actWord in wordsInRound.last!.wordsInGame {
+                if actWord.word == word {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    
     private func addWordToMyWords(word: String) {
         let foundedWord = realm.objects(MyWords.self).filter("word = %@", GV.actLanguage + word.lowercased())
         if foundedWord.count == 0 {

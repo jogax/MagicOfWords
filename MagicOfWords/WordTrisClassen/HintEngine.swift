@@ -55,6 +55,8 @@ class HintEngine {
     var OKWords = [String]()
 
     private func findWordsWithOneFixletter() {
+        let startTime = Date()
+        var interval = 0.0
         OKWords = [String]()
         for myIndex in 0..<results.count {
             let resultIndex = results.count - 1 - myIndex
@@ -90,9 +92,9 @@ class HintEngine {
                                 }
                             }
                         }
-                        for temporaryLetter in temporaryRedLetters {
-                            redLetters.append(temporaryLetter.letter)
-                        }
+//                        for temporaryLetter in temporaryRedLetters {
+//                            redLetters.append(temporaryLetter.letter)
+//                        }
                         if wordOK {
                             if !OKWords.contains(word) {
                                 OKWords.append(word)
@@ -104,18 +106,27 @@ class HintEngine {
                 if OKWords.count >= maxCountWords {
                     break
                 }
+                interval = Date().timeIntervalSince(startTime)
+                if interval > 0.25 {
+                    break
+                }
+
             }
             for word in OKWords {
                 let uppercasedWord = word.uppercased()
-                if !GV.hintTable.contains(uppercasedWord) {
+                if !WTGameWordList.shared.roundContainsWord(word: uppercasedWord) && !GV.hintTable.contains(uppercasedWord) {
                     GV.hintTable.append(uppercasedWord)
                 }
+            }
+            if interval > 0.25 {
+                break
             }
             OKWords.removeAll()
         }
     }
     
     private func findWordsWithTwoFixLetters() {
+        let startTime = Date()
         OKWords = [String]()
         func lettersInTheSameFreeArea(letter1: UsedLetterWithCounter, letter2: UsedLetterWithCounter)->Bool {
             var letter1InArray = 1000
@@ -132,12 +143,13 @@ class HintEngine {
                     if (freePlace.col == letter2.col && (freePlace.row == letter2.row - 1 || freePlace.row == letter2.row + 1)) ||
                         (freePlace.row == letter2.row && (freePlace.col == letter2.col - 1 || freePlace.col == letter2.col + 1)) {
                         letter2InArray = array.numberOfFreeArray
+                        break
                     }
                 }
             }
             return letter1InArray == letter2InArray
         }
-        for myIndex in 0..<results.count - 1 {
+        for myIndex in 0..<results.count {
             let resultIndex = results.count - 1 - myIndex
             if maxWordLength < results[resultIndex].first!.word.length {
                 continue
@@ -184,9 +196,9 @@ class HintEngine {
                                             if !OKWords.contains(foundedWord.word) {
                                                 OKWords.append(foundedWord.word)
                                             }
-                                            for temporaryLetter in temporaryRedLetters {
-                                                redLetters.append(temporaryLetter.letter)
-                                            }
+//                                            for temporaryLetter in temporaryRedLetters {
+//                                                redLetters.append(temporaryLetter.letter)
+//                                            }
                                             break
                                         }
 
@@ -197,14 +209,26 @@ class HintEngine {
                         }
                     }
                 }
-            
+                let actTime = Date()
+                let interval = actTime.timeIntervalSince(startTime)
+                if interval > 0.25 {
+                    break
+                }
+
             }
         }
+        for word in OKWords {
+            let uppercasedWord = word.uppercased()
+            if !WTGameWordList.shared.roundContainsWord(word: uppercasedWord) && !GV.hintTable.contains(uppercasedWord) {
+                GV.hintTable.append(uppercasedWord)
+            }
+        }
+        OKWords.removeAll()
     }
     
     private func findWordsWithRedLetters() {
         OKWords = [String]()
-        for myIndex in 0..<results.count - 1 {
+        for myIndex in 0..<results.count {
             var resultIndex = results.count - 1 - myIndex
             if maxWordLength < results[resultIndex].first!.word.length {
                 continue
@@ -249,9 +273,9 @@ class HintEngine {
                                 OKWords.append(word)
                             }
                         }
-                        for temporaryLetter in temporaryRedLetters {
-                            redLetters.append(temporaryLetter.letter)
-                        }
+//                        for temporaryLetter in temporaryRedLetters {
+//                            redLetters.append(temporaryLetter.letter)
+//                        }
                     } while OKWords.count < maxCountWords
                     resultIndex -= 1
                 } while OKWords.count < maxCountWords && resultIndex >= 0
@@ -264,10 +288,12 @@ class HintEngine {
                         }
                     }
                 }
-            } while GV.hintTable.count < maxCountWords
+            } while GV.hintTable.count < maxCountWords  && resultIndex >= 0
 
         }
     }
+    
+    var startTime = Date()
     
     public func createHints() {
         (maxWordLength, freeArrays) = wtGameboard!.getFreeArrays()
@@ -280,9 +306,12 @@ class HintEngine {
         if GV.hintTable.count == countHints {
             return
         }
-        findWordsWithOneFixletter()
-//        findWordsWithTwoFixLetters()
-        if fixLetters.count == 0 {
+        startTime = Date()
+        findWordsWithTwoFixLetters()
+        if GV.hintTable.count < countHints {
+            findWordsWithOneFixletter()
+        }
+        if GV.hintTable.count < countHints{
             findWordsWithRedLetters()
         }
         let sortedHints = GV.hintTable.sorted(by: {$0.length > $1.length})
