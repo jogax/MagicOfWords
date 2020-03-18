@@ -75,7 +75,7 @@ ShowNewWordsInCloudSceneDelegate {
             showMenu()
         } else {
             if !inMenu {
-                startGame()
+//                startGame()
             }
         }
     }

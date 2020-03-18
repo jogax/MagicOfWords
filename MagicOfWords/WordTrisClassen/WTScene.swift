@@ -4224,6 +4224,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         bgSprite!.addChild(pieceArray[2])
                     default: break
                     }
+                    HintEngine.shared.createHints()
                 } else {
                     var countTilesOnGameboard = 0
                     for tile in tilesForGame {
@@ -4254,6 +4255,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 modifyHeader()
             }
             saveActualState()
+            HintEngine.shared.createHints()
             saveToGameCenter()
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 && activityRoundItem.count == 1 {

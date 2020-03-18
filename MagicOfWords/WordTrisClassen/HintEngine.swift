@@ -56,7 +56,6 @@ class HintEngine {
 
     private func findWordsWithOneFixletter() {
         let startTime = Date()
-        var interval = 0.0
         OKWords = [String]()
         for myIndex in 0..<results.count {
             let resultIndex = results.count - 1 - myIndex
@@ -74,16 +73,16 @@ class HintEngine {
                 let tippWordsResults = results[resultIndex].filter("word like %@", searchWord.lowercased())
                 if tippWordsResults.count > 0 {
                     for foundedWord in tippWordsResults {
-                        let word = foundedWord.word
+                        let word = foundedWord.word.uppercased()
                         var temporaryRedLetters = [(letter:String, index:Int)]()
                         var wordOK = true
                         for letterIndex in 0..<word.length {
                             if searchWord.char(at: letterIndex) == "?" {
-                                if !(redLetters.contains(word.char(at: letterIndex).uppercased())) {
+                                if !(redLetters.contains(word.char(at: letterIndex))) {
                                     wordOK = false
                                     break
                                 } else {
-                                    let letter = word.char(at: letterIndex).uppercased()
+                                    let letter = word.char(at: letterIndex)
                                     temporaryRedLetters.append((letter, letterIndex))
                                     let index = redLetters.firstIndex(of: String(letter))
                                     if index != nil {
@@ -92,25 +91,29 @@ class HintEngine {
                                 }
                             }
                         }
-//                        for temporaryLetter in temporaryRedLetters {
-//                            redLetters.append(temporaryLetter.letter)
-//                        }
                         if wordOK {
                             if !OKWords.contains(word) {
                                 OKWords.append(word)
                             }
                             break
+                        } else {
+                            for temporaryLetter in temporaryRedLetters {
+                                redLetters.append(temporaryLetter.letter)
+                            }
+                            temporaryRedLetters.removeAll()
                         }
                     }
                 }
                 if OKWords.count >= maxCountWords {
                     break
                 }
-                interval = Date().timeIntervalSince(startTime)
-                if interval > maxInterval {
+                if Date().timeIntervalSince(startTime) > maxInterval {
                     break
                 }
 
+            }
+            if Date().timeIntervalSince(startTime) > maxInterval {
+                break
             }
             for word in OKWords {
                 let uppercasedWord = word.uppercased()
@@ -118,14 +121,11 @@ class HintEngine {
                     GV.hintTable.append(uppercasedWord)
                 }
             }
-            if interval > maxInterval {
-                break
-            }
             OKWords.removeAll()
         }
     }
     
-    let maxInterval = 0.05
+    let maxInterval = 100000000.10
     
     private func findWordsWithTwoFixLetters() {
         let startTime = Date()
@@ -163,60 +163,72 @@ class HintEngine {
                 }
             //                -----------------------------------------------
                 for fixLetter2 in fixLetters {
-                    if fixLetter2.freeCount == 0 {
+                    if fixLetter2.freeCount == 0 || fixLetter1 == fixLetter2 {
                         continue
                     }
                     searchWord = "".fill(with: "?", toLength: fillLength)
                     if lettersInTheSameFreeArea(letter1: fixLetter1, letter2: fixLetter2) {
-                        if fixLetter1 != fixLetter2 {
-                            let distance = fixLetter1.freeDistance(to: fixLetter2)
-                            if  distance > 0 && distance  <= fillLength - 2 {
-                                searchWord = searchWord.changeChars(at: 0, to: fixLetter1.letter)
-                                searchWord = searchWord.changeChars(at: distance + 1, to: fixLetter2.letter).lowercased()
-                                let tippWordsResults = results[resultIndex].filter("word like %@", searchWord)
-                                if tippWordsResults.count > 0 {
-                                    for foundedWord in tippWordsResults {
-                                        let word = foundedWord.word
-                                        var temporaryRedLetters = [(letter:String, index:Int)]()
-                                        var wordOK = true
-                                        for letterIndex in 0..<word.length {
-                                            if searchWord.char(at: letterIndex) == "?" {
-                                                if !redLetters.contains(word.char(at: letterIndex).uppercased()) {
-                                                    wordOK = false
-                                                    break
-                                                } else {
-                                                    let letter = word.char(at: letterIndex)
-                                                    temporaryRedLetters.append((letter.uppercased(), letterIndex))
-                                                    let index = redLetters.firstIndex(of: String(letter))
-                                                    if index != nil {
-                                                        redLetters.remove(at: index!)
-                                                    }
+                        let distance = fixLetter1.freeDistance(to: fixLetter2)
+                        if  distance > 0 && distance  <= fillLength - 2 {
+                            searchWord = searchWord.changeChars(at: 0, to: fixLetter1.letter)
+                            searchWord = searchWord.changeChars(at: distance + 1, to: fixLetter2.letter).lowercased()
+                            let tippWordsResults = results[resultIndex].filter("word like %@", searchWord)
+                            if tippWordsResults.count > 0 {
+                                for foundedWord in tippWordsResults {
+                                    let word = foundedWord.word
+                                    if word == "концентрат" {
+                                        print("word концентрат found")
+                                    }
+                                    
+                                    var temporaryRedLetters = [(letter:String, index:Int)]()
+                                    var wordOK = true
+                                    for letterIndex in 0..<word.length {
+                                        if searchWord.char(at: letterIndex) == "?" {
+                                            if !redLetters.contains(word.char(at: letterIndex).uppercased()) {
+                                                wordOK = false
+                                                break
+                                            } else {
+                                                let letter = word.char(at: letterIndex).uppercased()
+                                                temporaryRedLetters.append((letter, letterIndex))
+                                                let index = redLetters.firstIndex(of: String(letter))
+                                                if index != nil {
+                                                    redLetters.remove(at: index!)
                                                 }
                                             }
                                         }
-                                        if wordOK {
-                                            if !OKWords.contains(foundedWord.word) {
-                                                OKWords.append(foundedWord.word)
-                                            }
-//                                            for temporaryLetter in temporaryRedLetters {
-//                                                redLetters.append(temporaryLetter.letter)
-//                                            }
-                                            break
-                                        }
-
                                     }
+                                    if wordOK {
+                                        if !OKWords.contains(foundedWord.word) {
+                                            OKWords.append(foundedWord.word)
+                                            break
+                                        } else {
+                                            for temporaryLetter in temporaryRedLetters {
+                                                redLetters.append(temporaryLetter.letter)
+                                            }
+                                            temporaryRedLetters.removeAll()
+                                        }
+                                    } else {
+                                        for temporaryLetter in temporaryRedLetters {
+                                            redLetters.append(temporaryLetter.letter)
+                                        }
+                                        temporaryRedLetters.removeAll()
+                                    }
+
                                 }
-                                searchWord = "".fill(with: "?", toLength: fillLength)
                             }
+                            searchWord = "".fill(with: "?", toLength: fillLength)
                         }
                     }
+                    if Date().timeIntervalSince(startTime) > maxInterval {
+                        break
+                    }
                 }
-                let actTime = Date()
-                let interval = actTime.timeIntervalSince(startTime)
-                if interval > maxInterval {
+                if Date().timeIntervalSince(startTime) > maxInterval {
                     break
                 }
-
+            }
+            if Date().timeIntervalSince(startTime) > maxInterval {
+                break
             }
         }
         for word in OKWords {
@@ -229,6 +241,7 @@ class HintEngine {
     }
     
     private func findWordsWithRedLetters() {
+        let startTime = Date()
         OKWords = [String]()
         for myIndex in 0..<results.count {
             var resultIndex = results.count - 1 - myIndex
@@ -237,50 +250,50 @@ class HintEngine {
             }
 
 //            var maxCountCycles = 0
+//            repeat {
+//                repeat {
+            let actResults = results[resultIndex]
+            var wordIndexes = [Int]()
+            for index in 0..<actResults.count {
+                wordIndexes.append(index)
+            }
             repeat {
-                repeat {
-                    let actResults = results[resultIndex]
-//                    maxCountCycles = actResults.count
-                    var wordIndexes = [Int]()
-                    for index in 0..<actResults.count {
-                        wordIndexes.append(index)
-                    }
-                    repeat {
-                        var wordOK = true
-                        let index = Int.random(in: 0 ..< wordIndexes.count)
-                        let ind = wordIndexes[index]
-                        wordIndexes.remove(at: index)
-                        if wordIndexes.count == 0 {
+                var wordOK = true
+                let index = Int.random(in: 0 ..< wordIndexes.count)
+                let ind = wordIndexes[index]
+                wordIndexes.remove(at: index)
+                if wordIndexes.count == 0 {
+                    break
+                }
+                let word = results[resultIndex][ind].word
+                var temporaryRedLetters = [(letter:String, index:Int)]()
+                for (letterIndex, letter) in word.uppercased().enumerated() {
+//                        if wordToCheck.char(at: letterIndex) == "?" {
+                        if !redLetters.contains(String(letter)) {
+                            wordOK = false
                             break
-                        }
-                        let word = results[resultIndex][ind].word
-                        var temporaryRedLetters = [(letter:String, index:Int)]()
-                        for (letterIndex, letter) in word.uppercased().enumerated() {
-    //                        if wordToCheck.char(at: letterIndex) == "?" {
-                                if !redLetters.contains(String(letter)) {
-                                    wordOK = false
-                                    break
-                                } else {
-                                    temporaryRedLetters.append((String(letter), letterIndex))
-                                    let index = redLetters.firstIndex(of: String(letter))
-                                    if index != nil {
-                                        redLetters.remove(at: index!)
-                                    }
-                                }
-    //                        }
-                        }
-                        if wordOK {
-    //                        print("temporaryFixLetters: \(temporaryFixLetters)")
-                            if !OKWords.contains(word) {
-                                OKWords.append(word)
+                        } else {
+                            temporaryRedLetters.append((String(letter), letterIndex))
+                            let index = redLetters.firstIndex(of: String(letter))
+                            if index != nil {
+                                redLetters.remove(at: index!)
                             }
                         }
+//                        }
+                }
+                if wordOK {
+//                        print("temporaryFixLetters: \(temporaryFixLetters)")
+                    if !OKWords.contains(word) {
+                        OKWords.append(word)
+                    }
+                }
 //                        for temporaryLetter in temporaryRedLetters {
 //                            redLetters.append(temporaryLetter.letter)
 //                        }
-                    } while OKWords.count < maxCountWords
-                    resultIndex -= 1
-                } while OKWords.count < maxCountWords && resultIndex >= 0
+            } while OKWords.count < maxCountWords && Date().timeIntervalSince(startTime) < maxInterval
+            print("wordIndexes: \(wordIndexes.count)")
+            resultIndex -= 1
+//                } while OKWords.count < maxCountWords && resultIndex >= 0 && Date().timeIntervalSince(startTime) < maxInterval
                 for word in OKWords {
                     let uppercasedWord = word.uppercased()
                     if !GV.hintTable.contains(uppercasedWord) {
@@ -290,14 +303,17 @@ class HintEngine {
                         }
                     }
                 }
-            } while GV.hintTable.count < maxCountWords  && resultIndex >= 0
-
+//            } while GV.hintTable.count < maxCountWords  && resultIndex >= 0 && Date().timeIntervalSince(startTime) < maxInterval
+            if Date().timeIntervalSince(startTime) < maxInterval {
+                break
+            }
         }
     }
     
-    var startTime = Date()
+//    var startTime = Date()
     
     public func createHints() {
+        let num = setFirstTime()
         (maxWordLength, freeArrays) = wtGameboard!.getFreeArrays()
         redLetters = wtGameboard!.getRedLetters()
         fixLetters = wtGameboard!.getFixLetters()
@@ -308,20 +324,21 @@ class HintEngine {
         if GV.hintTable.count == countHints {
             return
         }
-        startTime = Date()
+//        startTime = Date()
+        let num1 = setFirstTime()
         findWordsWithTwoFixLetters()
+        showTime(num: num1, string: "findWordsWithTwoFixLetters")
         if GV.hintTable.count < countHints {
             findWordsWithOneFixletter()
+            showTime(num: num1, string: "findWordsWithOneFixletter")
         }
         if GV.hintTable.count < countHints{
             findWordsWithRedLetters()
+            showTime(num: num1, string: "findWordsWithRedLetters")
         }
         let sortedHints = GV.hintTable.sorted(by: {$0.length > $1.length})
         GV.hintTable = sortedHints
-        
-
-        
-
+        showTime(num: num, string: "createHints end")
     }
     private func checkHintsTable(maxWordLength: Int) {
         var redLetters = wtGameboard!.getRedLetters()
