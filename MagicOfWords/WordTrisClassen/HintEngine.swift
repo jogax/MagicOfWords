@@ -54,25 +54,53 @@ class HintEngine {
 //    let maxCountWords = 10
     var searchWord = ""
     var OKWords = [String]()
-
+    let maxCol = 9
     private func findWordsWithOneFixletter() {
         if fixLetters.count == 0 {
             return
         }
         let startTime = Date()
         OKWords = [String]()
+        func checkFreeAreasAtFixLetter(letter: UsedLetterWithCounter)->Int {
+            var returnValue = 0
+            var arrayNumberLeft = -1
+            var arrayNumberRight = -1
+            var arrayNumberUp = -1
+            var arrayNumberDown = -1
+            if letter.col > 0 {
+                arrayNumberLeft = GV.gameArray[letter.col - 1][letter.row].inFreeArray
+            }
+            if letter.col < maxCol - 1 {
+                arrayNumberRight = GV.gameArray[letter.col + 1][letter.row].inFreeArray
+            }
+            if letter.row > 0 {
+                arrayNumberUp = GV.gameArray[letter.col][letter.row - 1].inFreeArray
+            }
+            if letter.row > maxCol - 1 {
+                arrayNumberDown = GV.gameArray[letter.col + 1][letter.row].inFreeArray
+            }
+            returnValue = arrayNumberLeft < 0 ? returnValue : (returnValue < freeArrays[arrayNumberLeft].countFree ? freeArrays[arrayNumberLeft].countFree : returnValue)
+            returnValue = arrayNumberRight < 0 ? returnValue : (returnValue < freeArrays[arrayNumberRight].countFree ? freeArrays[arrayNumberRight].countFree : returnValue)
+            returnValue = arrayNumberUp < 0 ? returnValue : (returnValue < freeArrays[arrayNumberUp].countFree ? freeArrays[arrayNumberUp].countFree : returnValue)
+            returnValue = arrayNumberDown < 0 ? returnValue : (returnValue < freeArrays[arrayNumberDown].countFree ? freeArrays[arrayNumberDown].countFree : returnValue)
+            return returnValue
+        }
         for myIndex in 0..<results.count {
             let resultIndex = results.count - 1 - myIndex
             if maxWordLength < results[resultIndex].first!.word.length {
                 continue
             }
             let fillLength = results[resultIndex].first!.word.length
-            for fixLetter1 in fixLetters {
-                if fixLetter1.freeCount == 0 {
+            for fixLetter in fixLetters {
+                if fixLetter.freeCount == 0 {
                     continue
                 }
+                if checkFreeAreasAtFixLetter(letter: fixLetter) < fillLength {
+                    break
+                }
+                
                 searchWord = "".fill(with: "?", toLength: fillLength)
-                searchWord = searchWord.changeChars(at: 0, to: fixLetter1.letter)
+                searchWord = searchWord.changeChars(at: 0, to: fixLetter.letter)
     //                -----------------------------------------------
                 let tippWordsResults = results[resultIndex].filter("word like %@", searchWord.lowercased())
                 if tippWordsResults.count > 0 {
