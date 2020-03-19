@@ -1020,7 +1020,7 @@ class WTGameboard: SKShapeNode {
                         }
                     }
                 }
-                if GV.gameArray[col][row].status == .Used && !GV.gameArray[col][row].fixItem || GV.gameArray[col][row].status == .Empty {
+                if (GV.gameArray[col][row].status == .Used && !GV.gameArray[col][row].fixItem) || GV.gameArray[col][row].status == .Empty {
                     setConnection(toDirection: .up)
                     setConnection(toDirection: .down)
                     setConnection(toDirection: .left)
@@ -1068,6 +1068,13 @@ class WTGameboard: SKShapeNode {
             if maxWordLength >= 10 {
                 maxWordLength = 10
                 break
+            }
+        }
+        for (index, array) in returnValue.enumerated() {
+            for item in array.freePlaces {
+                let col = item.col
+                let row = item.row
+                GV.gameArray[col][row].inFreeArray = index
             }
         }
 

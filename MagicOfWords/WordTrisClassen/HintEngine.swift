@@ -23,7 +23,8 @@ class HintEngine {
     private func getAllWords()->[Results<HintModel>] {
         var returnValue = [Results<HintModel>]()
         let formatString = "language = %@ AND word Like %@"
-        let likes = ["????", "?????", "??????", "???????", "????????", "?????????", "??????????"]
+//        let likes = ["????", "?????", "??????", "???????", "????????", "?????????", "??????????"]
+        let likes = ["?????", "??????", "???????", "????????", "?????????", "??????????"]
         for like in likes {
             let results = realmMandatoryList.objects(HintModel.self).filter(formatString, GV.actLanguage, like)
             returnValue.append(results)
@@ -50,11 +51,14 @@ class HintEngine {
     var freeArrays = [FreeArray]()
     var results = [Results<HintModel>]()
     var maxWordLength = 0
-    let maxCountWords = 10
+//    let maxCountWords = 10
     var searchWord = ""
     var OKWords = [String]()
 
     private func findWordsWithOneFixletter() {
+        if fixLetters.count == 0 {
+            return
+        }
         let startTime = Date()
         OKWords = [String]()
         for myIndex in 0..<results.count {
@@ -104,7 +108,7 @@ class HintEngine {
                         }
                     }
                 }
-                if OKWords.count >= maxCountWords {
+                if OKWords.count >= countHints {
                     break
                 }
                 if Date().timeIntervalSince(startTime) > maxInterval {
@@ -125,9 +129,12 @@ class HintEngine {
         }
     }
     
-    let maxInterval = 100000000.10
+    let maxInterval = 0.10
     
     private func findWordsWithTwoFixLetters() {
+        if fixLetters.count == 0 {
+            return
+        }
         let startTime = Date()
         OKWords = [String]()
         func lettersInTheSameFreeArea(letter1: UsedLetterWithCounter, letter2: UsedLetterWithCounter)->Bool {
@@ -205,13 +212,11 @@ class HintEngine {
                                             for temporaryLetter in temporaryRedLetters {
                                                 redLetters.append(temporaryLetter.letter)
                                             }
-                                            temporaryRedLetters.removeAll()
                                         }
                                     } else {
                                         for temporaryLetter in temporaryRedLetters {
                                             redLetters.append(temporaryLetter.letter)
                                         }
-                                        temporaryRedLetters.removeAll()
                                     }
 
                                 }
@@ -244,10 +249,13 @@ class HintEngine {
         let startTime = Date()
         OKWords = [String]()
         for myIndex in 0..<results.count {
-            var resultIndex = results.count - 1 - myIndex
+            let resultIndex = results.count - 1 - myIndex
             if maxWordLength < results[resultIndex].first!.word.length {
                 continue
             }
+//            if resultIndex == 1 {
+//                print("wordLength = 1")
+//            }
 
 //            var maxCountCycles = 0
 //            repeat {
@@ -265,9 +273,9 @@ class HintEngine {
                 if wordIndexes.count == 0 {
                     break
                 }
-                let word = results[resultIndex][ind].word
+                let word = results[resultIndex][ind].word.uppercased()
                 var temporaryRedLetters = [(letter:String, index:Int)]()
-                for (letterIndex, letter) in word.uppercased().enumerated() {
+                for (letterIndex, letter) in word.enumerated() {
 //                        if wordToCheck.char(at: letterIndex) == "?" {
                         if !redLetters.contains(String(letter)) {
                             wordOK = false
@@ -282,64 +290,63 @@ class HintEngine {
 //                        }
                 }
                 if wordOK {
-//                        print("temporaryFixLetters: \(temporaryFixLetters)")
                     if !OKWords.contains(word) {
                         OKWords.append(word)
                     }
                 }
-//                        for temporaryLetter in temporaryRedLetters {
-//                            redLetters.append(temporaryLetter.letter)
-//                        }
-            } while OKWords.count < maxCountWords && Date().timeIntervalSince(startTime) < maxInterval
-            print("wordIndexes: \(wordIndexes.count)")
-            resultIndex -= 1
+                for temporaryLetter in temporaryRedLetters {
+                    redLetters.append(temporaryLetter.letter)
+                }
+            } while OKWords.count < countHints && Date().timeIntervalSince(startTime) < maxInterval
+//            print("wordIndexes: \(wordIndexes.count)")
+//            resultIndex -= 1
 //                } while OKWords.count < maxCountWords && resultIndex >= 0 && Date().timeIntervalSince(startTime) < maxInterval
                 for word in OKWords {
                     let uppercasedWord = word.uppercased()
                     if !GV.hintTable.contains(uppercasedWord) {
                         GV.hintTable.append(uppercasedWord)
-                        if GV.hintTable.count == maxCountWords {
+                        if GV.hintTable.count == countHints {
                             break
                         }
                     }
                 }
 //            } while GV.hintTable.count < maxCountWords  && resultIndex >= 0 && Date().timeIntervalSince(startTime) < maxInterval
-            if Date().timeIntervalSince(startTime) < maxInterval {
+            if Date().timeIntervalSince(startTime) > maxInterval {
                 break
             }
         }
     }
     
 //    var startTime = Date()
-    
+    let countHints = GV.onIpad ? 30 : 20
+
     public func createHints() {
-        let num = setFirstTime()
         (maxWordLength, freeArrays) = wtGameboard!.getFreeArrays()
         redLetters = wtGameboard!.getRedLetters()
         fixLetters = wtGameboard!.getFixLetters()
         freeGreenLetters = wtGameboard!.getFreeGreenLetters()
         results = getAllWords()
-        let countHints = GV.onIpad ? 30 : 20
         checkHintsTable(maxWordLength: maxWordLength)
         if GV.hintTable.count == countHints {
             return
         }
 //        startTime = Date()
-        let num1 = setFirstTime()
         findWordsWithTwoFixLetters()
-        showTime(num: num1, string: "findWordsWithTwoFixLetters")
+//        showTime(num: num1, string: "findWordsWithTwoFixLetters")
         if GV.hintTable.count < countHints {
             findWordsWithOneFixletter()
-            showTime(num: num1, string: "findWordsWithOneFixletter")
+//            showTime(num: num1, string: "findWordsWithOneFixletter")
         }
         if GV.hintTable.count < countHints{
             findWordsWithRedLetters()
-            showTime(num: num1, string: "findWordsWithRedLetters")
+//            showTime(num: num1, string: "findWordsWithRedLetters")
         }
-        let sortedHints = GV.hintTable.sorted(by: {$0.length > $1.length})
+        let sortedHints = GV.hintTable.sorted(by: {$0.length > $1.length || ($0.length == $1.length && $0 < $1)})
         GV.hintTable = sortedHints
-        showTime(num: num, string: "createHints end")
+//        showTime(num: num, string: "createHints end")
     }
+    
+    
     private func checkHintsTable(maxWordLength: Int) {
         var redLetters = wtGameboard!.getRedLetters()
         var wordsToDeleteFromHintTable = [String]()

@@ -31,6 +31,7 @@ class WTGameboardItem: SKSpriteNode {
     private var connectionType = ConnectionType()
     private var countOccurencesInWords = 0
     public var fixItem = false
+    public var inFreeArray = -1
     struct StatusType: Hashable {
         var itemStatus: ItemStatus = .Empty
         var fixItem: Bool = false

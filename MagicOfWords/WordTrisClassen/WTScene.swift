@@ -286,7 +286,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func calculateColumnWidths(showCount: Bool = true) {
         title = ""
         let fixlength = GV.onIpad ? 15 : 10
-        lengthOfWord = maxLength < fixlength ? fixlength : maxLength
+        lengthOfWord = globalMaxLength < fixlength ? fixlength : globalMaxLength
         let text1 = " \(GV.language.getText(.tcWord).fixLength(length: lengthOfWord, center: true))     "
         let text2 = showCount ? "\(GV.language.getText(.tcCount)) " : ""
         let text3 = "\(GV.language.getText(.tcLength)) "
@@ -338,7 +338,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             text = header1.fixLength(length: length, center: true)
             text0 = header0.fixLength(length: length, center: true)
         case .ShowHints:
-            text = hintHeaderLine
+            text = hintHeaderLine.fixLength(length: hintHeaderLine.length + 4, center: true)
+            if title.length < text.length {
+                width = text.width(font: myFont!)
+            }
         default:
             break
         }
@@ -1504,9 +1507,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         showFoundedWordsTableView = WTTableView()
 
         timerIsCounting = false
-        maxLength = 0
+        globalMaxLength = 0
         for word in listOfFoundedWords {
-            maxLength = word.length > maxLength ? word.length : maxLength
+            globalMaxLength = word.length > globalMaxLength ? word.length : globalMaxLength
         }
         calculateColumnWidths(showCount: false)
         let header1 = GV.language.getText(.tcShowWordlistHeader, values: String(listOfFoundedWords.count))
@@ -1526,8 +1529,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 showingWordsHeight = lineHeight * counter
             } while showingWordsHeight + headerframeHeight > maxHeight
         }
-        if maxLength < title.length {
-            maxLength = title.length
+        if globalMaxLength < title.length {
+            globalMaxLength = title.length
         }
 //        let optimalWidth = self.frame.width * 0.4
         var width: CGFloat = 0
@@ -2366,10 +2369,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } while remainingLength > 0
 //            GV.hintTable.append(actWord)
         }
-        while wtGameboard!.getCountFreePlaces() > 50 {
+        while wtGameboard!.getCountFreePlaces() > countRemainingFreePlaces {
             moveWordToGameArray()
         }
     }
+    
+    let countRemainingFreePlaces = 36
     
     private func fillTippIndexes() {
         tippIndexes = [:]
@@ -4576,7 +4581,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     var ownWordsForShow: WordsForShow?
-    var maxLength = 0
+    var globalMaxLength = 0
     var showingInTableViewActive = false
     let myFont = UIFont(name: GV.actLabelFont /*"CourierNewPS-BoldMT"*/, size: GV.onIpad ? 18 : 15)
     let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 15)
@@ -4586,7 +4591,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         showOwnWordsTablSeView = WTTableView()
         timerIsCounting = false
         var words: [FoundedWordWithCounter]
-        (words, maxLength) = WTGameWordList.shared.getWordsForShow()
+        (words, globalMaxLength) = WTGameWordList.shared.getWordsForShow()
         ownWordsForShow = WordsForShow(words: words)
         calculateColumnWidths()
         let suffix = " (\(GV.countOfWords)/\(ownWordsForShow!.countWords)/\(ownWordsForShow!.score))"
@@ -4606,8 +4611,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 showingWordsHeight = lineHeight * counter
             } while showingWordsHeight + headerframeHeight > self.frame.height * 0.8
         }
-        if maxLength < GV.language.getText(.tcWord).count {
-            maxLength = GV.language.getText(.tcWord).count
+        if globalMaxLength < GV.language.getText(.tcWord).count {
+            globalMaxLength = GV.language.getText(.tcWord).count
         }
         let size = CGSize(width: actWidth, height: showingWordsHeight + headerframeHeight)
         showOwnWordsTablSeView?.frame=CGRect(origin: origin, size: size)
@@ -4634,19 +4639,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         showHintsTableView = WTTableView()
         showingInTableViewActive = true
         timerIsCounting = false
-        var maxLength = 0
+        globalMaxLength = 0
+
         hintsTableForShow.removeAll()
         for item in GV.hintTable {
             let score = WTGameWordList.shared.getScoreForWord(word: item)
-            if item.length > maxLength {
-                maxLength = item.length
+            if item.length > globalMaxLength {
+                globalMaxLength = item.length
             }
             hintsTableForShow.append(HintForShow(hint: item, score: score))
         }
 //        ownWordsForShow = WordsForShow(words: words)
         calculateColumnWidths(showCount: false)
         hintHeaderLine = (GV.language.getText(.tcHintsWithRedLetters))
-        let actWidth = max(title.width(font: myFont!), hintHeaderLine.width(font: myFont!))//* 1.2
+        let actWidth = max(title.width(font: myFont!), hintHeaderLine.width(font: myFont!)) * 1.1
 
         showHintsTableView?.setDelegate(delegate: self)
         showHintsTableView?.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
@@ -4661,8 +4667,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 showingWordsHeight = lineHeight * counter
             } while showingWordsHeight + headerframeHeight > self.frame.height * 0.8
         }
-        if maxLength < GV.language.getText(.tcWord).count {
-            maxLength = GV.language.getText(.tcWord).count
+        if globalMaxLength < GV.language.getText(.tcWord).count {
+            globalMaxLength = GV.language.getText(.tcWord).count
         }
         let size = CGSize(width: actWidth, height: showingWordsHeight + headerframeHeight)
         showHintsTableView?.frame=CGRect(origin: origin, size: size)
@@ -4681,10 +4687,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         showingInTableViewActive = true
         self.wordList = wordList
         timerIsCounting = false
-        maxLength = 0
+        globalMaxLength = 0
         for selectedWord in wordList {
             let word = selectedWord.word
-            maxLength = word.length > maxLength ? word.length : maxLength
+            globalMaxLength = word.length > globalMaxLength ? word.length : globalMaxLength
         }
         calculateColumnWidths()
         showWordsOverPositionTableView?.setDelegate(delegate: self)
@@ -4700,8 +4706,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 showingWordsHeight = lineHeight * counter
             } while showingWordsHeight + headerframeHeight > self.frame.height * 0.9
         }
-        if maxLength < title.length {
-            maxLength = title.length
+        if globalMaxLength < title.length {
+            globalMaxLength = title.length
         }
         let width = title.width(font: myFont!)
         let size = CGSize(width: width, height: showingWordsHeight + headerframeHeight)
