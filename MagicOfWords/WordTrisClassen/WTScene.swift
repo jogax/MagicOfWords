@@ -1188,9 +1188,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-//        if showHelpDemoActive && lastHelpDemoStepReady && !createNextRound {
-//            showHelpStepByStep()
-//        }
+        if GV.hintTable.count == 0 {
+            hintButton!.alpha = 0.2
+            hintButton!.isEnabled = false
+        } else {
+            hintButton!.alpha = 1.0
+            hintButton!.isEnabled = true
+        }
     }
     
     private func afterNextRoundAnimation() {
@@ -1624,7 +1628,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if goToNextGameButton != nil {
             goToNextGameButton!.isEnabled = hide ? false : hasRecords(before: false)
         }
-//        tippButton!.isEnabled = !hide
+        hintButton!.isEnabled = !hide
         allWordsButton!.isEnabled = !hide
         finishButton!.isEnabled = !hide
         goBackButton!.isEnabled = !hide
@@ -1638,7 +1642,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if hide {
             goToPreviousGameButton!.alpha = 0.2
             goToNextGameButton!.alpha = 0.2
-//            tippButton!.alpha = 0.2
+            hintButton!.alpha = 0.2
             allWordsButton!.alpha = 0.2
             finishButton!.alpha = 0.2
             goBackButton!.alpha = 0.2
@@ -1652,7 +1656,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else {
             goToPreviousGameButton!.alpha = hasRecords(before: true) ? 1.0 : 0.2
             goToNextGameButton!.alpha = hasRecords(before: false) ? 1.0 : 0.2
-//            tippButton!.alpha = 1.0
+            hintButton!.alpha = 1.0
             allWordsButton!.alpha = 1.0
             finishButton!.alpha = 1.0
             goBackButton!.alpha = 1.0
