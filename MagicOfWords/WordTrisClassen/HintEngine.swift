@@ -49,6 +49,7 @@ class HintEngine {
     var fixLetters = [UsedLetterWithCounter]()
     var freeGreenLetters = [UsedLetterWithCounter]()
     var freeArrays = [FreeArray]()
+    var greenLetters = [String:[UsedLetter]]()
     var results = [Results<HintModel>]()
     var maxWordLength = 0
 //    let maxCountWords = 10
@@ -159,7 +160,22 @@ class HintEngine {
         }
     }
     
-    let maxInterval = 0.10
+    let maxInterval = 100000000000.10
+    
+    private func checkLetter(letter: UsedLetterWithCounter)->[Int] {
+        var letterInArrays = [Int]()
+        for array in freeArrays {
+            for freePlace in array.freePlaces {
+                if (freePlace.col == letter.col && (freePlace.row == letter.row - 1 || freePlace.row == letter.row + 1)) ||
+                    (freePlace.row == letter.row && (freePlace.col == letter.col - 1 || freePlace.col == letter.col + 1)) {
+                    if !letterInArrays.contains(array.numberOfFreeArray) {
+                        letterInArrays.append(array.numberOfFreeArray)
+                    }
+                }
+            }
+        }
+        return letterInArrays
+    }
     
     private func findWordsWithTwoFixLetters() {
         if fixLetters.count == 0 {
@@ -167,7 +183,7 @@ class HintEngine {
         }
         let startTime = Date()
         OKWords = [String]()
-        func lettersInTheSameFreeArea(letter1: UsedLetterWithCounter, letter2: UsedLetterWithCounter)->Bool {
+        func lettersInTheSameFreeArea(letter1: UsedLetterWithCounter, letter2: UsedLetterWithCounter)->(Bool, Int) {
             var letter1InArray = 1000
             var letter2InArray = 1001
             for array in freeArrays {
@@ -186,7 +202,7 @@ class HintEngine {
                     }
                 }
             }
-            return letter1InArray == letter2InArray
+            return (letter1InArray == letter2InArray, letter1InArray)
         }
         for myIndex in 0..<results.count {
             let resultIndex = results.count - 1 - myIndex
@@ -203,9 +219,37 @@ class HintEngine {
                     if fixLetter2.freeCount == 0 || fixLetter1 == fixLetter2 {
                         continue
                     }
+                    if fixLetter1.letter == "В" && fixLetter2.letter == "Л" {
+                        print("letter1: \(fixLetter1.letter), letter2: \(fixLetter2.letter)")
+                    }
                     searchWord = "".fill(with: "?", toLength: fillLength)
-                    if lettersInTheSameFreeArea(letter1: fixLetter1, letter2: fixLetter2) {
+                    let (inTheSameArea, firstAreaNr) = lettersInTheSameFreeArea(letter1: fixLetter1, letter2: fixLetter2)
+                    if inTheSameArea {
                         let distance = fixLetter1.freeDistance(to: fixLetter2)
+                        if distance < fillLength - 2 {
+                            if fixLetter2.freeCount == 1 {
+                                continue
+                            }
+                            let secondArraySize = fillLength - distance - 2
+                            let arrays = checkLetter(letter: fixLetter1)
+                            if arrays.count == 1 {
+                                if freeArrays[arrays[0]].freePlaces.count < distance + secondArraySize {
+                                    continue
+                                }
+                            } else {
+                                var areaSizeOK = false
+                                for arrayNr in arrays {
+                                    if arrayNr != firstAreaNr {
+                                        if secondArraySize <= freeArrays[arrayNr].freePlaces.count {
+                                            areaSizeOK = true
+                                        }
+                                    }
+                                }
+                                if !areaSizeOK {
+                                    continue
+                                }
+                            }
+                        }
                         if  distance > 0 && distance  <= fillLength - 2 {
                             searchWord = searchWord.changeChars(at: 0, to: fixLetter1.letter)
                             searchWord = searchWord.changeChars(at: distance + 1, to: fixLetter2.letter).lowercased()
@@ -213,10 +257,6 @@ class HintEngine {
                             if tippWordsResults.count > 0 {
                                 for foundedWord in tippWordsResults {
                                     let word = foundedWord.word
-                                    if word == "концентрат" {
-                                        print("word концентрат found")
-                                    }
-                                    
                                     var temporaryRedLetters = [(letter:String, index:Int)]()
                                     var wordOK = true
                                     for letterIndex in 0..<word.length {
@@ -357,10 +397,12 @@ class HintEngine {
                 }
                 let word = results[resultIndex][ind].word.uppercased()
                 var temporaryRedLetters = [(letter:String, index:Int)]()
+                var searchWord = "".fill(with: "?", toLength: word.length)
                 for (letterIndex, letter) in word.enumerated() {
                         if !redLetters.contains(String(letter)) {
                             wordOK = false
-                            break
+//                                break
+                            searchWord = searchWord.changeChars(at: letterIndex, to: String(letter))
                         } else {
                             temporaryRedLetters.append((String(letter), letterIndex))
                             let index = redLetters.firstIndex(of: String(letter))
@@ -372,6 +414,42 @@ class HintEngine {
                 if wordOK {
                     if !OKWords.contains(word) {
                         OKWords.append(word)
+                    }
+                } else {
+                    if let index = searchWord.index(from: 0, of: "?") {
+                        if index > 0 && index < 4 {
+                            let endsWith = "".fill(with: "?", toLength: word.length - index)
+                            var foundedBegin = [UsedLetter]()
+                            if searchWord.ends(with: endsWith)  {
+                                var myLetters = [[UsedLetter]]()
+                                print("word: \(word), searchWord: \(searchWord)")
+                                for letter in searchWord.startingSubString(length: index) {
+                                    if greenLetters[String(letter)]!.count > 0 {
+                                        myLetters.insert(greenLetters[String(letter)]!, at: 0)
+                                        print("greenLetter: \(letter)")
+                                    } else {
+                                        myLetters.removeAll()
+                                        break
+                                    }
+                                }
+                                if myLetters.count > 0 {
+                                    for (index, usedLetters) in myLetters.enumerated() {
+                                        for letter in usedLetters {
+                                            if index == 0 {
+                                                if !checkFreePlacesAtLetter(letter: letter, countLetters: endsWith.count) {
+                                                    continue
+                                                } else {
+                                                    foundedBegin.append(letter)
+                                                }
+                                            } else {
+                                                
+                                            }
+                                        }
+                                    }
+                                    print("word: \(word), myLetters: \(myLetters)")
+                                }
+                            }
+                        }
                     }
                 }
                 for temporaryLetter in temporaryRedLetters {
@@ -393,17 +471,33 @@ class HintEngine {
         }
     }
     let countHints = GV.onIpad ? 30 : 20
+    
+    public func checkFreePlacesAtLetter(letter: UsedLetter, countLetters: Int)->Bool {
+        
+        for array in freeArrays {
+            for freePlace in array.freePlaces {
+                if (freePlace.col == letter.col && (freePlace.row == letter.row - 1 || freePlace.row == letter.row + 1)) ||
+                    (freePlace.row == letter.row && (freePlace.col == letter.col - 1 || freePlace.col == letter.col + 1)) {
+                    if array.countFree >= countLetters {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
 
     public func createHints() {
+        if GV.hintTable.count == countHints {
+            return
+        }
         (maxWordLength, freeArrays) = wtGameboard!.getFreeArrays()
         redLetters = wtGameboard!.getRedLetters()
         fixLetters = wtGameboard!.getFixLetters()
         freeGreenLetters = wtGameboard!.getFreeGreenLetters()
+        greenLetters = wtGameboard!.getAllGreenLetters()
         results = getAllWords()
         checkHintsTable(maxWordLength: maxWordLength)
-        if GV.hintTable.count == countHints {
-            return
-        }
 //        startTime = Date()
         findWordsWithTwoFixLetters()
 //        showTime(num: num1, string: "findWordsWithTwoFixLetters")
@@ -414,6 +508,9 @@ class HintEngine {
         if GV.hintTable.count < countHints{
             findWordsWithRedLetters()
 //            showTime(num: num1, string: "findWordsWithRedLetters")
+        }
+        if GV.hintTable.count < countHints {
+            findWordsWithGreenAndRedLetters()
         }
         let sortedHints = GV.hintTable.sorted(by: {$0.length > $1.length || ($0.length == $1.length && $0 < $1)})
         GV.hintTable = sortedHints

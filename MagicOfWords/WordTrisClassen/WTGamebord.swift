@@ -42,8 +42,7 @@ public struct UsedLetterWithCounter {
         self.letter = letter
         self.freeCount = freeCount
     }
-    func freeDistance(to: UsedLetterWithCounter)->Int {
-        
+    func freeDistance(to: UsedLetterWithCounter)->Int {        
         let distance = abs(self.col - to.col) + abs(self.row - to.row) - 1
         var colAdder = self.col == to.col ? 0 : (self.col < to.col ? 1 : -1)
         var rowAdder = self.row == to.row ? 0 : (self.row < to.row ? 1 : -1)
@@ -1090,6 +1089,23 @@ class WTGameboard: SKShapeNode {
                     if usedLetter.freeCount > 0 {
                         returnValue.append(usedLetter)
                     }
+                }
+            }
+        }
+        return returnValue
+    }
+    
+    public func getAllGreenLetters()->[String:[UsedLetter]] {
+        var returnValue = [String:[UsedLetter]]()
+        let myLetters = GV.language.getText(.tcAlphabet)
+        for letter in myLetters {
+            returnValue[String(letter)] = [UsedLetter]()
+        }
+        for col in 0..<countCols {
+            for row in 0..<countCols {
+                if GV.gameArray[col][row].status == .WholeWord {
+                    let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
+                    returnValue[GV.gameArray[col][row].letter]?.append(actLetter)
                 }
             }
         }
