@@ -30,6 +30,13 @@ public struct UsedLetter {
         return String(col) + String(row) + String(letter)
     }
 }
+extension UsedLetter: Equatable {}
+
+public func ==(lhs: UsedLetter, rhs: UsedLetter) -> Bool {
+    let areEqual = lhs.col == rhs.col && lhs.row == rhs.row
+
+    return areEqual
+}
 
 public struct UsedLetterWithCounter {
     var col: Int = 0
@@ -324,9 +331,9 @@ public protocol WTGameboardDelegate: class {
 
 
 let WSGameboardSizeMultiplier:CGFloat = 2.0
-func == (left: UsedLetter, right: UsedLetter) -> Bool {
-    return left.col == right.col && left.row == right.row && left.letter == right.letter
-}
+//func == (left: UsedLetter, right: UsedLetter) -> Bool {
+//    return left.col == right.col && left.row == right.row && left.letter == right.letter
+//}
 
 func == (left: FoundedWord, right: FoundedWord) -> Bool {
     return left.word == right.word
