@@ -40,7 +40,7 @@ class CustomTableViewCell: UITableViewCell {
     }
     
     public func setBGColor(color: UIColor) {
-        boxView.backgroundColor = color
+        boxView.backgroundColor = .red // color
     }
     public func setFont(font: UIFont) {
         myFont = font
@@ -65,7 +65,8 @@ class CustomTableViewCell: UITableViewCell {
             xValue = posForColumn
         }
         let wordLength = text.width(font: myFont)// * 1.1
-        let wordHeight = text.height(font: myFont) * 2
+//        let wordHeight = text.height(font: myFont) * 2
+        let wordHeight = boxView.frame.height
 //        let label = UILabel(frame: CGRect(x: xValue, y: GV.onIpad ? 6 : 3, width: wordLength, height: wordHeight))
         let label = UILabel(frame: CGRect(x: xValue, y: GV.onIpad ? 2 : 3, width: wordLength, height: wordHeight))
 //        let label = UILabel(frame: CGRect(x: xValue, y: boxView.center.y + wordHeight * 0.5, width: wordLength, height: wordHeight))
@@ -73,7 +74,7 @@ class CustomTableViewCell: UITableViewCell {
         label.textAlignment = .left
         label.textColor = GV.darkMode ? .white : .black
         label.text = text
-//        label.backgroundColor = color
+        label.backgroundColor = color
         label.center.y = boxView.center.y
         boxView.addSubview(label)
     }

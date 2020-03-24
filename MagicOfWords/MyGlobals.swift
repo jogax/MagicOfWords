@@ -96,9 +96,11 @@ struct ScoreForShow {
 struct HintForShow {
     var hint: String
     var score: Int
-    init(hint: String, score: Int) {
+    var type: HintType
+    init(hint: String, score: Int, type: HintType) {
         self.hint = hint
         self.score = score
+        self.type = type
     }
 }
 
@@ -128,6 +130,45 @@ struct PlayerData {
     var mediumActScore = ""
     var countPlays = ""
 }
+
+enum HintType: Int {
+    case WithFixLetter = 0, WithGreenLetter, WithRedLetter
+    public func description()->String {
+        switch self {
+            case .WithFixLetter: return "F"
+            case .WithGreenLetter: return "G"
+            case .WithRedLetter: return "R"
+        }
+    }
+    init?(string: String) {
+        switch string {
+        case "F":
+            self = .WithFixLetter
+        case "G":
+            self = .WithGreenLetter
+        case "R":
+            self = .WithRedLetter
+        default:
+            return nil
+        }
+    }
+}
+struct HintTableStruct {
+    var hint: String = ""
+    var type: HintType = .WithRedLetter
+    init(hint: String, type: HintType) {
+        self.hint = hint
+        self.type = type
+    }
+}
+extension HintTableStruct: Equatable {}
+
+func ==(lhs: HintTableStruct, rhs: HintTableStruct) -> Bool {
+    let areEqual = lhs.hint == rhs.hint && lhs.type == rhs.type
+
+    return areEqual
+}
+
 
 struct GV {
     static var actLanguage: String {
@@ -196,7 +237,7 @@ struct GV {
 //    static var helpInfoRecords: Results<HelpInfo>?
     static let frequencyString = ":freq:"
     static var darkMode = false
-    static var hintTable = [String]()
+    static var hintTable = [HintTableStruct]()
 
     static let language = Language()
     static let size = 10

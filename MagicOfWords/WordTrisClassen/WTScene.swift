@@ -430,9 +430,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let spaces = " "
             cell.addColumn(text: spaces.fixLength(length: restLength), color: myLightBlue)
         case .ShowHints:
-            cell.addColumn(text: "   " + hintsTableForShow[indexPath.row].hint.fixLength(length: lengthOfWord, leadingBlanks: false), color: myLightBlue)
-            cell.addColumn(text: String(hintsTableForShow[indexPath.row].hint.count).fixLength(length: lengthOfLength), color: myLightBlue)
-            cell.addColumn(text: String(hintsTableForShow[indexPath.row].score).fixLength(length: lengthOfScore), color: myLightBlue)
+            var actColor = UIColor.white
+            switch hintsTableForShow[indexPath.row].type {
+            case .WithFixLetter: actColor = UIColor(red: 248/255, green: 209/255, blue: 255/255, alpha: 1.0)
+            case .WithGreenLetter: actColor = UIColor(red: 243/255, green: 126/255, blue: 107/255, alpha: 1.0)
+            case .WithRedLetter: actColor = UIColor(red: 153/255, green: 249/255, blue: 114/255, alpha: 1.0)
+            }
+            cell.addColumn(text: "   " + hintsTableForShow[indexPath.row].hint.fixLength(length: lengthOfWord, leadingBlanks: false), color: actColor)
+            cell.addColumn(text: String(hintsTableForShow[indexPath.row].hint.count).fixLength(length: lengthOfLength), color: actColor)
+            cell.addColumn(text: String(hintsTableForShow[indexPath.row].score).fixLength(length: lengthOfScore), color: actColor)
+            let restLength = Int(tableView.frame.width / "A".width(font:myFont!)) - lengthOfWord - lengthOfLength - lengthOfScore
+            let spaces = " "
+            cell.addColumn(text: spaces.fixLength(length: restLength), color: actColor)
         default:
             break
         }
@@ -1188,13 +1197,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-        if GV.hintTable.count == 0 {
-            hintButton!.alpha = 0.2
-            hintButton!.isEnabled = false
-        } else {
-            hintButton!.alpha = 1.0
-            hintButton!.isEnabled = true
-        }
+//        if GV.hintTable.count == 0 {
+//            hintButton!.alpha = 0.2
+//            hintButton!.isEnabled = false
+//        } else {
+//            hintButton!.alpha = 1.0
+//            hintButton!.isEnabled = true
+//        }
     }
     
     private func afterNextRoundAnimation() {
@@ -1211,7 +1220,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         createFixLetters()
         movePiecesToGameArray()
-        HintEngine.shared.createHints()
+//        HintEngine.shared.createHints()
         saveActualState()
         createNextRound = false
         GV.nextRoundAnimationFinished = false
@@ -1262,7 +1271,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                print("should send")
             }
         } else {
-            HintEngine.shared.createHints()
+//            HintEngine.shared.createHints()
             saveActualState()
             if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue  && GV.countOfWords >= GV.countOfWordsMaxValue {
                 congratulations(congratulationType: .AllWordsCollected)
@@ -1601,6 +1610,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc private func showHintTable() {
+        HintEngine.shared.createHints()
+        saveActualState()
         stopShowingTableIfNeeded()
         showHintsInTableView()
 
@@ -2247,9 +2258,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 showFoundedWords()
                 modifyHeader()
                 let hints = GV.playingRecord.hintTable.components(separatedBy: itemSeparator)
-                for hint in hints {
-                    if hint != "" {
-                        GV.hintTable.append(hint)
+                for item in hints {
+                    if item != "" {
+                        let newItem = item.components(separatedBy: itemInnerSeparator)
+                        if newItem.count == 2 {
+                            GV.hintTable.append(HintTableStruct(hint: newItem[0], type: HintType(string: newItem[1])!))
+                        }
                     }
                 }
                 let countFixLetters =  wtGameboard!.checkFixLetters()
@@ -2284,7 +2298,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        saveActualState()
         fillTippIndexes()
         movePiecesToGameArray()
-        HintEngine.shared.createHints()
+//        HintEngine.shared.createHints()
         saveActualState()
         
         if timer != nil {
@@ -4045,8 +4059,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             var hintTable = ""
             if GV.hintTable.count > 0 {
-                for word in GV.hintTable {
-                    hintTable += word + itemSeparator
+                for item in GV.hintTable {
+                    hintTable += item.hint + itemInnerSeparator + item.type.description() + itemSeparator
                 }
                 if hintTable != "" {
                     hintTable.removeLast()
@@ -4233,7 +4247,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                         bgSprite!.addChild(pieceArray[2])
                     default: break
                     }
-                    HintEngine.shared.createHints()
+//                    HintEngine.shared.createHints()
                 } else {
                     var countTilesOnGameboard = 0
                     for tile in tilesForGame {
@@ -4264,7 +4278,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 modifyHeader()
             }
             saveActualState()
-            HintEngine.shared.createHints()
+//            HintEngine.shared.createHints()
             saveToGameCenter()
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 && activityRoundItem.count == 1 {
@@ -4626,16 +4640,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.hideButtons(hide: true)
     }
     
-    private func getHintsForShow()->([String], Int) {
-        var returnArray = [String]()
-        var returnValue = 0
-        for hint in GV.hintTable {
-            returnValue = returnValue < hint.length ? hint.length : returnValue
-            returnArray.append(hint)
-        }
-        return (returnArray, returnValue)
-    }
-    
+//    private func getHintsForShow()->([String], Int) {
+//        var returnArray = [String]()
+//        var returnValue = 0
+//        for item in GV.hintTable {
+//            returnValue = returnValue < item.hint.length ? item.hint.length : returnValue
+//            returnArray.append(hint)
+//        }
+//        return (returnArray, returnValue)
+//    }
+//
     var hintsTableForShow = [HintForShow]()
     var hintHeaderLine = ""
     private func showHintsInTableView() {
@@ -4647,11 +4661,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
         hintsTableForShow.removeAll()
         for item in GV.hintTable {
-            let score = WTGameWordList.shared.getScoreForWord(word: item)
-            if item.length > globalMaxLength {
-                globalMaxLength = item.length
+            let score = WTGameWordList.shared.getScoreForWord(word: item.hint)
+            if item.hint.length > globalMaxLength {
+                globalMaxLength = item.hint.length
             }
-            hintsTableForShow.append(HintForShow(hint: item, score: score))
+            hintsTableForShow.append(HintForShow(hint: item.hint, score: score, type: item.type))
         }
 //        ownWordsForShow = WordsForShow(words: words)
         calculateColumnWidths(showCount: false)
