@@ -168,7 +168,7 @@ class HintEngine {
         }
     }
     
-    let maxInterval = 0.5
+    let maxInterval = 1.0 //0.5
     
     private func checkLetter(letter: UsedLetterWithCounter)->[Int] {
         var letterInArrays = [Int]()
@@ -435,9 +435,11 @@ class HintEngine {
 
                             if searchWord.ends(with: endsWith)  {
                                 var myLetters = [[UsedLetter]]()
-
+                                if word == "EXPONÁLÁS" {
+                                    print("word")
+                                }
                                 for letter in searchWord.startingSubString(length: index) {
-                                    if greenLetters[String(letter)]!.count > 0 {
+                                    if greenLetters[String(letter)] != nil && greenLetters[String(letter)]!.count > 0 {
                                         myLetters.append(greenLetters[String(letter)]!)
                                     } else {
                                         myLetters.removeAll()
@@ -576,6 +578,7 @@ class HintEngine {
             findWordsWithGreenAndRedLetters()
         }
         let sortedHints = GV.hintTable.sorted(by: { $0.hint.length > $1.hint.length || ($0.hint.length == $1.hint.length && $0.hint < $1.hint)})
+//        let sortedHints = GV.hintTable.sorted(by: { $0.hint.type < $1.hint.type || ($0.hint.type < $1.hint.type && $0.hint.length > $1.hint.length) || ($0.hint.length == $1.hint.length && $0.hint < $1.hint)})
         GV.hintTable = sortedHints
 //        showTime(num: num, string: "createHints end")
     }

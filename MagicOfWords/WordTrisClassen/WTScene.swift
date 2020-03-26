@@ -433,8 +433,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             var actColor = UIColor.white
             switch hintsTableForShow[indexPath.row].type {
             case .WithFixLetter: actColor = UIColor(red: 248/255, green: 209/255, blue: 255/255, alpha: 1.0)
-            case .WithGreenLetter: actColor = UIColor(red: 243/255, green: 126/255, blue: 107/255, alpha: 1.0)
-            case .WithRedLetter: actColor = UIColor(red: 153/255, green: 249/255, blue: 114/255, alpha: 1.0)
+            case .WithRedLetter: actColor = UIColor(red: 242/255, green: 170/255, blue: 159/255, alpha: 1.0)
+            case .WithGreenLetter: actColor = UIColor(red: 153/255, green: 249/255, blue: 114/255, alpha: 1.0)
             }
             cell.addColumn(text: "   " + hintsTableForShow[indexPath.row].hint.fixLength(length: lengthOfWord, leadingBlanks: false), color: actColor)
             cell.addColumn(text: String(hintsTableForShow[indexPath.row].hint.count).fixLength(length: lengthOfLength), color: actColor)
@@ -1272,13 +1272,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         } else {
 //            HintEngine.shared.createHints()
-            saveActualState()
             if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue  && GV.countOfWords >= GV.countOfWordsMaxValue {
-                congratulations(congratulationType: .AllWordsCollected)
+                setCountWords(count: GV.countOfWordsMaxValue + 100, type: GameDifficulty.Easy)
+//                congratulations(congratulationType: .AllWordsCollected)
             }
             if GV.basicDataRecord.difficulty == GameDifficulty.Medium.rawValue  && GV.countOfLetters >= GV.countOfLettersMaxValue {
-                congratulations(congratulationType: .AllLettersCollected)
+                setCountWords(count: GV.countOfLettersMaxValue + 50, type: GameDifficulty.Medium)
+//                congratulations(congratulationType: .AllLettersCollected)
             }
+            saveActualState()
         }
         return returnBool
     }
@@ -3732,7 +3734,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                        realmHelpInfo!.add(helpInfo)
 //                    }
 //                }
-               HintEngine.shared.createHints()
+//               HintEngine.shared.createHints()
                saveActualState()
             } else {
                 pieceArray[movedIndex].position = origPosition[movedIndex]
@@ -4375,8 +4377,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let gameNumberForRandom = GV.playingRecord.gameNumber * theDayOfMonth
         let random = MyRandom(gameNumber: gameNumberForRandom, modifier: GV.playingRecord.words.count)
         var tileType = MyShapes.NotUsed
-        var letters = [String]()
-        var generateLength = 0
+//        var letters = [String]()
+//        var generateLength = 0
         var typesWithLen1 = [MyShapes]()
         var typesWithLen2 = [MyShapes]()
         var typesWithLen3 = [MyShapes]()
