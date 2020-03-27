@@ -432,7 +432,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         case .ShowHints:
             var actColor = UIColor.white
             switch hintsTableForShow[indexPath.row].type {
-            case .WithFixLetter: actColor = UIColor(red: 248/255, green: 209/255, blue: 255/255, alpha: 1.0)
+            case .With1FixLetter: actColor = UIColor(red: 248/255, green: 209/255, blue: 255/255, alpha: 1.0)
+            case .With2FixLetters: actColor = UIColor(red: 255/255, green: 224/255, blue: 247/255, alpha: 1.0)
             case .WithRedLetter: actColor = UIColor(red: 242/255, green: 170/255, blue: 159/255, alpha: 1.0)
             case .WithGreenLetter: actColor = UIColor(red: 153/255, green: 249/255, blue: 114/255, alpha: 1.0)
             }
@@ -2263,8 +2264,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 for item in hints {
                     if item != "" {
                         let newItem = item.components(separatedBy: itemInnerSeparator)
-                        if newItem.count == 2 {
-                            GV.hintTable.append(HintTableStruct(hint: newItem[0], type: HintType(string: newItem[1])!))
+                        if newItem.count == 3 && HintType(string: newItem[2]) != nil {
+                            GV.hintTable.append(HintTableStruct(hint: newItem[0], search: newItem[1], type: HintType(string: newItem[2])!))
                         }
                     }
                 }
@@ -4062,7 +4063,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             var hintTable = ""
             if GV.hintTable.count > 0 {
                 for item in GV.hintTable {
-                    hintTable += item.hint + itemInnerSeparator + item.type.description() + itemSeparator
+                    hintTable += item.hint + itemInnerSeparator + item.search + itemInnerSeparator + item.type.description() + itemSeparator
                 }
                 if hintTable != "" {
                     hintTable.removeLast()

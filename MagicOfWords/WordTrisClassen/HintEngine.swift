@@ -132,7 +132,7 @@ class HintEngine {
                         temporaryRedLetters.removeAll()
                         if wordOK {
                             if !OKWords.contains(where: {$0.hint == word}) {
-                                OKWords.append(HintTableStruct(hint: word, type: .WithFixLetter))
+                                OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .With1FixLetter))
                             }
                             for temporaryLetter in temporaryRedLetters {
                                 redLetters.append(temporaryLetter.letter)
@@ -161,7 +161,7 @@ class HintEngine {
             for item in OKWords {
                 let uppercasedWord = item.hint.uppercased()
                 if !WTGameWordList.shared.roundContainsWord(word: uppercasedWord) && !GV.hintTable.contains(where: {$0.hint == uppercasedWord}) {
-                    GV.hintTable.append(HintTableStruct(hint: uppercasedWord, type: .WithFixLetter) )
+                    GV.hintTable.append(item)
                 }
             }
             OKWords.removeAll()
@@ -285,7 +285,7 @@ class HintEngine {
                                     temporaryRedLetters.removeAll()
                                     if wordOK {
                                         if !OKWords.contains(where: {$0.hint == word}) {
-                                            OKWords.append(HintTableStruct(hint: word, type: .WithFixLetter) )
+                                            OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .With2FixLetters) )
                                             break
                                         } else {
                                             for temporaryLetter in temporaryRedLetters {
@@ -426,7 +426,7 @@ class HintEngine {
                 }
                 if wordOK {
                     if !OKWords.contains(where: {$0.hint == word}) {
-                        OKWords.append(HintTableStruct(hint: word, type: .WithRedLetter))
+                        OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter))
                     }
                 } else {
                     if let index = searchWord.index(from: 0, of: "?") {
@@ -458,7 +458,7 @@ class HintEngine {
                                         if checkLetters(letters: letters, free: word.length - index) {
                                             if !OKWords.contains(where: {$0.hint == word}) {
 //                                                print("word: \(word), searchWord: \(searchWord)")
-                                                OKWords.append(HintTableStruct(hint: word, type: .WithGreenLetter))
+                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter))
                                             }
                                             break stopCycle
                                         } else {
@@ -548,16 +548,19 @@ class HintEngine {
         }
         return false
     }
-
+    
+    var random: MyRandom?
     public func createHints() {
-        GV.hintTable.removeAll()
+        random = MyRandom(gameNumber: GV.playingRecord.gameNumber % 1000, modifier: (GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count - 1) * 22)
+
+//        GV.hintTable.removeAll()
 //        if GV.hintTable.count == countHints {
 //            return
 //        }
         (maxWordLength, freeArrays) = wtGameboard!.getFreeArrays()
         redLetters = wtGameboard!.getRedLetters()
         fixLetters = wtGameboard!.getFixLetters()
-        freeGreenLetters = wtGameboard!.getFreeGreenLetters()
+//        freeGreenLetters = wtGameboard!.getFreeGreenLetters()
         greenLetters = wtGameboard!.getAllGreenLetters()
         results = getAllWords()
         checkHintsTable(maxWordLength: maxWordLength)
@@ -593,14 +596,16 @@ class HintEngine {
             if word.hint.length > maxWordLength {
                 wordsToDeleteFromHintTable.append(word)
             } else {
-                for letter in word.hint.uppercased() {
-                    if !redLetters.contains(String(letter)) {
+                for (index, letter) in word.hint.uppercased().enumerated() {
+                    if word.search.char(at: index) == "?" && !redLetters.contains(String(letter)) {
                         wordsToDeleteFromHintTable.append(word)
                         break
                     } else {
                         temporaryLetters.append(String(letter))
-                        let removeIndex = redLetters.firstIndex(of: String(letter))!
-                        redLetters.remove(at: removeIndex)
+                        if word.search.char(at: index) == "?" {
+                            let removeIndex = redLetters.firstIndex(of: String(letter))!
+                            redLetters.remove(at: removeIndex)
+                        }
                     }
                 }
                 for letter in temporaryLetters {

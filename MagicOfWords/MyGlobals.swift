@@ -93,17 +93,6 @@ struct ScoreForShow {
         self.me = me
     }
 }
-struct HintForShow {
-    var hint: String
-    var score: Int
-    var type: HintType
-    init(hint: String, score: Int, type: HintType) {
-        self.hint = hint
-        self.score = score
-        self.type = type
-    }
-}
-
 let NoValue = -1
 var myWidth: CGFloat = 0
 var myHeight: CGFloat = 0
@@ -132,18 +121,21 @@ struct PlayerData {
 }
 
 enum HintType: Int {
-    case WithFixLetter = 0, WithGreenLetter, WithRedLetter
+    case With1FixLetter = 0, With2FixLetters, WithGreenLetter, WithRedLetter
     public func description()->String {
         switch self {
-            case .WithFixLetter: return "F"
+            case .With1FixLetter: return "1"
+            case .With2FixLetters: return "2"
             case .WithGreenLetter: return "G"
             case .WithRedLetter: return "R"
         }
     }
     init?(string: String) {
         switch string {
-        case "F":
-            self = .WithFixLetter
+        case "1":
+            self = .With1FixLetter
+        case "2":
+            self = .With2FixLetters
         case "G":
             self = .WithGreenLetter
         case "R":
@@ -155,9 +147,11 @@ enum HintType: Int {
 }
 struct HintTableStruct {
     var hint: String = ""
+    var search: String = ""
     var type: HintType = .WithRedLetter
-    init(hint: String, type: HintType) {
+    init(hint: String, search: String, type: HintType) {
         self.hint = hint
+        self.search = search
         self.type = type
     }
 }
@@ -167,6 +161,17 @@ func ==(lhs: HintTableStruct, rhs: HintTableStruct) -> Bool {
     let areEqual = lhs.hint == rhs.hint && lhs.type == rhs.type
 
     return areEqual
+}
+
+struct HintForShow {
+    var hint: String
+    var score: Int
+    var type: HintType
+    init(hint: String, score: Int, type: HintType) {
+        self.hint = hint
+        self.score = score
+        self.type = type
+    }
 }
 
 
