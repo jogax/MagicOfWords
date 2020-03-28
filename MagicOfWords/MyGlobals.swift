@@ -121,21 +121,18 @@ struct PlayerData {
 }
 
 enum HintType: Int {
-    case With1FixLetter = 0, With2FixLetters, WithGreenLetter, WithRedLetter
+    case WithFixLetter = 0, WithGreenLetter, WithRedLetter
     public func description()->String {
         switch self {
-            case .With1FixLetter: return "1"
-            case .With2FixLetters: return "2"
+            case .WithFixLetter: return "F"
             case .WithGreenLetter: return "G"
             case .WithRedLetter: return "R"
         }
     }
     init?(string: String) {
         switch string {
-        case "1":
-            self = .With1FixLetter
-        case "2":
-            self = .With2FixLetters
+        case "F":
+            self = .WithFixLetter
         case "G":
             self = .WithGreenLetter
         case "R":
