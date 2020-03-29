@@ -326,7 +326,7 @@ public protocol WTGameboardDelegate: class {
     /// method is called when letters are moved on gameboard
     func setLettersMoved(fromLetters: [UsedLetter], toLetters: [UsedLetter])
     /// method is called when waitingTimer has fired
-    func setMovingSprite()
+//    func setMovingSprite()
 }
 
 
@@ -656,6 +656,10 @@ class WTGameboard: SKShapeNode {
     var origChoosedWord = FoundedWord()
     var stopChoosing = false
 
+    public func setMoveModusBecauseOfTimer(col: Int, row: Int)->Bool {
+        return setMoveModusIfPossible(col: col, row: row)
+    }
+    
     public func moveChooseOwnWord(col: Int, row: Int)->Bool {
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
         GV.gameArray[col][row].correctStatusIfNeeded()

@@ -3342,6 +3342,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     var relativPosition = CGPoint(x: 0, y: 0)
     
+    
     private func myTouchesBegan(location: CGPoint, touchedNodes: TouchedNodes) {
         self.scene?.alpha = 1.0
         if wtSceneDelegate == nil {
@@ -3353,7 +3354,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             finger = nil
         }
         #endif
-
         movedFromBottom = false
         inChoosingOwnWord = false
 //        ownWordsScrolling = false
@@ -3410,7 +3410,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                }
 //                helpInfo.letters = letters
 //            }
-        } else if touchedNodes.GCol.between(min: 0, max: GV.sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: GV.sizeOfGrid - 1){
+        } else if touchedNodes.GCol.between(min: 0, max: GV.sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: GV.sizeOfGrid - 1) {
+            touchedPosition = touchedNodes
+            timerForSetMovingModus = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(setMoveModus(timerX: )), userInfo: nil, repeats: false)
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
 //            if GV.generateHelpInfo {
@@ -3422,9 +3424,45 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     }
     
-    public func setMovingSprite() {
-        movingSprite = true
+    var touchedPosition = TouchedNodes()
+    @objc private func setMoveModus(timerX: Timer) {
+        let duration = 0.1
+        let col = touchedPosition.GCol
+        let row = touchedPosition.GRow
+        let myNode = GV.gameArray[col][row]
+        if !myNode.moveable {
+            return
+        }
+        let origZPosition = myNode.zPosition
+        let newSize = myNode.size * 2.0
+        let makeBiggerAction = SKAction.resize(toWidth: newSize.width, height: newSize.height, duration: duration)
+        let makeSmallerAction = SKAction.resize(toWidth: myNode.size.width, height: myNode.size.height, duration: duration)
+        let waitAction = SKAction.wait(forDuration: duration)
+        let setMoveModusAction = SKAction.run({
+            self.movingSprite = wtGameboard!.setMoveModusBecauseOfTimer(col: col, row: row)
+        })
+        let setMaxZPositionAction = SKAction.run({
+            myNode.zPosition = 1000
+        })
+        let setOrigZPositionAction = SKAction.run({
+            myNode.zPosition = origZPosition
+        })
+        var sequence = [SKAction]()
+        sequence.append(setMaxZPositionAction)
+        sequence.append(makeBiggerAction)
+        sequence.append(waitAction)
+        sequence.append(makeSmallerAction)
+        sequence.append(setOrigZPositionAction)
+        sequence.append(setMoveModusAction)
+        myNode.run(SKAction.sequence(sequence))
     }
+
+    
+    var timerForSetMovingModus: Timer?
+    
+//    public func setMovingSprite() {
+//        movingSprite = true
+//    }
     
 //    struct MovedInfoData {
 //        var onGameArray = false
@@ -3511,6 +3549,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
 
         } else if inChoosingOwnWord {
+            if timerForSetMovingModus != nil {
+                timerForSetMovingModus!.invalidate()
+                timerForSetMovingModus = nil
+            }
             if movingSprite {
 //                if wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 2, GRow: touchedNodes.GRow) {
 //                    _ = wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row + 1, GRow: touchedNodes.GRow)
