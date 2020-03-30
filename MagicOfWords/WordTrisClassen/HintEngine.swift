@@ -179,7 +179,7 @@ class HintEngine {
         OKWords.removeAll()
     }
     
-    let maxInterval = 100000.5
+    let maxInterval = 0.5
     let maxWordCount = 5
     
     private func checkLetter(letter: UsedLetterWithCounter)->[Int] {
