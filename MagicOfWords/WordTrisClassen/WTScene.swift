@@ -2299,7 +2299,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
 //        saveActualState()
-        fillTippIndexes()
+//        fillTippIndexes()
         movePiecesToGameArray()
 //        HintEngine.shared.createHints()
         saveActualState()
@@ -3425,18 +3425,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     var touchedPosition = TouchedNodes()
+
     @objc private func setMoveModus(timerX: Timer) {
         let duration = 0.1
         let col = touchedPosition.GCol
         let row = touchedPosition.GRow
         let myNode = GV.gameArray[col][row]
         if !myNode.moveable {
+            if timerForSetMovingModus != nil {
+               timerForSetMovingModus!.invalidate()
+               timerForSetMovingModus = nil
+           }
             return
         }
         let origZPosition = myNode.zPosition
-        let newSize = myNode.size * 2.0
+        let newSize = myNode.size * (GV.onIpad ? 2.0 : 5.0)
         let makeBiggerAction = SKAction.resize(toWidth: newSize.width, height: newSize.height, duration: duration)
-        let makeSmallerAction = SKAction.resize(toWidth: myNode.size.width, height: myNode.size.height, duration: duration)
+        let makeSmallerAction = SKAction.resize(toWidth: myNode.size.width, height: myNode.size.height, duration: 0)
         let waitAction = SKAction.wait(forDuration: duration)
         let setMoveModusAction = SKAction.run({
             self.movingSprite = wtGameboard!.setMoveModusBecauseOfTimer(col: col, row: row)
@@ -3452,8 +3457,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         sequence.append(makeBiggerAction)
         sequence.append(waitAction)
         sequence.append(makeSmallerAction)
-        sequence.append(setOrigZPositionAction)
         sequence.append(setMoveModusAction)
+        sequence.append(setOrigZPositionAction)
         myNode.run(SKAction.sequence(sequence))
     }
 
@@ -3549,7 +3554,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
 
         } else if inChoosingOwnWord {
-            if timerForSetMovingModus != nil {
+            
+            if abs((firstTouchLocation - location).length()) > 20 && timerForSetMovingModus != nil {
                 timerForSetMovingModus!.invalidate()
                 timerForSetMovingModus = nil
             }

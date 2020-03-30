@@ -87,7 +87,10 @@ class HintEngine {
             return
         }
         let startTime = Date()
-        OKWords = [HintTableStruct]()
+        OKWords = GV.hintTable
+        if OKWords.count >= maxWordCount {
+            return
+        }
         for myIndex in 0..<results.count {
             let resultIndex = results.count - 1 - myIndex
             if maxWordLength < results[resultIndex].first!.word.length {
@@ -95,6 +98,9 @@ class HintEngine {
             }
             let fillLength = results[resultIndex].first!.word.length
             for fixLetter in fixLetters {
+                if OKWords.count >= maxWordCount {
+                    break
+                }
                 if fixLetter.freeCount == 0 {
                     continue
                 }
@@ -134,6 +140,9 @@ class HintEngine {
                             if checkFreeAreasAtFixLetter(letter: fixLetter) >= word.length {
                                 if !OKWords.contains(where: {$0.hint == word}) {
                                     OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter))
+                                    if OKWords.count >= maxWordCount {
+                                        break
+                                    }
                                 }
                             }
                             for temporaryLetter in temporaryRedLetters {
@@ -170,7 +179,7 @@ class HintEngine {
         OKWords.removeAll()
     }
     
-    let maxInterval = 0.5
+    let maxInterval = 100000.5
     let maxWordCount = 5
     
     private func checkLetter(letter: UsedLetterWithCounter)->[Int] {
@@ -439,9 +448,6 @@ class HintEngine {
 
                             if searchWord.ends(with: endsWith)  {
                                 var myLetters = [[UsedLetter]]()
-                                if word == "EXPONÁLÁS" {
-                                    print("word")
-                                }
                                 for letter in searchWord.startingSubString(length: index) {
                                     if greenLetters[String(letter)] != nil && greenLetters[String(letter)]!.count > 0 {
                                         myLetters.append(greenLetters[String(letter)]!)
