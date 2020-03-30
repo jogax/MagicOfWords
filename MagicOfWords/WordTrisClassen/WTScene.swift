@@ -2331,26 +2331,27 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 let form = myForms[piece.myType]![piece.rotateIndex]
                 let (maxCol, maxRow) = piece.getMaxColRow()
                 var placeIsOK = true
-                var randomCol = 0
-                var randomRow = 0
-                repeat {
-                    placeIsOK = true
-                    randomCol = random.getRandomInt(0, max: gameArraySize - maxCol)
-                    randomRow = random.getRandomInt(0, max: gameArraySize - maxRow)
-                    for index in 0..<form.points.count {
-    //                    let col = randomCol + form.points[index] / 10
-    //                    let row = randomRow + form.points[index] % 10
-                        if GV.gameArray[randomCol + form.points[index] / 10][randomRow + form.points[index] % 10].status != .Empty {
+                func getFreePosition()->(col: Int, row: Int) {
+                    var randomCol = 0
+                    var randomRow = 0
+                    repeat {
+                        placeIsOK = true
+                        randomCol = random.getRandomInt(0, max: gameArraySize)
+                        randomRow = random.getRandomInt(0, max: gameArraySize)
+                        if GV.gameArray[randomCol][randomRow].status != .Empty {
                             placeIsOK = false
-                            break
+                            continue
                         }
-                    }
-                } while !placeIsOK
+                    } while !placeIsOK
+                    return (col: randomCol, row: randomRow)
+                }
                 var gameArrayPositions = [GameArrayPositions]()
                 for index in 0..<form.points.count {
-                    let col = randomCol + form.points[index] / 10
-                    let row = randomRow + form.points[index] % 10
+                    let (col, row) = getFreePosition()
                     let letter = piece.letters[index]
+                    if GV.gameArray[col][row].status != .Empty {
+                        print("error at col: \(col), row: \(row)")
+                    }
                     _ = GV.gameArray[col][row].setLetter(letter: letter, toStatus: .Used, calledFrom: "movePiecesToGameArray")
                     gameArrayPositions.append(GameArrayPositions(col:col,row: row))
                 }
@@ -2384,6 +2385,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 pieceArray[lastIndex].position = origPosition[lastIndex]
                 pieceArray[lastIndex].name = "Pos\(lastIndex)"
                 pieceArray[lastIndex].setPieceFromPosition(index: lastIndex)
+                words = GV.playingRecord.words.components(separatedBy: itemSeparator)
                 for index in 0...lastIndex {
                     bgSprite!.addChild(pieceArray[index])
                 }
