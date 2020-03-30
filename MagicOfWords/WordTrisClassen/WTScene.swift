@@ -2329,7 +2329,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             repeat {
                 let piece = pieceArray[pieceFromPosition]
                 let form = myForms[piece.myType]![piece.rotateIndex]
-                let (maxCol, maxRow) = piece.getMaxColRow()
                 var placeIsOK = true
                 func getFreePosition()->(col: Int, row: Int) {
                     var randomCol = 0
@@ -3434,10 +3433,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let row = touchedPosition.GRow
         let myNode = GV.gameArray[col][row]
         if !myNode.moveable {
-            if timerForSetMovingModus != nil {
-               timerForSetMovingModus!.invalidate()
-               timerForSetMovingModus = nil
-           }
             return
         }
         let origZPosition = myNode.zPosition
@@ -3658,6 +3653,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     
     private func myTouchesEnded(location: CGPoint, touchedNodes: TouchedNodes, checkLetters: String = "")->Bool {
+         if timerForSetMovingModus != nil {
+            timerForSetMovingModus!.invalidate()
+            timerForSetMovingModus = nil
+        }
+
         if wtSceneDelegate == nil {
             return false
         }
