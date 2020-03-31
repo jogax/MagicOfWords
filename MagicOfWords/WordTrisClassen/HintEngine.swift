@@ -21,6 +21,15 @@ class HintEngine {
     }
     
     private func getAllWords()->[Results<HintModel>] {
+        let mandatoryListConfig  = Realm.Configuration(
+            // Get the path to the bundled file
+        //    fileURL: URL(string: Bundle.main.path(forResource: "MandatoryList", ofType:"realm")!),
+            fileURL: URL(string: Bundle.main.path(forResource: "Hints", ofType:"realm")!),
+            // Open the file in read-only mode as application bundles are not writeable
+            readOnly: true,
+            objectTypes: [HintModel.self])
+
+        let realmMandatoryList: Realm = try! Realm(configuration: mandatoryListConfig)
         var returnValue = [Results<HintModel>]()
         let formatString = "language = %@ AND word Like %@"
 //        let likes = ["????", "?????", "??????", "???????", "????????", "?????????", "??????????"]
@@ -179,7 +188,7 @@ class HintEngine {
         OKWords.removeAll()
     }
     
-    let maxInterval = 0.5
+    let maxInterval = 10000.5
     let maxWordCount = 5
     
     private func checkLetter(letter: UsedLetterWithCounter)->[Int] {
@@ -560,8 +569,8 @@ class HintEngine {
     }
     
     var random: MyRandom?
-    public func createHints() {
-        random = MyRandom(gameNumber: GV.playingRecord.gameNumber % 1000, modifier: (GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count - 1) * 22)
+    public func createHints(gameNumber: Int, round: Int) {
+        random = MyRandom(gameNumber: gameNumber % 1000, modifier: (round == 0 ? 1 : round - 1) * 22)
 
         GV.hintTable.removeAll()
 //        if GV.hintTable.count == countHints {

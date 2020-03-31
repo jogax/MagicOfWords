@@ -1155,6 +1155,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if bestName == GKLocalPlayer.local.alias && bestScore < score {
             bestScore = score
         }
+        let bestScoreLength = String(bestScore).count
         let rankLength = String(rank).length
         let is1000Words = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue
         var myWordsText = ""
@@ -1163,8 +1164,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else {
             myWordsText = GV.language.getText(.tcMyWordsHeader250, values: String(GV.countOfLetters), String(GV.countOfLettersMaxValue))
         }
-        let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(rank).fixLength(length: rankLength), String(score).fixLength(length:scoreLength), GKLocalPlayer.local.alias)
-        let bestScoreText = GV.language.getText(.tcBestScoreHeader, values: String(1).fixLength(length: rankLength),String(bestScore).fixLength(length:scoreLength), bestName)
+        let scoreText = GV.language.getText(.tcMyScoreHeader, values: String(rank).fixLength(length: rankLength), String(score).fixLength(length:bestScoreLength), GKLocalPlayer.local.alias)
+        let bestScoreText = GV.language.getText(.tcBestScoreHeader, values: String(1).fixLength(length: rankLength),String(bestScore).fixLength(length:bestScoreLength), bestName)
         myWordsHeaderLabel.text = myWordsText
         myScoreHeaderLabel.text = scoreText
         bestScoreHeaderLabel.text = bestScoreText
@@ -1198,13 +1199,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-//        if GV.hintTable.count == 0 {
-//            hintButton!.alpha = 0.2
-//            hintButton!.isEnabled = false
-//        } else {
-//            hintButton!.alpha = 1.0
-//            hintButton!.isEnabled = true
-//        }
+        if hintsCreated {
+            hintButton!.alpha = 1.0
+            hintButton!.isEnabled = true
+        } else {
+            hintButton!.alpha = 0.2
+            hintButton!.isEnabled = false
+        }
     }
     
     private func afterNextRoundAnimation() {
@@ -1222,6 +1223,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         createFixLetters()
         movePiecesToGameArray()
 //        HintEngine.shared.createHints()
+        createHintsInBackground()
         saveActualState()
         createNextRound = false
         GV.nextRoundAnimationFinished = false
@@ -1273,6 +1275,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         } else {
 //            HintEngine.shared.createHints()
+            createHintsInBackground()
             if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue  && GV.countOfWords >= GV.countOfWordsMaxValue {
                 setCountWords(count: GV.countOfWordsMaxValue + 100, type: GameDifficulty.Easy)
 //                congratulations(congratulationType: .AllWordsCollected)
@@ -1613,7 +1616,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     @objc private func showHintTable() {
-        HintEngine.shared.createHints()
+//        HintEngine.shared.createHints()
         saveActualState()
         stopShowingTableIfNeeded()
         showHintsInTableView()
@@ -2302,6 +2305,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        fillTippIndexes()
         movePiecesToGameArray()
 //        HintEngine.shared.createHints()
+        createHintsInBackground()
         saveActualState()
         
         if timer != nil {
@@ -3786,6 +3790,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                    }
 //                }
 //               HintEngine.shared.createHints()
+                createHintsInBackground()
                saveActualState()
             } else {
                 pieceArray[movedIndex].position = origPosition[movedIndex]
@@ -3835,6 +3840,20 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.gameboardEnabled = false
         self.removeNodesWith(name: self.MyQuestionName)
         self.removeNodesWith(name: self.answer2Name)
+    }
+    
+    var hintsCreated = false
+    
+    private func createHintsInBackground() {
+        let gameNumber = GV.playingRecord.gameNumber
+        let round = GV.playingRecord.rounds.count
+        let globalQueue = DispatchQueue.global()
+        globalQueue.async {
+            self.hintsCreated = false
+            HintEngine.shared.createHints(gameNumber: gameNumber, round: round)
+            self.hintsCreated = true
+        }
+
     }
 
     private func saveToGameCenter() {
@@ -4301,6 +4320,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     default: break
                     }
 //                    HintEngine.shared.createHints()
+                    createHintsInBackground()
                 } else {
                     var countTilesOnGameboard = 0
                     for tile in tilesForGame {
@@ -4332,6 +4352,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             saveActualState()
 //            HintEngine.shared.createHints()
+            createHintsInBackground()
             saveToGameCenter()
         }
         if activityRoundItem[activityRoundItem.count - 1].activityItems.count == 0 && activityRoundItem.count == 1 {
