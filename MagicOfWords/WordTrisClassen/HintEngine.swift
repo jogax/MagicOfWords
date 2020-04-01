@@ -33,7 +33,7 @@ class HintEngine {
         var returnValue = [Results<HintModel>]()
         let formatString = "language = %@ AND word Like %@"
 //        let likes = ["????", "?????", "??????", "???????", "????????", "?????????", "??????????"]
-        let likes = ["?????", "??????", "???????", "????????", "?????????", "??????????"]
+        let likes = ["????", "?????", "??????", "???????", "????????", "?????????", "??????????"]
         for like in likes {
             let results = realmMandatoryList.objects(HintModel.self).filter(formatString, GV.actLanguage, like)
             returnValue.append(results)
@@ -188,7 +188,7 @@ class HintEngine {
         OKWords.removeAll()
     }
     
-    let maxInterval = 10000.5
+    let maxInterval = 0.25
     let maxWordCount = 5
     
     private func checkLetter(letter: UsedLetterWithCounter)->[Int] {
@@ -409,9 +409,9 @@ class HintEngine {
 //    }
 //
     private func findWordsWithGreenAndRedLetters() {
-        let startTime = Date()
         OKWords = [HintTableStruct]()
         for myIndex in 0..<results.count {
+            let startTime = Date()
             let resultIndex = results.count - 1 - myIndex
             if maxWordLength < results[resultIndex].first!.word.length {
                 continue
@@ -446,7 +446,7 @@ class HintEngine {
                             }
                         }
                 }
-                if wordOK {
+                if wordOK && maxWordLength >= word.length {
                     if !OKWords.contains(where: {$0.hint == word}) {
                         OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter))
                     }
@@ -454,7 +454,9 @@ class HintEngine {
                     if let index = searchWord.index(from: 0, of: "?") {
                         if index > 0 && index < 9 {
                             let endsWith = "".fill(with: "?", toLength: word.length - index)
-
+                            if endsWith.length > maxWordLength {
+                                continue
+                            }
                             if searchWord.ends(with: endsWith)  {
                                 var myLetters = [[UsedLetter]]()
                                 for letter in searchWord.startingSubString(length: index) {
@@ -512,7 +514,8 @@ class HintEngine {
                 }
             }
             if Date().timeIntervalSince(startTime) > maxInterval {
-                break
+                print("myIndex: \(myIndex)")
+                continue
             }
         }
     }

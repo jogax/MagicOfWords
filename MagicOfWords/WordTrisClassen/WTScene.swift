@@ -2238,6 +2238,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         headerCreated = false
         GV.countOfWords = 0
         GV.countOfLetters = 0
+        hintsCreated = true
 //        gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
 //        gameNumberForGenerating = newGameNumber
         WTGameWordList.shared.setDelegate(delegate: self)
@@ -2509,112 +2510,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var actPlayer = ""
     var actScore = 0
     var lastPosition = CGPoint(x: 0, y: 0)
-//    let convertValue: CGFloat = 1000
-    
-//    private func createFixLetters() {
-//        if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
-//            return
-//        }
-////        let isDemo = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber
-////        if isDemo {
-////            createFixLettersForDemo()
-////        } else {
-//        createFixLettersForNormal()
-////        }
-//    }
-
-//    private func createFixLettersForDemo() {
-//        var fixLetters = [UsedLetter]()
-////        let useLettersProRound = GV.playingRecord.created > Date(year: 2019, month: 9, day: 1)
-//        let gameNumber = GV.playingRecord.gameNumber % 1000
-//        let startValue = 8
-//        let adderValue = 4
-//        let roundCount = GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count
-//        let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
-////        let countLettersOnGameboard = wtGameboard!.getCountLetters()
-////        let maxLetterCount = 100
-////        let maxFixLetterCount = 32
-//        let calculatedFixLetterCount = startValue + roundCount * adderValue
-//        let countOfLetters = calculatedFixLetterCount
-//        var remainigLength = countOfLetters
-//        var myLengths = [Int]()
-//        repeat {
-//            if remainigLength > 15 {
-//                let newLength = random.getRandomInt(5, max: 6)
-//                myLengths.append(newLength)
-//                remainigLength -= newLength
-//            } else if remainigLength < 10 {
-//                myLengths.append(remainigLength)
-//                break
-//            } else {
-//                myLengths.append(5)
-//                myLengths.append(remainigLength - 5)
-//                break
-//            }
-//        } while true
-//        var myLetters = ""
-//        for length in myLengths {
-//            let likeValue = String(repeating: "?", count: length)
-//            let words = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %@ and word LIKE %d", GV.actLanguage, likeValue)
-//            if words.count > 0 {
-//                myLetters += words[random.getRandomInt(0, max: words.count)].word
-//            }
-//        }
-//        if myLetters.count == 0 {
-//            let letters = GV.language.getText(.tcAlphabet)
-//            let maxLength = letters.length - 1
-//            for _ in 1...myLengths[0] {
-//                myLetters += letters.subString(at: random.getRandomInt(0, max: maxLength), length: 1)
-//            }
-//            print (myLetters)
-//        }
-//        var inputWord = ""
-//        let items = myLetters.components(separatedBy: "ß")
-//        if items.count > 1 {
-//            for item in items {
-//                inputWord += item.uppercased() + "ß"
-//            }
-//            inputWord.removeLast()
-//        } else {
-//            inputWord = myLetters.uppercased()
-//        }
-//        myLetters = inputWord
-//        var letterIndex = 0
-//        for _ in 1...(countOfLetters + 2) / 4 {
-//            var col = 0
-//            var row = 0
-//            var positionExists = false
-//            repeat {
-//                col = random.getRandomInt(0, max: 4)
-//                row = random.getRandomInt(0, max: 4)
-//                positionExists = false
-//                for usedLetter in fixLetters {
-//                    if usedLetter.col == col && usedLetter.row == row {
-//                        positionExists = true
-//                    }
-//                }
-//                if GV.gameArray[col][row].status != .Empty ||
-//                   GV.gameArray[9 - col][row].status != .Empty ||
-//                   GV.gameArray[col][9 - row].status != .Empty ||
-//                   GV.gameArray[9 - col][9 - row].status != .Empty
-//                {
-//                    positionExists = true
-//                }
-//            } while positionExists
-//            fixLetters.append(UsedLetter(col:col, row: row, letter: myLetters.char(at:letterIndex)))
-//            fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex + 1)))
-//            if roundCount % 2 == 0 || countOfLetters - letterIndex > 4 {
-//                fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at:letterIndex + 2)))
-//                fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex + 3)))
-//            }
-//            letterIndex += 4
-//        }
-//        wtGameboard!.addFixLettersToGamearray(fixLetters: fixLetters)
-//        saveActualState()
-//    }
-//
     let startValueForFixLetters = 7 // Starts with startValue fixLetters
-    let maxLetterCountForFixLetters = 32
+    let maxLetterCountForFixLetters = 20
 
     private func createFixLetters() {
         if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
@@ -3417,7 +3314,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
         } else if touchedNodes.GCol.between(min: 0, max: GV.sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: GV.sizeOfGrid - 1) {
             touchedPosition = touchedNodes
-            timerForSetMovingModus = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(setMoveModus(timerX: )), userInfo: nil, repeats: false)
+            timerForSetMovingModus = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(setMoveModus(timerX: )), userInfo: nil, repeats: false)
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
 //            if GV.generateHelpInfo {
@@ -3845,6 +3742,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var hintsCreated = false
     
     private func createHintsInBackground() {
+        if !hintsCreated {
+            return
+        }
         let gameNumber = GV.playingRecord.gameNumber
         let round = GV.playingRecord.rounds.count
         let globalQueue = DispatchQueue.global()
