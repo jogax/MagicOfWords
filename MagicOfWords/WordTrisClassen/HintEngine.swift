@@ -148,7 +148,7 @@ class HintEngine {
                         if wordOK {
                             if checkFreeAreasAtFixLetter(letter: fixLetter) >= word.length {
                                 if !OKWords.contains(where: {$0.hint == word}) {
-                                    OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter))
+                                    OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 1))
                                     if OKWords.count >= maxWordCount {
                                         break
                                     }
@@ -188,7 +188,7 @@ class HintEngine {
         OKWords.removeAll()
     }
     
-    let maxInterval = 0.25
+    let maxInterval = 0.1
     let maxWordCount = 5
     
     private func checkLetter(letter: UsedLetterWithCounter)->[Int] {
@@ -306,7 +306,7 @@ class HintEngine {
                                     temporaryRedLetters.removeAll()
                                     if wordOK {
                                         if !OKWords.contains(where: {$0.hint == word}) {
-                                            OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter) )
+                                            OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 2) )
                                             break
                                         } else {
                                             for temporaryLetter in temporaryRedLetters {
@@ -433,11 +433,14 @@ class HintEngine {
                 let word = results[resultIndex][ind].word.uppercased()
                 var temporaryRedLetters = [(letter:String, index:Int)]()
                 var searchWord = "".fill(with: "?", toLength: word.length)
+                var countGreenLetters = 0
+
                 for (letterIndex, letter) in word.enumerated() {
                         if !redLetters.contains(String(letter)) {
                             wordOK = false
 //                                break
                             searchWord = searchWord.changeChars(at: letterIndex, to: String(letter))
+                            countGreenLetters  += 1
                         } else {
                             temporaryRedLetters.append((String(letter), letterIndex))
                             let index = redLetters.firstIndex(of: String(letter))
@@ -448,7 +451,7 @@ class HintEngine {
                 }
                 if wordOK && maxWordLength >= word.length {
                     if !OKWords.contains(where: {$0.hint == word}) {
-                        OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter))
+                        OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0))
                     }
                 } else {
                     if let index = searchWord.index(from: 0, of: "?") {
@@ -479,7 +482,7 @@ class HintEngine {
                                         if checkLetters(letters: letters, free: word.length - index) {
                                             if !OKWords.contains(where: {$0.hint == word}) {
 //                                                print("word: \(word), searchWord: \(searchWord)")
-                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter))
+                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters))
                                             }
                                             break stopCycle
                                         } else {

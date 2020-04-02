@@ -299,7 +299,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        title += text5
 //        lengthOfWord = maxLength
         lengthOfCnt = text2.length
-        lengthOfLength = text3.length
+        lengthOfLength = text3.length + (showCount ? 0 : 4)
         lengthOfScore = text4.length
 //        lengthOfMin = text5.length
     }
@@ -423,7 +423,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             cell.addColumn(text: String(wordList[indexPath.row].score).fixLength(length: lengthOfScore + 1), color: color)
 //            cell.addColumn(text: "+\(WTGameWordList.shared.getMinutesForWord(word: wordList[indexPath.row].word))".fixLength(length: lengthOfMin - 1))
         case .ShowFoundedWords:
-            cell.addColumn(text: "  " + listOfFoundedWords[indexPath.row].word.fixLength(length: lengthOfWord, leadingBlanks: false), color: myLightBlue)
+            cell.addColumn(text: "  " + listOfFoundedWords[indexPath.row].word.uppercased().fixLength(length: lengthOfWord, leadingBlanks: false), color: myLightBlue)
             cell.addColumn(text: String(listOfFoundedWords[indexPath.row].length).fixLength(length: lengthOfLength), color: myLightBlue)
             cell.addColumn(text: String(listOfFoundedWords[indexPath.row].score).fixLength(length: lengthOfScore), color: myLightBlue)
             let restLength = Int(tableView.frame.width / "A".width(font:myFont!)) - lengthOfWord - lengthOfLength - lengthOfScore
@@ -431,15 +431,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             cell.addColumn(text: spaces.fixLength(length: restLength), color: myLightBlue)
         case .ShowHints:
             var actColor = UIColor.white
-            switch hintsTableForShow[indexPath.row].type {
+            let item = hintsTableForShow[indexPath.row]
+            switch item.type {
             case .WithFixLetter: actColor = UIColor(red: 248/255, green: 209/255, blue: 255/255, alpha: 1.0)
-//            case .With2FixLetters: actColor = UIColor(red: 255/255, green: 224/255, blue: 247/255, alpha: 1.0)
             case .WithRedLetter: actColor = UIColor(red: 242/255, green: 170/255, blue: 159/255, alpha: 1.0)
             case .WithGreenLetter: actColor = UIColor(red: 153/255, green: 249/255, blue: 114/255, alpha: 1.0)
             }
-            cell.addColumn(text: "   " + hintsTableForShow[indexPath.row].hint.fixLength(length: lengthOfWord, leadingBlanks: false), color: actColor)
-            cell.addColumn(text: String(hintsTableForShow[indexPath.row].hint.count).fixLength(length: lengthOfLength), color: actColor)
-            cell.addColumn(text: String(hintsTableForShow[indexPath.row].score).fixLength(length: lengthOfScore), color: actColor)
+            cell.addColumn(text: "   " + item.hint.fixLength(length: lengthOfWord, leadingBlanks: false), color: actColor)
+            let lengthText = "\(item.hint.count) (\(item.count))"
+            cell.addColumn(text: lengthText.fixLength(length: lengthOfLength), color: actColor)
+            cell.addColumn(text: String(item.score).fixLength(length: lengthOfScore), color: actColor)
             let restLength = Int(tableView.frame.width / "A".width(font:myFont!)) - lengthOfWord - lengthOfLength - lengthOfScore
             let spaces = " "
             cell.addColumn(text: spaces.fixLength(length: restLength), color: actColor)
@@ -4639,7 +4640,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if item.hint.length > globalMaxLength {
                 globalMaxLength = item.hint.length
             }
-            hintsTableForShow.append(HintForShow(hint: item.hint, score: score, type: item.type))
+            hintsTableForShow.append(HintForShow(hint: item.hint, score: score, type: item.type, count: item.count))
         }
 //        ownWordsForShow = WordsForShow(words: words)
         calculateColumnWidths(showCount: false)

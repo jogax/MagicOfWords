@@ -146,10 +146,12 @@ struct HintTableStruct {
     var hint: String = ""
     var search: String = ""
     var type: HintType = .WithRedLetter
-    init(hint: String, search: String, type: HintType) {
+    var count: Int = 0
+    init(hint: String, search: String, type: HintType, count: Int) {
         self.hint = hint
         self.search = search
         self.type = type
+        self.count = count
     }
 }
 extension HintTableStruct: Equatable {}
@@ -164,10 +166,12 @@ struct HintForShow {
     var hint: String
     var score: Int
     var type: HintType
-    init(hint: String, score: Int, type: HintType) {
+    var count: Int
+    init(hint: String, score: Int, type: HintType, count: Int) {
         self.hint = hint
         self.score = score
         self.type = type
+        self.count = count
     }
 }
 
