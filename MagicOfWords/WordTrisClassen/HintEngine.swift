@@ -63,7 +63,7 @@ class HintEngine {
     var maxWordLength = 0
 //    let maxCountWords = 10
     var searchWord = ""
-    var OKWords = [HintTableStruct]()
+//    var OKWords = [HintTableStruct]()
     let maxCol = 9
     
     private func checkFreeAreasAtFixLetter(letter: UsedLetterWithCounter)->Int {
@@ -92,12 +92,13 @@ class HintEngine {
     }
 
     private func findWordsWithOneFixletter() {
+        let startWordCount = GV.hintTable.count
         if fixLetters.count == 0 {
             return
         }
         let startTime = Date()
-        OKWords = GV.hintTable
-        if OKWords.count >= maxWordCount {
+//        OKWords = GV.hintTable
+        if GV.hintTable.count >= maxWordCount {
             return
         }
         for myIndex in 0..<results.count {
@@ -107,7 +108,7 @@ class HintEngine {
             }
             let fillLength = results[resultIndex].first!.word.length
             for fixLetter in fixLetters {
-                if OKWords.count >= maxWordCount {
+                if GV.hintTable.count >= maxWordCount {
                     break
                 }
                 if fixLetter.freeCount == 0 {
@@ -147,24 +148,31 @@ class HintEngine {
                         temporaryRedLetters.removeAll()
                         if wordOK {
                             if checkFreeAreasAtFixLetter(letter: fixLetter) >= word.length {
-                                if !OKWords.contains(where: {$0.hint == word}) {
-                                    OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 1))
-                                    if OKWords.count >= maxWordCount {
-                                        break
-                                    }
+                                if !WTGameWordList.shared.roundContainsWord(word: word.uppercased()) && !GV.hintTable.contains(where: {$0.hint == word.uppercased()}) {
+                                    GV.hintTable.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 1))
                                 }
+//                                if !OKWords.contains(where: {$0.hint == word}) {
+//                                    OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 1))
+//                                    if OKWords.count >= maxWordCount {
+//                                        break
+//                                    }
+//                                }
                             }
-                            for temporaryLetter in temporaryRedLetters {
-                                redLetters.append(temporaryLetter.letter)
-                            }
-                            temporaryRedLetters.removeAll()
+//                            for temporaryLetter in temporaryRedLetters {
+//                                redLetters.append(temporaryLetter.letter)
+//                            }
+//                            temporaryRedLetters.removeAll()
                             break
                         } else {
-                            for temporaryLetter in temporaryRedLetters {
-                                redLetters.append(temporaryLetter.letter)
-                            }
-                            temporaryRedLetters.removeAll()
+//                            for temporaryLetter in temporaryRedLetters {
+//                                redLetters.append(temporaryLetter.letter)
+//                            }
+//                            temporaryRedLetters.removeAll()
                         }
+                        for temporaryLetter in temporaryRedLetters {
+                            redLetters.append(temporaryLetter.letter)
+                        }
+                        temporaryRedLetters.removeAll()
                     }
                 }
                 if Date().timeIntervalSince(startTime) > maxInterval {
@@ -175,17 +183,17 @@ class HintEngine {
             if Date().timeIntervalSince(startTime) > maxInterval {
                 break
             }
-            if OKWords.count >= maxWordCount {
+            if GV.hintTable.count - startWordCount >= maxWordCount {
                 break
             }
         }
-        for item in OKWords {
-            let uppercasedWord = item.hint.uppercased()
-            if !WTGameWordList.shared.roundContainsWord(word: uppercasedWord) && !GV.hintTable.contains(where: {$0.hint == uppercasedWord}) {
-                GV.hintTable.append(item)
-            }
-        }
-        OKWords.removeAll()
+//        for item in OKWords {
+//            let uppercasedWord = item.hint.uppercased()
+//            if !WTGameWordList.shared.roundContainsWord(word: uppercasedWord) && !GV.hintTable.contains(where: {$0.hint == uppercasedWord}) {
+//                GV.hintTable.append(item)
+//            }
+//        }
+//        OKWords.removeAll()
     }
     
     let maxInterval = 0.1
@@ -211,7 +219,7 @@ class HintEngine {
             return
         }
         let startTime = Date()
-        OKWords = [HintTableStruct]()
+//        OKWords = [HintTableStruct]()
         func lettersInTheSameFreeArea(letter1: UsedLetterWithCounter, letter2: UsedLetterWithCounter)->(Bool, Int) {
             var letter1InArray = 1000
             var letter2InArray = 1001
@@ -305,111 +313,62 @@ class HintEngine {
                                     }
                                     temporaryRedLetters.removeAll()
                                     if wordOK {
-                                        if !OKWords.contains(where: {$0.hint == word}) {
-                                            OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 2) )
+                                        let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 2)
+                                        if !WTGameWordList.shared.roundContainsWord(word: word.uppercased()) && !GV.hintTable.contains(item) {
+                                            GV.hintTable.append(item)
                                             break
-                                        } else {
-                                            for temporaryLetter in temporaryRedLetters {
-                                                redLetters.append(temporaryLetter.letter)
-                                            }
-                                            temporaryRedLetters.removeAll()
                                         }
-                                    } else {
-                                        for temporaryLetter in temporaryRedLetters {
-                                            redLetters.append(temporaryLetter.letter)
-                                        }
-                                        temporaryRedLetters.removeAll()
+
+//                                        if !OKWords.contains(where: {$0.hint == word}) {
+//                                            OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 2) )
+//                                            break
+//                                        } else {
+//                                            for temporaryLetter in temporaryRedLetters {
+//                                                redLetters.append(temporaryLetter.letter)
+//                                            }
+//                                            temporaryRedLetters.removeAll()
+//                                        }
+//                                    } else {
+//                                        for temporaryLetter in temporaryRedLetters {
+//                                            redLetters.append(temporaryLetter.letter)
+//                                        }
+//                                        temporaryRedLetters.removeAll()
                                     }
+                                    for temporaryLetter in temporaryRedLetters {
+                                        redLetters.append(temporaryLetter.letter)
+                                    }
+                                    temporaryRedLetters.removeAll()
 
                                 }
                             }
                             searchWord = "".fill(with: "?", toLength: fillLength)
                         }
                     }
-                    if Date().timeIntervalSince(startTime) > maxInterval || OKWords.count >= maxWordCount  {
+                    if Date().timeIntervalSince(startTime) > maxInterval || GV.hintTable.count >= maxWordCount  {
                         break
                     }
                 }
-                if Date().timeIntervalSince(startTime) > maxInterval || OKWords.count >= maxWordCount {
+                if Date().timeIntervalSince(startTime) > maxInterval || GV.hintTable.count >= maxWordCount {
                     break
                 }
             }
             if Date().timeIntervalSince(startTime) > maxInterval {
                 break
             }
-            if OKWords.count >= maxWordCount {
+            if GV.hintTable.count >= maxWordCount {
                 break
             }
         }
-        for item in OKWords {
-            if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
-                GV.hintTable.append(item)
-            }
-        }
-        OKWords.removeAll()
-    }
-    
-//    private func findWordsWithRedLetters() {
-//        let startTime = Date()
-//        OKWords = [String]()
-//        for myIndex in 0..<results.count {
-//            let resultIndex = results.count - 1 - myIndex
-//            if maxWordLength < results[resultIndex].first!.word.length {
-//                continue
-//            }
-//            let actResults = results[resultIndex]
-//            var wordIndexes = [Int]()
-//            for index in 0..<actResults.count {
-//                wordIndexes.append(index)
-//            }
-//            repeat {
-//                var wordOK = true
-//                let index = Int.random(in: 0 ..< wordIndexes.count)
-//                let ind = wordIndexes[index]
-//                wordIndexes.remove(at: index)
-//                if wordIndexes.count == 0 {
-//                    break
-//                }
-//                let word = results[resultIndex][ind].word.uppercased()
-//                var temporaryRedLetters = [(letter:String, index:Int)]()
-//                for (letterIndex, letter) in word.enumerated() {
-//                        if !redLetters.contains(String(letter)) {
-//                            wordOK = false
-//                            break
-//                        } else {
-//                            temporaryRedLetters.append((String(letter), letterIndex))
-//                            let index = redLetters.firstIndex(of: String(letter))
-//                            if index != nil {
-//                                redLetters.remove(at: index!)
-//                            }
-//                        }
-//                }
-//                if wordOK {
-//                    if !OKWords.contains(word) {
-//                        OKWords.append(word)
-//                    }
-//                }
-//                for temporaryLetter in temporaryRedLetters {
-//                    redLetters.append(temporaryLetter.letter)
-//                }
-//            } while OKWords.count < countHints && Date().timeIntervalSince(startTime) < maxInterval
-//                for word in OKWords {
-//                    let uppercasedWord = word.uppercased()
-//                    if !GV.hintTable.contains(uppercasedWord) {
-//                        GV.hintTable.append(uppercasedWord)
-//                        if GV.hintTable.count == countHints {
-//                            break
-//                        }
-//                    }
-//                }
-//            if Date().timeIntervalSince(startTime) > maxInterval {
-//                break
+//        for item in OKWords {
+//            if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
+//                GV.hintTable.append(item)
 //            }
 //        }
-//    }
-//
-    private func findWordsWithGreenAndRedLetters() {
-        OKWords = [HintTableStruct]()
+//        OKWords.removeAll()
+    }
+    
+    private func findWordsWithRedLetters() {
+        let startWordCounter = GV.hintTable.count
         for myIndex in 0..<results.count {
             let startTime = Date()
             let resultIndex = results.count - 1 - myIndex
@@ -450,9 +409,14 @@ class HintEngine {
                         }
                 }
                 if wordOK && maxWordLength >= word.length {
-                    if !OKWords.contains(where: {$0.hint == word}) {
-                        OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0))
+                    let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0)
+                    if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
+                        GV.hintTable.append(item)
                     }
+
+//                    if !OKWords.contains(where: {$0.hint == word}) {
+//                        OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0))
+//                    }
                 } else {
                     if let index = searchWord.index(from: 0, of: "?") {
                         if index > 0 && index < 9 {
@@ -480,10 +444,14 @@ class HintEngine {
                                             letters.append(myLetter[actIndex])
                                         }
                                         if checkLetters(letters: letters, free: word.length - index) {
-                                            if !OKWords.contains(where: {$0.hint == word}) {
-//                                                print("word: \(word), searchWord: \(searchWord)")
-                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters))
+                                            let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters)
+                                            if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
+                                                GV.hintTable.append(item)
                                             }
+//                                            if !OKWords.contains(where: {$0.hint == word}) {
+////                                                print("word: \(word), searchWord: \(searchWord)")
+//                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters))
+//                                            }
                                             break stopCycle
                                         } else {
                                             var indexForIndexes = indexes.count - 1
@@ -510,14 +478,139 @@ class HintEngine {
                 for temporaryLetter in temporaryRedLetters {
                     redLetters.append(temporaryLetter.letter)
                 }
-            } while OKWords.count < 10 && Date().timeIntervalSince(startTime) < maxInterval
-            for item in OKWords {
-                if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
-                    GV.hintTable.append(item)
-                }
-            }
+            } while GV.hintTable.count - startWordCounter < 10 && Date().timeIntervalSince(startTime) < maxInterval
+//            for item in OKWords {
+//                if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
+//                    GV.hintTable.append(item)
+//                }
+//            }
             if Date().timeIntervalSince(startTime) > maxInterval {
-                print("myIndex: \(myIndex)")
+//                print("myIndex: \(myIndex)")
+                continue
+            }
+        }
+    }
+//
+    private func findWordsWithGreenAndRedLetters() {
+//        OKWords = [HintTableStruct]()
+        let startWordCounter = GV.hintTable.count
+        for myIndex in 0..<results.count {
+            let startTime = Date()
+            let resultIndex = results.count - 1 - myIndex
+            if maxWordLength < results[resultIndex].first!.word.length {
+                continue
+            }
+            let actResults = results[resultIndex]
+            var wordIndexes = [Int]()
+            for index in 0..<actResults.count {
+                wordIndexes.append(index)
+            }
+            repeat {
+                var wordOK = true
+//                let index = Int.random(in: 0 ..< wordIndexes.count)
+                let index = random!.getRandomInt(0, max: wordIndexes.count - 1)
+                let ind = wordIndexes[index]
+                wordIndexes.remove(at: index)
+                if wordIndexes.count == 0 {
+                    break
+                }
+                let word = results[resultIndex][ind].word.uppercased()
+                var temporaryRedLetters = [(letter:String, index:Int)]()
+                var searchWord = "".fill(with: "?", toLength: word.length)
+                var countGreenLetters = 0
+
+                for (letterIndex, letter) in word.enumerated() {
+                        if !redLetters.contains(String(letter)) {
+                            wordOK = false
+//                                break
+                            searchWord = searchWord.changeChars(at: letterIndex, to: String(letter))
+                            countGreenLetters  += 1
+                        } else {
+                            temporaryRedLetters.append((String(letter), letterIndex))
+                            let index = redLetters.firstIndex(of: String(letter))
+                            if index != nil {
+                                redLetters.remove(at: index!)
+                            }
+                        }
+                }
+                if wordOK && maxWordLength >= word.length {
+                    let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0)
+                    if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
+                        GV.hintTable.append(item)
+                    }
+
+//                    if !OKWords.contains(where: {$0.hint == word}) {
+//                        OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0))
+//                    }
+                } else {
+                    if let index = searchWord.index(from: 0, of: "?") {
+                        if index > 0 && index < 9 {
+                            let endsWith = "".fill(with: "?", toLength: word.length - index)
+                            if endsWith.length > maxWordLength {
+                                continue
+                            }
+                            if searchWord.ends(with: endsWith)  {
+                                var myLetters = [[UsedLetter]]()
+                                for letter in searchWord.startingSubString(length: index) {
+                                    if greenLetters[String(letter)] != nil && greenLetters[String(letter)]!.count > 0 {
+                                        myLetters.append(greenLetters[String(letter)]!)
+                                    } else {
+                                        myLetters.removeAll()
+                                        break
+                                    }
+                                }
+                                if myLetters.count == index {
+                                    var indexes = [Int](repeating: 0, count: index)
+                                    stopCycle:
+                                    repeat {
+                                        var letters = [UsedLetter]()
+                                        for (letterIndex, myLetter) in myLetters.enumerated() {
+                                            let actIndex = indexes[letterIndex]
+                                            letters.append(myLetter[actIndex])
+                                        }
+                                        if checkLetters(letters: letters, free: word.length - index) {
+                                            let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters)
+                                            if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
+                                                GV.hintTable.append(item)
+                                            }
+//                                            if !OKWords.contains(where: {$0.hint == word}) {
+////                                                print("word: \(word), searchWord: \(searchWord)")
+//                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters))
+//                                            }
+                                            break stopCycle
+                                        } else {
+                                            var indexForIndexes = indexes.count - 1
+                                            repeat {
+                                                indexes[indexForIndexes] += 1
+                                                if indexes[indexForIndexes] > myLetters[indexForIndexes].count - 1 {
+                                                    indexes[indexForIndexes] = 0
+                                                    if indexForIndexes > 0 {
+                                                        indexForIndexes -= 1
+                                                    } else {
+                                                        break stopCycle
+                                                    }
+                                                } else {
+                                                    break
+                                                }
+                                            } while true
+                                        }
+                                    } while true
+                                }
+                            }
+                        }
+                    }
+                }
+                for temporaryLetter in temporaryRedLetters {
+                    redLetters.append(temporaryLetter.letter)
+                }
+            } while GV.hintTable.count - startWordCounter < 10 && Date().timeIntervalSince(startTime) < maxInterval
+//            for item in OKWords {
+//                if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
+//                    GV.hintTable.append(item)
+//                }
+//            }
+            if Date().timeIntervalSince(startTime) > maxInterval {
+//                print("myIndex: \(myIndex)")
                 continue
             }
         }
@@ -594,60 +687,16 @@ class HintEngine {
 //        showTime(num: num1, string: "findWordsWithTwoFixLetters")
         if GV.hintTable.count < countHints {
             findWordsWithOneFixletter()
-//            showTime(num: num1, string: "findWordsWithOneFixletter")
         }
-//        if GV.hintTable.count < countHints{
-//            findWordsWithRedLetters()
-////            showTime(num: num1, string: "findWordsWithRedLetters")
-//        }
         
         findWordsWithGreenAndRedLetters()
 //        let sortedHints = GV.hintTable.sorted(by: { $0.hint.length > $1.hint.length || ($0.hint.length == $1.hint.length && $0.hint < $1.hint)})
-        let sortedHints = GV.hintTable.sorted(by: {$0.type.rawValue < $1.type.rawValue ||
-            ($0.type.rawValue == $1.type.rawValue && $0.hint.length > $1.hint.length) ||
-            ($0.type.rawValue == $1.type.rawValue && $0.hint.length == $1.hint.length && $0.hint < $1.hint)})
-        GV.hintTable = sortedHints
+//        let sortedHints = GV.hintTable.sorted(by: {$0.type.rawValue < $1.type.rawValue ||
+//            ($0.type.rawValue == $1.type.rawValue && $0.hint.length > $1.hint.length) ||
+//            ($0.type.rawValue == $1.type.rawValue && $0.hint.length == $1.hint.length && $0.hint < $1.hint)})
+//        GV.hintTable = sortedHints
 //        showTime(num: num, string: "createHints end")
     }
     
     
-//    private func checkHintsTable(maxWordLength: Int) {
-//        var redLetters = wtGameboard!.getRedLetters()
-//        var wordsToDeleteFromHintTable = [HintTableStruct]()
-//        // itt még ellenőrizni kell, hogy megfelelő számú betű áll rendelkezésre, pl. a sárgaság szóhoz két á és két s és két g -re van szükség
-//        var temporaryLetters = [String]()
-//        for word in GV.hintTable {
-//            if word.hint.length > maxWordLength {
-//                wordsToDeleteFromHintTable.append(word)
-//            } else {
-//                for (index, letter) in word.hint.uppercased().enumerated() {
-//                    if word.search.char(at: index) == "?" && !redLetters.contains(String(letter)) {
-//                        wordsToDeleteFromHintTable.append(word)
-//                        break
-//                    } else {
-//                        temporaryLetters.append(String(letter))
-//                        if word.search.char(at: index) == "?" {
-//                            let removeIndex = redLetters.firstIndex(of: String(letter))!
-//                            redLetters.remove(at: removeIndex)
-//                        }
-//                    }
-//                }
-//                for letter in temporaryLetters {
-//                    redLetters.append(letter)
-//                }
-//                temporaryLetters.removeAll()
-//            }
-//        }
-//        if wordsToDeleteFromHintTable.count > 0 {
-//            repeat {
-//                let wordToDelete = wordsToDeleteFromHintTable.last!
-//                let index = GV.hintTable.firstIndex(of: wordToDelete)
-//                if index != nil {
-//                    GV.hintTable.remove(at: index!)
-//                }
-//                wordsToDeleteFromHintTable.removeLast()
-//            } while wordsToDeleteFromHintTable.count > 0
-//        }
-//    }
-
 }

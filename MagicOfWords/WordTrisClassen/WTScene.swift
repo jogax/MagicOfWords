@@ -1200,13 +1200,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-        if hintsCreated {
-            hintButton!.alpha = 1.0
-            hintButton!.isEnabled = true
-        } else {
-            hintButton!.alpha = 0.2
-            hintButton!.isEnabled = false
-        }
+//        if (hintsCreated || GV.hintTable.count > 0) {
+//            hintButton!.alpha = 1.0
+//            hintButton!.isEnabled = true
+//        } else {
+//            hintButton!.alpha = 0.2
+//            hintButton!.isEnabled = false
+//        }
     }
     
     private func afterNextRoundAnimation() {
@@ -4635,7 +4635,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         globalMaxLength = 0
 
         hintsTableForShow.removeAll()
-        for item in GV.hintTable {
+        let sortedTable = GV.hintTable.sorted(by: {$0.type.rawValue < $1.type.rawValue ||
+            ($0.type.rawValue == $1.type.rawValue && $0.hint.length > $1.hint.length) ||
+            ($0.type.rawValue == $1.type.rawValue && $0.hint.length == $1.hint.length && $0.hint < $1.hint)})
+        for item in sortedTable {
             let score = WTGameWordList.shared.getScoreForWord(word: item.hint)
             if item.hint.length > globalMaxLength {
                 globalMaxLength = item.hint.length
