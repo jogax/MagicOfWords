@@ -1114,7 +1114,7 @@ class WTGameboard: SKShapeNode {
         }
         for col in 0..<countCols {
             for row in 0..<countCols {
-                if GV.gameArray[col][row].status == .WholeWord {
+                if GV.gameArray[col][row].status == .WholeWord /* || GV.gameArray[col][row].fixItem */ {
                     let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
                     returnValue[GV.gameArray[col][row].letter]?.append(actLetter)
                 }

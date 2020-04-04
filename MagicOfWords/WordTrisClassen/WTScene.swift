@@ -1195,11 +1195,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var headerCreated = false
     var createNextRound = false
+    var oldHintCounter = 1000
     
     override func update(_ currentTime: TimeInterval) {
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
+        if oldHintCounter != GV.hintTable.count {
+            hintButton!.setButtonLabel(title: String(GV.hintTable.count), font: myFont!)
+            oldHintCounter = GV.hintTable.count
+        }
+        
 //        if (hintsCreated || GV.hintTable.count > 0) {
 //            hintButton!.alpha = 1.0
 //            hintButton!.isEnabled = true
@@ -1795,7 +1801,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         hintButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.showHintTable))
         hintButton!.name = imageName
         hintButton!.zPosition = 10
+        hintButton!.setButtonLabel(title: "0", font: myFont!)
         bgSprite!.addChild(hintButton!)
+        
     }
     
     private func createMyButton(imageName: String = "", title: String = "", size: CGSize, center: CGPoint, enabled: Bool, newSize: CGFloat = 0)->MyButton {

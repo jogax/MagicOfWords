@@ -124,7 +124,7 @@ class HintEngine {
                 let tippWordsResults = results[resultIndex].filter("word like %@", searchWord.lowercased())
                 if tippWordsResults.count > 0 {
                     for foundedWord in tippWordsResults {
-                        let word = foundedWord.word.uppercased()
+                        let word = foundedWord.word.myUpperCased()
                         var temporaryRedLetters = [(letter:String, index:Int)]()
                         var wordOK = true
                         for letterIndex in 0..<word.length {
@@ -148,11 +148,11 @@ class HintEngine {
                         temporaryRedLetters.removeAll()
                         if wordOK {
                             if checkFreeAreasAtFixLetter(letter: fixLetter) >= word.length {
-                                if !WTGameWordList.shared.roundContainsWord(word: word.uppercased()) && !GV.hintTable.contains(where: {$0.hint == word.uppercased()}) {
-                                    GV.hintTable.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 1))
+                                if !WTGameWordList.shared.roundContainsWord(word: word.myUpperCased()) && !GV.hintTable.contains(where: {$0.hint == word.myUpperCased()}) {
+                                    GV.hintTable.append(HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithFixLetter, count: 1))
                                 }
 //                                if !OKWords.contains(where: {$0.hint == word}) {
-//                                    OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 1))
+//                                    OKWords.append(HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithFixLetter, count: 1))
 //                                    if OKWords.count >= maxWordCount {
 //                                        break
 //                                    }
@@ -188,8 +188,8 @@ class HintEngine {
             }
         }
 //        for item in OKWords {
-//            let uppercasedWord = item.hint.uppercased()
-//            if !WTGameWordList.shared.roundContainsWord(word: uppercasedWord) && !GV.hintTable.contains(where: {$0.hint == uppercasedWord}) {
+//            let myApperCasedWord = item.hint.myUpperCased()
+//            if !WTGameWordList.shared.roundContainsWord(word: myApperCasedWord) && !GV.hintTable.contains(where: {$0.hint == myApperCasedWord}) {
 //                GV.hintTable.append(item)
 //            }
 //        }
@@ -285,21 +285,25 @@ class HintEngine {
                             }
                         }
                         if  distance > 0 && distance  <= fillLength - 2 {
+
                             searchWord = searchWord.changeChars(at: 0, to: fixLetter1.letter)
                             searchWord = searchWord.changeChars(at: distance + 1, to: fixLetter2.letter).lowercased()
                             let tippWordsResults = results[resultIndex].filter("word like %@", searchWord)
                             if tippWordsResults.count > 0 {
                                 for foundedWord in tippWordsResults {
-                                    let word = foundedWord.word.uppercased()
+                                    let word = foundedWord.word.myUpperCased()
+                                    if word.endsWith("ELTERN") {
+                                        print("word: \(word), founded: \(foundedWord.word)")
+                                    }
                                     var temporaryRedLetters = [(letter:String, index:Int)]()
                                     var wordOK = true
                                     for letterIndex in 0..<word.length {
                                         if searchWord.char(at: letterIndex) == "?" {
-                                            if !redLetters.contains(word.char(at: letterIndex).uppercased()) {
+                                            if !redLetters.contains(word.char(at: letterIndex).myUpperCased()) {
                                                 wordOK = false
                                                 break
                                             } else {
-                                                let letter = word.char(at: letterIndex).uppercased()
+                                                let letter = word.char(at: letterIndex).myUpperCased()
                                                 temporaryRedLetters.append((letter, letterIndex))
                                                 let index = redLetters.firstIndex(of: String(letter))
                                                 if index != nil {
@@ -313,14 +317,14 @@ class HintEngine {
                                     }
                                     temporaryRedLetters.removeAll()
                                     if wordOK {
-                                        let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 2)
-                                        if !WTGameWordList.shared.roundContainsWord(word: word.uppercased()) && !GV.hintTable.contains(item) {
+                                        let item = HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithFixLetter, count: 2)
+                                        if !WTGameWordList.shared.roundContainsWord(word: word.myUpperCased()) && !GV.hintTable.contains(item) {
                                             GV.hintTable.append(item)
                                             break
                                         }
 
 //                                        if !OKWords.contains(where: {$0.hint == word}) {
-//                                            OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithFixLetter, count: 2) )
+//                                            OKWords.append(HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithFixLetter, count: 2) )
 //                                            break
 //                                        } else {
 //                                            for temporaryLetter in temporaryRedLetters {
@@ -389,7 +393,7 @@ class HintEngine {
                 if wordIndexes.count == 0 {
                     break
                 }
-                let word = results[resultIndex][ind].word.uppercased()
+                let word = results[resultIndex][ind].word.myUpperCased()
                 var temporaryRedLetters = [(letter:String, index:Int)]()
                 var searchWord = "".fill(with: "?", toLength: word.length)
                 var countGreenLetters = 0
@@ -409,13 +413,13 @@ class HintEngine {
                         }
                 }
                 if wordOK && maxWordLength >= word.length {
-                    let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0)
+                    let item = HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithRedLetter, count: 0)
                     if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
                         GV.hintTable.append(item)
                     }
 
 //                    if !OKWords.contains(where: {$0.hint == word}) {
-//                        OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0))
+//                        OKWords.append(HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithRedLetter, count: 0))
 //                    }
                 } else {
                     if let index = searchWord.index(from: 0, of: "?") {
@@ -444,13 +448,13 @@ class HintEngine {
                                             letters.append(myLetter[actIndex])
                                         }
                                         if checkLetters(letters: letters, free: word.length - index) {
-                                            let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters)
+                                            let item = HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithGreenLetter, count: countGreenLetters)
                                             if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
                                                 GV.hintTable.append(item)
                                             }
 //                                            if !OKWords.contains(where: {$0.hint == word}) {
 ////                                                print("word: \(word), searchWord: \(searchWord)")
-//                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters))
+//                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithGreenLetter, count: countGreenLetters))
 //                                            }
                                             break stopCycle
                                         } else {
@@ -514,7 +518,7 @@ class HintEngine {
                 if wordIndexes.count == 0 {
                     break
                 }
-                let word = results[resultIndex][ind].word.uppercased()
+                let word = results[resultIndex][ind].word.myUpperCased()
                 var temporaryRedLetters = [(letter:String, index:Int)]()
                 var searchWord = "".fill(with: "?", toLength: word.length)
                 var countGreenLetters = 0
@@ -534,13 +538,13 @@ class HintEngine {
                         }
                 }
                 if wordOK && maxWordLength >= word.length {
-                    let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0)
+                    let item = HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithRedLetter, count: 0)
                     if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
                         GV.hintTable.append(item)
                     }
 
 //                    if !OKWords.contains(where: {$0.hint == word}) {
-//                        OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithRedLetter, count: 0))
+//                        OKWords.append(HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithRedLetter, count: 0))
 //                    }
                 } else {
                     if let index = searchWord.index(from: 0, of: "?") {
@@ -569,13 +573,13 @@ class HintEngine {
                                             letters.append(myLetter[actIndex])
                                         }
                                         if checkLetters(letters: letters, free: word.length - index) {
-                                            let item = HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters)
+                                            let item = HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithGreenLetter, count: countGreenLetters)
                                             if !WTGameWordList.shared.roundContainsWord(word: item.hint) && !GV.hintTable.contains(item) {
                                                 GV.hintTable.append(item)
                                             }
 //                                            if !OKWords.contains(where: {$0.hint == word}) {
 ////                                                print("word: \(word), searchWord: \(searchWord)")
-//                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.uppercased(), type: .WithGreenLetter, count: countGreenLetters))
+//                                                OKWords.append(HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithGreenLetter, count: countGreenLetters))
 //                                            }
                                             break stopCycle
                                         } else {

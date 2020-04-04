@@ -443,6 +443,22 @@ extension String {
         return nil
     }
     
+    func myUpperCased()->String {
+        let scharfesS = "ß"
+        if self.contains(scharfesS) {
+            var returnValue = ""
+            for char in self {
+                if String(char) == scharfesS  {
+                    returnValue.append(scharfesS)
+                } else {
+                    returnValue.append(char.uppercased())
+                }
+            }
+            return returnValue
+        }
+        return self.uppercased()
+    }
+    
     func replace(_ what: String, values: [String])->String {
         let toArray = self.components(separatedBy: what)
         var endString = ""
