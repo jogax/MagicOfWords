@@ -679,5 +679,10 @@ class HintEngine {
         findWordsWithGreenAndRedLetters()
     }
     
+    deinit {
+        print("\n THE CLASS \((type(of: self))) WAS REMOVED FROM MEMORY (DEINIT) \n")
+    }
+
+    
     
 }
