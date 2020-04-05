@@ -244,7 +244,8 @@ struct GV {
     static let frequencyString = ":freq:"
     static var darkMode = false
     static var hintTable = [HintTableStruct]()
-
+//    static var stopHintEngine = false
+//    static var hintEngineStopped = true
     static let language = Language()
     static let size = 10
     static var maxRecordCount = 0

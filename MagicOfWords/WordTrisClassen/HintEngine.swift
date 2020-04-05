@@ -10,12 +10,12 @@ import Foundation
 import RealmSwift
 
 class HintEngine {
-    public class var shared: HintEngine {
-        struct Static {
-            static let instance = HintEngine()
-        }
-        return Static.instance
-    }
+//    public class var shared: HintEngine {
+//        struct Static {
+//            static let instance = HintEngine()
+//        }
+//        return Static.instance
+//    }
     init() {
         
     }
@@ -292,9 +292,6 @@ class HintEngine {
                             if tippWordsResults.count > 0 {
                                 for foundedWord in tippWordsResults {
                                     let word = foundedWord.word.myUpperCased()
-                                    if word.endsWith("ELTERN") {
-                                        print("word: \(word), founded: \(foundedWord.word)")
-                                    }
                                     var temporaryRedLetters = [(letter:String, index:Int)]()
                                     var wordOK = true
                                     for letterIndex in 0..<word.length {
@@ -323,20 +320,6 @@ class HintEngine {
                                             break
                                         }
 
-//                                        if !OKWords.contains(where: {$0.hint == word}) {
-//                                            OKWords.append(HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithFixLetter, count: 2) )
-//                                            break
-//                                        } else {
-//                                            for temporaryLetter in temporaryRedLetters {
-//                                                redLetters.append(temporaryLetter.letter)
-//                                            }
-//                                            temporaryRedLetters.removeAll()
-//                                        }
-//                                    } else {
-//                                        for temporaryLetter in temporaryRedLetters {
-//                                            redLetters.append(temporaryLetter.letter)
-//                                        }
-//                                        temporaryRedLetters.removeAll()
                                     }
                                     for temporaryLetter in temporaryRedLetters {
                                         redLetters.append(temporaryLetter.letter)
@@ -348,7 +331,7 @@ class HintEngine {
                             searchWord = "".fill(with: "?", toLength: fillLength)
                         }
                     }
-                    if Date().timeIntervalSince(startTime) > maxInterval || GV.hintTable.count >= maxWordCount  {
+                    if Date().timeIntervalSince(startTime) > maxInterval || GV.hintTable.count >= maxWordCount {
                         break
                     }
                 }
@@ -674,7 +657,7 @@ class HintEngine {
     var random: MyRandom?
     public func createHints(gameNumber: Int, round: Int) {
         random = MyRandom(gameNumber: gameNumber % 1000, modifier: (round == 0 ? 1 : round - 1) * 22)
-
+        
         GV.hintTable.removeAll()
 //        if GV.hintTable.count == countHints {
 //            return
@@ -694,12 +677,6 @@ class HintEngine {
         }
         
         findWordsWithGreenAndRedLetters()
-//        let sortedHints = GV.hintTable.sorted(by: { $0.hint.length > $1.hint.length || ($0.hint.length == $1.hint.length && $0.hint < $1.hint)})
-//        let sortedHints = GV.hintTable.sorted(by: {$0.type.rawValue < $1.type.rawValue ||
-//            ($0.type.rawValue == $1.type.rawValue && $0.hint.length > $1.hint.length) ||
-//            ($0.type.rawValue == $1.type.rawValue && $0.hint.length == $1.hint.length && $0.hint < $1.hint)})
-//        GV.hintTable = sortedHints
-//        showTime(num: num, string: "createHints end")
     }
     
     

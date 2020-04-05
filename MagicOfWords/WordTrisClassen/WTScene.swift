@@ -1195,16 +1195,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var headerCreated = false
     var createNextRound = false
-    var oldHintCounter = 1000
     
     override func update(_ currentTime: TimeInterval) {
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-        if oldHintCounter != GV.hintTable.count {
-            hintButton!.setButtonLabel(title: String(GV.hintTable.count), font: myFont!)
-            oldHintCounter = GV.hintTable.count
-        }
+        hintButton!.setButtonLabel(title: String(GV.hintTable.count), font: myFont!)
         
 //        if (hintsCreated || GV.hintTable.count > 0) {
 //            hintButton!.alpha = 1.0
@@ -3749,17 +3745,19 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     var hintsCreated = false
+    var hintEngine = HintEngine()
     
     private func createHintsInBackground() {
-        if !hintsCreated {
-            return
-        }
+//        if !hintsCreated {
+//            return
+//        }
         let gameNumber = GV.playingRecord.gameNumber
         let round = GV.playingRecord.rounds.count
         let globalQueue = DispatchQueue.global()
         globalQueue.async {
+            self.hintEngine = HintEngine()
             self.hintsCreated = false
-            HintEngine.shared.createHints(gameNumber: gameNumber, round: round)
+            self.hintEngine.createHints(gameNumber: gameNumber, round: round)
             self.hintsCreated = true
         }
 
