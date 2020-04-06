@@ -2548,7 +2548,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         for length in myLengths {
             let likeValue = String(repeating: "?", count: length)
             let words = realmMandatoryList.objects(HintModel.self).filter("language = %@ and word LIKE %d", GV.actLanguage, likeValue)
-            myLetters += words[random.getRandomInt(0, max: words.count)].word
+            myLetters += words[random.getRandomInt(0, max: words.count - 1)].word
         }
 //        print (myLetters)
         var inputWord = ""
