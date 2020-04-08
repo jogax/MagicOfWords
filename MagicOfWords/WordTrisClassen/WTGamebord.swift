@@ -657,10 +657,25 @@ class WTGameboard: SKShapeNode {
     var stopChoosing = false
 
     public func setMoveModusBecauseOfTimer(col: Int, row: Int)->Bool {
-        return setMoveModusIfPossible(col: col, row: row)
+        myPiece = WTPiece(fromChoosedWord: choosedWord, parent: parentScene, blockSize: blockSize!)
+        if myPiece.myType != .NotUsed {
+            origChoosedWord = choosedWord
+            if startShowingSpriteOnGameboard(shape: myPiece, col: choosedWord.usedLetters[0].col, row: choosedWord.usedLetters[0].row) {
+//                for usedLetter in choosedWord.usedLetters {
+//                    GV.gameArray[usedLetter.col][usedLetter.row].remove()
+//                }
+                moveModusStarted = true
+                return true
+            }
+        }
+        return false
+//        return setMoveModusIfPossible(col: col, row: row)
     }
     
     public func moveChooseOwnWord(col: Int, row: Int)->Bool {
+        if choosedWord.usedLetters.count == 0 {
+            return false
+        }
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
         GV.gameArray[col][row].correctStatusIfNeeded()
         let status = GV.gameArray[col][row].status
@@ -668,10 +683,15 @@ class WTGameboard: SKShapeNode {
         if choosedWord.usedLetters.last! == actLetter {
             return false
         }
-        
         if (status == .Empty) { // empty block
             if setMoveModusIfPossible(col: col, row: row) {
                 return true
+            } else {
+                for letter in choosedWord.usedLetters {
+                    GV.gameArray[letter.col][letter.row].setStatus(toStatus: .OrigStatus)
+                }
+                choosedWord = FoundedWord()
+                return false
             }
         } else { // Not empty field
                if choosedWord.usedLetters.count > 1 && choosedWord.usedLetters[choosedWord.usedLetters.count - 2] == actLetter {
@@ -690,6 +710,10 @@ class WTGameboard: SKShapeNode {
                         }
                     }
                     if !stopChoosing {
+
+                        if GV.gameArray[col][row].letter == " " {
+                            return false
+                        }
                         GV.gameArray[col][row].setStatus(toStatus: .Temporary)
                         choosedWord.addLetter(letter: actLetter)
                     }
@@ -721,6 +745,11 @@ class WTGameboard: SKShapeNode {
                     moveModusStarted = true
                     return true
                 }
+            } else {
+                for usedLetter in choosedWord.usedLetters {
+                    GV.gameArray[usedLetter.col][usedLetter.row].setStatus(toStatus: .OrigStatus)
+                }
+                choosedWord = FoundedWord()
             }
         } else {
             if startsWithLetters.usedLetters.count > 0 {
@@ -774,6 +803,9 @@ class WTGameboard: SKShapeNode {
             var word = ""
             var wordAdded = false
             for letter in choosedWord.usedLetters {
+                if letter.letter == " " {
+                    return nil
+                }
                 word.append(letter.letter)
             }
             if word.count > 1 {
@@ -782,6 +814,9 @@ class WTGameboard: SKShapeNode {
                 clear()
             } else {
                 showingWords = true
+                if choosedWord.usedLetters.count == 0 {
+                    return nil
+                }
                 if choosedWord.usedLetters[0].letter != emptyLetter {
                     if choosedWord.usedLetters[0].col == col && choosedWord.usedLetters[0].row == row {
                         GV.actLetter = choosedWord.usedLetters[0].letter

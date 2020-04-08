@@ -3319,7 +3319,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
         } else if touchedNodes.GCol.between(min: 0, max: GV.sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: GV.sizeOfGrid - 1) {
             touchedPosition = touchedNodes
-            timerForSetMovingModus = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(setMoveModus(timerX: )), userInfo: nil, repeats: false)
+            timerForSetMovingModus = Timer.scheduledTimer(timeInterval: 0.15, target: self, selector: #selector(setMoveModus(timerX: )), userInfo: nil, repeats: false)
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
 //            if GV.generateHelpInfo {
@@ -3332,6 +3332,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     var touchedPosition = TouchedNodes()
+    var movesForbidden = false
 
     @objc private func setMoveModus(timerX: Timer) {
         let duration = 0.1
@@ -3341,10 +3342,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if !myNode.moveable {
             return
         }
+        movesForbidden = true
         let origZPosition = myNode.zPosition
-        let newSize = myNode.size * (GV.onIpad ? 2.0 : 5.0)
+        let newSize = myNode.size * (GV.onIpad ? 2.0 : 3.0)
+        let origSize = myNode.size
         let makeBiggerAction = SKAction.resize(toWidth: newSize.width, height: newSize.height, duration: duration)
-        let makeSmallerAction = SKAction.resize(toWidth: myNode.size.width, height: myNode.size.height, duration: 0)
+        let makeSmallerAction = SKAction.resize(toWidth: origSize.width, height: origSize.height, duration: 0)
         let waitAction = SKAction.wait(forDuration: duration)
         let setMoveModusAction = SKAction.run({
             self.movingSprite = wtGameboard!.setMoveModusBecauseOfTimer(col: col, row: row)
@@ -3355,6 +3358,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let setOrigZPositionAction = SKAction.run({
             myNode.zPosition = origZPosition
         })
+        let enableMovesAction = SKAction.run({
+            self.movesForbidden = false
+        })
         var sequence = [SKAction]()
         sequence.append(setMaxZPositionAction)
         sequence.append(makeBiggerAction)
@@ -3362,6 +3368,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         sequence.append(makeSmallerAction)
         sequence.append(setMoveModusAction)
         sequence.append(setOrigZPositionAction)
+        sequence.append(enableMovesAction)
         myNode.run(SKAction.sequence(sequence))
     }
 
@@ -3413,6 +3420,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     private func myTouchesMoved(location: CGPoint, touchedNodes: TouchedNodes) {
         if wtSceneDelegate == nil {
+            return
+        }
+        if movesForbidden {
             return
         }
 
