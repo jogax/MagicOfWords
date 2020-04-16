@@ -3787,6 +3787,60 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
         GCHelper.shared.sendScoreToGameCenter(score: GV.totalScore, difficulty: GV.basicDataRecord.difficulty, completion: {self.modifyHeader()})
         GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyHeader()})
+        let difficulty = GV.basicDataRecord.difficulty
+        let actPlayingTime = GV.basicDataRecord.playingTime
+        let actPlayingTimeToday = GV.basicDataRecord.playingTimeToday
+
+        var deviceRecordID = String(GV.getTimeIntervalSince20190101())
+        if GV.basicDataRecord.deviceRecordInCloudID != "" {
+            deviceRecordID = GV.basicDataRecord.deviceRecordInCloudID
+        } else {
+            try! realm.safeWrite {
+                GV.basicDataRecord.deviceRecordInCloudID = deviceRecordID
+            }
+        }
+//        Saving to iCloud
+        let recordID = CKRecord.ID(recordName: deviceRecordID)
+        let predicate = NSPredicate(format: "recordID = %@", recordID)
+        let query = CKQuery(recordType: "DeviceRecord", predicate: predicate)
+        let container = CKContainer.default()
+        container.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
+            if error != nil {
+                return
+            }
+            let deviceRecord = results![0]
+            deviceRecord["playingTime"] = actPlayingTime
+            deviceRecord["lastPlayingTime"] = actPlayingTimeToday
+            if deviceRecord["lastPlayed"] != Date().yearMonthDay {
+                deviceRecord["lastPlayed"] = Date().yearMonthDay
+            }
+            switch difficulty {
+            case GameDifficulty.Easy.rawValue:
+                if deviceRecord["bestScoreEasy"] == nil {
+                    deviceRecord["bestScoreEasy"] = GV.totalScore
+                } else if (deviceRecord["bestScoreEasy"] as! Int64) < GV.totalScore {
+                    deviceRecord["bestScoreEasy"] = GV.totalScore
+                }
+                deviceRecord["actScoreEasy"] = GV.totalScore
+            case GameDifficulty.Medium.rawValue:
+                if deviceRecord["bestScoreMedium"] == nil {
+                    deviceRecord["bestScoreMedium"] = GV.totalScore
+                } else if (deviceRecord["bestScoreMedium"] as! Int64) < GV.totalScore {
+                    deviceRecord["bestScoreMedium"] = GV.totalScore
+                }
+                deviceRecord["actScoreMedium"] = GV.totalScore
+            default: break
+            }
+            
+            container.publicCloudDatabase.save(deviceRecord) {
+                (record, error) in
+                if let error = error {
+                    // Insert error handling
+                    print("Error by save: \(error)")
+                    return
+                }
+            }
+        }
     }
     
     enum CongratulationType: Int {

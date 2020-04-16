@@ -771,7 +771,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             })
         }
     }
-    
+        
     public func getName() -> String {
         return GKLocalPlayer.local.alias
     }

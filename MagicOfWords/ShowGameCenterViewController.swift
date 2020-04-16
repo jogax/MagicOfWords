@@ -9,6 +9,13 @@
 import UIKit
 import RealmSwift
 import GameplayKit
+import CloudKit
+import GameKit
+
+enum DataSource: Int {
+    case GameCenter = 0, ICloud
+}
+
 
 //#if DEBUG
 public protocol ShowGameCenterViewControllerDelegate: class {
@@ -32,6 +39,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     let indexOfEasyActScore = 10
     let indexOfMediumActScore = 11
     let indexOfCountPlays = 12
+    var dataSource: DataSource = .GameCenter
     
     enum ShowingModus: Int {
         case Left = 0, Right
@@ -76,7 +84,9 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
 //        return returnValue
 //    }
     
-
+    public func setDataSource(dataSource: DataSource) {
+        self.dataSource = dataSource
+    }
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
 //        let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)
@@ -235,7 +245,11 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
 
         showGameCenterView!.setDelegate(delegate: self)
 //        createButtons()
-        GCHelper.shared.getAllGlobalInfos(completion: {self.showPlayerActivity()})
+        if dataSource == .GameCenter {
+            GCHelper.shared.getAllGlobalInfos(completion: {self.showPlayerActivity()})
+        } else {
+            getGlobalInfoFromICloud(completion: {self.showPlayerActivity()})
+        }
         showingModus = .Left
         buttonsCreated = false
         buttonRadius = self.view.frame.width / 25
@@ -275,7 +289,69 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     let myTitleFont = UIFont(name: GV.actFont, size: GV.onIpad ? 30 : 8)
     var sortUp = true
     var buttonsCreated = false
+    var countWaitings = 0
 
+    private func getGlobalInfoFromICloud(completion: @escaping ()->()) {
+        let predicate = NSPredicate(format: "deviceType != %@", "")
+        let query = CKQuery(recordType: "DeviceRecord", predicate: predicate)
+        let container = CKContainer.default()
+        container.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
+             if results!.count > 0 {
+                self.countWaitings = results!.count
+                GV.globalInfoTable.removeAll()
+                for result in results! {
+                    var playerData = PlayerData()
+                    playerData.device = result.object(forKey: "deviceType") as! String
+                    playerData.land = (result.object(forKey: "land") as! String) + "/" + (result.object(forKey: "language") as! String)
+                    playerData.allTime = result.object(forKey: "playingTime")  as! Int
+                    playerData.lastDay = result.object(forKey: "lastPlayed") as! Int
+                    playerData.lastTime = result.object(forKey: "lastPlayingTime") as! Int
+                    playerData.version = result.object(forKey: "version") as! String
+                    if result.object(forKey: "actScoreEasy") != nil {
+                        playerData.easyActScore = String(result.object(forKey: "actScoreEasy") as! Int64)
+                    }
+                    if result.object(forKey: "actScoreMedium") != nil {
+                        playerData.mediumActScore = String(result.object(forKey: "actScoreMedium") as! Int64)
+                    }
+                    if result.object(forKey: "actScoreEasy") != nil {
+                        playerData.easyBestScore = result.object(forKey: "actScoreEasy") as! Int64
+                    }
+                    if result.object(forKey: "actScoreMedium") != nil {
+                        playerData.mediumBestScore = result.object(forKey: "actScoreMedium") as! Int64
+                    }
+                    let playerID = result.object(forKey: "playerID") as! String
+                    if playerID != "" {
+                        self.loadPlayer(playerID: playerID, saveToIndex: GV.globalInfoTable.count, completion: completion)
+                    } else {
+                        playerData.alias = playerID
+                        self.countWaitings -= 1
+                        if self.countWaitings == 0 {
+                            completion()
+                        }
+                    }
+                    GV.globalInfoTable.append(playerData)
+                }
+            }
+//            self.showPlayerActivity()
+        }
+    }
+    
+    private func loadPlayer(playerID: String, saveToIndex: Int, completion: @escaping ()->()) {
+        GKPlayer.loadPlayers(forIdentifiers: [playerID], withCompletionHandler: {
+            (players, error) in
+            if players != nil {
+                if players!.count > 0 {
+                    GV.globalInfoTable[saveToIndex].alias = players![0].alias
+                    self.countWaitings -= 1
+                    if self.countWaitings == 0 {
+                        completion()
+                    }
+                }
+            }
+        })
+    }
+
+    
     private func createButtons() {
         let buttonCenterDistance = (showGameCenterView!.frame.size.width - 2 * buttonRadius) / 4
         let buttonFrameWidth = 2 * buttonRadius

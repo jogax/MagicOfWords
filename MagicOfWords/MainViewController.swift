@@ -138,12 +138,12 @@ ShowNewWordsInCloudSceneDelegate {
 //        }
 //    }
     
-    
     #if DEBUG
-    func displayGameCenterViewController() {
+    func displayGameCenterViewController(dataSource: DataSource) {
         let gameCenterViewController = ShowGameCenterViewController()
         gameCenterViewController.myDelegate = self
         gameCenterViewController.modalPresentationStyle = .overFullScreen
+        gameCenterViewController.setDataSource(dataSource: dataSource)
         self.present(gameCenterViewController, animated: true, completion: nil)
     }
     #endif
@@ -397,7 +397,7 @@ ShowNewWordsInCloudSceneDelegate {
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
         convertIfNeeded()
-//        checkDeviceRecordInCloud()
+        checkDeviceRecordInCloud()
         checkReportedWordsInCloud()
         checkNewWordsInCloud()
 //        checkMyBonusMalus()
@@ -425,8 +425,9 @@ ShowNewWordsInCloudSceneDelegate {
             if error != nil {
                 return
             }
+            var deviceRecord = CKRecord(recordType: "DeviceRecord", recordID: recordID)
             if results!.count == 0 {
-                let deviceRecord = CKRecord(recordType: "DeviceRecord", recordID: recordID)
+//                deviceRecord = CKRecord(recordType: "DeviceRecord", recordID: recordID)
                 deviceRecord["deviceType"] = UIDevice().convertIntToModelName(value: UIDevice().getModelCode())
                 deviceRecord["land"] = Locale.current.regionCode == nil ? "HU" : Locale.current.regionCode
                 deviceRecord["language"] = GV.actLanguage
@@ -435,18 +436,13 @@ ShowNewWordsInCloudSceneDelegate {
                 deviceRecord["lastPlayed"] = Date().yearMonthDay
                 deviceRecord["version"] = actVersion
                 deviceRecord["playerID"] = ""
-                container.publicCloudDatabase.save(deviceRecord) {
-                    (record, error) in
-                    if let error = error {
-                        // Insert error handling
-                        print("Error by save: \(error)")
-                        return
-                    }
-                    print("OK")
-                }
+                deviceRecord["actScoreEasy"] = 0
+                deviceRecord["bestScoreEasy"] = 0   
+                deviceRecord["actScoreMedium"] = 0
+                deviceRecord["bestScoreMedium"] = 0
 
             } else {
-                let deviceRecord = results![0]
+                deviceRecord = results![0]
                 deviceRecord["playingTime"] = actPlayingTime
                 deviceRecord["lastPlayingTime"] = actPlayingTimeToday
                 if deviceRecord["lastPlayed"] != Date().yearMonthDay {
@@ -456,16 +452,18 @@ ShowNewWordsInCloudSceneDelegate {
                 if deviceRecord["playerID"] == "" && GKLocalPlayer.local.playerID != "" {
                     deviceRecord["playerID"] = GKLocalPlayer.local.playerID
                 }
-                container.publicCloudDatabase.save(deviceRecord) {
-                    (record, error) in
-                    if let error = error {
-                        // Insert error handling
-                        print("Error by save: \(error)")
-                        return
-                    }
-                }
 
             }
+            container.publicCloudDatabase.save(deviceRecord) {
+                (record, error) in
+                if let error = error {
+                    // Insert error handling
+                    print("Error by save: \(error)")
+                    return
+                }
+                print("OK")
+            }
+
         }
 
     }
@@ -925,10 +923,16 @@ ShowNewWordsInCloudSceneDelegate {
         if GV.connectedToInternet && GKLocalPlayer.local.isAuthenticated {
             showGlobalDataAction = UIAlertAction(title: GV.language.getText(.tcShowRealmCloud), style: .default, handler: { [unowned self]
                 alert -> Void in
-                self.displayGameCenterViewController()
+                self.displayGameCenterViewController(dataSource: .GameCenter)
             })
             alertController.addAction(showGlobalDataAction!)
         }
+        let showCloudDataAction = UIAlertAction(title: GV.language.getText(.tcShowCloudData), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.displayGameCenterViewController(dataSource: .ICloud)
+        })
+        alertController.addAction(showCloudDataAction)
+        
         let showGameCenterAction = UIAlertAction(title: GV.language.getText(.tcShowGameCenter), style: .default, handler: { [unowned self]
             alert -> Void in
                 let gcVC = GKGameCenterViewController()

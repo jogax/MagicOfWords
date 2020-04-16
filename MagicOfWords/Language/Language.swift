@@ -73,6 +73,7 @@ enum TextConstants: Int {
     tcShowAllWords,
     tcWordsOverLetter,
     tcShowRealmCloud,
+    tcShowCloudData,
     tcNickName,
     tcIsOnline,
     tcOnlineSince,
