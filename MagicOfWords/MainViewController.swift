@@ -431,16 +431,19 @@ ShowNewWordsInCloudSceneDelegate {
                 deviceRecord["deviceType"] = UIDevice().convertIntToModelName(value: UIDevice().getModelCode())
                 deviceRecord["land"] = Locale.current.regionCode == nil ? "HU" : Locale.current.regionCode
                 deviceRecord["language"] = GV.actLanguage
-                deviceRecord["playingTime"] = 0
-                deviceRecord["lastPlayingTime"] = 0
+                deviceRecord["playingTime"] = actPlayingTime
+                deviceRecord["lastPlayingTime"] = actPlayingTimeToday
                 deviceRecord["lastPlayed"] = Date().yearMonthDay
                 deviceRecord["version"] = actVersion
-                deviceRecord["playerID"] = ""
+                if GKLocalPlayer.local.playerID != "" {
+                    deviceRecord["playerID"] = GKLocalPlayer.local.playerID
+                } else {
+                    deviceRecord["playerID"] = ""
+                }
                 deviceRecord["actScoreEasy"] = 0
                 deviceRecord["bestScoreEasy"] = 0   
                 deviceRecord["actScoreMedium"] = 0
                 deviceRecord["bestScoreMedium"] = 0
-
             } else {
                 deviceRecord = results![0]
                 deviceRecord["playingTime"] = actPlayingTime
@@ -452,7 +455,8 @@ ShowNewWordsInCloudSceneDelegate {
                 if deviceRecord["playerID"] == "" && GKLocalPlayer.local.playerID != "" {
                     deviceRecord["playerID"] = GKLocalPlayer.local.playerID
                 }
-
+                deviceRecord["language"] = GV.actLanguage
+                deviceRecord["version"] = actVersion
             }
             container.publicCloudDatabase.save(deviceRecord) {
                 (record, error) in
@@ -461,9 +465,7 @@ ShowNewWordsInCloudSceneDelegate {
                     print("Error by save: \(error)")
                     return
                 }
-                print("OK")
             }
-
         }
 
     }

@@ -1097,7 +1097,7 @@ class WTGameboard: SKShapeNode {
             }
         }
         var maxWordLength = 0
-        for array in returnValue {
+        for (index, array) in returnValue.enumerated() {
             if array.countFree > maxWordLength {
                 maxWordLength = array.countFree
                 var itemsWithOneConnection = 0
@@ -1108,6 +1108,7 @@ class WTGameboard: SKShapeNode {
                 }
                 if itemsWithOneConnection > 2 {
                     maxWordLength = maxWordLength - itemsWithOneConnection + 2
+                    returnValue[index].countFree -= (itemsWithOneConnection - 2)
                 }
             }
             if maxWordLength >= 10 {

@@ -1195,12 +1195,34 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     var headerCreated = false
     var createNextRound = false
+    var oldHintsCreated = false
+    
     
     override func update(_ currentTime: TimeInterval) {
+        let duration = 0.1
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-        hintButton!.setButtonLabel(title: String(GV.hintTable.count), font: myFont!)
+        hintButton!.setButtonLabel(title: String(GV.hintTable.count), font: hintFont!)
+        if oldHintsCreated != hintsCreated {
+            if GV.hintTable.count > 0 {
+                hintButton!.alpha = 1.0
+                hintButton!.isEnabled = true
+            }
+            if hintsCreated {
+                if GV.hintTable.count > 0 {
+                    let origPos = hintButton!.position
+                    let jumpUpAction = SKAction.move(to: CGPoint(x: hintButton!.position.x, y: hintButton!.position.y + hintButton!.size.height / 2), duration: duration)
+                    let waitAction = SKAction.wait(forDuration: 0.05)
+                    let jumpDownAction = SKAction.move(to: origPos, duration: duration)
+                    hintButton!.run(SKAction.sequence([jumpUpAction, waitAction, jumpDownAction]))
+                } else {
+                    hintButton!.alpha = 0.2
+                    hintButton!.isEnabled = false
+                }
+            }
+            oldHintsCreated = hintsCreated
+        }
         
 //        if (hintsCreated || GV.hintTable.count > 0) {
 //            hintButton!.alpha = 1.0
@@ -1784,7 +1806,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         allWordsButton!.zPosition = 10
         bgSprite!.addChild(allWordsButton!)
     }
-    
+    let hintFont = UIFont(name: GV.actLabelFont /*"CourierNewPS-BoldMT"*/, size: GV.onIpad ? 18 : 10)
+
     private func createHintButton() {
         if hintButton != nil {
             hintButton?.removeFromParent()
@@ -1797,7 +1820,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         hintButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.showHintTable))
         hintButton!.name = imageName
         hintButton!.zPosition = 10
-        hintButton!.setButtonLabel(title: "0", font: myFont!)
+        hintButton!.setButtonLabel(title: "0", font: hintFont!)
         bgSprite!.addChild(hintButton!)
         
     }
@@ -3782,11 +3805,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         
         if GV.basicDataRecord.GameCenterEnabled != GCEnabledType.GameCenterEnabled.rawValue {
-            return
+            GCHelper.shared.sendScoreToGameCenter(score: GV.totalScore, difficulty: GV.basicDataRecord.difficulty, completion: {self.modifyHeader()})
+            GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyHeader()})
         }
-
-        GCHelper.shared.sendScoreToGameCenter(score: GV.totalScore, difficulty: GV.basicDataRecord.difficulty, completion: {self.modifyHeader()})
-        GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyHeader()})
         let difficulty = GV.basicDataRecord.difficulty
         let actPlayingTime = GV.basicDataRecord.playingTime
         let actPlayingTimeToday = GV.basicDataRecord.playingTimeToday
@@ -4100,19 +4121,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 activityItemsString.removeLast()
                 rounds.activityItems = activityItemsString
             }
-//            var hintTable = ""
-//            if GV.hintTable.count > 0 {
-//                for item in GV.hintTable {
-//                    hintTable += item.hint + itemInnerSeparator + item.search + itemInnerSeparator + item.type.description() + itemSeparator
-//                }
-//                if hintTable != "" {
-//                    hintTable.removeLast()
-//                }
-//                GV.playingRecord.hintTable = hintTable
-//            }
-        }        
+        }
         modifyDifficultyLabels(number: calculatePlace())
-//        hideButtons(hide: false)
     }
     
     enum GameStatus: Int {
