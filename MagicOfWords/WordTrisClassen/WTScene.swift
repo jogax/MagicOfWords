@@ -1037,14 +1037,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.nextGame = next
         self.newGameNumber = gameNumber
         self.restart = restart
-//        self.showHelp = showHelp
     }
     
     let gameNumberLinePosition:CGFloat = 0.93
     let myWordsLinePosition: CGFloat = 0.91
     let bestScoreLinePosition:CGFloat = 0.89
     let myScoreLinePosition:CGFloat = 0.87
-//    let bonusPointsLinePosition:CGFloat = 0.86
     let ownWordsLinePosition:CGFloat = 0.84
     let mandatoryWordsLinePosition:CGFloat = 0.82
     let buttonLineCenterY:CGFloat = 0.265
@@ -1083,9 +1081,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             headerLabel.fontColor = SKColor.black
             bgSprite!.addChild(headerLabel)
         }
-        
-//        let myName = GV.basicDataRecord.myNickname
-        
+                
         let bestName = "nobody"
         let bestScore = 0
         
