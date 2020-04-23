@@ -201,3 +201,16 @@ Orosz:
 - В начале новой игры или нового круга игра немедленно заполняет игровое поле с таким количеством красных букв чтобы остались прибл. 35-40 пустых полей. Это позволяет игроку сразу же начать собирать слова.
 - Новая функция: если вы прикоснетесь к красной букве и оставите ее неподвижной в течение очень короткого времени (0.2 сек.), буква короткое мигнет, показывая, что вы вошли в режим перемещения. С этого момента её можно перетаскивать в любое пустое место. Чтобы выбрать слово, вам нужно двигать пальцем сразу после нажатия красной буквы. После короткой практики это будет происходить очень легко и удобно.
 
+Build 28, Version 1.28 (1.1)
+Angol:
+- The hint button pops up to indicate when the hints are complete
+- Hold the red letter you want to move for half a second before activating the move mode
+Német:
+- Die Hinweisschaltfläche springt kurz auf, um anzuzeigen, wann die Hinweise vollständig sind
+- Halten Sie den roten Buchstaben, den Sie bewegen möchten, eine halbe Sekunde lang gedrückt, um den Bewegungsmodus aktivieren
+Magyar:
+- A tippgomb felugrással jelzi, ha a tippek elkészültek
+- A mozgatás üzemmód bekapcsolása előtt fél másodpercig kell mozdulatlanul tartani a mozgatni kivánt piros betűt
+Orosz:
+- Кнопка подсказок вспыгнет, чтобы указать, когда подсказки готовы
+- Удерживайте красную букву, которую хотите переместить, на полсекунды, чтобы активировать режим передвижения

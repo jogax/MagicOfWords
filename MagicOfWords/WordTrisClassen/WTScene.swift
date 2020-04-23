@@ -226,7 +226,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             (record, error) in
             if let error = error {
                 // Insert error handling
-                print("Error by save: \(error)")
+                print("Error by save in WTScene1: \(error)")
                 return
             }
             let title = GV.language.getText(.tcWordReportedTitle)
@@ -1203,27 +1203,28 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if createNextRound && GV.nextRoundAnimationFinished {
             afterNextRoundAnimation()
         }
-        hintButton!.setButtonLabel(title: String(GV.hintTable.count), font: hintFont!)
-        if oldHintsCreated != hintsCreated {
-            if GV.hintTable.count > 0 {
-                hintButton!.alpha = 1.0
-                hintButton!.isEnabled = true
-            }
-            if hintsCreated {
+        if hintButton != nil {
+            hintButton!.setButtonLabel(title: String(GV.hintTable.count), font: hintFont!)
+            if oldHintsCreated != hintsCreated {
                 if GV.hintTable.count > 0 {
-                    let origPos = hintButton!.position
-                    let jumpUpAction = SKAction.move(to: CGPoint(x: hintButton!.position.x, y: hintButton!.position.y + hintButton!.size.height / 2), duration: duration)
-                    let waitAction = SKAction.wait(forDuration: 0.05)
-                    let jumpDownAction = SKAction.move(to: origPos, duration: duration)
-                    hintButton!.run(SKAction.sequence([jumpUpAction, waitAction, jumpDownAction]))
-                } else {
-                    hintButton!.alpha = 0.2
-                    hintButton!.isEnabled = false
+                    hintButton!.alpha = 1.0
+                    hintButton!.isEnabled = true
                 }
+                if hintsCreated {
+                    if GV.hintTable.count > 0 {
+                        let origPos = hintButton!.position
+                        let jumpUpAction = SKAction.move(to: CGPoint(x: hintButton!.position.x, y: hintButton!.position.y + hintButton!.size.height / 2), duration: duration)
+                        let waitAction = SKAction.wait(forDuration: 0.05)
+                        let jumpDownAction = SKAction.move(to: origPos, duration: duration)
+                        hintButton!.run(SKAction.sequence([jumpUpAction, waitAction, jumpDownAction]))
+                    } else {
+                        hintButton!.alpha = 0.2
+                        hintButton!.isEnabled = false
+                    }
+                }
+                oldHintsCreated = hintsCreated
             }
-            oldHintsCreated = hintsCreated
         }
-        
 //        if (hintsCreated || GV.hintTable.count > 0) {
 //            hintButton!.alpha = 1.0
 //            hintButton!.isEnabled = true
@@ -3342,7 +3343,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            }
         } else if touchedNodes.GCol.between(min: 0, max: GV.sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: GV.sizeOfGrid - 1) {
             touchedPosition = touchedNodes
-            timerForSetMovingModus = Timer.scheduledTimer(timeInterval: 0.15, target: self, selector: #selector(setMoveModus(timerX: )), userInfo: nil, repeats: false)
+            timerForSetMovingModus = Timer.scheduledTimer(timeInterval: GV.basicDataRecord.setMoveModusDuration, target: self, selector: #selector(setMoveModus(timerX: )), userInfo: nil, repeats: false)
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
 //            if GV.generateHelpInfo {
@@ -3829,36 +3830,38 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if error != nil {
                 return
             }
-            let deviceRecord = results![0]
-            deviceRecord["playingTime"] = actPlayingTime
-            deviceRecord["lastPlayingTime"] = actPlayingTimeToday
-            if deviceRecord["lastPlayed"] != Date().yearMonthDay {
-                deviceRecord["lastPlayed"] = Date().yearMonthDay
-            }
-            switch difficulty {
-            case GameDifficulty.Easy.rawValue:
-                if deviceRecord["bestScoreEasy"] == nil {
-                    deviceRecord["bestScoreEasy"] = GV.totalScore
-                } else if (deviceRecord["bestScoreEasy"] as! Int64) < GV.totalScore {
-                    deviceRecord["bestScoreEasy"] = GV.totalScore
+            if results != nil && results!.count > 0 {
+                let deviceRecord = results![0]
+                deviceRecord["playingTime"] = actPlayingTime
+                deviceRecord["lastPlayingTime"] = actPlayingTimeToday
+                if deviceRecord["lastPlayed"] != Date().yearMonthDay {
+                    deviceRecord["lastPlayed"] = Date().yearMonthDay
                 }
-                deviceRecord["actScoreEasy"] = GV.totalScore
-            case GameDifficulty.Medium.rawValue:
-                if deviceRecord["bestScoreMedium"] == nil {
-                    deviceRecord["bestScoreMedium"] = GV.totalScore
-                } else if (deviceRecord["bestScoreMedium"] as! Int64) < GV.totalScore {
-                    deviceRecord["bestScoreMedium"] = GV.totalScore
+                switch difficulty {
+                case GameDifficulty.Easy.rawValue:
+                    if deviceRecord["bestScoreEasy"] == nil {
+                        deviceRecord["bestScoreEasy"] = GV.totalScore
+                    } else if (deviceRecord["bestScoreEasy"] as! Int64) < GV.totalScore {
+                        deviceRecord["bestScoreEasy"] = GV.totalScore
+                    }
+                    deviceRecord["actScoreEasy"] = GV.totalScore
+                case GameDifficulty.Medium.rawValue:
+                    if deviceRecord["bestScoreMedium"] == nil {
+                        deviceRecord["bestScoreMedium"] = GV.totalScore
+                    } else if (deviceRecord["bestScoreMedium"] as! Int64) < GV.totalScore {
+                        deviceRecord["bestScoreMedium"] = GV.totalScore
+                    }
+                    deviceRecord["actScoreMedium"] = GV.totalScore
+                default: break
                 }
-                deviceRecord["actScoreMedium"] = GV.totalScore
-            default: break
-            }
-            
-            container.publicCloudDatabase.save(deviceRecord) {
-                (record, error) in
-                if let error = error {
-                    // Insert error handling
-                    print("Error by save: \(error)")
-                    return
+                
+                container.publicCloudDatabase.save(deviceRecord) {
+                    (record, error) in
+                    if let error = error {
+                        // Insert error handling
+                        print("Error by save in WTScene2: \(error)")
+                        return
+                    }
                 }
             }
         }

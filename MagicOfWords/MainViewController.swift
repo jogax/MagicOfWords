@@ -338,36 +338,6 @@ ShowNewWordsInCloudSceneDelegate {
 //        delete temporary files
         let path = NSTemporaryDirectory()
         let subDirs = FileManager().subpaths(atPath: NSTemporaryDirectory())
-//        let languages = ["en", "de", "hu", "ru"]
-//        let likes = ["?????", "??????", "???????", "????????", "?????????", "??????????"]
-//        for language in languages {
-//            for like in likes {
-//                let myHints = realmMandatoryList.objects(MandatoryListModel.self).filter("language = %@ and word like %@", language, like).sorted(byKeyPath: "word")
-//                for hint in myHints {
-//                    try! realmHints.safeWrite {
-//                        let newHint = HintModel()
-//                        newHint.languageWord = hint.language + hint.word
-//                        newHint.language = hint.language
-//                        newHint.word = hint.word
-//                        realmHints.add(newHint)
-//                    }
-//                }
-//            }
-//        }
-//        for language in languages {
-//            let myWords = realmWordList.objects(WordListModel.self).filter("word beginswith %@ and word like %@", language, "??????").sorted(byKeyPath: "word")
-//            for hint in myWords {
-//                try! realmHints.safeWrite {
-//                    let newHint = HintModel()
-//                    let language = hint.word.startingSubString(length: 2)
-//                    let word = hint.word.endingSubString(at: 2)
-//                    newHint.languageWord = hint.word
-//                    newHint.language = language
-//                    newHint.word = word
-//                    realmHints.add(newHint)
-//                }
-//            }
-//        }
         for file in subDirs! {
             print("file: \(file)")
             if file.count > 30 {
@@ -420,9 +390,10 @@ ShowNewWordsInCloudSceneDelegate {
         let recordID = CKRecord.ID(recordName: deviceRecordID)
         let predicate = NSPredicate(format: "recordID = %@", recordID)
         let query = CKQuery(recordType: "DeviceRecord", predicate: predicate)
-        let container = CKContainer.default()
-        container.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
+        let defaultContainer = CKContainer.default()
+        defaultContainer.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
             if error != nil {
+                print("error in checkDeviceRecordInCloud: \(String(describing: error))")
                 return
             }
             var deviceRecord = CKRecord(recordType: "DeviceRecord", recordID: recordID)
@@ -455,10 +426,11 @@ ShowNewWordsInCloudSceneDelegate {
                 if deviceRecord["playerID"] == "" && GKLocalPlayer.local.playerID != "" {
                     deviceRecord["playerID"] = GKLocalPlayer.local.playerID
                 }
+                deviceRecord["land"] = Locale.current.regionCode == nil ? "HU" : Locale.current.regionCode
                 deviceRecord["language"] = GV.actLanguage
                 deviceRecord["version"] = actVersion
             }
-            container.publicCloudDatabase.save(deviceRecord) {
+            defaultContainer.publicCloudDatabase.save(deviceRecord) {
                 (record, error) in
                 if let error = error {
                     // Insert error handling
@@ -1269,11 +1241,16 @@ ShowNewWordsInCloudSceneDelegate {
             if GV.basicDataRecord.scoreInfos.count == 0 {
                 createScoreInfo()
             }
+            if GV.basicDataRecord.setMoveModusDuration == 0 {
+                try! realm.safeWrite() {
+                    GV.basicDataRecord.setMoveModusDuration = 0.5
+               }
+            }
             if GV.basicDataRecord.deviceType == 0 {
                 try! realm.safeWrite() {
                     GV.basicDataRecord.deviceType = UIDevice().getModelCode()
                     GV.basicDataRecord.land = GV.convertLocaleToInt()
-                }
+               }
             }
             if Date().yearMonthDay != GV.basicDataRecord.lastPlayingDay {
                 try! realm.safeWrite() {
