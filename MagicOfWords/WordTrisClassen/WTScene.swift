@@ -3487,10 +3487,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //                    onGameArray = false
                 }
             }
-//            if GV.generateHelpInfo {
-//                let movedInfoData = MovedInfoData(onGameArray: onGameArray, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString() + itemSeparator
-//                helpInfo.movedInfo += movedInfoData
-//            }
 
         } else if inChoosingOwnWord {
             
@@ -3513,10 +3509,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
 //                onGameArray = true
             }
-//            if GV.generateHelpInfo {
-//                let movedInfoData = MovedInfoData(onGameArray: onGameArray, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString() + itemSeparator
-//                helpInfo.movedInfo += movedInfoData
-//            }
         } else  {
             if touchedNodes.shapeIndex >= 0 {
                 pieceArray[touchedNodes.shapeIndex].position = touchLocation
