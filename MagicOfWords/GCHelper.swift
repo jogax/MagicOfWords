@@ -163,7 +163,12 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                 if let gcAuthViewController = gcAuthViewController {
                     // Pause any activities that require user interaction, then present the
                     // gcAuthViewController to the player.
-                    viewController.present(gcAuthViewController, animated:true, completion:nil)
+                    if viewController.presentedViewController==nil{
+                        viewController.present(gcAuthViewController, animated: true, completion: nil)
+                    }else{
+                        viewController.presentedViewController!.present(gcAuthViewController, animated: true, completion: nil)
+                    }
+//                    viewController.present(gcAuthViewController, animated:true, completion:nil)
                 } else if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
                     authAdmin()
                 } else {
@@ -404,7 +409,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
 
     @objc private func sendGlobalInfosTOGC(timerX: Timer) {
         var infoArray = [GCInfo]()
-        print("sendGlobalInfosTOGC actTime: \(Date())")
+//        print("sendGlobalInfosTOGC actTime: \(Date())")
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             infoArray.append(GCInfo(identifier: playingTimeName, value: Int64(GV.basicDataRecord.playingTime)))
             infoArray.append(GCInfo(identifier: playingTimeTodayName, value: Int64(GV.basicDataRecord.playingTimeToday)))

@@ -1,0 +1,6 @@
+Angol:
+- The MagicOfWords helps to develop the player's combination ability. The player must to collect as many words as possible. He will receive help in the form of hints.
+Német:
+- Das Spiel Wörterzauber hilft, die Kombinationsfähigkeit des Spielers zu entwickeln. Der Spieler muss so viele Wörter wie möglich zusammensetzen mit Hilfe von Tipps.
+Magyar:
+- A szómágia játék segít fejleszteni a játékos kombinációs képességét. A játékos feladata minél több szó összeállítása. Ehhez folyamatosan segítséget kap tippek formájában.

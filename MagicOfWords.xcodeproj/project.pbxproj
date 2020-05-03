@@ -154,6 +154,7 @@
 		D0576F1A241FB9770095943D /* HintModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0576F19241FB9770095943D /* HintModel.swift */; };
 		D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1B241FC8BD0095943D /* HelpInfo.realm */; };
 		D0576F1E241FC8F30095943D /* Hints.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1D241FC8F30095943D /* Hints.realm */; };
+		D0748B9924531D01008DEC99 /* PromotionText.txt in Resources */ = {isa = PBXBuildFile; fileRef = D0748B9824531D01008DEC99 /* PromotionText.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -311,6 +312,7 @@
 		D0576F19241FB9770095943D /* HintModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModel.swift; sourceTree = "<group>"; };
 		D0576F1B241FC8BD0095943D /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
 		D0576F1D241FC8F30095943D /* Hints.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Hints.realm; sourceTree = "<group>"; };
+		D0748B9824531D01008DEC99 /* PromotionText.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = PromotionText.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -352,6 +354,7 @@
 			children = (
 				20846BB6233E5DF800678857 /* MagicOfWords.entitlements */,
 				20439FEE20BC40DB00D44286 /* Versions.txt */,
+				D0748B9824531D01008DEC99 /* PromotionText.txt */,
 				201FB1CF20288CEA00EC9F36 /* Extensions.swift */,
 				201FB1CA20288CE900EC9F36 /* MainViewController.swift */,
 				20CDA668214FFEBF00160DC6 /* ShowGameCenterViewController.swift */,
@@ -660,6 +663,7 @@
 				202EF6C621CA9DAD000E4DA4 /* online.png in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
+				D0748B9924531D01008DEC99 /* PromotionText.txt in Resources */,
 				20819322202B484D00406D9A /* gameData.txt in Resources */,
 				2087444321FA1C74006C00C6 /* deRestWords.txt in Resources */,
 				204AC87B2228436800A5A03D /* LightRedSprite.png in Resources */,
@@ -966,7 +970,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MagicOfWords/MagicOfWords.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = WT499VC842;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -979,10 +983,10 @@
 				INFOPLIST_FILE = MagicOfWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG SHOWFINGER";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUGx SHOWFINGER";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -994,7 +998,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MagicOfWords/MagicOfWords.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 28;
+				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = WT499VC842;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1003,7 +1007,7 @@
 				INFOPLIST_FILE = MagicOfWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.28;
+				MARKETING_VERSION = 1.29;
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.MagicOfWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

@@ -338,7 +338,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             text = header1.fixLength(length: length, center: true)
             text0 = header0.fixLength(length: length, center: true)
         case .ShowHints:
-            text = hintHeaderLine.fixLength(length: hintHeaderLine.length + 4, center: true)
+            let length = Int(tableView.frame.width / "W".width(font: myFont!))
+            text = hintHeaderLine.fixLength(length: length + 4, center: true)
             if title.length < text.length {
                 width = text.width(font: myFont!)
             }
@@ -1192,6 +1193,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var headerCreated = false
     var createNextRound = false
     var oldHintsCreated = false
+    var oldHintCount = 0
     
     
     override func update(_ currentTime: TimeInterval) {
@@ -1200,7 +1202,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             afterNextRoundAnimation()
         }
         if hintButton != nil {
-            hintButton!.setButtonLabel(title: String(GV.hintTable.count), font: hintFont!)
+            let hintCount = GV.hintTable.count
+            if oldHintCount != hintCount {
+                hintButton!.setButtonLabel(title: String(hintCount), font: hintFont!)
+                oldHintCount = hintCount
+            }
             if oldHintsCreated != hintsCreated {
                 if GV.hintTable.count > 0 {
                     hintButton!.alpha = 1.0
@@ -2141,7 +2147,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     let firstButtonColumn: CGFloat = 0.08
     var lastButtonColumn: CGFloat = 0.92
-    var musicOnOffLine: CGFloat = 0.92
+    var musicOnOffLine: CGFloat = 0.94
     var firstButtonLine: CGFloat = 0.84
     var secondButtonLine: CGFloat = 0.80
     var lastButtonLine: CGFloat = GV.onIpad ? 0.09 : 0.18
@@ -4726,7 +4732,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 //        ownWordsForShow = WordsForShow(words: words)
         calculateColumnWidths(showCount: false)
-        hintHeaderLine = (GV.language.getText(.tcHintsWithRedLetters))
+        hintHeaderLine = (GV.language.getText(.tcHintsHeader))
         let actWidth = max(title.width(font: myFont!), hintHeaderLine.width(font: myFont!)) * 1.1
 
         showHintsTableView?.setDelegate(delegate: self)

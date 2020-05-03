@@ -189,7 +189,7 @@ enum TextConstants: Int {
     tcAcceptedDescription,
     tcWordReportedTitle,
     tcWordReportedMessage,
-    tcHintsWithRedLetters
+    tcHintsHeader
 }
 
     let LanguageEN = "en" // index 0

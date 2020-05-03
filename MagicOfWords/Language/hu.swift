@@ -188,5 +188,5 @@ let huDictionary: [TextConstants: String] = [
     .tcAcceptedDescription: "Ezért  % jutalompont jár neked a szó minden felhasználásakor!",
     .tcWordReportedTitle:    "A szó elküldve a fejlesztőnek!",
     .tcWordReportedMessage: "Kérlek várj türelemmel a válaszra!",
-    .tcHintsWithRedLetters: "Néhány tipp a piros betükkel",
+    .tcHintsHeader: "Néhány tipp",
 ]

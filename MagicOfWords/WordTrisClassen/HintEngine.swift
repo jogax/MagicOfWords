@@ -410,9 +410,6 @@ class HintEngine {
 //                        OKWords.append(HintTableStruct(hint: word, search: searchWord.myUpperCased(), type: .WithRedLetter, count: 0))
 //                    }
                 } else {
-                    if word == "DELEJ" {
-                        print("DELEJ Found")
-                    }
                     if let index = searchWord.index(from: 0, of: "?") {
                         if index > 0 && index < 9 {
                             let endsWith = "".fill(with: "?", toLength: word.length - index)

@@ -189,5 +189,5 @@ let enDictionary: [TextConstants: String] = [
     .tcAcceptedDescription: "You get % bonus points for each using!",
     .tcWordReportedTitle:    "The word has been sent to the developer!",
     .tcWordReportedMessage: "Please wait patiently for the answer!",
-    .tcHintsWithRedLetters: "Some hints with red letters",
+    .tcHintsHeader: "Some hints",
 ]

@@ -188,8 +188,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcDeniedDescription: "В следующий раз убедись, что ты сообщаещь только о нехватающих в словаре существительных в единственном числе!",
     .tcAcceptedReport:    "Поздравляю! Сообщенное разработчику слово \"%\" существует!",
     .tcAcceptedDescription: "За это ты получишь % бонусных очков!",
-    .tcWordReportedTitle:    "Слово отправлено разработчику!",
-    .tcWordReportedMessage:   "Пожалуйста, жди терпеливо ответа!",
-    .tcHintsWithRedLetters: "Несколько подсказок для красных букв",
+    .tcWordReportedTitle:   "Слово отправлено разработчику!",
+    .tcWordReportedMessage: "Пожалуйста, жди терпеливо ответа!",
+    .tcHintsHeader:         "Несколько подсказок",
 ]
 

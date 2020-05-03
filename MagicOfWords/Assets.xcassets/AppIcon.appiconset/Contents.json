@@ -1,116 +1,116 @@
 {
   "images" : [
     {
-      "size" : "20x20",
+      "filename" : "AppIcon40.jpg",
       "idiom" : "iphone",
-      "filename" : "MagicOfWordsAppicon40.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "20x20"
     },
     {
-      "size" : "20x20",
+      "filename" : "AppIcon60.jpg",
       "idiom" : "iphone",
-      "filename" : "MagicOfWordsAppicon60.png",
-      "scale" : "3x"
+      "scale" : "3x",
+      "size" : "20x20"
     },
     {
-      "size" : "29x29",
+      "filename" : "AppIcon58.jpg",
       "idiom" : "iphone",
-      "filename" : "MagicOfWordsAppicon58.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "29x29"
     },
     {
-      "size" : "29x29",
+      "filename" : "AppIcon87.jpg",
       "idiom" : "iphone",
-      "filename" : "MagicOfWordsAppicon87.png",
-      "scale" : "3x"
+      "scale" : "3x",
+      "size" : "29x29"
     },
     {
-      "size" : "40x40",
+      "filename" : "AppIcon80.jpg",
       "idiom" : "iphone",
-      "filename" : "MagicOfWordsAppicon80.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "40x40"
     },
     {
-      "size" : "40x40",
+      "filename" : "AppIcon120.jpg",
       "idiom" : "iphone",
-      "filename" : "MagicOfWordsAppicon120.png",
-      "scale" : "3x"
+      "scale" : "3x",
+      "size" : "40x40"
     },
     {
-      "size" : "60x60",
+      "filename" : "AppIcon120-1.jpg",
       "idiom" : "iphone",
-      "filename" : "MagicOfWordsAppicon120-1.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "60x60"
     },
     {
-      "size" : "60x60",
+      "filename" : "AppIcon180.jpg",
       "idiom" : "iphone",
-      "filename" : "MagicOfWordsAppicon180.png",
-      "scale" : "3x"
+      "scale" : "3x",
+      "size" : "60x60"
     },
     {
-      "size" : "20x20",
+      "filename" : "AppIcon20.jpg",
       "idiom" : "ipad",
-      "filename" : "MagicOfWordsAppicon20.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "20x20"
     },
     {
-      "size" : "20x20",
+      "filename" : "AppIcon40-1.jpg",
       "idiom" : "ipad",
-      "filename" : "MagicOfWordsAppicon40-1.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "20x20"
     },
     {
-      "size" : "29x29",
+      "filename" : "AppIcon29.jpg",
       "idiom" : "ipad",
-      "filename" : "MagicOfWordsAppicon29.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "29x29"
     },
     {
-      "size" : "29x29",
+      "filename" : "AppIcon58-1.jpg",
       "idiom" : "ipad",
-      "filename" : "MagicOfWordsAppicon58-1.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "29x29"
     },
     {
-      "size" : "40x40",
+      "filename" : "AppIcon40-2.jpg",
       "idiom" : "ipad",
-      "filename" : "MagicOfWordsAppicon40-2.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "40x40"
     },
     {
-      "size" : "40x40",
+      "filename" : "AppIcon80-1.jpg",
       "idiom" : "ipad",
-      "filename" : "MagicOfWordsAppicon80-1.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "40x40"
     },
     {
-      "size" : "76x76",
+      "filename" : "AppIcon76.jpg",
       "idiom" : "ipad",
-      "filename" : "MagicOfWordsAppicon76.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "76x76"
     },
     {
-      "size" : "76x76",
+      "filename" : "AppIcon152.jpg",
       "idiom" : "ipad",
-      "filename" : "MagicOfWordsAppicon152.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "76x76"
     },
     {
-      "size" : "83.5x83.5",
+      "filename" : "AppIcon167.jpg",
       "idiom" : "ipad",
-      "filename" : "MagicOfWordsAppicon167.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "83.5x83.5"
     },
     {
-      "size" : "1024x1024",
+      "filename" : "AppIcon1024.jpg",
       "idiom" : "ios-marketing",
-      "filename" : "MagicOfWordsAppicon1024.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "1024x1024"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }

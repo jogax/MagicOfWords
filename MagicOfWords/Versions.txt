@@ -179,9 +179,9 @@ Build 27, Version 1.27 (1.1)
 Angol:
 - Bugfixing
 - Three-time selection of words unknown to the game allows the player to inform the developer about the missing words (singular nouns only). If they are accepted by the developer, the player will receive bonus points each time he use the reported words.
-- A "Hint" button has appeared above the game field, which, when pressed, lists some of the words that can be selected on the game field at that moment. A number in the middle of the button indicates how many tips are available. If this number is 0, then the game has no hints at the moment. Of course, the use of hints is not mandatory, the player can still select any words. These tips make it very easy to learn languages.
+- A "Hint" button has appeared above the game field, which, when pressed, lists some of the words that can be selected on the game field at that moment. A number in the middle of the button indicates how many hints are available. If this number is 0, then the game has no hints at the moment. Of course, the use of hints is not mandatory, the player can still select any words. These hints make it very easy to learn languages.
 - When starting a new game or a new round, the game immediately fills the playing field with red letters while leaving 35-40 blank fields. This allows the player to start collecting the words immediately.
-- New function: if you touch a red letter and leave it motionless for a very short time (0.2 sec.), the letter will flash briefly to indicate that you have entered move mode. From now on, the letter can be dragged to any empty space. To select a word, you need to move your finger immediately after tapping the red letter. After a short practice, this goes very easily.
+- New function: if you touch a red letter and leave it motionless for a short time (0.5 sec.), the letter will flash briefly to indicate that you have entered move mode. From now on, the letter can be dragged to any empty place. To select a word, you need to move your finger immediately after tapping the red letter. After a short practice, this goes very easily.
 Német:
 - Fehlerbehebung
 - Das  dreimalige Auswählen von Wörtern, die dem Spiel unbekannt sind, ermöglicht es dem Spieler, dem Entwickler fehlende Wörter (nur singular Substantive) zu melden. Wenn sie vom Entwickler akzeptiert werden, erhält der Spieler Belohnungspunkte jedes Mal, wenn er die gemeldete Wörter verwendet.
@@ -190,16 +190,16 @@ Német:
 - Neue Funktion: Wenn Sie einen roten Buchstaben berühren und ihn für kurze Zeit unbeweglich lassen, blinkt der Buchstabe kurz, um anzuzeigen, dass Sie in den Bewegungsmodus eingetreten sind. Von nun an kann der Buchstabe in eine beliebige leere Stelle gezogen werden. Um ein Wort auszuwählen, müssen Sie Ihren Finger sofort nach dem Tippen auf den roten Buchstaben bewegen. Nach einer kurzen Übung geht dies sehr leicht und angenehm.
 Magyar:
 - Kisebb hibák javítása
-- A játék által nem ismert szavak háromszori kijelölésekor a játékosnak lehetősége nyílik a hiányzó szavak (csak egyes számú főnevek) bejelentésére a fejlesztő felé. A fejlesztő általi elfogadás esetén a játékos a bejelentett szavak minden felhasználásakor jutalompontokat kap.
+- Ha egy szó kijelölése után háromszor pirosan villog, akkor ezt a szót a játék nem ismeri. Ha a játékos biztos benne, hogy a szó létezik a magyar nyelvben, akkor ezt jelezheti a fejlesztő felé: a szót még két alkalommal jelölje ki. A harmadik kijelölés után a játék megkérdezi, hogy a játékos akarja - e ezt a szót a fejlesztővel közölni. Igenlő válasz esetén a szó elküldésre kerül a fejlesztő felé. Ha a fejlesztő elfogadja szót, a játékos a bejelentett szó minden felhasználásakor jutalompontokat kap.
 - A játékmező felett egy "Tipp" gomb jelent meg, melynek megnyomásakor a játék felsorolja a játékmezőn az adott pillanatban kirakható szavak egy részét. A gomb közepén egy szám jelzi, hány tipp áll rendelkezésre. Ha ez a szám 0, akkor az adott pilanatban a játéknak nincsenek tippjei. Természetesen a tippek használata nem kötelező, a játékos továbbra is tetszőleges szavakat rakhat ki. A tippek használata nagyon megkönnyítheti az idegen nyelvek tanulását.
 - Új játék vagy új kör indulásakor a játék azonnal feltölt a játékmezőbe annyi piros betűt, hogy kb. 35-40 üres mező maradjon. Igy a játékos azonnal elkezdheti a szavak kirakását.
 - Új funkció: ha egy piros betűt megérintünk és egy nagyon rövid ideig mozdulatlanul hagyjuk, akkor a betű rövid felvillanással jelzi, hogy átment mozgatás üzemmódba. Ettől kezdve a betű tetszőleges üres helyre húzható. Ha egy szót akarunk kijelölni, akkor a piros betű megérintése után azonnal el kell mozdítani az ujjunkat. Rövid gyakorlás után ez nagyon könnyen megy.
 Orosz:
 - Исправление ошибок
-- Трехкратный выбор слов, неизвестных игре, позволяет игроку сообщать разработчику о неизвестных игре словах (только существительные в единственном числе). В случае принятия разработчиком, игрок будет получать призовые очки каждый раз, когда он использует такие слова
-- Над игровым полем появилась кнопка «Подсказка», при нажатии которой перечисляются некоторые слова, которые могут быть собраны на игровом поле в данный момент. Число в середине кнопки указывает, сколько подсказок доступно. Если это число равно 0, то в данный момент игра не имеет подсказок. Конечно, использование подсказок не является обязательным, игрок все равно может выложить любые слова. Эти советы облегчают изучение языков.
+- Если после выбора слова оно мигает красным три раза, игра не знает это слово. Если игрок уверен, что слово существует в русском языке, он может указать это разработчику: выбери слово еще два раза. После третьего выбора игра спрашивает, хочет ли игрок сообщить это слово разработчику. Если ответ «да», слово отправляется разработчику. Если разработчик принимает слово, игрок получает бонусные баллы за каждое использование объявленного слова.
+- Над игровым полем появилась кнопка «Подсказка», при нажатии которой перечисляются некоторые слова, которые могут быть собраны на игровом поле в данный момент. Число в середине кнопки указывает, сколько подсказок доступно. Если это число равно 0, то в данный момент игра не имеет подсказок. Конечно, использование подсказок не является обязательным, игрок все равно может выложить любые слова. Эти подсказки могут облегчить изучение языков.
 - В начале новой игры или нового круга игра немедленно заполняет игровое поле с таким количеством красных букв чтобы остались прибл. 35-40 пустых полей. Это позволяет игроку сразу же начать собирать слова.
-- Новая функция: если вы прикоснетесь к красной букве и оставите ее неподвижной в течение очень короткого времени (0.2 сек.), буква короткое мигнет, показывая, что вы вошли в режим перемещения. С этого момента её можно перетаскивать в любое пустое место. Чтобы выбрать слово, вам нужно двигать пальцем сразу после нажатия красной буквы. После короткой практики это будет происходить очень легко и удобно.
+- Новая функция: если вы прикоснётесь к красной букве и оставите ее неподвижной в течение короткого времени (0.5 сек.), буква коротко мигнет, показывая, что вы вошли в режим перемещения. С этого момента букву можно перетаскивать в любое пустое место. Чтобы выбрать слово, вам нужно двигать пальцем сразу после нажатия красной буквы. После короткой практики это будет происходить очень легко и удобно.
 
 Build 28, Version 1.28 (1.1)
 Angol:
@@ -215,3 +215,16 @@ Orosz:
 - Кнопка подсказок вспыгнет, чтобы указать, когда подсказки готовы
 - Удерживайте красную букву, которую хотите переместить, на полсекунды, чтобы активировать режим передвижения
 
+Build 29, Version 1.29 (1.1)
+Angol:
+- New AppIcon
+- Bugfixing
+Német:
+- Neues AppIcon
+- Fehlerbehebung
+Magyar:
+- Új AppIcon
+- Kisebb hibák javítása
+Orosz:
+- Новый AppIcon
+- Исправление ошибок
