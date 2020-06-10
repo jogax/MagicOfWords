@@ -1249,6 +1249,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             self.activityRoundItem[self.activityRoundItem.count - 1].activityItems = [ActivityItem]()
         }
         createFixLetters()
+        
         movePiecesToGameArray()
 //        HintEngine.shared.createHints()
         createHintsInBackground()
@@ -2335,6 +2336,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 //        saveActualState()
 //        fillTippIndexes()
+        
         movePiecesToGameArray()
 //        HintEngine.shared.createHints()
         createHintsInBackground()
@@ -2349,7 +2351,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func movePiecesToGameArray() {
-        
+        #if GALINA
+            return
+        #endif
         var words = GV.playingRecord.words.components(separatedBy: itemSeparator)
         var wordIndex = 0
         let pieceFromPosition = 0

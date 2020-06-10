@@ -239,7 +239,7 @@ ShowNewWordsInCloudSceneDelegate {
     
     func startGame() {
         let actPlay = realm.objects(GameDataModel.self).filter("language = %d and gameNumber >= %d and gameNumber <= %d",GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
-        if actPlay.count == 0 {
+        if actPlay.isEmpty {
             let gameNumber = GV.basicDataRecord.difficulty * 1000
             startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
         } else {
