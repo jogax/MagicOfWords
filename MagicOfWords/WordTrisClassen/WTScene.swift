@@ -717,6 +717,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //
 //        }
         self.backgroundColor = bgColor
+        let background = SKSpriteNode(imageNamed: "background")
+        background.size = frame.size
+        background.position = CGPoint(x: frame.midX, y: frame.midY)
+        background.zPosition = -5
+        addChild(background)
+        
 //        if restart {
 //            let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, newGameNumber)
 //            if recordToDelete.count == 1 {

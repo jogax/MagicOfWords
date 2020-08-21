@@ -155,6 +155,7 @@
 		D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1B241FC8BD0095943D /* HelpInfo.realm */; };
 		D0576F1E241FC8F30095943D /* Hints.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1D241FC8F30095943D /* Hints.realm */; };
 		D0748B9924531D01008DEC99 /* PromotionText.txt in Resources */ = {isa = PBXBuildFile; fileRef = D0748B9824531D01008DEC99 /* PromotionText.txt */; };
+		D0CE00F224F0188B001376CA /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CE00F124F0188B001376CA /* background.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -313,6 +314,7 @@
 		D0576F1B241FC8BD0095943D /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
 		D0576F1D241FC8F30095943D /* Hints.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Hints.realm; sourceTree = "<group>"; };
 		D0748B9824531D01008DEC99 /* PromotionText.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = PromotionText.txt; sourceTree = "<group>"; };
+		D0CE00F124F0188B001376CA /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -443,6 +445,7 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				D0CE00F124F0188B001376CA /* background.png */,
 				208A7E36231AC7CB00B23B6D /* MusicOff.png */,
 				208A7E35231AC7CB00B23B6D /* MusicOn.png */,
 				201484CB2315758E002F323F /* Tipp.png */,
@@ -732,6 +735,7 @@
 				2049314A21E6494D00BE66EA /* deMandatory.txt in Resources */,
 				20491F4D21CFCEB20060C675 /* ruMandatory.txt in Resources */,
 				20395F5D21A2FE4E00947D7F /* retype.png in Resources */,
+				D0CE00F224F0188B001376CA /* background.png in Resources */,
 				20469BD021A43F4E00743EB1 /* sortdown.png in Resources */,
 				20506A44225772F1000BB525 /* finger1.png in Resources */,
 				204B6FD421CD418D00893D58 /* bestScores.png in Resources */,
