@@ -14,6 +14,7 @@ class GameDataModel: Object {
     @objc dynamic var combinedKey = ""
     @objc dynamic var language = ""
     @objc dynamic var gameNumber = 0
+    @objc dynamic var size = 10
     @objc dynamic var nowPlaying = false
     @objc dynamic var gameStatus = 0 // 0: new, 1: playing, 2: finished, 3: continued
     @objc dynamic var mandatoryWords = ""
@@ -39,6 +40,7 @@ class GameDataModel: Object {
         newRecord.combinedKey = newCombinedKey
         newRecord.language = self.language
         newRecord.gameNumber = self.gameNumber
+        newRecord.size = self.size
         newRecord.nowPlaying = self.nowPlaying
         newRecord.gameStatus = self.gameStatus
         newRecord.mandatoryWords = self.mandatoryWords

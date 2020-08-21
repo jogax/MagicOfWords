@@ -248,7 +248,7 @@ struct GV {
 //    static var stopHintEngine = false
 //    static var hintEngineStopped = true
     static let language = Language()
-    static let size = 10
+//    static var size = 5
     static var maxRecordCount = 0
     static var actRecordCount = 0
     static var EndOfFileReached = false
@@ -265,7 +265,7 @@ struct GV {
     static var activated = false
     static var gameArray: [[WTGameboardItem]] = [[WTGameboardItem]]()
     static var notificationToken: NotificationToken?
-    static let sizeOfGrid = 10
+    static var sizeOfGrid = 10
 //    static var mandatoryScore = 0
     static var ownScore = 0
     static var bonusScore = 0

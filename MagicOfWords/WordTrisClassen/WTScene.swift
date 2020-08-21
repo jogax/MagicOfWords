@@ -970,6 +970,10 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } else {
                 GV.playingRecord = nowPlaying.last!
             }
+            let sizeOfGrid: [Int:Int] = [0:10, 50:5, 72:6, 98:7, 128:8, 162:9, 200:10]
+            if GV.playingRecord.rounds.count > 0 {
+                GV.sizeOfGrid = sizeOfGrid[GV.playingRecord.rounds.first!.gameArray.count]!
+            }
             try! realm.safeWrite() {
                 if GV.playingRecord.countOfWordsMaxValue == 0 {
                     GV.playingRecord.countOfWordsMaxValue = 1000
@@ -4029,21 +4033,35 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     private func createFinishGameAlert(status: GameFinishedStatus) {
         var title = ""
         var message = ""
-        var action1Title = ""
-        let action2Title = GV.language.getText(.tcBack)
+//        var actionTitle = ""
+//        let action2Title = GV.language.getText(.tcBack)
+        var myAlert: MyAlertController!
         if gameFinishedStatus == .OK {
             title = GV.language.getText(.tcGameFinished1)
             message = GV.language.getText(.tcGameFinished2)
-            action1Title = GV.language.getText(.tcNewGame)
+            myAlert = MyAlertController(title: title, message: message, target: self, type: .Red)
+            if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
+                myAlert.addAction(text: GV.language.getText(.tcNewGame5), action: #selector(newGame5ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGame6), action: #selector(newGame6ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGame7), action: #selector(newGame7ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGame8), action: #selector(newGame8ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGame9), action: #selector(newGame9ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGame10), action: #selector(newGame10ButtonTapped))
+            } else {
+                myAlert.addAction(text: GV.language.getText(.tcNewGame), action: #selector(newGameButtonTapped))
+            }
         } else {
             title = GV.language.getText(.tcTaskNotCompletedWithNoMoreSteps)
             message = GV.language.getText(.tcWillBeRestarted)
-            action1Title = GV.language.getText(.tcRestartGame)
+            myAlert = MyAlertController(title: title, message: message, target: self, type: .Red)
+            myAlert.addAction(text: GV.language.getText(.tcNewGame), action: #selector(newGameButtonTapped))
+
+//            actionTitle = GV.language.getText(.tcRestartGame)
         }
-        let myAlert = MyAlertController(title: title, message: message, target: self, type: .Red)
+//        let myAlert = MyAlertController(title: title, message: message, target: self, type: .Red)
         //        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        myAlert.addAction(text: action1Title, action: #selector(newGameButtonTapped))
-        myAlert.addAction(text: action2Title, action: #selector(goBackButtonTapped2))
+//        myAlert.addAction(text: action1Title, action: #selector(newGameButtonTapped))
+//        myAlert.addAction(text: action2Title, action: #selector(goBackButtonTapped2))
         myAlert.presentAlert()
         myAlert.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         finishGameAlert = myAlert
@@ -4053,18 +4071,41 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     @objc private func newGameButtonTapped() {
         gameboardEnabled = true
         enabled = true
-//        nextRoundTapped
         if gameFinishedStatus == .OK {
-//            saveHelpInfo(action: .FinishGame)
-//            try! realm.safeWrite() {
-//                GV.playingRecord.gameStatus = GV.GameStatusFinished
-//            }
-//            if !showHelp {
             self.startNewGame()
-//            }
         } else {
             self.restartThisGame()
         }
+    }
+    
+    @objc private func newGame5ButtonTapped() {
+        GV.sizeOfGrid = 5
+        newGameButtonTapped()
+    }
+    
+    @objc private func newGame6ButtonTapped() {
+        GV.sizeOfGrid = 6
+        newGameButtonTapped()
+    }
+    
+    @objc private func newGame7ButtonTapped() {
+        GV.sizeOfGrid = 7
+        newGameButtonTapped()
+    }
+    
+    @objc private func newGame8ButtonTapped() {
+        GV.sizeOfGrid = 8
+        newGameButtonTapped()
+    }
+    
+    @objc private func newGame9ButtonTapped() {
+        GV.sizeOfGrid = 9
+        newGameButtonTapped()
+    }
+    
+    @objc private func newGame10ButtonTapped() {
+        GV.sizeOfGrid = 10
+        newGameButtonTapped()
     }
     
     @objc private func goBackButtonTapped2() {

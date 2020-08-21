@@ -324,16 +324,16 @@ public class WTGameWordList {
     }
      
     private func resetOccurencesInWords() {
-        for col in 0..<GV.size {
-            for row in 0..<GV.size {
+        for col in 0..<GV.sizeOfGrid {
+            for row in 0..<GV.sizeOfGrid {
                 GV.gameArray[col][row].resetCountOccurencesInWords()
             }
         }
     }
     
     private func cleanGameArray() {
-        for col in 0..<GV.size {
-            for row in 0..<GV.size {
+        for col in 0..<GV.sizeOfGrid {
+            for row in 0..<GV.sizeOfGrid {
                 GV.gameArray[col][row].clearConnectionType()
             }
         }
