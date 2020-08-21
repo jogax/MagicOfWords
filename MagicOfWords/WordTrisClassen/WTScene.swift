@@ -1250,7 +1250,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         createFixLetters()
         
-        movePiecesToGameArray()
+//        movePiecesToGameArray()
 //        HintEngine.shared.createHints()
         createHintsInBackground()
         saveActualState()
@@ -2337,7 +2337,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        saveActualState()
 //        fillTippIndexes()
         
-        movePiecesToGameArray()
+//        movePiecesToGameArray()
 //        HintEngine.shared.createHints()
         createHintsInBackground()
         saveActualState()
