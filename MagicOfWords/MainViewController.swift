@@ -204,6 +204,22 @@ ShowNewWordsInCloudSceneDelegate {
         startWTScene(new: true, next: .NoMore, gameNumber: 0)
     }
     
+    override var shouldAutorotate: Bool {
+        return true
+    }
+
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            return .allButUpsideDown
+        } else {
+            return .all
+        }
+    }
+
+    override var prefersStatusBarHidden: Bool {
+        return false
+    }
+    
     func findWords() {
         print("Search Words choosed")
     }
@@ -672,13 +688,15 @@ ShowNewWordsInCloudSceneDelegate {
     
     private func showBackgroundPicture() {
         let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
-        backgroundImage.image = UIImage(named: "magier.png")
+        backgroundImage.image = UIImage(named: "background.png")
         backgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
         self.view.insertSubview(backgroundImage, at: 0)
     }
     let callerName = "MainViewController"
     ////
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(deviceRotated), name: UIDevice.orientationDidChangeNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: reachability)
         do {
             try reachability!.startNotifier()
@@ -686,6 +704,30 @@ ShowNewWordsInCloudSceneDelegate {
             print("could not start reachability notifier")
         }
     }
+    override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .reachabilityChanged, object: nil)
+    }
+
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        GV.actWidth = size.width
+        GV.actHeight = size.height
+        GV.deviceOrientation = GV.actWidth > GV.actHeight ? .Landscape : .Portrait
+//        print("in viewWillTransition ---- to Size: \(size)---------- \(getDeviceOrientation()) at \(Date())")
+        if GV.orientationHandler != nil && GV.target != nil {
+            _ = GV.target!.perform(GV.orientationHandler!)
+        }
+    }
+    
+    @objc func deviceRotated() {
+        if GV.orientationHandler != nil && GV.target != nil {
+            _ = GV.target!.perform(GV.orientationHandler!)
+        }
+    }
+
+
+    
     
     var oldConnectedToInternet = false
     
@@ -1316,9 +1358,6 @@ ShowNewWordsInCloudSceneDelegate {
 
     }
     
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
-    }
     func printDEWordsSorted() {
         let deWords = realmWordList.objects(WordListModel.self).filter("word BEGINSWITH de").sorted(byKeyPath: "word", ascending: true)
         for deWord in deWords {

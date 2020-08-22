@@ -1051,6 +1051,65 @@ extension SKLabelNode {
     }
 }
 
+struct PLPosSize {
+    var PPos = CGPoint()
+    var LPos = CGPoint()
+    var PSize: CGSize? = nil
+    var LSize: CGSize? = nil
+}
+enum SKNodeSubclassType: Int {
+    case MyLabel = 0, MyButton, Grid, SKSpriteNode, Background
+}
+
+fileprivate var storedProperty_PLPosition: [ObjectIdentifier:PLPosSize?] = [:]
+fileprivate var storedProperty_SubClassType: [ObjectIdentifier:SKNodeSubclassType?] = [:]
+
+
+
+extension SKNode {
+    var plPosSize: PLPosSize? {
+        get {return storedProperty_PLPosition[ObjectIdentifier(self)] ?? nil}
+        set {storedProperty_PLPosition[ObjectIdentifier(self)] = newValue}
+    }
+    var nodeType: SKNodeSubclassType? {
+        get {return storedProperty_SubClassType[ObjectIdentifier(self)] ?? nil}
+        set {storedProperty_SubClassType[ObjectIdentifier(self)] = newValue}
+    }
+    
+    public func removeAllStoredPropertys() {
+        let indexForType = storedProperty_SubClassType.index(forKey: ObjectIdentifier(self))
+        if indexForType != nil {
+            storedProperty_SubClassType.remove(at: indexForType!)
+        }
+        let indexForPos = storedProperty_PLPosition.index(forKey: ObjectIdentifier(self))
+        if indexForPos != nil {
+            storedProperty_PLPosition.remove(at: indexForPos!)
+        }
+    }
+    public func setActPosSize() {
+        let isPortrait = GV.deviceOrientation == .Portrait
+        if plPosSize != nil {
+            position = isPortrait ? plPosSize!.PPos : plPosSize!.LPos
+            let mySize = isPortrait ? plPosSize!.PSize : plPosSize!.LSize
+            switch nodeType {
+            case .Grid: (self as! Grid).size = mySize!
+            case .MyButton: (self as! MyButton).size = mySize!
+            case .SKSpriteNode: (self as! SKSpriteNode).size = mySize!
+            default: break
+            }
+        }
+    }
+    public func setPosAndSizeForAllChildren() {
+        for child in children {
+            if child.nodeType != .Background {
+                child.setActPosSize()
+            }
+        }
+    }
+}
+
+
+
 
 
 //extension GCHelper {

@@ -680,6 +680,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     
     override func didMove(to view: SKView) {
+        GV.target = self
+        GV.orientationHandler = #selector(didRotated)
         if GV.comeBackFromSleeping {
             GV.comeBackFromSleeping = false
             return
@@ -716,12 +718,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        } else if showHelp {
 //
 //        }
-        self.backgroundColor = bgColor
-        let background = SKSpriteNode(imageNamed: "background")
-        background.size = frame.size
-        background.position = CGPoint(x: frame.midX, y: frame.midY)
-        background.zPosition = -5
-        addChild(background)
+//        self.backgroundColor = bgColor
+        setBackground()
         
 //        if restart {
 //            let recordToDelete = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber = %d", GV.actLanguage, newGameNumber)
@@ -777,6 +775,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            self.bgSprite!.addChild(myAlert)
 //        }
    }
+    
+    @objc private func didRotated() {
+        
+    }
+    let BackgroundName = "BackgroundName"
+    private func setBackground() {
+        let background = SKSpriteNode(imageNamed: "background")
+        background.size = frame.size
+        background.position = CGPoint(x: frame.midX, y: frame.midY)
+        background.zPosition = -50
+        background.nodeType = .Background
+        background.name = BackgroundName
+        removeChildrenWithTypes(from: bgSprite!, types: [.Background])
+        bgSprite!.addChild(background)
+    }
     private func setCountWords(count: Int, type: GameDifficulty) {
         try! realm.safeWrite() {
             if type == .Easy {
@@ -789,69 +802,21 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         modifyHeader()
     }
-//    @objc private func startEasy100() {
-//        setCountWords(count: 100, type: .Easy)
-//    }
-//
-//    @objc private func startEasy250() {
-//        setCountWords(count: 250, type: .Easy)
-//    }
-//
-//    @objc private func startEasy500() {
-//        setCountWords(count: 500, type: .Easy)
-//    }
-//
-//    @objc private func startEasy750() {
-//        setCountWords(count: 750, type: .Easy)
-//    }
-//
-//    @objc private func startEasy1000() {
-//        setCountWords(count: 1000, type: .Easy)
-//    }
-//
-//    @objc private func startMedium50() {
-//        setCountWords(count: 50, type: .Medium)
-//    }
-//
-//    @objc private func startMedium100() {
-//        setCountWords(count: 100, type: .Medium)
-//    }
-//
-//    @objc private func startMedium150() {
-//        setCountWords(count: 150, type: .Medium)
-//    }
-//
-//    @objc private func startMedium200() {
-//        setCountWords(count: 200, type: .Medium)
-//    }
-//
-//    @objc private func startMedium250() {
-//        setCountWords(count: 250, type: .Medium)
-//    }
-    
 
     private func goBackToWTScene(start: StartType) {
-//        if player != nil {
-//            player!.stop()
-//        }
-//        playingMusic = false
-//        removeAllSubviews()
         wtSceneDelegate!.gameFinished(start: start)
     }
     
     
     @objc func startNewGame() {
         goBackToWTScene(start: .NewGame)
-//        wtSceneDelegate!.gameFinished(start: .NewGame)
     }
     
     let timeInitValue = "0°origMaxTime"
     func restartThisGame() {
         actRound = 1
         try! realm.safeWrite() {
-    //        GV.playingRecord.ownWords = ""
             GV.playingRecord.pieces = ""
-    //        GV.playingRecord.activityItems = ""
             GV.playingRecord.time = timeInitValue
             GV.playingRecord.rounds.removeAll()
             GV.playingRecord.gameStatus = GV.GameStatusNew
@@ -861,19 +826,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         //        wtSceneDelegate!.gameFinished(start: .NewGame)
     }
     
-//    private func clearAllWords() {
-//        var indexesToRemove = [Int]()
-//        for index in 0..<GV.allWords.count {
-//            if !GV.allWords[index].mandatory {
-//                indexesToRemove.append(index)
-//            }
-//        }
-//        let indexesSorted = indexesToRemove.sorted(by: {$0 > $1})
-//        for index in indexesSorted {
-//            GV.allWords.remove(at:index)
-//        }
-//    }
-//
     private func getPlayingRecord(next: StartType, gameNumber: Int/*, showHelp: Bool = false*/) {
         func setMandatoryWords() {
             if GV.playingRecord.mandatoryWords == "" {
@@ -2306,15 +2258,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 restoreGameArray()
                 showFoundedWords()
                 modifyHeader()
-//                let hints = GV.playingRecord.hintTable.components(separatedBy: itemSeparator)
-//                for item in hints {
-//                    if item != "" {
-//                        let newItem = item.components(separatedBy: itemInnerSeparator)
-//                        if newItem.count == 3 && HintType(string: newItem[2]) != nil {
-//                            GV.hintTable.append(HintTableStruct(hint: newItem[0], search: newItem[1], type: HintType(string: newItem[2])!))
-//                        }
-//                    }
-//                }
                 let countFixLetters =  wtGameboard!.checkFixLetters()
                 var targetLetterCount = startValueForFixLetters + GV.playingRecord.rounds.count
                 targetLetterCount = (targetLetterCount > maxLetterCountForFixLetters) ? maxLetterCountForFixLetters : targetLetterCount
@@ -4640,7 +4583,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             generatedArrayInStringForm += tile.toString() + itemSeparator
         }
         wordsString.removeLast()
-        print("wordString: \(wordsString)")
+//        print("wordString: \(wordsString)")
         try! realm.safeWrite() {
             GV.playingRecord.words = wordsString
         }
@@ -4652,7 +4595,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             word += index < tilesForGame.count - 1 ?  "-" : ""
         }
-        print("letters: \(word)")
+//        print("letters: \(word)")
         return generatedArrayInStringForm
 
     }

@@ -362,12 +362,17 @@ class WTGameboard: SKShapeNode {
     private var foundedWordsWithCount = [FoundedWordWithCounter]()
     private let scoreProLetter = 10
     private var yCenter: CGFloat = 0
+    
 
     init(countCols: Int, parentScene: SKScene, delegate: WTGameboardDelegate, yCenter: CGFloat) {
-        self.countCols = countCols
+        let blockSizeMultiplierForIpad: [Int:CGFloat] = [5: 0.08, 6: 0.08, 7: 0.08, 8: 0.075, 9: 0.07, 10: 0.07]
+        let blockSizeMultiplierForIPhone: [Int:CGFloat] = [5: 0.15, 6: 0.14, 7: 0.13, 8: 0.11, 9: 0.10, 10: 0.092]
+
+        self.countCols = GV.sizeOfGrid
         self.parentScene = parentScene
-        let onIPhoneValue: CGFloat = GV.onIPhone5 ? 0.80 : 0.85
-        self.blockSize = parentScene.frame.size.width * (GV.onIpad ? 0.70 : onIPhoneValue) / CGFloat(countCols)
+//        let onIPhoneValue: CGFloat = GV.onIPhone5 ? 0.80 : 0.85
+        self.blockSize = GV.onIpad ?
+            blockSizeMultiplierForIpad [GV.sizeOfGrid]! * GV.minSide : blockSizeMultiplierForIPhone [GV.sizeOfGrid]! * GV.minSide
         self.delegate = delegate
         self.yCenter = yCenter
         super.init()
@@ -427,7 +432,7 @@ class WTGameboard: SKShapeNode {
             
             for j in 0..<countCols {
                 gameArray[i].append( WTGameboardItem(blockSize: blockSize!, fontSize: parentScene.frame.width * 0.040) )
-                gameArray[i][j].letter = emptyLetter
+                _ = gameArray[i][j].setLetter(letter: emptyLetter, toStatus: .Empty, calledFrom: "")
             }
         }
         return gameArray
@@ -1148,8 +1153,8 @@ class WTGameboard: SKShapeNode {
         for letter in myLetters {
             returnValue[String(letter)] = [UsedLetter]()
         }
-        for col in 0..<countCols {
-            for row in 0..<countCols {
+        for col in 0..<GV.sizeOfGrid {
+            for row in 0..<GV.sizeOfGrid {
                 if GV.gameArray[col][row].status == .WholeWord /* || GV.gameArray[col][row].fixItem */ {
                     let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
                     returnValue[GV.gameArray[col][row].letter]?.append(actLetter)
@@ -1194,9 +1199,9 @@ class WTGameboard: SKShapeNode {
         GV.nextRoundAnimationFinished = false
         toPositionX = grid!.frame.maxX
         adder = grid!.blockSize
-        for row in 0..<countCols {
-            for col in 0..<countCols {
-                let newCol = row % 2 == 0 ? 9 - col : col
+        for row in 0..<GV.sizeOfGrid {
+            for col in 0..<GV.sizeOfGrid {
+                let newCol = row % 2 == 0 ? GV.sizeOfGrid - col - 1 : col
                 animateClearing(col: newCol, row: row)
             }
         }

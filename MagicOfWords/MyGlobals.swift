@@ -176,7 +176,9 @@ struct HintForShow {
     }
 }
 
-
+enum DeviceOrientation: Int {
+    case Portrait = 0, Landscape
+}
 struct GV {
     static var actLanguage: String {
         get {
@@ -184,7 +186,14 @@ struct GV {
         }
     }
     static var globalInfoTable = [PlayerData]()
-
+    
+    static var actWidth: CGFloat = 0
+    static var actHeight: CGFloat = 0
+    static var deviceOrientation: DeviceOrientation = .Portrait
+    static var target: AnyObject?
+    static var orientationHandler: Selector?
+    static let minSide: CGFloat = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+    static let maxSide: CGFloat = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
     static var actLanguageInt = GV.languageToInt[actLanguage]
     static let GameStatusNew = 0
     static let GameStatusPlaying = 1

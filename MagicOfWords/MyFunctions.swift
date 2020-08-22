@@ -8,6 +8,7 @@
 
 import Foundation
 import AVFoundation
+import SpriteKit
 
 func + (left: CGSize, right: CGSize) -> CGSize {
     return CGSize(width: left.width + right.width, height: left.height + right.height)
@@ -51,5 +52,27 @@ func getLocalDate()->Date {
     let UTCDate = Date()
     return UTCDate + TimeInterval(NSTimeZone.system.secondsFromGMT(for: UTCDate))
 }
+
+func removeChildrenExceptTypes(from: SKNode, types: [SKNodeSubclassType]) {
+    for child in from.children {
+        if child.nodeType != nil {
+            if !types.contains(child.nodeType!) {
+                child.removeAllStoredPropertys()
+                child.removeFromParent()
+            }
+        }
+    }
+}
+
+func removeChildrenWithTypes(from: SKNode, types: [SKNodeSubclassType]) {
+    for child in from.children {
+        if types.contains(child.nodeType!) {
+            child.removeAllStoredPropertys()
+            child.removeFromParent()
+        }
+    }
+}
+
+
 
 

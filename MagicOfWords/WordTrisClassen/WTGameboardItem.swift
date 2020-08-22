@@ -70,10 +70,15 @@ class WTGameboardItem: SKSpriteNode {
         label.fontName = GV.actPieceFont //"KohinoorBangla-Regular"
         label.fontColor = .black
         label.verticalAlignmentMode = .center
+        repeat {
+            if "A".height(font: UIFont(name: GV.actPieceFont, size: self.fontSize)!) > blockSize * 0.6 {
+                break
+            }
+            self.fontSize += 1
+        } while true
         label.fontSize = self.fontSize
         label.zPosition = self.zPosition + 1
         addChild(label)
-
         countWordsLabel.position = CGPoint(x: blockSize * 0.28, y: -blockSize * 0.35)
         countWordsLabel.fontName = GV.actPieceFont //"KohinoorBangla-Regular"
         countWordsLabel.fontColor = .black
@@ -324,6 +329,7 @@ class WTGameboardItem: SKSpriteNode {
         }
 //        print("In SetStatus: caller: \(calledFrom), letter: \(letter), oldStatus: \(oldStatus), status: \(newStatus), newStatus: \(status)")
         setConnectionType(connectionType: connectionType)
+        self.alpha = self.status == .Empty ? 0.2 : 1.0
     }
     
     var lastCol = 0
