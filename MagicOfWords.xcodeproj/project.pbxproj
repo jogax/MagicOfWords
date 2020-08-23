@@ -155,7 +155,9 @@
 		D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1B241FC8BD0095943D /* HelpInfo.realm */; };
 		D0576F1E241FC8F30095943D /* Hints.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1D241FC8F30095943D /* Hints.realm */; };
 		D0748B9924531D01008DEC99 /* PromotionText.txt in Resources */ = {isa = PBXBuildFile; fileRef = D0748B9824531D01008DEC99 /* PromotionText.txt */; };
-		D0CE00F224F0188B001376CA /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CE00F124F0188B001376CA /* background.png */; };
+		D089796B24F298090096EF86 /* MyLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D089796A24F298090096EF86 /* MyLabel.swift */; };
+		D089796D24F2A7080096EF86 /* backgroundL.png in Resources */ = {isa = PBXBuildFile; fileRef = D089796C24F2A7080096EF86 /* backgroundL.png */; };
+		D0CE00F224F0188B001376CA /* backgroundP.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CE00F124F0188B001376CA /* backgroundP.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -314,7 +316,9 @@
 		D0576F1B241FC8BD0095943D /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
 		D0576F1D241FC8F30095943D /* Hints.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Hints.realm; sourceTree = "<group>"; };
 		D0748B9824531D01008DEC99 /* PromotionText.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = PromotionText.txt; sourceTree = "<group>"; };
-		D0CE00F124F0188B001376CA /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
+		D089796A24F298090096EF86 /* MyLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLabel.swift; sourceTree = "<group>"; };
+		D089796C24F2A7080096EF86 /* backgroundL.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backgroundL.png; sourceTree = "<group>"; };
+		D0CE00F124F0188B001376CA /* backgroundP.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backgroundP.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -365,6 +369,7 @@
 				201FB1CC20288CEA00EC9F36 /* MyFunctions.swift */,
 				20553D89225665C7001628D1 /* MyAlertController.swift */,
 				201FB1C920288CE900EC9F36 /* MyGlobals.swift */,
+				D089796A24F298090096EF86 /* MyLabel.swift */,
 				20A604B22035D93A00DC48F0 /* MyRandom.swift */,
 				201FB1B120288C2B00EC9F36 /* AppDelegate.swift */,
 				205850F32170D2C900D89B9A /* RealmManager.swift */,
@@ -445,7 +450,8 @@
 		20587FAF205A6D9F008C018A /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
-				D0CE00F124F0188B001376CA /* background.png */,
+				D0CE00F124F0188B001376CA /* backgroundP.png */,
+				D089796C24F2A7080096EF86 /* backgroundL.png */,
 				208A7E36231AC7CB00B23B6D /* MusicOff.png */,
 				208A7E35231AC7CB00B23B6D /* MusicOn.png */,
 				201484CB2315758E002F323F /* Tipp.png */,
@@ -657,6 +663,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2051004922944816008521E7 /* DarkGreenSprite.png in Resources */,
+				D089796D24F2A7080096EF86 /* backgroundL.png in Resources */,
 				205211342221B37A00B25072 /* UnDelete.png in Resources */,
 				D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */,
 				2086F3FD228EEE8A00D845B7 /* Connection1010.png in Resources */,
@@ -735,7 +742,7 @@
 				2049314A21E6494D00BE66EA /* deMandatory.txt in Resources */,
 				20491F4D21CFCEB20060C675 /* ruMandatory.txt in Resources */,
 				20395F5D21A2FE4E00947D7F /* retype.png in Resources */,
-				D0CE00F224F0188B001376CA /* background.png in Resources */,
+				D0CE00F224F0188B001376CA /* backgroundP.png in Resources */,
 				20469BD021A43F4E00743EB1 /* sortdown.png in Resources */,
 				20506A44225772F1000BB525 /* finger1.png in Resources */,
 				204B6FD421CD418D00893D58 /* bestScores.png in Resources */,
@@ -809,6 +816,7 @@
 				205850F42170D2C900D89B9A /* RealmManager.swift in Sources */,
 				20E70EA0233281A300185ECE /* FinishedGames.swift in Sources */,
 				20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */,
+				D089796B24F298090096EF86 /* MyLabel.swift in Sources */,
 				201FB1DB20288CEA00EC9F36 /* Extensions.swift in Sources */,
 				20553D8A225665C7001628D1 /* MyAlertController.swift in Sources */,
 				208073802242933700BE38E9 /* WelcomeScene.swift in Sources */,

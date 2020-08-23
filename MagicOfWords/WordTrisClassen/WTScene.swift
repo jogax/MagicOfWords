@@ -594,16 +594,17 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    var allWordsToShow = [AllWordsToShow]()
     var timer: Timer? = Timer()
 //    var timeLabel = SKLabelNode()
-    var headerLabel = SKLabelNode()
-    var versionLabel = SKLabelNode()
-    var myWordsHeaderLabel = SKLabelNode()
-    var myScoreHeaderLabel = SKLabelNode()
-    var bestScoreHeaderLabel = SKLabelNode()
-    var actScoreHeaderLabel = SKLabelNode()
-    var scoreLabel = SKLabelNode()
-    var goBackLabel = SKLabelNode()
-    var goToPreviousGameLabel = SKLabelNode()
-    var goToNextGameLabel = SKLabelNode()
+    var gameTypeLabel: MyLabel!
+    var headerLabel: MyLabel!
+    var versionLabel: MyLabel!
+    var myWordsHeaderLabel: MyLabel!
+    var myScoreHeaderLabel: MyLabel!
+    var bestScoreHeaderLabel: MyLabel!
+    var actScoreHeaderLabel: MyLabel!
+    var scoreLabel: MyLabel!
+    var goBackLabel: MyLabel!
+    var goToPreviousGameLabel: MyLabel!
+    var goToNextGameLabel: MyLabel!
     var firstTouchLocation = CGPoint(x: 0, y: 0)
 //    var scoreMandatoryWords = 0
 //    var scoreOwnWords = 0
@@ -663,6 +664,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let headerLineName = "°°°headerLine°°°"
     let myScoreName = "°°°myScore°°°"
     let myWordsName = "°°°myWords°°°"
+    let gameTypeName = "°°°gameType°°°"
     let bestScoreName = "°°°bestScore°°°"
     let actScoreName = "°°°actScore°°°"
     let timeName = "°°°timeName°°°"
@@ -777,11 +779,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
    }
     
     @objc private func didRotated() {
-        
+        self.size = CGSize(width: GV.actWidth,height: GV.actHeight)
+        self.view!.frame = CGRect(x: 0, y: 0, width: GV.actWidth, height: GV.actHeight)
+        bgSprite!.size = self.size
+        setBackground()
+        bgSprite!.setPosAndSizeForAllChildren()
     }
     let BackgroundName = "BackgroundName"
+    
     private func setBackground() {
-        let background = SKSpriteNode(imageNamed: "background")
+        let background = SKSpriteNode(imageNamed: GV.actHeight > GV.actWidth ? "backgroundP" : "backgroundL")
         background.size = frame.size
         background.position = CGPoint(x: frame.midX, y: frame.midY)
         background.zPosition = -50
@@ -1002,10 +1009,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.restart = restart
     }
     
-    let gameNumberLinePosition:CGFloat = 0.93
-    let myWordsLinePosition: CGFloat = 0.91
-    let bestScoreLinePosition:CGFloat = 0.89
-    let myScoreLinePosition:CGFloat = 0.87
+
     let ownWordsLinePosition:CGFloat = 0.84
     let mandatoryWordsLinePosition:CGFloat = 0.82
     let buttonLineCenterY:CGFloat = 0.265
@@ -1019,66 +1023,65 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func createHeader() {
+        var widthMpx = CGFloat(0)
+        var heightMpx = CGFloat(0)
         let fontSize = self.frame.size.height * 0.0175 // GV.onIpad ? self.frame.size.width * 0.02 : self.frame.size.width * 0.032
         if bgSprite!.childNode(withName: versionLabelName) == nil {
             let versionText = GV.language.getText(.tcActVersion, values: actVersion)
-            versionLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
-            versionLabel.text = versionText
+            widthMpx = GV.onIpad ? 0.02 : 0.02
+            heightMpx = GV.onIpad ? 0.02 : 0.020
+            let plPos = PLPosSize(PPos: CGPoint(x: GV.actWidth * widthMpx, y: GV.actHeight * heightMpx), LPos: CGPoint(x: GV.actWidth * widthMpx, y: GV.actHeight * heightMpx))
+            versionLabel = MyLabel(text: versionText, position: plPos, fontName: GV.actLabelFont, fontSize: fontSize)
+//            versionLabel.text = versionText
             versionLabel.name = String(versionLabelName)
-            versionLabel.fontSize = fontSize
-            versionLabel.position = CGPoint(x: self.frame.size.width * (GV.onIpad ? 0.0175 : 0.02), y: self.frame.size.height * (GV.onIpad ? 0.010 : 0.020))
+//            versionLabel.fontSize = fontSize
+//            versionLabel.position = CGPoint(x: self.frame.size.width * (GV.onIpad ? 0.0175 : 0.02), y: self.frame.size.height * (GV.onIpad ? 0.010 : 0.020))
             versionLabel.horizontalAlignmentMode = .left
             versionLabel.fontColor = SKColor(red: 0, green: 0, blue: 0, alpha: 0.5)
             bgSprite!.addChild(versionLabel)
         }
+        
+        if bgSprite!.childNode(withName: gameTypeName) == nil {
+            let gameTypeLinePosition:CGFloat = 0.93
+            let pX: CGFloat = GV.minSide * 0.5
+            let pY: CGFloat = GV.maxSide * gameTypeLinePosition
+            let lX: CGFloat = GV.maxSide * 0.5
+            let lY: CGFloat = GV.minSide * gameTypeLinePosition
+            let plPos = PLPosSize(PPos: CGPoint(x: pX, y: pY), LPos: CGPoint(x: lX, y: lY))
+            let text = GV.language.getText((GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? .tcEasyPlay : .tcMediumPlay), values: "\(GV.sizeOfGrid)x\(GV.sizeOfGrid)")
+            gameTypeLabel = MyLabel(text: text, position: plPos, fontName: GV.actLabelFont, fontSize: fontSize * 1.2)
+            gameTypeLabel.name = gameTypeName
+            gameTypeLabel.fontColor = .black
+            gameTypeLabel.zPosition = self.zPosition + 10
+            bgSprite!.addChild(gameTypeLabel)
+        }
+
         if bgSprite!.childNode(withName: headerName) == nil {
-            let YPosition: CGFloat = self.frame.height * gameNumberLinePosition
-//            let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(""/*GV.playingRecord.gameNumber % 1000 + 1*/)
+            let gameNumberLinePosition:CGFloat = 0.92
+            let pX: CGFloat = GV.minSide * 0.5
+            let pY: CGFloat = GV.maxSide * gameNumberLinePosition
+            let lX: CGFloat = GV.maxSide * 0.5
+            let lY: CGFloat = GV.minSide * gameNumberLinePosition
+            //            let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(""/*GV.playingRecord.gameNumber % 1000 + 1*/)
             let text = GV.language.getText(.tcHeader, values: String(1), timeForGame.time.HourMinSec)
-            headerLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
-            headerLabel.text = text
+            let plPos = PLPosSize(PPos: CGPoint(x: pX, y: pY), LPos: CGPoint(x: lX, y: lY))
+            headerLabel = MyLabel(text: text, position: plPos, fontName: GV.actLabelFont, fontSize: fontSize)
             headerLabel.name = String(headerName)
-            headerLabel.fontSize = fontSize
-            headerLabel.position = CGPoint(x: self.frame.size.width * 0.5, y: YPosition)
             headerLabel.horizontalAlignmentMode = .center
-            headerLabel.fontColor = SKColor.black
+            headerLabel.fontColor = .black
             bgSprite!.addChild(headerLabel)
         }
                 
         let bestName = "nobody"
         let bestScore = 0
         
-        if bgSprite!.childNode(withName: bestScoreName) == nil {
-            let YPosition: CGFloat = self.frame.height * bestScoreLinePosition
-            //            let text = GV.language.getText(.tcBestScoreHeader, values: bestOnlineRecord!.player, bestOnlineRecord!.score)
-            let text = GV.language.getText(.tcBestScoreHeader, values: String(1).fixLength(length: 5), String(bestScore).fixLength(length:scoreLength), bestName)
-            bestScoreHeaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
-            bestScoreHeaderLabel.text = text
-            bestScoreHeaderLabel.name = String(bestScoreName)
-            bestScoreHeaderLabel.fontSize = fontSize
-//            bestScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * 0.5, y: YPosition)
-            bestScoreHeaderLabel.position = CGPoint(x: headerLabel.frame.minX, y: YPosition)
-            bestScoreHeaderLabel.horizontalAlignmentMode = .left
-            bestScoreHeaderLabel.fontColor = SKColor.black
-            bgSprite!.addChild(bestScoreHeaderLabel)
-        }
-        
-        if bgSprite!.childNode(withName: myScoreName) == nil {
-            let YPosition: CGFloat = self.frame.height * myScoreLinePosition
-            let text = GV.language.getText(.tcMyScoreHeader, values: String(GV.playingRecord.score).fixLength(length:scoreLength), GKLocalPlayer.local.alias)
-            myScoreHeaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
-            myScoreHeaderLabel.text = text
-            myScoreHeaderLabel.name = String(myScoreName)
-            myScoreHeaderLabel.fontSize = fontSize
-//            myScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * 0.5 /*startPosXForHeaderMultiplier*/, y: YPosition)
-            myScoreHeaderLabel.position = CGPoint(x: headerLabel.frame.minX, y: YPosition)
-            myScoreHeaderLabel.horizontalAlignmentMode = .left
-            myScoreHeaderLabel.fontColor = SKColor.black
-            bgSprite!.addChild(myScoreHeaderLabel)
-        }
-        
         if bgSprite!.childNode(withName: myWordsName) == nil {
-            let YPosition: CGFloat = self.frame.height * myWordsLinePosition
+            let myWordsLinePosition: CGFloat = 0.90
+            let pX: CGFloat = headerLabel.plPosSize!.PPos.x - headerLabel.frame.width / 2
+            let pY: CGFloat = GV.maxSide * myWordsLinePosition
+            let lX: CGFloat = headerLabel.plPosSize!.LPos.x - headerLabel.frame.width / 2
+            let lY: CGFloat = GV.minSide * myWordsLinePosition
+            let plPos = PLPosSize(PPos: CGPoint(x: pX, y: pY), LPos: CGPoint(x: lX, y: lY))
             let is1000Words = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue
             var text = ""
             if is1000Words {
@@ -1086,15 +1089,44 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } else {
                 text = GV.language.getText(.tcMyWordsHeader250, values: String(GV.countOfLetters), String(GV.countOfLettersMaxValue))
             }
-            myWordsHeaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
-            myWordsHeaderLabel.text = text
+            myWordsHeaderLabel = MyLabel(text: text, position: plPos, fontName: GV.actLabelFont, fontSize: fontSize)
             myWordsHeaderLabel.name = String(myWordsName)
-            myWordsHeaderLabel.fontSize = fontSize
-            //            myScoreHeaderLabel.position = CGPoint(x: self.frame.size.width * 0.5 /*startPosXForHeaderMultiplier*/, y: YPosition)
-            myWordsHeaderLabel.position = CGPoint(x: headerLabel.frame.minX, y: YPosition)
             myWordsHeaderLabel.horizontalAlignmentMode = .left
             myWordsHeaderLabel.fontColor = SKColor.black
             bgSprite!.addChild(myWordsHeaderLabel)
+        }
+        
+
+        if bgSprite!.childNode(withName: bestScoreName) == nil {
+            let bestScoreLinePosition:CGFloat = 0.88
+            let pX: CGFloat = headerLabel.plPosSize!.PPos.x - headerLabel.frame.width / 2
+            let pY: CGFloat = GV.maxSide * bestScoreLinePosition
+            let lX: CGFloat = headerLabel.plPosSize!.LPos.x - headerLabel.frame.width / 2
+            let lY: CGFloat = GV.minSide * bestScoreLinePosition
+            let plPos = PLPosSize(PPos: CGPoint(x: pX, y: pY), LPos: CGPoint(x: lX, y: lY))
+            let text = GV.language.getText(.tcBestScoreHeader, values: String(1).fixLength(length: 5), String(bestScore).fixLength(length:scoreLength), bestName)
+//            bestScoreHeaderLabel = SKLabelNode(fontNamed: GV.actLabelFont) //"CourierNewPS-BoldMT")// Snell Roundhand")
+            bestScoreHeaderLabel = MyLabel(text: text, position: plPos, fontName: GV.actLabelFont, fontSize: fontSize)
+            bestScoreHeaderLabel.name = String(bestScoreName)
+            bestScoreHeaderLabel.fontSize = fontSize
+            bestScoreHeaderLabel.horizontalAlignmentMode = .left
+            bestScoreHeaderLabel.fontColor = SKColor.black
+            bgSprite!.addChild(bestScoreHeaderLabel)
+        }
+        
+        if bgSprite!.childNode(withName: myScoreName) == nil {
+            let myScoreLinePosition:CGFloat = 0.86
+            let pX: CGFloat = headerLabel.plPosSize!.PPos.x - headerLabel.frame.width / 2
+            let pY: CGFloat = GV.maxSide * myScoreLinePosition
+            let lX: CGFloat = headerLabel.plPosSize!.LPos.x - headerLabel.frame.width / 2
+            let lY: CGFloat = GV.minSide * myScoreLinePosition
+            let plPos = PLPosSize(PPos: CGPoint(x: pX, y: pY), LPos: CGPoint(x: lX, y: lY))
+            let text = GV.language.getText(.tcMyScoreHeader, values: String(GV.playingRecord.score).fixLength(length:scoreLength), GKLocalPlayer.local.alias)
+            myScoreHeaderLabel = MyLabel(text: text, position: plPos, fontName: GV.actLabelFont, fontSize: fontSize)
+            myScoreHeaderLabel.name = String(myScoreName)
+            myScoreHeaderLabel.horizontalAlignmentMode = .left
+            myScoreHeaderLabel.fontColor = SKColor.black
+            bgSprite!.addChild(myScoreHeaderLabel)
         }
         
         modifyHeader()

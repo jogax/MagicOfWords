@@ -369,10 +369,10 @@ ShowNewWordsInCloudSceneDelegate {
         GV.mainViewController = self
         setDarkMode()
         GV.wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
+        GV.actHeight = UIScreen.main.bounds.height //self.view.frame.size.height
+        GV.actWidth = UIScreen.main.bounds.width // self.view.frame.size.width
         showBackgroundPicture()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
-        myHeight = self.view.frame.size.height
-        myWidth = self.view.frame.size.width
         if GV.basicDataRecord.actLanguage == "" { //basicDataRecord not loaded yet
             generateBasicDataRecordIfNeeded()
         }
@@ -688,7 +688,8 @@ ShowNewWordsInCloudSceneDelegate {
     
     private func showBackgroundPicture() {
         let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
-        backgroundImage.image = UIImage(named: "background.png")
+        
+        backgroundImage.image = UIImage(named: GV.actHeight > GV.actWidth ? "backgroundP.png" : "backgroundL.png")
         backgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
         self.view.insertSubview(backgroundImage, at: 0)
     }
@@ -726,9 +727,6 @@ ShowNewWordsInCloudSceneDelegate {
         }
     }
 
-
-    
-    
     var oldConnectedToInternet = false
     
     

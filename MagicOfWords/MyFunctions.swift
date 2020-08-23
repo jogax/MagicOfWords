@@ -66,7 +66,7 @@ func removeChildrenExceptTypes(from: SKNode, types: [SKNodeSubclassType]) {
 
 func removeChildrenWithTypes(from: SKNode, types: [SKNodeSubclassType]) {
     for child in from.children {
-        if types.contains(child.nodeType!) {
+        if child.nodeType != nil && types.contains(child.nodeType!) {
             child.removeAllStoredPropertys()
             child.removeFromParent()
         }

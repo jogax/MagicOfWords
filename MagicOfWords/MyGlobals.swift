@@ -95,8 +95,8 @@ struct ScoreForShow {
     }
 }
 let NoValue = -1
-var myWidth: CGFloat = 0
-var myHeight: CGFloat = 0
+//var myWidth: CGFloat = 0
+//var myHeight: CGFloat = 0
 
 var codeTableToString: [Int: String]  = [65: "A", 66: "B", 67: "C", 68: "D", 69: "E", 70: "F", 71: "G", 72: "H", 73: "I", 74: "J",
                                          75: "K", 76: "L", 77: "M", 78: "N", 79: "O", 80: "P", 81: "Q", 82: "R", 83: "S", 84: "T",
