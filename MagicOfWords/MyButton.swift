@@ -54,7 +54,7 @@ class MyButton: SKSpriteNode {
         let bugFixLayerNode = SKSpriteNode(texture: nil, color: UIColor.clear, size: defaultTexture.size())
         bugFixLayerNode.position = self.position
         addChild(bugFixLayerNode)
-
+        self.nodeType = .MyButton
     }
     
     

@@ -697,6 +697,7 @@ ShowNewWordsInCloudSceneDelegate {
     ////
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        GV.deviceHasNotch = UIApplication.shared.hasNotch
         NotificationCenter.default.addObserver(self, selector: #selector(deviceRotated), name: UIDevice.orientationDidChangeNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: reachability)
         do {

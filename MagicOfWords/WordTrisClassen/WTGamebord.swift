@@ -442,9 +442,14 @@ class WTGameboard: SKShapeNode {
         //        let myShape =
 
         grid = Grid(blockSize: blockSize!, rows:countCols, cols:countCols)
-        grid!.position = CGPoint (x:parentScene.frame.midX, y:parentScene.frame.maxY * yCenter)
+        grid!.plPosSize = PLPosSize(PPos: CGPoint (x: GV.minSide * 0.5, y: GV.maxSide * yCenter),
+                                    LPos: CGPoint (x: GV.maxSide * 0.7, y: GV.minSide * 0.5))
+            
         grid!.name = gridName
-        self.addChild(grid!)
+        grid!.setActPosSize()
+        grid!.nodeType = .Grid
+//        self.addChild(grid!)
+        bgSprite!.addChild(grid!)
     }
     
     public func getGridSize()->CGSize {

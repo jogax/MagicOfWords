@@ -187,6 +187,7 @@ struct GV {
     }
     static var globalInfoTable = [PlayerData]()
     
+    static var deviceHasNotch = false
     static var actWidth: CGFloat = 0
     static var actHeight: CGFloat = 0
     static var deviceOrientation: DeviceOrientation = .Portrait

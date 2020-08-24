@@ -1087,24 +1087,52 @@ extension SKNode {
         }
     }
     public func setActPosSize() {
-        let isPortrait = GV.deviceOrientation == .Portrait
+        let isPortrait = GV.actHeight > GV.actWidth
         if plPosSize != nil {
             position = isPortrait ? plPosSize!.PPos : plPosSize!.LPos
             let mySize = isPortrait ? plPosSize!.PSize : plPosSize!.LSize
-            switch nodeType {
-            case .Grid: (self as! Grid).size = mySize!
-            case .MyButton: (self as! MyButton).size = mySize!
-            case .SKSpriteNode: (self as! SKSpriteNode).size = mySize!
-            default: break
+            if mySize != nil {
+                switch nodeType {
+                case .Grid: (self as! Grid).size = mySize!
+                case .MyButton: (self as! MyButton).size = mySize!
+                case .SKSpriteNode: (self as! SKSpriteNode).size = mySize!
+                default: break
+                }
             }
         }
     }
+    
     public func setPosAndSizeForAllChildren() {
         for child in children {
             if child.nodeType != .Background {
+//                if child.nodeType == .MyLabel {
+//                    print("MyLabel gefunden'")
+//                }
                 child.setActPosSize()
             }
         }
+    }
+}
+
+extension UIApplication {
+    var hasNotch: Bool {
+        if #available(iOS 11.0, *) {
+            if UIApplication.shared.windows.count > 0 {
+                if UIApplication.shared.windows.first!.safeAreaInsets.bottom > 0 {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    var notchBottom: CGFloat {
+        if #available(iOS 11.0, *) {
+            if UIApplication.shared.windows.count > 0 {
+                return UIApplication.shared.windows.first!.safeAreaInsets.bottom
+            }
+        }
+        return 0
+
     }
 }
 
