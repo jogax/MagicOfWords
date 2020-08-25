@@ -593,7 +593,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var timeForGame = TimeForGame()
     var timerIsCounting = false
     let heightMultiplicator = CGFloat((GV.onIpad ? 0.10 : 0.15))
-    var blockSize: CGFloat = 0
+//    var blockSize: CGFloat = 0
 //    var allWordsToShow = [AllWordsToShow]()
     var timer: Timer? = Timer()
 //    var timeLabel = SKLabelNode()
@@ -696,7 +696,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.name = "WTScene"
         self.view!.isMultipleTouchEnabled = false
         self.view!.subviews.forEach { $0.removeFromSuperview() }
-        self.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+        GV.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
         self.tilesForGame.removeAll()
 //        self.gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
         if self.children.count > 0 {
@@ -918,7 +918,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } else {
                 GV.playingRecord = nowPlaying.last!
             }
-            let sizeOfGrid: [Int:Int] = [0:10, 50:5, 72:6, 98:7, 128:8, 162:9, 200:10]
+            let sizeOfGrid: [Int:Int] = [0:10, 50:5, 72:6, 98:7, 128:8, 162:9, 200:10, 242:11, 288:12]
             if GV.playingRecord.rounds.count > 0 {
                 GV.sizeOfGrid = sizeOfGrid[GV.playingRecord.rounds.first!.gameArray.count]!
             }
@@ -2704,7 +2704,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 if index >= tilesForGame.count {
                     let piece = piecesToPlay[index]
                     if piece.count > 0 {
-                        let tile = WTPiece(from: piece, parent: self, blockSize: blockSize, arrayIndex: index)
+                        let tile = WTPiece(from: piece, parent: self, blockSize: GV.blockSize, arrayIndex: index)
                         tilesForGame.append(tile)
                         tilesForGame.last!.setArrayIndex(index: index)
                     }
@@ -3050,7 +3050,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         } else if movedFromBottom {
             // only by from Bottom
             let sprite = pieceArray[movedIndex]
-            sprite.position = touchLocation + CGPoint(x: 0, y: blockSize * WSGameboardSizeMultiplier)
+            sprite.position = touchLocation + CGPoint(x: 0, y: GV.blockSize * WSGameboardSizeMultiplier)
             sprite.alpha = 0.0
             if wtGameboard!.moveSpriteOnGameboard(col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow) {  // true says moving finished
                 if touchedNodes.row == GV.sizeOfGrid { // when at bottom
@@ -3086,7 +3086,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             let distanceMultipler = CGFloat(0.1)
             let yDistance = abs((touchLocation - firstTouchLocation).y)
-            if yDistance > (blockSize * distanceMultipler) && touchedNodes.row >= 0 && touchedNodes.row < GV.sizeOfGrid {
+            if yDistance > (GV.blockSize * distanceMultipler) && touchedNodes.row >= 0 && touchedNodes.row < GV.sizeOfGrid {
                 if touchedNodes.shapeIndex >= 0 {
                     movedFromBottom = wtGameboard!.startShowingSpriteOnGameboard(shape: pieceArray[touchedNodes.shapeIndex], col: touchedNodes.col, row: touchedNodes.row) //, shapePos: touchedNodes.shapeIndex)
                     movedIndex = touchedNodes.shapeIndex
@@ -3118,8 +3118,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             if enabled || gameboardEnabled {
                 if name.begins(with: "GBD") {
-                    touchedNodes.GCol = Int(name.subString(at: 4, length:1))!
-                    touchedNodes.GRow = Int(name.subString(at: 6, length:1))!
+                    let values = name.components(separatedBy: "/")
+                    if values[1].isNumeric() {
+                        touchedNodes.GCol = Int(values[1])!
+                    }
+                    if values[2].isNumeric() {
+                        touchedNodes.GRow = Int(values[2])!
+                    }
+//                    touchedNodes.GCol = Int(name.subString(at: 4, length:1))!
+//                    touchedNodes.GRow = Int(name.subString(at: 6, length:1))!
                 } else if let number = Int(name.subString(at: 3, length: name.count - 3)) {
                     if enabled {
                         let nameStartedWith = name.subString(at: 0, length: 3)
@@ -3604,12 +3611,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             message = GV.language.getText(.tcGameFinished2)
             myAlert = MyAlertController(title: title, message: message, target: self, type: .Red)
             if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
-                myAlert.addAction(text: GV.language.getText(.tcNewGame5), action: #selector(newGame5ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGame6), action: #selector(newGame6ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGame7), action: #selector(newGame7ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGame8), action: #selector(newGame8ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGame9), action: #selector(newGame9ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGame10), action: #selector(newGame10ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "5"), action: #selector(newGame5ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "6"), action: #selector(newGame6ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "7"), action: #selector(newGame7ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "8"), action: #selector(newGame8ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "9"), action: #selector(newGame9ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "10"), action: #selector(newGame10ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "11"), action: #selector(newGame11ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "12"), action: #selector(newGame12ButtonTapped))
             } else {
                 myAlert.addAction(text: GV.language.getText(.tcNewGame), action: #selector(newGameButtonTapped))
             }
@@ -3668,6 +3677,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     @objc private func newGame10ButtonTapped() {
         GV.sizeOfGrid = 10
+        newGameButtonTapped()
+    }
+    
+    @objc private func newGame11ButtonTapped() {
+        GV.sizeOfGrid = 11
+        newGameButtonTapped()
+    }
+    
+    @objc private func newGame12ButtonTapped() {
+        GV.sizeOfGrid = 12
         newGameButtonTapped()
     }
     
@@ -4083,7 +4102,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 let rotateIndex = random.getRandomInt(0, max: 3)
 
-                let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: blockSize, letters: letters)
+                let tileForGameItem = WTPiece(type: tileType, rotateIndex: rotateIndex, parent: self, blockSize: GV.blockSize, letters: letters)
                 for letter in letters {
                     pieceString += letter
                 }

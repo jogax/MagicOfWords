@@ -346,7 +346,7 @@ class WTGameboard: SKShapeNode {
     var myPiece = WTPiece()
     var countCols: Int
     var grid: Grid?
-    let blockSize: CGFloat?
+//    let blockSize: CGFloat?
     var shape: WTPiece = WTPiece()
     private var showingWords = false
     private var lastCol: Int = 0
@@ -365,13 +365,13 @@ class WTGameboard: SKShapeNode {
     
 
     init(countCols: Int, parentScene: SKScene, delegate: WTGameboardDelegate, yCenter: CGFloat) {
-        let blockSizeMultiplierForIpad: [Int:CGFloat] = [5: 0.08, 6: 0.08, 7: 0.08, 8: 0.075, 9: 0.07, 10: 0.07]
-        let blockSizeMultiplierForIPhone: [Int:CGFloat] = [5: 0.15, 6: 0.14, 7: 0.13, 8: 0.11, 9: 0.10, 10: 0.092]
+        let blockSizeMultiplierForIpad: [Int:CGFloat] = [5: 0.08, 6: 0.08, 7: 0.08, 8: 0.075, 9: 0.07, 10: 0.07, 11: 0.065, 12: 0.055]
+        let blockSizeMultiplierForIPhone: [Int:CGFloat] = [5: 0.15, 6: 0.14, 7: 0.13, 8: 0.11, 9: 0.10, 10: 0.090, 11:0.078, 12: 0.075]
 
         self.countCols = GV.sizeOfGrid
         self.parentScene = parentScene
 //        let onIPhoneValue: CGFloat = GV.onIPhone5 ? 0.80 : 0.85
-        self.blockSize = GV.onIpad ?
+        GV.blockSize = GV.onIpad ?
             blockSizeMultiplierForIpad [GV.sizeOfGrid]! * GV.minSide : blockSizeMultiplierForIPhone [GV.sizeOfGrid]! * GV.minSide
         self.delegate = delegate
         self.yCenter = yCenter
@@ -394,7 +394,7 @@ class WTGameboard: SKShapeNode {
         for col in 0..<countCols {
             let colSprite = SKSpriteNode()
             colSprite.position = grid!.gridPosition(col: col, row: 0) + CGPoint(x: grid!.frame.midX, y: grid!.frame.minY)
-            colSprite.size = CGSize(width: blockSize!, height: parentScene.frame.height)
+            colSprite.size = CGSize(width: GV.blockSize, height: parentScene.frame.height)
             colSprite.name = "Col\(col)"
             parentScene.addChild(colSprite)
         }
@@ -407,15 +407,15 @@ class WTGameboard: SKShapeNode {
         
         let rowSprite = SKSpriteNode()
         let row10Height = grid!.frame.minY - parentScene.frame.minY
-        rowSprite.position = CGPoint(x: parentScene.frame.midX, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * blockSize!)
+        rowSprite.position = CGPoint(x: parentScene.frame.midX, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize)
         rowSprite.size = CGSize(width: parentScene.frame.width, height: row10Height)
 //        rowSprite.color = .blue
         rowSprite.name = "Row\(countCols)"
         parentScene.addChild(rowSprite)
         for row in 0..<countCols {
             let rowSprite = SKSpriteNode()
-            rowSprite.position = CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * blockSize!)
-            rowSprite.size = CGSize(width: parentScene.frame.width * 1.1, height: blockSize!)
+            rowSprite.position = CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize)
+            rowSprite.size = CGSize(width: parentScene.frame.width * 1.1, height: GV.blockSize)
 //            if row % 2 == 0 {
 //                rowSprite.alpha = 1
 //                rowSprite.color = .green
@@ -431,7 +431,7 @@ class WTGameboard: SKShapeNode {
             gameArray.append( [WTGameboardItem]() )
             
             for j in 0..<countCols {
-                gameArray[i].append( WTGameboardItem(blockSize: blockSize!, fontSize: parentScene.frame.width * 0.040) )
+                gameArray[i].append( WTGameboardItem(blockSize: GV.blockSize, fontSize: parentScene.frame.width * 0.040) )
                 _ = gameArray[i][j].setLetter(letter: emptyLetter, toStatus: .Empty, calledFrom: "")
             }
         }
@@ -441,9 +441,9 @@ class WTGameboard: SKShapeNode {
     private func createBackgroundShape(countCols: Int) {
         //        let myShape =
 
-        grid = Grid(blockSize: blockSize!, rows:countCols, cols:countCols)
+        grid = Grid(blockSize: GV.blockSize, rows:countCols, cols:countCols)
         grid!.plPosSize = PLPosSize(PPos: CGPoint (x: GV.minSide * 0.5, y: GV.maxSide * yCenter),
-                                    LPos: CGPoint (x: GV.maxSide * 0.7, y: GV.minSide * 0.5))
+                                    LPos: CGPoint (x: GV.maxSide * 0.5, y: GV.minSide * 0.5))
             
         grid!.name = gridName
         grid!.setActPosSize()
@@ -667,7 +667,7 @@ class WTGameboard: SKShapeNode {
     var stopChoosing = false
 
     public func setMoveModusBecauseOfTimer(col: Int, row: Int)->Bool {
-        myPiece = WTPiece(fromChoosedWord: choosedWord, parent: parentScene, blockSize: blockSize!)
+        myPiece = WTPiece(fromChoosedWord: choosedWord, parent: parentScene, blockSize: GV.blockSize)
         if myPiece.myType != .NotUsed {
             origChoosedWord = choosedWord
             if startShowingSpriteOnGameboard(shape: myPiece, col: choosedWord.usedLetters[0].col, row: choosedWord.usedLetters[0].row) {
@@ -745,7 +745,7 @@ class WTGameboard: SKShapeNode {
             }
         }
         if onlyUsedLetters {
-            myPiece = WTPiece(fromChoosedWord: choosedWord, parent: parentScene, blockSize: blockSize!)
+            myPiece = WTPiece(fromChoosedWord: choosedWord, parent: parentScene, blockSize: GV.blockSize)
             if myPiece.myType != .NotUsed {
                 origChoosedWord = choosedWord
                 if startShowingSpriteOnGameboard(shape: myPiece, col: choosedWord.usedLetters[0].col, row: choosedWord.usedLetters[0].row) {
@@ -775,7 +775,7 @@ class WTGameboard: SKShapeNode {
                     for letter in choosedWord.usedLetters {
                         GV.gameArray[letter.col][letter.row].setStatus(toStatus: .OrigStatus)
                     }
-                    myPiece = WTPiece(fromChoosedWord: startsWithLetters, parent: parentScene, blockSize: blockSize!)
+                    myPiece = WTPiece(fromChoosedWord: startsWithLetters, parent: parentScene, blockSize: GV.blockSize)
                     if myPiece.myType != .NotUsed {
                         origChoosedWord = startsWithLetters
                         if startShowingSpriteOnGameboard(shape: myPiece, col: startsWithLetters.usedLetters[0].col, row: startsWithLetters.usedLetters[0].row) {

@@ -70,11 +70,13 @@ class WTGameboardItem: SKSpriteNode {
         label.fontName = GV.actPieceFont //"KohinoorBangla-Regular"
         label.fontColor = .black
         label.verticalAlignmentMode = .center
+        var mySize = blockSize * 0.4
         repeat {
-            if "A".height(font: UIFont(name: GV.actPieceFont, size: self.fontSize)!) > blockSize * 0.6 {
+            if "A".height(font: UIFont(name: GV.actPieceFont, size: mySize)!) > blockSize * 0.7 {
+                self.fontSize = mySize
                 break
             }
-            self.fontSize += 1
+            mySize += 1
         } while true
         label.fontSize = self.fontSize
         label.zPosition = self.zPosition + 1

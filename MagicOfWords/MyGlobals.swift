@@ -186,6 +186,7 @@ struct GV {
         }
     }
     static var globalInfoTable = [PlayerData]()
+    static var blockSize = CGFloat(0)
     
     static var deviceHasNotch = false
     static var actWidth: CGFloat = 0
