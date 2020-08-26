@@ -726,7 +726,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         //        createTippButton()
         createAllWordsButton()
         createHintButton()
-        createFinishButton()
+        createNewGameButton()
         createSearchButton()
 //        createDifficultyButtons(number: calculatePlace())
         createHeader()
@@ -1030,7 +1030,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            let gameTypeLinePosition:CGFloat = 0.93
             let pX: CGFloat = GV.minSide * 0.5
             let pY: CGFloat = GV.maxSide * (GV.deviceHasNotch ? 0.93 : 0.97)
-            let lX: CGFloat = GV.maxSide * 0.25
+            let lX: CGFloat = GV.maxSide * 0.5
             let lY: CGFloat = GV.minSide * (GV.deviceHasNotch ? 0.93 : 0.97)
             let plPos = PLPosSize(PPos: CGPoint(x: pX, y: pY), LPos: CGPoint(x: lX, y: lY))
             let text = GV.language.getText((GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? .tcEasyPlay : .tcMediumPlay), values: "\(GV.sizeOfGrid)x\(GV.sizeOfGrid)")
@@ -1047,7 +1047,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if bgSprite!.childNode(withName: headerLine) == nil {
             let pX: CGFloat = GV.minSide * 0.5
             let pY: CGFloat = firstLineYP - lineAdderP
-            let lX: CGFloat = GV.maxSide * 0.25
+            let lX: CGFloat = GV.maxSide * 0.5
             let lY: CGFloat = firstLineYL - lineAdderL
             //            let gameNumber = GV.playingRecord.gameNumber >= GV.DemoEasyGameNumber ? "DEMO" : String(""/*GV.playingRecord.gameNumber % 1000 + 1*/)
             let text = GV.language.getText(.tcHeader, values: String(1), timeForGame.time.HourMinSec)
@@ -1786,7 +1786,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let size = CGSize(width:wordLength * 1.5, height: buttonHeight)
 //        ownHeaderYPos = self.frame.height * mybuttonLineCenterY// - ownHeader.frame.maxY + frame.height
         allWordsButtonCenter = PLPosSize(PPos: CGPoint(x:GV.minSide * 0.45, y: GV.maxSide * mybuttonLineCenterY),
-                                         LPos: CGPoint(x:GV.maxSide * 0.45, y: GV.minSide * mybuttonLineCenterY))
+                                         LPos: CGPoint(x:GV.maxSide * 0.10, y: GV.minSide * mybuttonLineCenterY))
              //self.frame.height * 0.20)
 //        let radius = frame.height * 0.5
         allWordsButton = createMyButton(title: title, size: size, center: allWordsButtonCenter, enabled: true )
@@ -1803,7 +1803,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             hintButton = nil
         }
         let center = PLPosSize(PPos: CGPoint(x:GV.minSide * 0.70, y:GV.maxSide * mybuttonLineCenterY),
-                               LPos: CGPoint(x:GV.maxSide * 0.70, y:GV.minSide * mybuttonLineCenterY))
+                               LPos: CGPoint(x:GV.maxSide * 0.80, y:GV.minSide * firstButtonLine))
             
         
         let imageName = "Tipp"
@@ -1842,7 +1842,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     }
     
-    private func createFinishButton() {
+    private func createNewGameButton() {
         if finishButton != nil {
             finishButton?.removeFromParent()
             finishButton = nil
@@ -1852,7 +1852,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let wordHeight = title.height(font: myTitleFont!)
         let size = CGSize(width:wordLength * 1.2, height: buttonHeight)
         let finishButtonCenter = PLPosSize(PPos: CGPoint(x:GV.minSide * 0.15, y: GV.maxSide * mybuttonLineCenterY),
-                                           LPos: CGPoint(x:GV.maxSide * 0.15, y: GV.minSide * mybuttonLineCenterY))
+                                           LPos: CGPoint(x:GV.maxSide * 0.10, y: GV.minSide * firstButtonLine))
             //self.frame.height * 0.20)
 //        let radius = frame.height * 0.5
         finishButton = createMyButton(title: title, size: size, center: finishButtonCenter, enabled: true )
@@ -1980,7 +1980,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 //        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = PLPosSize(PPos: CGPoint(x:GV.minSide * firstButtonColumn, y:GV.maxSide * firstButtonLine),
-                               LPos: CGPoint(x:GV.maxSide * firstButtonColumn, y:GV.minSide * firstButtonLine))
+                               LPos: CGPoint(x:GV.maxSide * firstButtonColumn, y:GV.minSide * musicOnOffLine))
             
 //        let radius = self.frame.width * 0.04
 //        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
