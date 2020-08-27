@@ -1069,7 +1069,9 @@ fileprivate var storedProperty_SubClassType: [ObjectIdentifier:SKNodeSubclassTyp
 extension SKNode {
     var plPosSize: PLPosSize? {
         get {return storedProperty_PLPosition[ObjectIdentifier(self)] ?? nil}
-        set {storedProperty_PLPosition[ObjectIdentifier(self)] = newValue}
+        set {storedProperty_PLPosition[ObjectIdentifier(self)] = newValue
+            setActPosSize()
+        }
     }
     var nodeType: SKNodeSubclassType? {
         get {return storedProperty_SubClassType[ObjectIdentifier(self)] ?? nil}

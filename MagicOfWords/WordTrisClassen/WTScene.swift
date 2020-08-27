@@ -529,7 +529,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let width = textOnBalloon.width(font: myFont!) * (GV.onIpad ? 2.0 : 1.5)
         let height = textOnBalloon.height(font: myFont!) * 2.5
         balloon.size = CGSize(width: width, height: height)
-        balloon.zPosition = 10
+        balloon.zPosition = 100
 //        let atY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
 //        let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
         let startPos = CGPoint(x: self.frame.width * 0.5, y: allWordsButton!.frame.maxY + balloon.size.height * 2)
@@ -631,7 +631,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //    var wtGameFinishedSprite = WTGameFinished()
 
     var pieceArray = [WTPiece]()
-    var origPosition: [CGPoint] = Array(repeating: CGPoint(x:0, y: 0), count: 3)
+    var origPosition: [PLPosSize] = Array(repeating: PLPosSize(), count: 3)
     var origSize: [CGSize] = Array(repeating: CGSize(width:0, height: 0), count: 3)
     var totalScore: Int = 0
     var movedFromBottom = false
@@ -996,8 +996,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let ownWordsLinePosition:CGFloat = 0.84
     let mandatoryWordsLinePosition:CGFloat = 0.82
     let buttonLineCenterY:CGFloat = 0.265
-    let mybuttonLineCenterY:CGFloat = 1 - 0.265 // 1 - buttonLineCenterY
-    let gameboardCenterY: CGFloat = GV.onIpad ? 0.43 : 0.46
+    let gameboardCenterY: CGFloat = GV.onIpad ? 0.45 : 0.48
     let pieceArrayCenterY: CGFloat = GV.onIpad ? 0.08 : 0.1
     let scoreLength: Int = 6
     
@@ -1029,7 +1028,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if bgSprite!.childNode(withName: gameTypeName) == nil {
 //            let gameTypeLinePosition:CGFloat = 0.93
             let pX: CGFloat = GV.minSide * 0.5
-            let pY: CGFloat = GV.maxSide * (GV.deviceHasNotch ? 0.93 : 0.97)
+            let pY: CGFloat = GV.maxSide * (GV.deviceHasNotch ? 0.93 : 0.95)
             let lX: CGFloat = GV.maxSide * 0.5
             let lY: CGFloat = GV.minSide * (GV.deviceHasNotch ? 0.93 : 0.97)
             let plPos = PLPosSize(PPos: CGPoint(x: pX, y: pY), LPos: CGPoint(x: lX, y: lY))
@@ -1115,7 +1114,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             bgSprite!.addChild(myScoreHeaderLabel)
         }
         
-        bgSprite!.setPosAndSizeForAllChildren()
+//        bgSprite!.setPosAndSizeForAllChildren()
         
         modifyHeader()
    }
@@ -1743,8 +1742,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             musicOnOffButton!.removeFromParent()
             musicOnOffButton = nil
         }
-        let center = PLPosSize(PPos: CGPoint(x:GV.minSide * lastButtonColumn, y:GV.maxSide * musicOnOffLine),
-                               LPos: CGPoint(x:GV.maxSide * lastButtonColumn, y:GV.minSide * musicOnOffLine))
+        let center = PLPosSize(PPos: CGPoint(x:GV.minSide * lastButtonColumn, y:GV.maxSide * firstButtonLine),
+                               LPos: CGPoint(x:GV.maxSide * lastButtonColumn, y:GV.minSide * firstButtonLine))
         let imageName = GV.basicDataRecord.musicOn ? "MusicOn" : "MusicOff"
         musicOnOffButton = createMyButton(imageName: imageName, size: buttonSize, center: center, enabled: enabled, newSize: buttonHeight)
         musicOnOffButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.switchMusicOnOff))
@@ -1784,9 +1783,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let wordLength = title.width(font: myTitleFont!)
 //        let wordHeight = title.height(font: myTitleFont!)
         let size = CGSize(width:wordLength * 1.5, height: buttonHeight)
-//        ownHeaderYPos = self.frame.height * mybuttonLineCenterY// - ownHeader.frame.maxY + frame.height
-        allWordsButtonCenter = PLPosSize(PPos: CGPoint(x:GV.minSide * 0.45, y: GV.maxSide * mybuttonLineCenterY),
-                                         LPos: CGPoint(x:GV.maxSide * 0.10, y: GV.minSide * mybuttonLineCenterY))
+        allWordsButtonCenter = PLPosSize(PPos: CGPoint(x:GV.minSide * secondButtonColumn, y: GV.maxSide * secondButtonLine),
+                                         LPos: CGPoint(x:GV.maxSide * firstButtonColumn, y: GV.minSide * thirdButtonLine))
              //self.frame.height * 0.20)
 //        let radius = frame.height * 0.5
         allWordsButton = createMyButton(title: title, size: size, center: allWordsButtonCenter, enabled: true )
@@ -1802,8 +1800,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             hintButton?.removeFromParent()
             hintButton = nil
         }
-        let center = PLPosSize(PPos: CGPoint(x:GV.minSide * 0.70, y:GV.maxSide * mybuttonLineCenterY),
-                               LPos: CGPoint(x:GV.maxSide * 0.80, y:GV.minSide * firstButtonLine))
+        let center = PLPosSize(PPos: CGPoint(x:GV.minSide * thirdButtonColumn, y:GV.maxSide * secondButtonLine),
+                               LPos: CGPoint(x:GV.maxSide * fourthButtonColumn, y:GV.minSide * secondButtonLine))
             
         
         let imageName = "Tipp"
@@ -1851,8 +1849,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let wordLength = title.width(font: myTitleFont!)
 //        let wordHeight = title.height(font: myTitleFont!)
         let size = CGSize(width:wordLength * 1.2, height: buttonHeight)
-        let finishButtonCenter = PLPosSize(PPos: CGPoint(x:GV.minSide * 0.15, y: GV.maxSide * mybuttonLineCenterY),
-                                           LPos: CGPoint(x:GV.maxSide * 0.10, y: GV.minSide * firstButtonLine))
+        let finishButtonCenter = PLPosSize(PPos: CGPoint(x:GV.minSide * firstButtonColumn, y: GV.maxSide * secondButtonLine),
+                                           LPos: CGPoint(x:GV.maxSide * firstButtonColumn, y: GV.minSide * secondButtonLine))
             //self.frame.height * 0.20)
 //        let radius = frame.height * 0.5
         finishButton = createMyButton(title: title, size: size, center: finishButtonCenter, enabled: true )
@@ -1931,8 +1929,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let size = CGSize(width: buttonHeight, height: buttonHeight)
 //        let freePlaceWidth = self.frame.width - allWordsButton!.frame.maxX
-        let center = PLPosSize(PPos: CGPoint(x: self.frame.width * lastButtonColumn, y: allWordsButtonCenter.PPos.y),
-                               LPos: CGPoint(x: self.frame.width * lastButtonColumn, y: allWordsButtonCenter.LPos.y))
+        let center = PLPosSize(PPos: CGPoint(x: GV.minSide * fourthButtonColumn, y: GV.maxSide * secondButtonLine),
+                               LPos: CGPoint(x: GV.maxSide * fourthButtonColumn, y: GV.minSide * firstButtonLine))
 //        let radius = self.frame.width * 0.04
 //        let image = UIImage(named: "search")
         let newSize = allWordsButton!.size.height
@@ -1944,32 +1942,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        searchButton!.addTarget(self, action: #selector(self.searchButtonTappod), for: .touchUpInside)
         bgSprite!.addChild(searchButton!)
     }
-    
-//    private func createTippButton() {
-//        if tippButton != nil {
-//            tippButton?.removeFromParent()
-//            tippButton = nil
-//        }
-//        let xPosition = self.self.frame.width * (GV.onIpad ? 0.75 : 0.5)
-//        let yPosition = self.frame.height * (GV.onIpad ? mybuttonLineCenterY : lastButtonLine)
-//        let center = CGPoint(x: xPosition, y: yPosition)
-//        let size = CGSize(width: buttonHeight, height: buttonHeight)
-//        let imageName = "Tipp"
-//        tippButton = createMyButton(imageName: imageName, size: size, center: center, enabled: enabled, newSize: buttonHeight)
-//        tippButton!.setButtonAction(target: self, triggerEvent:.TouchUpInside, action: #selector(self.showTipps))
-//        tippButton!.name = imageName
-//        tippButton!.zPosition = 10
-//        bgSprite!.addChild(tippButton!)
-//    }
-//
-//    @objc private func showTipps() {
-//        //        let freeLetters = findFreeLetters()
-//    }
-//    private func findFreeLetters()->(redLetters:[String], freePositions:[(Int, Int)]) {
-//
-//    }
-
-    
 
     
     let buttonYPosition: CGFloat = 0.145
@@ -1980,7 +1952,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 //        let frame = CGRect(x: 0, y: 0, width: buttonHeight, height: buttonHeight)
         let center = PLPosSize(PPos: CGPoint(x:GV.minSide * firstButtonColumn, y:GV.maxSide * firstButtonLine),
-                               LPos: CGPoint(x:GV.maxSide * firstButtonColumn, y:GV.minSide * musicOnOffLine))
+                               LPos: CGPoint(x:GV.maxSide * firstButtonColumn, y:GV.minSide * firstButtonLine))
             
 //        let radius = self.frame.width * 0.04
 //        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
@@ -2064,11 +2036,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        wtSceneDelegate!.gameFinished(start: .SetMedium)
     }
     
-    let firstButtonColumn: CGFloat = 0.08
+    let firstButtonColumn: CGFloat = 0.10
+    let secondButtonColumn: CGFloat = 0.43
+    let thirdButtonColumn: CGFloat = 0.65
+    let fourthButtonColumn: CGFloat = 0.80
     var lastButtonColumn: CGFloat = 0.92
-    var musicOnOffLine: CGFloat = 0.94
-    var firstButtonLine: CGFloat = 0.84
-    var secondButtonLine: CGFloat = 0.80
+    var firstButtonLine: CGFloat = 0.94
+    var secondButtonLine: CGFloat = 0.82
+    var thirdButtonLine: CGFloat = 0.70
     var lastButtonLine: CGFloat = GV.onIpad ? 0.09 : 0.18
     
     private func createUndo() {
@@ -2082,8 +2057,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
 //        let hasFrame = GV.buttonType == GV.ButtonTypeSimple
         let imageName = "UndoElite"
-        let center = PLPosSize(PPos: CGPoint(x: GV.minSide * lastButtonColumn, y: GV.maxSide * firstButtonLine),
-                               LPos: CGPoint(x: GV.maxSide * lastButtonColumn, y: GV.minSide * firstButtonLine))
+        let center = PLPosSize(PPos: CGPoint(x: GV.minSide * lastButtonColumn, y: GV.maxSide * secondButtonLine),
+                               LPos: CGPoint(x: GV.maxSide * lastButtonColumn, y: GV.minSide * secondButtonLine))
             
         let size = CGSize(width: buttonHeight, height: buttonHeight)
         let newSize = buttonHeight
@@ -2204,7 +2179,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         indexOfTilesForGame = 0
         pieceArray = Array(repeating: WTPiece(), count: 3)
         for index in 0..<3 {
-            origPosition[index] = CGPoint(x:self.frame.width * shapeMultiplicator[index], y:self.frame.height * pieceArrayCenterY)
+            origPosition[index] = PLPosSize(PPos: CGPoint(x:GV.minSide * shapeMultiplicator[index], y:GV.maxSide * pieceArrayCenterY),
+                                            LPos: CGPoint(x:GV.maxSide * shapeMultiplicator[index], y:GV.minSide * pieceArrayCenterY))
+                
         }
 //        GV.hintTable.removeAll()
         if !new {
@@ -2239,12 +2216,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             for index in 0..<3 {
                 pieceArray[index] = getNextPiece(/*horizontalPosition: index*/)
                 origSize[index] = pieceArray[index].size
-                pieceArray[index].position = origPosition[index]
+                pieceArray[index].plPosSize = origPosition[index]
                 pieceArray[index].name = "Pos\(index)"
                 pieceArray[index].setPieceFromPosition(index: index)
                 bgSprite!.addChild(pieceArray[index])
             }
         }
+//        bgSprite!.setPosAndSizeForAllChildren()
 //        saveActualState()
 //        fillTippIndexes()
         
@@ -2326,13 +2304,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     for index in movedIndex..<lastIndex {
                         pieceArray[index] = pieceArray[index + 1]
                         pieceArray[index].name = "Pos\(String(index))"
-                        pieceArray[index].position = origPosition[index]
+                        pieceArray[index].plPosSize = origPosition[index]
                         pieceArray[index].setPieceFromPosition(index: index)
                         origSize[index] = pieceArray[index].size
                     }
                 }
                 pieceArray[lastIndex] = getNextPiece(/*horizontalPosition: lastIndex*/)
-                pieceArray[lastIndex].position = origPosition[lastIndex]
+                pieceArray[lastIndex].plPosSize = origPosition[lastIndex]
                 pieceArray[lastIndex].name = "Pos\(lastIndex)"
                 pieceArray[lastIndex].setPieceFromPosition(index: lastIndex)
                 words = GV.playingRecord.words.components(separatedBy: itemSeparator)
@@ -2905,25 +2883,11 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             startShapeIndex = touchedNodes.shapeIndex
             pieceArray[touchedNodes.shapeIndex].zPosition = 10
             wtGameboard!.clear()
-//            if GV.generateHelpInfo {
-//                helpInfo.typeOfTouch = TypeOfTouch.FromBottom.rawValue
-//                helpInfo.beganInfo = "\(touchedNodes.shapeIndex)"
-//                var letters = ""
-//                for letter in pieceArray[touchedNodes.shapeIndex].letters {
-//                    letters += letter
-//                }
-//                helpInfo.letters = letters
-//            }
         } else if touchedNodes.GCol.between(min: 0, max: GV.sizeOfGrid - 1) && touchedNodes.GRow.between(min:0, max: GV.sizeOfGrid - 1) {
             touchedPosition = touchedNodes
             timerForSetMovingModus = Timer.scheduledTimer(timeInterval: GV.basicDataRecord.setMoveModusDuration, target: self, selector: #selector(setMoveModus(timerX: )), userInfo: nil, repeats: false)
             inChoosingOwnWord = true
             wtGameboard?.startChooseOwnWord(col: touchedNodes.GCol, row: touchedNodes.GRow)
-//            if GV.generateHelpInfo {
-//                helpInfo.typeOfTouch = TypeOfTouch.FromGameArray.rawValue
-//                let beganInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.GCol, row: touchedNodes.GRow, GRow: touchedNodes.GRow).toString()
-//                helpInfo.beganInfo = "\(beganInfoData)"
-//            }
         }
 
     }
@@ -2971,39 +2935,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     
     var timerForSetMovingModus: Timer?
-    
-//    public func setMovingSprite() {
-//        movingSprite = true
-//    }
-    
-//    struct MovedInfoData {
-//        var onGameArray = false
-//        var relPosX: CGFloat = 0
-//        var relPosY: CGFloat = 0
-//        var col = NoValue
-//        var row = NoValue
-//        var GRow = NoValue
-//        init(onGameArray: Bool = false, relPosX: CGFloat = 0, relPosY: CGFloat = 0, col: Int = NoValue, row: Int = NoValue, GRow: Int = NoValue) {
-//            self.onGameArray = onGameArray
-//            self.relPosX = relPosX
-//            self.relPosY = relPosY
-//            self.col = col
-//            self.row = row
-//            self.GRow = GRow
-//        }
-//        init(from: String) {
-//            let values = from.components(separatedBy: "/")
-//            self.onGameArray = Int(values[0]) == 0 ? false : true
-//            self.relPosX = CGFloat(Float(values[1])!)
-//            self.relPosY = CGFloat(Float(values[2])!)
-//            self.col = Int(values[3])!
-//            self.row = Int(values[4])!
-//            self.GRow = Int(values[5])!
-//        }
-//        func toString()->String {
-//            return "\(onGameArray ? "1" : "0")/\(relPosX.nDecimals(n: 3))/\(relPosY.nDecimals(n: 3))/\(col)/\(row)/\(GRow)"
-//        }
-//    }
     
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -3227,19 +3158,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
             }
             returnBool = checkLetters == "" || checkLetters == lettersForCheck
-//            if GV.generateHelpInfo {
-//                let endedInfoData = MovedInfoData(onGameArray: true, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
-//                helpInfo.endedInfo = endedInfoData
-//                if helpInfo.movedInfo.length > 0 {
-//                    helpInfo.movedInfo.removeLast()
-//                }
-//                helpInfo.letters = lettersForCheck
-//                if saveRecord {
-//                    try! realmHelpInfo!.safeWrite() {
-//                        realmHelpInfo!.add(helpInfo)
-//                    }
-//                }
-//            }
 
         } else if movedFromBottom {
             for piece in pieceArray {
@@ -3270,13 +3188,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     for index in movedIndex..<lastIndex {
                         pieceArray[index] = pieceArray[index + 1]
                         pieceArray[index].name = "Pos\(String(index))"
-                        pieceArray[index].position = origPosition[index]
+                        pieceArray[index].plPosSize = origPosition[index]
                         pieceArray[index].setPieceFromPosition(index: index)
                         origSize[index] = pieceArray[index].size
                     }
                 }
                 pieceArray[lastIndex] = getNextPiece(/*horizontalPosition: lastIndex*/)
-                pieceArray[lastIndex].position = origPosition[lastIndex]
+                pieceArray[lastIndex].plPosSize = origPosition[lastIndex]
                 pieceArray[lastIndex].name = "Pos\(lastIndex)"
                 pieceArray[lastIndex].setPieceFromPosition(index: lastIndex)
                 for index in 0...lastIndex {
@@ -3301,7 +3219,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 createHintsInBackground()
                saveActualState()
             } else {
-                pieceArray[movedIndex].position = origPosition[movedIndex]
+                pieceArray[movedIndex].plPosSize = origPosition[movedIndex]
 //                pieceArray[movedIndex].scale(to: origSize[movedIndex])
                 pieceArray[movedIndex].alpha = 1
             }
@@ -3314,7 +3232,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 }
                 returnBool = letters == checkLetters
                 pieceArray[touchedNodes.shapeIndex].rotate()
-                pieceArray[touchedNodes.shapeIndex].position = origPosition[touchedNodes.shapeIndex]
+                pieceArray[touchedNodes.shapeIndex].plPosSize = origPosition[touchedNodes.shapeIndex]
 //                if GV.generateHelpInfo {
 //                    let endedInfoData = MovedInfoData(onGameArray: false, relPosX: relativPosition.x, relPosY: relativPosition.y, col: touchedNodes.col, row: touchedNodes.row, GRow: touchedNodes.GRow).toString()
 //                    helpInfo.endedInfo += endedInfoData
@@ -3619,6 +3537,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "10"), action: #selector(newGame10ButtonTapped))
                 myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "11"), action: #selector(newGame11ButtonTapped))
                 myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "12"), action: #selector(newGame12ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcBack), action: #selector(continueAction))
             } else {
                 myAlert.addAction(text: GV.language.getText(.tcNewGame), action: #selector(newGameButtonTapped))
             }
@@ -3839,7 +3758,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             pieceArray[to] = from
             pieceArray[to].name = "Pos\(String(to))"
-            pieceArray[to].position = origPosition[to]
+            pieceArray[to].plPosSize = origPosition[to]
             pieceArray[to].setPieceFromPosition(index: to)
             origSize[to] = pieceArray[to].size
         }
@@ -3951,7 +3870,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     func restoreGameArray() {
         func addPieceAsChild(pieceIndex: Int, piece: WTPiece) {
             pieceArray[pieceIndex] = piece
-            pieceArray[pieceIndex].position = origPosition[pieceIndex]
+            pieceArray[pieceIndex].plPosSize = origPosition[pieceIndex]
             origSize[pieceIndex] = piece.size
             pieceArray[pieceIndex].name = "Pos\(pieceIndex)"
             removeNodesWith(name: "Pos\(pieceIndex)")             // remove the piece from this position, if exists
@@ -4031,7 +3950,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var typesWithLen1 = [MyShapes]()
         var typesWithLen2 = [MyShapes]()
         var typesWithLen3 = [MyShapes]()
-        var typesWithLen4 = [MyShapes]()
+//        var typesWithLen4 = [MyShapes]()
         var usedWords = [String]()
         var wordsString = ""
         var pieceString = ""
@@ -4048,8 +3967,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             switch length {
             case 1: typesWithLen1.append(type)
             case 2: typesWithLen2.append(type)
-            case 3: typesWithLen3.append(type)
-            case 4: typesWithLen4.append(type)
+//            case 3: typesWithLen3.append(type)
+//            case 4: typesWithLen4.append(type)
             default: break
             }
         }
@@ -4087,7 +4006,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             wordsString += inputWord + itemSeparator
             repeat {
                 var letters = [String]()
-                let randomLength = inputWord.length > 3 ? 3 : inputWord.length
+                let randomLength = inputWord.length > 2 ? 2 : inputWord.length
                 let tileLength = random.getRandomInt(1, max: randomLength)
                 for _ in 0..<tileLength {
                     letters.append(inputWord.firstChar())
@@ -4291,16 +4210,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.hideButtons(hide: true)
     }
     
-//    private func getHintsForShow()->([String], Int) {
-//        var returnArray = [String]()
-//        var returnValue = 0
-//        for item in GV.hintTable {
-//            returnValue = returnValue < item.hint.length ? item.hint.length : returnValue
-//            returnArray.append(hint)
-//        }
-//        return (returnArray, returnValue)
-//    }
-//
     var hintsTableForShow = [HintForShow]()
     var hintHeaderLine = ""
     private func showHintsInTableView() {

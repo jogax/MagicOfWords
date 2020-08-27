@@ -340,7 +340,7 @@ class WTPiece: SKSpriteNode {
 //            label.position = position
             label.text = letters[index]
             label.fontColor = .black
-            label.fontSize = myParent.frame.width / 25
+            label.fontSize = GV.minSide / 25
             label.horizontalAlignmentMode = .center
             label.verticalAlignmentMode = .center
             label.color = .blue

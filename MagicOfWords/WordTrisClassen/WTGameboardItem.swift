@@ -85,7 +85,7 @@ class WTGameboardItem: SKSpriteNode {
         countWordsLabel.fontName = GV.actPieceFont //"KohinoorBangla-Regular"
         countWordsLabel.fontColor = .black
 //        countWordsLabel.verticalAlignmentMode = .center
-        countWordsLabel.fontSize = fontSize * 0.7
+        countWordsLabel.fontSize = fontSize * 0.5
 //        countWordsLabel.text = String(countOccurencesInWords)
         countWordsLabel.zPosition = self.zPosition + 2
         addChild(countWordsLabel)
@@ -324,7 +324,7 @@ class WTGameboardItem: SKSpriteNode {
         if newStatus == .WholeWord || newStatus == .GoldStatus || newStatus == .DarkGoldStatus || newStatus == .Error || newStatus == .DarkGreenStatus {
             if countOccurencesInWords > 0 {
                 self.countWordsLabel.text = String(countOccurencesInWords)
-                self.countWordsLabel.fontSize = self.fontSize * (countOccurencesInWords < 10 ? 0.7 : 0.6)
+                self.countWordsLabel.fontSize = self.fontSize * (countOccurencesInWords < 10 ? 0.6 : 0.5)
             }
         } else {
             self.countWordsLabel.text = ""
