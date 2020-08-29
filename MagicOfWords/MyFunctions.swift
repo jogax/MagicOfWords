@@ -30,6 +30,10 @@ func / (point: CGSize, scalar: CGFloat) -> CGSize {
     return CGSize(width: point.width / scalar, height: point.height / scalar)
 }
 
+func + (left: PLPosSize, right: PLPosSize)-> PLPosSize {
+    return PLPosSize(PPos: CGPoint(x: left.PPos.x + right.PPos.x, y: left.PPos.y + right.PPos.y),
+                     LPos: CGPoint(x: left.LPos.x + right.LPos.x, y: left.LPos.y + right.LPos.y))
+}
 
 
 func + (left: CGPoint, right: CGPoint) -> CGPoint {

@@ -327,7 +327,7 @@ class WTPiece: SKSpriteNode {
             let position = gridPosition(col: col, row: row)
             let width = blockSize
             let frameForLetter = SKSpriteNode(color: .clear, size: CGSize(width: width, height: width))
-            frameForLetter.position = position
+            frameForLetter.plPosSize = position
             frameForLetter.color = .white
             let name = nameArray[index]
             frameForLetter.texture = SKTexture(imageNamed: "GraySprite")
@@ -410,11 +410,11 @@ class WTPiece: SKSpriteNode {
     }
     
     
-    private func gridPosition(col:Int, row:Int) -> CGPoint {
+    private func gridPosition(col:Int, row:Int) -> PLPosSize {
         let offset = blockSize * 0.5 + 0.5
         let x = self.frame.minX + (CGFloat(row) * blockSize - 1) + offset
         let y = self.frame.minY + (CGFloat(col) * blockSize - 1) + offset * 0.8 // / 2.2
-        return CGPoint(x:x, y:y)
+        return PLPosSize(PPos: CGPoint(x:x, y:y), LPos: CGPoint(x:x, y:y))
     }
     
     public func getLetterCoordinates()->[LetterCoordinates] {

@@ -380,48 +380,64 @@ class WTGameboard: SKShapeNode {
         GV.gameArray = createNewGameArray(countCols: countCols)
         for col in 0..<countCols {
             for row in 0..<countCols {
-                GV.gameArray[col][row].position = grid!.gridPosition(col: col, row: row) //+
+                GV.gameArray[col][row].plPosSize = grid!.gridPosition(col: col, row: row) //+
                 GV.gameArray[col][row].name = "GBD/\(col)/\(row)"
                 grid!.addChild(GV.gameArray[col][row])
             }
         }
         self.name = gameboardName
-        parentScene.addChild(self)
+        bgSprite!.addChild(self)
         generateNetOfColsAndRows()
     }
     
     private func generateNetOfColsAndRows() {
         for col in 0..<countCols {
             let colSprite = SKSpriteNode()
-            colSprite.position = grid!.gridPosition(col: col, row: 0) + CGPoint(x: grid!.frame.midX, y: grid!.frame.minY)
+            colSprite.nodeType = .SKSpriteNode
+            colSprite.plPosSize = grid!.gridPosition(col: col, row: 0) +
+                PLPosSize(
+                    PPos: CGPoint(x: grid!.plPosSize!.PPos.x, y: grid!.plPosSize!.PPos.y - grid!.frame.height / 2),
+                    LPos: CGPoint(x: grid!.plPosSize!.LPos.x, y: grid!.plPosSize!.LPos.y - grid!.frame.height / 2)
+            )
             colSprite.size = CGSize(width: GV.blockSize, height: parentScene.frame.height)
             colSprite.name = "Col\(col)"
-            parentScene.addChild(colSprite)
+//            if col % 2 == 0 {
+//                colSprite.alpha = 0.5
+//                colSprite.color = .red
+//            }
+
+            bgSprite!.addChild(colSprite)
         }
         let colSprite = SKSpriteNode()
+        colSprite.nodeType = .SKSpriteNode
         let col10Width = parentScene.frame.maxX - grid!.frame.maxX
         colSprite.position = CGPoint(x: grid!.frame.maxX + col10Width / 2, y: grid!.frame.midY)
         colSprite.size = CGSize(width: col10Width, height: parentScene.frame.height)
         colSprite.name = "Col\(countCols)"
-        parentScene.addChild(colSprite)
+        bgSprite!.addChild(colSprite)
         
         let rowSprite = SKSpriteNode()
+        rowSprite.nodeType = .SKSpriteNode
         let row10Height = grid!.frame.minY - parentScene.frame.minY
         rowSprite.position = CGPoint(x: parentScene.frame.midX, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize)
         rowSprite.size = CGSize(width: parentScene.frame.width, height: row10Height)
 //        rowSprite.color = .blue
         rowSprite.name = "Row\(countCols)"
-        parentScene.addChild(rowSprite)
+        bgSprite!.addChild(rowSprite)
         for row in 0..<countCols {
             let rowSprite = SKSpriteNode()
-            rowSprite.position = CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize)
+            rowSprite.nodeType = .SKSpriteNode
+            rowSprite.plPosSize = PLPosSize(
+                PPos: CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row).PPos - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize),
+                LPos: CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row).LPos - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize)
+            )
             rowSprite.size = CGSize(width: parentScene.frame.width * 1.1, height: GV.blockSize)
 //            if row % 2 == 0 {
-//                rowSprite.alpha = 1
+//                rowSprite.alpha = 0.5
 //                rowSprite.color = .green
 //            }
             rowSprite.name = "Row\(countCols - 1 - row)"
-            parentScene.addChild(rowSprite)
+            bgSprite!.addChild(rowSprite)
         }
     }
     private func createNewGameArray(countCols: Int) -> [[WTGameboardItem]] {
@@ -1302,8 +1318,8 @@ class WTGameboard: SKShapeNode {
         }
     }
     
-    public func getCellPosition(col: Int, row: Int)->CGPoint {
-        let addPosition = grid!.position
+    public func getCellPosition(col: Int, row: Int)->PLPosSize {
+        let addPosition = grid!.plPosSize!
         return grid!.gridPosition(col: col, row: row) + addPosition
     }
     
