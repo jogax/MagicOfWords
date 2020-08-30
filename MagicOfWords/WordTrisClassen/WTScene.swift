@@ -1423,7 +1423,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         wtGameboardMovedBy = self.frame.height * 0.15
 //        print(origMovedBy)
 //        wtGameboardMovedBy = self.frame.height - (gridPosition.y + gridSize.height / 2)
-        for row in 0...10 {
+        for row in 0...GV.sizeOfGrid {
             if let child = bgSprite!.childNode(withName: "Row\(row)") {
                 child.position.y -= hide ? wtGameboardMovedBy : -wtGameboardMovedBy
             }
@@ -2560,66 +2560,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         try! realm.safeWrite() {
             GV.playingRecord.time = timeForGame.toString()
         }
-//        if myTimer!.update(time: timeForGame) {
-//            timer!.invalidate()
-//            timer = nil
-//            showGameFinished(status: .TimeOut)
-//        }
     }
     
-//    var realmHelpInfo: Realm?
-    
-//    private func initiateHelpModel() {
-//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-//        let helpInfoURL = documentsURL.appendingPathComponent("HelpInfo.realm")
-//        let config1 = Realm.Configuration(
-//            fileURL: helpInfoURL,
-//            shouldCompactOnLaunch: { totalBytes, usedBytes in
-//                // totalBytes refers to the size of the file on disk in bytes (data + free space)
-//                // usedBytes refers to the number of bytes used by data in the file
-//
-//                // Compact if the file is over 100MB in size and less than 50% 'used'
-//                let oneMB = 10 * 1024 * 1024
-//                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
-//        },
-//            objectTypes: [HelpInfo.self])
-//        do {
-//            // Realm is compacted on the first open if the configuration block conditions were met.
-//            _ = try Realm(configuration: config1)
-//        } catch {
-//            print("error")
-//            // handle error compacting or opening Realm
-//        }
-//        let helpInfoConfig = Realm.Configuration(
-//            fileURL: helpInfoURL,
-//            schemaVersion: 0, // new item words
-//            // Set the block which will be called automatically when opening a Realm with
-//            // a schema version lower than the one set above
-//            migrationBlock: { migration, oldSchemaVersion in
-//                switch oldSchemaVersion {
-////                case 0...3:
-////                    migration.deleteData(forType: HelpModel.className())
-////
-//                default: migration.enumerateObjects(ofType: BasicDataModel.className())
-//                    { oldObject, newObject in
-//                    }
-//                }
-//            },
-//            objectTypes: [HelpInfo.self])
-//
-//        realmHelpInfo = try! Realm(configuration: helpInfoConfig)
-//
-//    }
-    
-//    private func resetHelpInfo() {
-//        let difficulty = GV.basicDataRecord.difficulty
-//        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, difficulty)
-//        if records.count > 0 {
-//            try! realmHelpInfo!.safeWrite() {
-//                realmHelpInfo!.delete(records)
-//            }
-//        }
-//    }
     var lastCol = NoValue
     var lastRow = NoValue
     var countOfMoves = 0
@@ -2641,39 +2583,6 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
 
     
-//    private func saveHelpInfo(action: TypeOfTouch) {
-//        if !GV.generateHelpInfo {
-//            return
-//        }
-//        let records = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@ and difficulty = %d", GV.actLanguage, GV.basicDataRecord.difficulty).sorted(byKeyPath: "counter")
-//        let counter = records.count > 0 ? records.last!.counter + 1 : 1
-//        let sDifficulty = String(GV.basicDataRecord.difficulty)
-//        let helpInfo = HelpInfo()
-//        helpInfo.difficulty = GV.basicDataRecord.difficulty
-//        helpInfo.typeOfTouch = action.rawValue
-//        helpInfo.combinedKey = GV.actLanguage + itemSeparator + String(counter) + itemSeparator + sDifficulty
-//        helpInfo.language = GV.actLanguage
-//        helpInfo.counter = counter
-//        switch action {
-//        case .UndoButton: helpInfo.letters = UndoButtonHelpInfo
-//        case .ShowMyWordsButton: helpInfo.letters = ShowMyWordsButtonHelpInfo
-//        case .FinishButton: helpInfo.letters = FinishButtonHelpInfo
-//        case .ContinueGameEasy: helpInfo.letters = ContinueGameEasyHelpInfo
-//        case .ContinueGameMedium: helpInfo.letters = ContinueGameMediumHelpInfo
-//        case .FinishGameEasy: helpInfo.letters = FinishGameEasyHelpInfo
-//        case .FinishGameMedium: helpInfo.letters = FinishGameMediumHelpInfo
-//        case .OKFixLettersSolved: helpInfo.letters = OKFixLettersEasyHelpInfo
-//        case .OKMandatorySolved: helpInfo.letters = OKMandatorySolvedHelpInfo
-//        case .NoMoreStepsBack: helpInfo.letters = NoMoreStepsBackHelpInfo
-//        case .NoMoreStepsNext: helpInfo.letters = NoMoreStepsNextHelpInfo
-//        case .NoMoreStepsCont: helpInfo.letters = NoMoreStepsContHelpInfo
-//        case .FinishGame: helpInfo.letters = FinishGameHelpInfo
-//        default: break
-//        }
-//        try! realmHelpInfo!.safeWrite() {
-//            realmHelpInfo!.add(helpInfo)
-//        }
-//    }
     private func saveArrayOfPieces() {
 //        tilesForGame.removeAll()
         let piecesToPlay = GV.playingRecord.pieces.components(separatedBy: itemSeparator)
@@ -2869,7 +2778,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if inDefiningSearchingWord {
             //            let origLocation = CGPoint(x: touchLocation.x, y: touchLocation.y + wtGameboardMovedBy)
             //            touchedNodes = analyzeNodes(touchLocation: origLocation, calledFrom: .stop)
-            if (touchedNodes.col >= 0 && touchedNodes.col < 10) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < 10) {
+            if (touchedNodes.col >= 0 && touchedNodes.col < GV.sizeOfGrid) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < GV.sizeOfGrid) {
                 firstTouchedCol = touchedNodes.col
                 firstTouchedRow = touchedNodes.GRow
                 var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.GRow].letter
@@ -2942,27 +2851,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         let touchLocation = touches.first!.location(in: self)
         let touchedNodes = analyzeNodes(touchLocation: touchLocation)
-//        myTouchesMoved(location: touchLocation, touchedNodes: touchedNodes)
-//    }
-//
-//    private func myTouchesMoved(location: CGPoint, touchedNodes: TouchedNodes) {
-//
-//        let touchLocation = location //firstTouch!.location(in: self)
-//        if GV.generateHelpInfo {
-//            relativPosition = (touchLocation - CGPoint(x: wtGameboard!.grid!.frame.minX, y: wtGameboard!.grid!.frame.minY)) / wtGameboard!.grid!.frame.width
-//        }
 
         #if SHOWFINGER
         finger?.position = touchLocation + CGPoint(x: 0, y: fingerAdder)
         #endif
-//        let nodes = self.nodes(at: touchLocation)
-//        let nodes1 = self.nodes(at: CGPoint(x: touchLocation.x, y: touchLocation.y + blockSize * 0.11))
-//        let touchedNodes = analyzeNodes(touchLocation: touchLocation, calledFrom: .Move)
-//        var onGameArray = true
         if inDefiningSearchingWord {
             //            let origLocation = CGPoint(x: touchLocation.x, y: touchLocation.y + wtGameboardMovedBy)
             //            touchedNodes = analyzeNodes(touchLocation: origLocation, calledFrom: .stop)
-            if (touchedNodes.col >= 0 && touchedNodes.col < 10) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < 10) {
+            if (touchedNodes.col >= 0 && touchedNodes.col < GV.sizeOfGrid) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < GV.sizeOfGrid) {
                 if firstTouchedCol != touchedNodes.col || firstTouchedRow != touchedNodes.GRow {
                     var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.GRow].letter
                     choosedLetter = choosedLetter == " " ? "" : choosedLetter
@@ -3111,7 +3007,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if inDefiningSearchingWord {
 //            let origLocation = CGPoint(x: touchLocation.x, y: touchLocation.y + wtGameboardMovedBy)
 //            touchedNodes = analyzeNodes(touchLocation: origLocation, calledFrom: .stop)
-            if (touchedNodes.col >= 0 && touchedNodes.col < 10) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < 10) {
+            if (touchedNodes.col >= 0 && touchedNodes.col < GV.sizeOfGrid) && (touchedNodes.GRow >= 0 && touchedNodes.GRow < GV.sizeOfGrid) {
                 if firstTouchedCol != touchedNodes.col || firstTouchedRow != touchedNodes.GRow {
                     var choosedLetter = GV.gameArray[touchedNodes.col][touchedNodes.GRow].letter
                     choosedLetter = choosedLetter == " " ? "" : choosedLetter
@@ -3126,7 +3022,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            var saveRecord = false
             if movingSprite {
                 movingSprite = false
-                let row = touchedNodes.row + 2 == 10 ? 9 : touchedNodes.row + 2
+                let row = touchedNodes.row + 2 == GV.sizeOfGrid ? GV.sizeOfGrid - 1 : touchedNodes.row + 2
                 (_, letters) = wtGameboard!.stopShowingSpriteOnGameboard(col: touchedNodes.col, row: row, fromBottom: false)
                 if letters != "" {
                     lettersForCheck = letters + "/" + LettersColor.Red.rawValue
@@ -4293,9 +4189,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     private func printGameArray() {
         let line = "____________________________________________"
-        for row in 0..<10 {
+        for row in 0..<GV.sizeOfGrid {
             var infoLine = "|"
-            for col in 0..<10 {
+            for col in 0..<GV.sizeOfGrid {
                 let char = GV.gameArray[col][row].letter
                 var greenMark = emptyLetter
                 if GV.gameArray[col][row].status == .WholeWord {

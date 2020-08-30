@@ -610,7 +610,7 @@ class WTGameboard: SKShapeNode {
         var fixed = true
         var letters = ""
 //        self.wordsToCheck = wordsToCheck
-        if row == 10 {
+        if row == GV.sizeOfGrid {
             if fromBottom {
                 for index in 0..<usedItems.count {
                     usedItems[index].item!.clearIfTemporary(col: usedItems[index].col, row: usedItems[index].row)
@@ -1311,8 +1311,8 @@ class WTGameboard: SKShapeNode {
 
     
     public func clearGameArray(all: Bool = false) {
-        for row in 0..<countCols {
-            for col in 0..<countCols {
+        for row in 0..<GV.sizeOfGrid {
+            for col in 0..<GV.sizeOfGrid {
                 GV.gameArray[col][row].remove(all: all)
             }
         }
@@ -1337,9 +1337,9 @@ class WTGameboard: SKShapeNode {
     
     public func printGameArray() {
         let line = "____________________________________________"
-        for row in 0..<10 {
+        for row in 0..<GV.sizeOfGrid {
             var infoLine = "|"
-            for col in 0..<10 {
+            for col in 0..<GV.sizeOfGrid {
                 let char = GV.gameArray[col][row].letter
                 var greenMark = emptyLetter
                 if GV.gameArray[col][row].status == .WholeWord {

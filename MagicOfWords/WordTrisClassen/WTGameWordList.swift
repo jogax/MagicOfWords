@@ -80,12 +80,16 @@ public struct SelectedWord {
         if valueTab.count > 1 {
             self.word = valueTab[0]
             for index in 1..<valueTab.count {
-                if let iColRow = Int(valueTab[index]) {
-                    let col = iColRow / 10
-                    let row = iColRow % 10
-                    self.usedLetters.append(UsedLetter(col: col, row: row, letter: word.subString(at: index - 1, length: 1)))
-                    countFixLetters += GV.gameArray[col][row].fixItem ? 1 : 0
+                var value = ""
+                if valueTab[index].count == 1 {
+                    value = "0" + valueTab[index]
+                } else {
+                    value = valueTab[index]
                 }
+                let col = Int(value.firstChar(), radix: 16)!
+                let row = Int(value.char(at: 1), radix: 16)!
+                self.usedLetters.append(UsedLetter(col: col, row: row, letter: word.subString(at: index - 1, length: 1)))
+                countFixLetters += GV.gameArray[col][row].fixItem ? 1 : 0
             }
         }
         self.connectionTypes = setConnectionTypes()
@@ -154,10 +158,12 @@ public struct SelectedWord {
     func toString()->String {
         var colRowString = ""
         for letter in usedLetters {
-            colRowString += String(10 * letter.col + letter.row)
-            if colRowString.length == 1 {
-                colRowString = "0" + colRowString
-            }
+            let hexCol = String(format: "%X", letter.col)
+            let hexRow = String(format: "%X", letter.row)
+            colRowString += String(hexCol + hexRow)
+//            if colRowString.length == 1 {
+//                colRowString = "0" + colRowString
+//            }
             colRowString +=  itemInnerSeparator
         }
         if colRowString.length > 1 {
@@ -618,7 +624,6 @@ public class WTGameWordList {
                 var count = GV.gameArray[col][row].getCountOccurencesInWords()
                 count = count > 25 ? 25 : count
                 letterScore += pointsForLettersInPosition[count]!
-//                print("col: \(col), row: \(row), count: \(count), score: \(letterScore)")
             }
         }
         return letterScore
