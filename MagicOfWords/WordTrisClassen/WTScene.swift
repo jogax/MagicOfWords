@@ -763,7 +763,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     
     @objc private func didRotated() {
         self.size = CGSize(width: GV.actWidth,height: GV.actHeight)
-        self.view!.frame = CGRect(x: 0, y: 0, width: GV.actWidth, height: GV.actHeight)
+        if let actView = self.view {
+            self.view!.frame = CGRect(x: 0, y: 0, width: GV.actWidth, height: GV.actHeight)
+        }
         bgSprite!.size = self.size
         setBackground()
         bgSprite!.setPosAndSizeForAllChildren()

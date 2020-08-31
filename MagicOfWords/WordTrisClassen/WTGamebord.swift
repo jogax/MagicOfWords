@@ -419,8 +419,10 @@ class WTGameboard: SKShapeNode {
         let rowSprite = SKSpriteNode()
         rowSprite.nodeType = .SKSpriteNode
         let row10Height = grid!.frame.minY - parentScene.frame.minY
-        rowSprite.position = CGPoint(x: parentScene.frame.midX, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize)
-        rowSprite.size = CGSize(width: parentScene.frame.width, height: row10Height)
+        rowSprite.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide / 2, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize),
+                                        LPos: CGPoint(x: GV.maxSide / 2, y: grid!.frame.minY - row10Height / 2) - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize),
+                                        PSize: CGSize(width: GV.minSide, height: row10Height),
+                                        LSize: CGSize(width: GV.maxSide, height: row10Height))
 //        rowSprite.color = .blue
         rowSprite.name = "Row\(countCols)"
         bgSprite!.addChild(rowSprite)
@@ -428,10 +430,11 @@ class WTGameboard: SKShapeNode {
             let rowSprite = SKSpriteNode()
             rowSprite.nodeType = .SKSpriteNode
             rowSprite.plPosSize = PLPosSize(
-                PPos: CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row).PPos - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize),
-                LPos: CGPoint(x: grid!.frame.minX, y: grid!.frame.midY) - grid!.gridPosition(col: 0, row: row).LPos - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize)
+                PPos: CGPoint(x: 0, y: (grid!.plPosSize?.PPos.y)!) - grid!.gridPosition(col: 0, row: row).PPos - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize),
+                LPos: CGPoint(x: 0, y: (grid!.plPosSize?.LPos.y)!) - grid!.gridPosition(col: 0, row: row).LPos - CGPoint(x: 0, y: WSGameboardSizeMultiplier * GV.blockSize),
+                PSize: CGSize(width: GV.minSide * 2, height: GV.blockSize),
+                LSize: CGSize(width: GV.maxSide * 2, height: GV.blockSize)
             )
-            rowSprite.size = CGSize(width: parentScene.frame.width * 1.1, height: GV.blockSize)
 //            if row % 2 == 0 {
 //                rowSprite.alpha = 0.5
 //                rowSprite.color = .green

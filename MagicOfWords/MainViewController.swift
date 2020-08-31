@@ -278,11 +278,39 @@ ShowNewWordsInCloudSceneDelegate {
         }
     }
     
-//    func continueGame() {
-//        let gameNumber = GV.basicDataRecord.difficulty * 1000
-//        startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
-//    }
+    func chooseGame() {
+
+
+        alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
+                                            message: "", //GV.language.getText(.tcActDifficulty, values: gameDifficulty!.description()),
+                                            preferredStyle: .alert)
+        
+        //--------------------- StartGameAction ---------------------
+        let startGameAction = UIAlertAction(title: "\(GV.language.getText(.tcEasyPlay)) ", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 0
+            self.showMenu()
+        })
+        alertController!.addAction(startGameAction)
+        //--------------------- Choose Game Type ---------------------
+        let chooseGameAction = UIAlertAction(title: "\(GV.language.getText(.tcMediumPlay)) ", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 0
+            self.showMenu()
+        })
+        alertController!.addAction(chooseGameAction)
+        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
+            alert -> Void in
+            self.showMenu()
+        })
+        alertController!.addAction(cancelAction)
+        present(alertController!, animated: true, completion: nil)
+        
+    }
     
+
     func chooseLanguage() {
         func setLanguage(language: String) {
             GV.language.setLanguage(language)
@@ -798,6 +826,7 @@ ShowNewWordsInCloudSceneDelegate {
         if GV.playing {
             return
         }
+        
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
                                             message: "", //GV.language.getText(.tcActDifficulty, values: gameDifficulty!.description()),
                                             preferredStyle: .alert)
@@ -809,6 +838,13 @@ ShowNewWordsInCloudSceneDelegate {
                 self.startGame()
         })
         alertController!.addAction(startGameAction)
+        //--------------------- Choose Game Type ---------------------
+        let chooseGameAction = UIAlertAction(title: "\(GV.language.getText(.tcChooseGame)) ", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+                self.chooseGame()
+        })
+        alertController!.addAction(chooseGameAction)
         //--------------------- bestScoreAction ---------------------
         let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
             alert -> Void in
@@ -1152,94 +1188,6 @@ ShowNewWordsInCloudSceneDelegate {
         present(myAlertController, animated: true, completion: nil)
     }
     
-//    var bestScoreItems: Results<BestScoreSync>?
-//    var bestScoreNotificationToken: NotificationToken?
-//    var bestScoreSubscription: SyncSubscription<BestScoreSync>!
-//    var forGameItems: Results<BestScoreForGame>?
-//    var forGameNotificationToken: NotificationToken?
-//    var forGameSubscription: SyncSubscription<BestScoreForGame>!
-//    var bestScoreSubscriptionToken: NotificationToken?
-//    var forGameSubscriptionToken: NotificationToken?
-    
-    
-
-//    private func deactivateSubscriptions() {
-//        if forGameSubscription != nil {
-//            forGameSubscriptionToken!.invalidate()
-//            forGameSubscription!.unsubscribe()
-//        }
-//        if bestScoreSubscription != nil {
-//            bestScoreSubscriptionToken!.invalidate()
-//            bestScoreSubscription!.unsubscribe()
-//        }
-//    }
-
-//    private func generateBestScoreList() {
-//        deactivateSubscriptions()
-//        bestScoreItems = RealmService.objects(BestScoreSync.self).filter("language = %@ AND score > 0", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
-//        bestScoreSubscription = bestScoreItems!.subscribe(named: "\(GV.actLanguage)bestScoreQuery")
-//        bestScoreSubscriptionToken = bestScoreSubscription.observe(\.state) { [weak self]  state in
-//            print("in Subscription!")
-//            switch state {
-//            case .creating:
-//                print("creating")
-//            // The subscription has not yet been written to the Realm
-//            case .pending:
-//                print("pending")
-//                // The subscription has been written to the Realm and is waiting
-//            // to be processed by the server
-//            case .complete:
-//                self!.forGameItems = RealmService.objects(BestScoreForGame.self).filter("language = %@", GV.actLanguage).sorted(byKeyPath: "gameNumber", ascending: true)
-//                self!.forGameSubscription = self!.forGameItems!.subscribe(named: "\(GV.actLanguage)bestForGameList")
-//                self!.forGameSubscriptionToken = self!.forGameSubscription.observe(\.state) { [weak self]  state in
-//                    switch state {
-//                    case .creating:
-//                        print("creating")
-//                    // The subscription has not yet been written to the Realm
-//                    case .pending:
-//                        print("pending")
-//                        // The subscription has been written to the Realm and is waiting
-//                    // to be processed by the server
-//                    case .complete:
-//                        print("Both table are complete")
-//                        for gameNumber in 0...999 {
-//                             if self!.bestScoreItems!.filter("gameNumber = %d", gameNumber).count > 0 {
-//                                if self!.forGameItems!.filter("gameNumber = %d", gameNumber).count == 0 {
-//                                    let item = self!.bestScoreItems!.filter("gameNumber = %d", gameNumber).sorted(byKeyPath: "score", ascending: false).first!
-//                                    let bestScoreForGameItem = BestScoreForGame()
-//                                    bestScoreForGameItem.combinedPrimary = String(gameNumber) + item.language
-//                                    bestScoreForGameItem.gameNumber = gameNumber
-//                                    bestScoreForGameItem.language = item.language
-//                                    bestScoreForGameItem.bestScore = item.score
-//                                    bestScoreForGameItem.timeStamp = item.timeStamp
-//                                    bestScoreForGameItem.owner = item.owner!
-//                                    try! RealmService.safeWrite() {
-//                                        RealmService.add(bestScoreForGameItem)
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    case .invalidated:
-//                        print("invalidated")
-//                    // The subscription has been removed
-//                    case .error(let error):
-//                        print("error: \(error)")
-//                        // An error occurred while processing the subscription
-//                    }
-//                }
-//
-//            case .invalidated:
-//                print("invalidated")
-//            // The subscription has been removed
-//            case .error(let error):
-//                print("error: \(error)")
-//                // An error occurred while processing the subscription
-//            }
-//            
-//        }
-//
-//    }
-//    
     private func setDifficulty(difficulty: GameDifficulty) {
         try! realm.safeWrite() {
             GV.basicDataRecord.difficulty = difficulty.rawValue

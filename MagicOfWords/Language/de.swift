@@ -24,7 +24,7 @@ let deDictionary: [TextConstants: String] = [
     .tcNewGame:          "Neues Spiel",
     .tcNewGameX:         "Neues Spiel (%)",
     .tcRestart:          "Neustart",
-//    .tcContinue:         "Fortsetzen %",
+    .tcChooseGame:       "Wähle einen Spieltyp",
     .tcFinished:         "Beendete Spiele %",
     .tcSettings:         "Einstellungen",
     .tcWordTris:         "Wortris",
