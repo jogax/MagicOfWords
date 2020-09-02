@@ -18,8 +18,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcGermanShort:      "de",
     .tcHungarianShort:   "hu",
     .tcRussianShort:     "ru",
-    .tcEasyPlay:         "Игра Собери-Слова (%)",
-    .tcMediumPlay:       "Игра Неподвижные-Буквы (%)",
+    .tcEasyPlay:         "Собери-Слова %",
+    .tcMediumPlay:       "Неподвижные-Буквы %",
     .tcPlayer:           "Игрок",
     .tcNewGame:          "Новая игра",
     .tcNewGameX:         "Новая игра (%)",
@@ -192,5 +192,6 @@ let ruDictionary: [TextConstants: String] = [
     .tcWordReportedTitle:   "Слово отправлено разработчику!",
     .tcWordReportedMessage: "Пожалуйста, жди терпеливо ответа!",
     .tcHintsHeader:         "Несколько подсказок",
+    .tcChooseGameSize:  "Выбери размер игры",
 ]
 

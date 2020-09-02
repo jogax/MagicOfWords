@@ -104,40 +104,7 @@ ShowNewWordsInCloudSceneDelegate {
     func myPlaceFounded() {
         
     }
-    
-    
-//    func backFromAnimation() {
-//        if let view = self.view as! SKView? {
-//            view.presentScene(nil)
-//            animationScene = nil
-//        }
-//        showBackgroundPicture()
-////        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.AskForGameCenter.rawValue && GV.connectedToInternet {
-////            manageGameCenter()
-////        } else {
-//            self.showMenu()
-////        }
-//    }
-    
-//    func showHowToPlay(difficulty: Int) {
-//        if let view = self.view as! SKView? {
-//            view.presentScene(nil)
-//            animationScene = nil
-//        }
-//        showBackgroundPicture()
-//        GV.origDifficulty = GV.basicDataRecord.difficulty
-//        try! realm.safeWrite() {
-//            GV.basicDataRecord.difficulty = difficulty
-//        }
-//        GV.helpInfoRecords = realmHelp.objects(HelpInfo.self).filter("language = %d", GV.actLanguage).sorted(byKeyPath: "counter")
-//        let gameNumber = difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
-//        if GV.helpInfoRecords!.count > 0 {
-//            startWTScene(new: true, next: StartType.GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
-//        } else {
-//            self.showMenu()
-//        }
-//    }
-    
+
     #if DEBUG
     func displayGameCenterViewController(dataSource: DataSource) {
         let gameCenterViewController = ShowGameCenterViewController()
@@ -254,12 +221,14 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     func startGame() {
-        let actPlay = realm.objects(GameDataModel.self).filter("language = %d and gameNumber >= %d and gameNumber <= %d",GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
-        if actPlay.isEmpty {
+        let type: Int = GV.gameType.rawValue
+        let actGame = realm.objects(GameDataModel.self).filter("language = %d and type = %d and sizeOfGrid = %d",GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
+//        let actPlay = realm.objects(GameDataModel.self).filter("language = %d and gameNumber >= %d and gameNumber <= %d",GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+        if actGame.isEmpty {
             let gameNumber = GV.basicDataRecord.difficulty * 1000
             startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
         } else {
-            if actPlay.count > 1 {
+            if actGame.count > 1 {
                 convertIfNeeded()
             }
 //            if actPlay.first!.gameStatus == GV.GameStatusFinished {
@@ -271,7 +240,7 @@ ShowNewWordsInCloudSceneDelegate {
 //                let gameNumber = GV.basicDataRecord.difficulty * 1000
 //                startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
 //            } else {
-            let gameNumber = actPlay.first!.gameNumber
+            let gameNumber = actGame.first!.gameNumber
             GV.comeBackFromSleeping = false
             startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
 //            }
@@ -289,16 +258,16 @@ ShowNewWordsInCloudSceneDelegate {
         let startGameAction = UIAlertAction(title: "\(GV.language.getText(.tcEasyPlay)) ", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
-            GV.sizeOfGrid = 0
-            self.showMenu()
+            GV.gameType = .CollectWords
+            self.chooseGameSize()
         })
         alertController!.addAction(startGameAction)
         //--------------------- Choose Game Type ---------------------
         let chooseGameAction = UIAlertAction(title: "\(GV.language.getText(.tcMediumPlay)) ", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
-            GV.sizeOfGrid = 0
-            self.showMenu()
+            GV.gameType = .FixLetter
+            self.chooseGameSize()
         })
         alertController!.addAction(chooseGameAction)
         let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
@@ -308,6 +277,89 @@ ShowNewWordsInCloudSceneDelegate {
         alertController!.addAction(cancelAction)
         present(alertController!, animated: true, completion: nil)
         
+    }
+    
+    private func chooseGameSize() {
+        alertController = UIAlertController(title: GV.language.getText(.tcChooseGameSize),
+                                            message: "", //GV.language.getText(.tcActDifficulty, values: gameDifficulty!.description()),
+                                            preferredStyle: .alert)
+        
+        //--------------------- 5 x 5 ---------------------
+        let choose5x5Action = UIAlertAction(title: "5x5", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 5
+            self.showMenu()
+        })
+        alertController!.addAction(choose5x5Action)
+        //--------------------- 6 x 6  ---------------------
+        let choose6x6Action = UIAlertAction(title: "6x6", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 6
+            self.showMenu()
+        })
+        alertController!.addAction(choose6x6Action)
+        //--------------------- 7 x 7  ---------------------
+        let choose7x7Action = UIAlertAction(title: "7x7", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 7
+            self.showMenu()
+        })
+        alertController!.addAction(choose7x7Action)
+        
+        //--------------------- 8 x 8  ---------------------
+        let choose8x8Action = UIAlertAction(title: "8x8", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 8
+            self.showMenu()
+        })
+        alertController!.addAction(choose8x8Action)
+        
+        //--------------------- 9 x 9  ---------------------
+        let choose9x9Action = UIAlertAction(title: "9x9", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 9
+            self.showMenu()
+        })
+        alertController!.addAction(choose9x9Action)
+        
+        //--------------------- 10 x 10  ---------------------
+        let choose10x10Action = UIAlertAction(title: "10x10", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 10
+            self.showMenu()
+        })
+        alertController!.addAction(choose10x10Action)
+        
+        //--------------------- 11 x 11  ---------------------
+        let choose11x11Action = UIAlertAction(title: "11x11", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 11
+            self.showMenu()
+        })
+        alertController!.addAction(choose11x11Action)
+        
+        //--------------------- 12 x 12  ---------------------
+        let choose12x12Action = UIAlertAction(title: "12x12", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.sizeOfGrid = 12
+            self.showMenu()
+        })
+        alertController!.addAction(choose12x12Action)
+        
+        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
+            alert -> Void in
+            self.showMenu()
+        })
+        alertController!.addAction(cancelAction)
+        present(alertController!, animated: true, completion: nil)
     }
     
 

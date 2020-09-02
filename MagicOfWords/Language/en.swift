@@ -18,8 +18,8 @@ let enDictionary: [TextConstants: String] = [
     .tcGermanShort:      "de",
     .tcHungarianShort:   "hu",
     .tcRussianShort:     "ru",
-    .tcEasyPlay:         "Game Collect-Words (%)",
-    .tcMediumPlay:       "Game Use-Fixed-Letters (%)",
+    .tcEasyPlay:         "Collect-Words %",
+    .tcMediumPlay:       "Use-Fixed-Letters %",
     .tcPlayer:           "Player",
     .tcNewGame:          "New game",
     .tcNewGameX:         "New game (%)",
@@ -191,4 +191,5 @@ let enDictionary: [TextConstants: String] = [
     .tcWordReportedTitle:    "The word has been sent to the developer!",
     .tcWordReportedMessage: "Please wait patiently for the answer!",
     .tcHintsHeader: "Some hints",
+    .tcChooseGameSize:  "Choose game size",
 ]

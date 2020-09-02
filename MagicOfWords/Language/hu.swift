@@ -18,8 +18,8 @@ let huDictionary: [TextConstants: String] = [
     .tcGermanShort:      "de",
     .tcHungarianShort:   "hu",
     .tcRussianShort:     "ru",
-    .tcEasyPlay:         "Szógyűjtő Játék (%)",
-    .tcMediumPlay:       "Fix-Betű Játék (%)",
+    .tcEasyPlay:         "Szógyűjtő %",
+    .tcMediumPlay:       "Fix-Betű %",
     .tcPlayer:           "Játékos",
     .tcNewGame:          "Új játék",
     .tcNewGameX:         "Új játék (%)",
@@ -190,4 +190,5 @@ let huDictionary: [TextConstants: String] = [
     .tcWordReportedTitle:    "A szó elküldve a fejlesztőnek!",
     .tcWordReportedMessage: "Kérlek várj türelemmel a válaszra!",
     .tcHintsHeader: "Néhány tipp",
+    .tcChooseGameSize:  "Válassz játék méretet",
 ]

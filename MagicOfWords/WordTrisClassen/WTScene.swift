@@ -764,7 +764,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     @objc private func didRotated() {
         self.size = CGSize(width: GV.actWidth,height: GV.actHeight)
         if let actView = self.view {
-            self.view!.frame = CGRect(x: 0, y: 0, width: GV.actWidth, height: GV.actHeight)
+            actView.frame = CGRect(x: 0, y: 0, width: GV.actWidth, height: GV.actHeight)
         }
         bgSprite!.size = self.size
         setBackground()
@@ -1034,7 +1034,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             let lX: CGFloat = GV.maxSide * 0.5
             let lY: CGFloat = GV.minSide * (GV.deviceHasNotch ? 0.93 : 0.97)
             let plPos = PLPosSize(PPos: CGPoint(x: pX, y: pY), LPos: CGPoint(x: lX, y: lY))
-            let text = GV.language.getText((GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? .tcEasyPlay : .tcMediumPlay), values: "\(GV.sizeOfGrid)x\(GV.sizeOfGrid)")
+            let text = GV.language.getText((GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? .tcEasyPlay : .tcMediumPlay), values: "(\(GV.sizeOfGrid)x\(GV.sizeOfGrid))")
             gameTypeLabel = MyLabel(text: text, position: plPos, fontName: GV.actLabelFont, fontSize: fontSize * 1.2)
             gameTypeLabel.name = gameTypeName
             gameTypeLabel.fontColor = .black

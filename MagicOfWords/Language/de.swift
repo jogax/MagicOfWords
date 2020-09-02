@@ -18,8 +18,8 @@ let deDictionary: [TextConstants: String] = [
     .tcGermanShort:      "de",
     .tcHungarianShort:   "hu",
     .tcRussianShort:     "ru",
-    .tcEasyPlay:         "Spiel Sammle-Wörter (%)",
-    .tcMediumPlay:       "Spiel Verwende-Feste-Buchstaben (%)",
+    .tcEasyPlay:         "Sammle-Wörter %",
+    .tcMediumPlay:       "Verwende-Feste-Buchstaben %",
     .tcPlayer:           "Spieler",
     .tcNewGame:          "Neues Spiel",
     .tcNewGameX:         "Neues Spiel (%)",
@@ -194,6 +194,7 @@ let deDictionary: [TextConstants: String] = [
     .tcWordReportedTitle:    "Das Wort wurde an den Entwickler gesendet!",
     .tcWordReportedMessage: "Warte geduldig auf die Antwort!",
     .tcHintsHeader: "Einige Tipps",
+    .tcChooseGameSize:  "Wähle eine Spielgröße",
 ]
 
 

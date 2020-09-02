@@ -23,7 +23,7 @@ let itemExternSeparator = "|"
 
 
 enum GameType: Int {
-    case WordTris = 1, SearchWords, NoMoreGames
+    case GameNotSelected = 0, CollectWords, FixLetter, SearchWords
 }
 enum LettersColor: String {
     case NoColor = "NoColor", Red = "Red", Green = "Green"
@@ -194,6 +194,7 @@ struct GV {
     static var deviceOrientation: DeviceOrientation = .Portrait
     static var target: AnyObject?
     static var orientationHandler: Selector?
+    static var gameType: GameType = .GameNotSelected
     static let minSide: CGFloat = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
     static let maxSide: CGFloat = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
     static var actLanguageInt = GV.languageToInt[actLanguage]
