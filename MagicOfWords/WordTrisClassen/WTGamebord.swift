@@ -443,7 +443,7 @@ class WTGameboard: SKShapeNode {
             bgSprite!.addChild(rowSprite)
         }
     }
-    private func createNewGameArray(countCols: Int) -> [[WTGameboardItem]] {
+    public func createNewGameArray(countCols: Int) -> [[WTGameboardItem]] {
         var gameArray: [[WTGameboardItem]] = []
         
         for i in 0..<countCols {
@@ -925,9 +925,9 @@ class WTGameboard: SKShapeNode {
     
     public func stringToGameArray(string: String) {
         setFirstTime()
-        for index in 0..<countCols * countCols {
-            let col = index / countCols
-            let row = index % countCols
+        for index in 0..<GV.sizeOfGrid * GV.sizeOfGrid {
+            let col = index / GV.sizeOfGrid
+            let row = index % GV.sizeOfGrid
             GV.gameArray[col][row].restore(from: string.subString(at: 2 * index, length: 2))
 //            showTime(string: "col: \(col), row: \(row)")
         }

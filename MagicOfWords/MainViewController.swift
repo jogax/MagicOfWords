@@ -71,13 +71,13 @@ ShowNewWordsInCloudSceneDelegate {
         
 
 
-        if GV.wtScene == nil {
-            showMenu()
-        } else {
-            if !inMenu {
-                startGame()
-            }
-        }
+//        if GV.wtScene == nil {
+//            showMenu()
+//        } else {
+//            if !inMenu {
+//                startGame()
+//            }
+//        }
     }
     
     
@@ -158,12 +158,13 @@ ShowNewWordsInCloudSceneDelegate {
         case .PreviousGame, .NextGame: startWTScene(new: false, next: start, gameNumber: 0)
         case .NewGame: startWTScene(new: true, next: .NoMore, gameNumber: 0)
         case .GameNumber: startWTScene(new: true, next: .NoMore, gameNumber: 0)
-        case .SetEasy:
-            setDifficulty(difficulty: .Easy)
-            startWTScene(new: false, next: .NoMore, gameNumber: 0)
-        case .SetMedium:
-            setDifficulty(difficulty: .Medium)
-            startWTScene(new: false, next: .NoMore, gameNumber: 0)
+//        case .SetEasy:
+//            setDifficulty(difficulty: .Easy)
+//            startWTScene(new: false, next: .NoMore, gameNumber: 0)
+//        case .SetMedium:
+//            setDifficulty(difficulty: .Medium)
+//            startWTScene(new: false, next: .NoMore, gameNumber: 0)
+        default: break
         }
     }
     
@@ -221,25 +222,12 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     func startGame() {
-        let type: Int = GV.gameType.rawValue
-        let actGame = realm.objects(GameDataModel.self).filter("language = %d and type = %d and sizeOfGrid = %d",GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
+        let actGame = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d and sizeOfGrid = %d",GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
 //        let actPlay = realm.objects(GameDataModel.self).filter("language = %d and gameNumber >= %d and gameNumber <= %d",GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
         if actGame.isEmpty {
             let gameNumber = GV.basicDataRecord.difficulty * 1000
             startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
         } else {
-            if actGame.count > 1 {
-                convertIfNeeded()
-            }
-//            if actPlay.first!.gameStatus == GV.GameStatusFinished {
-//                try! realm.safeWrite() {
-////                    realm.delete(actPlay)
-//                    GV.basicDataRecord.countPlays += 1
-//                    GCHelper.shared.sendScoreToGameCenter(score: 0, difficulty: GV.basicDataRecord.difficulty, completion: {})
-//                }
-//                let gameNumber = GV.basicDataRecord.difficulty * 1000
-//                startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
-//            } else {
             let gameNumber = actGame.first!.gameNumber
             GV.comeBackFromSleeping = false
             startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
@@ -251,7 +239,7 @@ ShowNewWordsInCloudSceneDelegate {
 
 
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
-                                            message: "", //GV.language.getText(.tcActDifficulty, values: gameDifficulty!.description()),
+                                            message: "",
                                             preferredStyle: .alert)
         
         //--------------------- StartGameAction ---------------------
@@ -281,7 +269,7 @@ ShowNewWordsInCloudSceneDelegate {
     
     private func chooseGameSize() {
         alertController = UIAlertController(title: GV.language.getText(.tcChooseGameSize),
-                                            message: "", //GV.language.getText(.tcActDifficulty, values: gameDifficulty!.description()),
+                                            message: "",
                                             preferredStyle: .alert)
         
         //--------------------- 5 x 5 ---------------------
@@ -289,7 +277,7 @@ ShowNewWordsInCloudSceneDelegate {
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 5
-            self.showMenu()
+            self.startGame()
         })
         alertController!.addAction(choose5x5Action)
         //--------------------- 6 x 6  ---------------------
@@ -297,7 +285,7 @@ ShowNewWordsInCloudSceneDelegate {
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 6
-            self.showMenu()
+            self.startGame()
         })
         alertController!.addAction(choose6x6Action)
         //--------------------- 7 x 7  ---------------------
@@ -305,7 +293,7 @@ ShowNewWordsInCloudSceneDelegate {
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 7
-            self.showMenu()
+            self.startGame()
         })
         alertController!.addAction(choose7x7Action)
         
@@ -314,7 +302,7 @@ ShowNewWordsInCloudSceneDelegate {
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 8
-            self.showMenu()
+            self.startGame()
         })
         alertController!.addAction(choose8x8Action)
         
@@ -323,7 +311,7 @@ ShowNewWordsInCloudSceneDelegate {
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 9
-            self.showMenu()
+            self.startGame()
         })
         alertController!.addAction(choose9x9Action)
         
@@ -332,7 +320,7 @@ ShowNewWordsInCloudSceneDelegate {
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 10
-            self.showMenu()
+            self.startGame()
         })
         alertController!.addAction(choose10x10Action)
         
@@ -341,7 +329,7 @@ ShowNewWordsInCloudSceneDelegate {
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 11
-            self.showMenu()
+            self.startGame()
         })
         alertController!.addAction(choose11x11Action)
         
@@ -350,7 +338,7 @@ ShowNewWordsInCloudSceneDelegate {
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 12
-            self.showMenu()
+            self.startGame()
         })
         alertController!.addAction(choose12x12Action)
         
@@ -369,7 +357,6 @@ ShowNewWordsInCloudSceneDelegate {
             try! realm.safeWrite() {
                 GV.basicDataRecord.actLanguage = language
                 GV.basicDataRecord.land = GV.convertLocaleToInt()
-                GV.basicDataRecord.deviceInfoSaved = false
             }
             GCHelper.shared.getBestScore(completion: {[unowned self] in
                 self.callModifyHeader()
@@ -703,7 +690,7 @@ ShowNewWordsInCloudSceneDelegate {
         var dayAdder = 1
         for languageIndex in 0...3 {
             let language = GV.IntToLanguage[languageIndex]
-            for difficulty in GameDifficulty.Easy.rawValue...GameDifficulty.Medium.rawValue {
+            for difficulty in GameType.CollectWords.rawValue...GameType.SearchWords.rawValue {
                 let minGameNumber = difficulty * 1000
                 let maxGameNumber = minGameNumber + 999
                 let myPlayingRecords = realm.objects(GameDataModel.self).filter("language = %@ and combinedKey BEGINSWITH %@ and gameNumber >= %d and gameNumber <= %d", language!, language!, minGameNumber, maxGameNumber)
@@ -721,8 +708,35 @@ ShowNewWordsInCloudSceneDelegate {
                     }
                 }
             }
+            let allRecordsPerLanguage = realm.objects(GameDataModel.self).filter("language = %@ and gameType = %d", language!, GameType.GameNotSelected.rawValue)
+            for record in allRecordsPerLanguage {
+                try! realm.safeWrite {
+                    if record.gameNumber < 1000 {
+                        record.gameType = GameType.CollectWords.rawValue
+                    } else {
+                        record.gameType = GameType.FixLetter.rawValue
+                    }
+                    record.sizeOfGrid = GV.calculatedSize[record.rounds[0].gameArray.count]!
+                }
+
+            }
+            let allRecordsPerLanguage1 = realm.objects(GameDataModel.self).filter("language = %@", language!).sorted(byKeyPath: "combinedKey", ascending: true)
+            for record in allRecordsPerLanguage1 {
+                if record.combinedKey.toDate() != record.created {
+                    try! realm.safeWrite {
+                        record.created = record.combinedKey.toDate()
+                    }
+                }
+            }
         }
-        
+        let lastPlayed = realm.objects(GameDataModel.self).filter("language = %@ and nowPlaying = true",GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: false)
+        switch lastPlayed.count {
+        case 0:
+            chooseGame()
+        default:
+            GV.gameType = GameType(rawValue: lastPlayed[0].gameType)!
+            GV.sizeOfGrid = lastPlayed[0].sizeOfGrid
+        }
     }
     
     @objc private func startDemoOrMenu() {
@@ -880,7 +894,7 @@ ShowNewWordsInCloudSceneDelegate {
         }
         
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
-                                            message: "", //GV.language.getText(.tcActDifficulty, values: gameDifficulty!.description()),
+                                            message: "",
                                             preferredStyle: .alert)
         
         //--------------------- StartGameAction ---------------------
@@ -1051,21 +1065,6 @@ ShowNewWordsInCloudSceneDelegate {
         })
         alertController.addAction(showSavedWordsInCloudAction)
 
-//        let newGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenNew), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.areYouSure()
-//        })
-//        alertController.addAction(newGenHelpAction)
-//        if countContinueGames > 0 {
-//            let continueGenHelpAction = UIAlertAction(title: GV.language.getText(.tcHelpGenContinue), style: .default, handler: { [unowned self]
-//                alert -> Void in
-////                GV.generateHelpInfo = true
-//                let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
-//                self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber, restart: true, showHelp: true)
-//            })
-//            alertController.addAction(continueGenHelpAction)
-//
-//        }
         let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
             alert -> Void in
             self.showMenu()
@@ -1085,98 +1084,9 @@ ShowNewWordsInCloudSceneDelegate {
         }
     }
     
-//    private func areYouSure() {
-//        let alertController = UIAlertController(title: GV.language.getText(.tcAreYouSureForNewDemo),
-//                                                message: GV.language.getText(.tcAreYouSureMessage),
-//                                                preferredStyle: .alert)
-//
-//        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.showMenu()
-//        })
-//        alertController.addAction(cancelAction)
-//
-//        let OKAction = UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler: { [unowned self]
-//            alert -> Void in
-////            GV.generateHelpInfo = true
-//            let gameNumber = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
-//            self.startWTScene(new: true, next: .GameNumber, gameNumber: gameNumber)
-//        })
-//        alertController.addAction(OKAction)
-//        present(alertController, animated: true, completion: nil)
-//    }
     
     #endif
 
-//    private func getCloudData() {
-//        cloudGameData = realmSync!.objects(GameData.self).filter("combinedKey BEGINSWITH %@", GV.actLanguage)
-//        cloudGameDataSubscription = cloudGameData!.subscribe(named: "cloudGameData:\(GV.actLanguage)")
-//        cloudGameDataToken = cloudGameDataSubscription!.observe(\.state) { [weak self]  state in
-//            if state == .complete {
-//                if self!.cloudGameData!.count > 0 {
-//                    let alertController = UIAlertController(title: GV.language.getText(.tcChooseGameToGet),
-//                                                              message: "",
-//                                                              preferredStyle: .alert)
-//                    for game in self!.cloudGameData! {
-//                        let nickName = game.owner!.nickName
-//                        let gameNumber = String(game.gameNumber)
-//                        let combinedKey = GV.actLanguage + gameNumber + game.owner!.name
-//                        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcGameLine, values: nickName!, String(game.gameNumber + 1)), style: .default, handler: { [/*unowned*/ self]
-//                            alert -> Void in
-//                            self!.getGame(combinedKey: combinedKey)
-//                        })
-//                        alertController.addAction(chooseLanguageAction)
-//                    }
-//                    let cancelAction =  UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [/*unowned*/ self]
-//                        alert -> Void in
-//                        self!.showMenu()
-//                    })
-//                    alertController.addAction(cancelAction)
-//                    self!.present(alertController, animated: true, completion: nil)
-//                }
-//            }
-//        }
-//    }
-//
-//    @objc private func getGame(combinedKey: String) {
-//        let cloudGameDataRecord = cloudGameData!.filter("combinedKey = %d", combinedKey).first!
-//        let adder = 1000
-//        let localGameNumber = cloudGameDataRecord.gameNumber + adder
-//        let localCombinedKey = cloudGameDataRecord.language + String(localGameNumber)
-//        let localRecords = realm.objects(GameDataModel.self).filter("combinedKey = %d", localCombinedKey)
-//        if localRecords.count > 0 {
-//            try! realm.safeWrite() {
-//                realm.delete(localRecords)
-//            }
-//        }
-//        let localGameData = GameDataModel()
-//        localGameData.combinedKey = localCombinedKey
-//        localGameData.language = cloudGameDataRecord.language
-//        localGameData.gameNumber = localGameNumber
-//        localGameData.nowPlaying = false
-//        localGameData.gameStatus = cloudGameDataRecord.gameStatus
-//        localGameData.mandatoryWords = cloudGameDataRecord.mandatoryWords
-//        localGameData.ownWords = cloudGameDataRecord.ownWords
-//        localGameData.pieces = cloudGameDataRecord.pieces
-//        localGameData.words = cloudGameDataRecord.words
-//        localGameData.score = cloudGameDataRecord.score
-//        localGameData.time = cloudGameDataRecord.time
-//        localGameData.synced = true
-//        try! realm.safeWrite() {
-//            realm.add(localGameData)
-//            for round in cloudGameDataRecord.rounds {
-//                let myRound = RoundDataModel()
-//                myRound.infos = round.infos
-//                myRound.activityItems = round.activityItems
-//                myRound.gameArray = round.gameArray
-//                myRound.roundScore = round.roundScore
-//                localGameData.rounds.append(myRound)
-//            }
-//        }
-//        showMenu()
-//    }
-//
-//
     
     private func showSettingsMenu() {
         let myAlertController = UIAlertController(title: GV.language.getText(.tcSettings),
@@ -1188,49 +1098,6 @@ ShowNewWordsInCloudSceneDelegate {
             self.chooseLanguage()
         })
         myAlertController.addAction(chooseLanguageAction)
-        //--------------------- GameCenter on / off ---------------------
-//        var GCTitle = ""
-//        var chooseGCAction: UIAlertAction
-//        if GCHelper.shared.authenticateStatus == GCHelper.AuthenticatingStatus.authenticated {
-//            GCTitle = GV.language.getText(.tcDisconnectGC)
-//            chooseGCAction = UIAlertAction(title: GCTitle, style: .default, handler: { /*[unowned self]*/
-//                alert -> Void in
-//                GCHelper.shared.authenticateStatus = .notAuthenticated
-//                try! realm.safeWrite() {
-//                    GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterSupressed.rawValue
-//                }
-//                self.showMenu()
-//            })
-//        } else {
-//            GCTitle = GV.language.getText(.tcConnectGC)
-//            chooseGCAction = UIAlertAction(title: GCTitle, style: .default, handler: { [unowned self]
-//                alert -> Void in
-//                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
-//            })
-//        }
-//        myAlertController.addAction(chooseGCAction)
-       //--------------------- showHelpAction ---------------------
-//        let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
-//            alert -> Void in
-////            self.showHowToPlay()
-//            self.startWelcomeScene()
-//        })
-//        myAlertController.addAction(showHelpAction)
-       //--------------------- choose Style action -----------------------
-//        let chooseStyleAction =  UIAlertAction(title: GV.language.getText(.tcChooseStyle), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            self.chooseStyle()
-//        })
-//        myAlertController.addAction(chooseStyleAction)
-        //-------------------- generate BestScoreForGame ------------------
-//        #if DEBUG
-//            let generateListAction =  UIAlertAction(title: GV.language.getText(.tcGenerateBestScore), style: .default, handler: { [unowned self]
-//                alert -> Void in
-//                self.generateBestScoreList()
-//                self.showMenu()
-//            })
-//            myAlertController.addAction(generateListAction)
-//        #endif
         let cancelAction =  UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
             alert -> Void in
             self.showMenu()
@@ -1240,9 +1107,9 @@ ShowNewWordsInCloudSceneDelegate {
         present(myAlertController, animated: true, completion: nil)
     }
     
-    private func setDifficulty(difficulty: GameDifficulty) {
+    private func setGameType(gameType: GameType) {
         try! realm.safeWrite() {
-            GV.basicDataRecord.difficulty = difficulty.rawValue
+            GV.basicDataRecord.difficulty = gameType.rawValue
         }
         GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
         GV.maxGameNumber = GV.minGameNumber + 999

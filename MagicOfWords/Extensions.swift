@@ -625,6 +625,22 @@ extension String {
         }
         return result
     }
+    
+    public func toDate()->Date {
+        let dateParts = self.components(separatedBy: " ")
+        let yearMonthDay = dateParts[0].components(separatedBy: "-")
+        let hourMinuteSecond = dateParts[1].components(separatedBy: ":")
+        var dateComponents = DateComponents()
+        dateComponents.year = Int(yearMonthDay[0])!
+        dateComponents.month = Int(yearMonthDay[1])!
+        dateComponents.day = Int(yearMonthDay[2])!
+        dateComponents.hour = Int(hourMinuteSecond[0])!
+        dateComponents.minute = Int(hourMinuteSecond[1])!
+        dateComponents.second = Int(hourMinuteSecond[2])!
+        let userCalendar = Calendar.current // user calendar
+        let date = userCalendar.date(from: dateComponents)!
+        return date
+    }
 
 }
 extension NSAttributedString {

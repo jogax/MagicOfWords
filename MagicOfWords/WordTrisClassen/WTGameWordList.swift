@@ -313,6 +313,8 @@ public class WTGameWordList {
     
     public func restoreFromPlayingRecord() {
         clearWordsInGame()
+        wtGameboard!.createNewGameArray(countCols: GV.calculatedSize[GV.playingRecord.rounds[0].gameArray.count]!)
+        GV.sizeOfGrid = GV.playingRecord.sizeOfGrid
         for (index, round) in GV.playingRecord.rounds.enumerated() {
 //            print("round: \(index + 1)")
 //            let num = setFirstTime()
@@ -338,8 +340,9 @@ public class WTGameWordList {
     }
     
     private func cleanGameArray() {
-        for col in 0..<GV.sizeOfGrid {
-            for row in 0..<GV.sizeOfGrid {
+        let size = GV.gameArray.count
+        for col in 0..<size {
+            for row in 0..<size {
                 GV.gameArray[col][row].clearConnectionType()
             }
         }

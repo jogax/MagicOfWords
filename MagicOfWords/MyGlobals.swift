@@ -22,25 +22,33 @@ let itemInnerSeparator = "^"
 let itemExternSeparator = "|"
 
 
-enum GameType: Int {
-    case GameNotSelected = 0, CollectWords, FixLetter, SearchWords
-}
+//enum GameType: Int {
+//    case GameNotSelected = 0, CollectWords, FixLetter, SearchWords
+//}
 enum LettersColor: String {
     case NoColor = "NoColor", Red = "Red", Green = "Green"
 }
 
+typealias GameType = GameDifficulty
 
 enum GameDifficulty: Int {
-    case Easy = 0, Medium, Hard, VeryHard
+    case Easy = 0, Medium, Hard, VeryHard, GameNotSelected = -1
     public func description()->String {
         switch self {
         case .Easy: return "easy"
         case .Medium: return "medium"
         case .Hard: return "hard"
         case .VeryHard: return "veryHard"
+        case .GameNotSelected: return "not selected"
         }
     }
+    static let CollectWords = GameType.Easy
+    static let FixLetter = GameType.Medium
+    static let SearchWords = GameType.Hard
 }
+
+
+
 
 func == (left: MyDate, right: MyDate) -> Bool {
     return left.year == right.year &&
@@ -187,14 +195,14 @@ struct GV {
     }
     static var globalInfoTable = [PlayerData]()
     static var blockSize = CGFloat(0)
-    
+    static let calculatedSize: [Int:Int] = [0:10, 50:5, 72:6, 98:7, 128:8, 162:9, 200:10, 242:11, 288:12]
     static var deviceHasNotch = false
     static var actWidth: CGFloat = 0
     static var actHeight: CGFloat = 0
     static var deviceOrientation: DeviceOrientation = .Portrait
     static var target: AnyObject?
     static var orientationHandler: Selector?
-    static var gameType: GameType = .GameNotSelected
+    static var gameType: GameDifficulty = .CollectWords
     static let minSide: CGFloat = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
     static let maxSide: CGFloat = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
     static var actLanguageInt = GV.languageToInt[actLanguage]

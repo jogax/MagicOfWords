@@ -15,7 +15,7 @@ class GameDataModel: Object {
     @objc dynamic var language = ""
     @objc dynamic var gameNumber = 0
     @objc dynamic var sizeOfGrid = 10
-    @objc dynamic var type = 0
+    @objc dynamic var gameType = -1
     @objc dynamic var nowPlaying = false
     @objc dynamic var gameStatus = 0 // 0: new, 1: playing, 2: finished, 3: continued
     @objc dynamic var mandatoryWords = ""
@@ -29,6 +29,7 @@ class GameDataModel: Object {
     @objc dynamic var countOfWordsMaxValue = 1000
     @objc dynamic var countOfLettersMaxValue = 250
     @objc dynamic var created: Date = Date()
+    @objc dynamic var timeStamp: Date = Date()
 //    @objc dynamic var randomCounts = 0
     let rounds = List<RoundDataModel>()
     override  class func primaryKey() -> String {

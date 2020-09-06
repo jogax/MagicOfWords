@@ -154,11 +154,11 @@
 //    }
 //
 //    @objc private func EasyButtonTapped() {
-//        myDelegate!.showHowToPlay(difficulty: GameDifficulty.Easy.rawValue)
+//        myDelegate!.showHowToPlay(difficulty: GameType.CollectWords.rawValue)
 //    }
 //
 //    @objc private func MediumButtonTapped() {
-//        myDelegate!.showHowToPlay(difficulty: GameDifficulty.Medium.rawValue)
+//        myDelegate!.showHowToPlay(difficulty: GameType.FixLetter.rawValue)
 //    }
 //
 //   @objc private func laterButtonTapped() {

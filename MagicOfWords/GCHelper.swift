@@ -384,8 +384,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
         var infoArray = [GCInfo]()
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
-            let bestIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyBestScoreName : mediumBestScoreName
-            let actIdentifier = difficulty == GameDifficulty.Easy.rawValue ? easyActScoreName : mediumActScoreName
+            let bestIdentifier = difficulty == GameType.CollectWords.rawValue ? easyBestScoreName : mediumBestScoreName
+            let actIdentifier = difficulty == GameType.CollectWords.rawValue ? easyActScoreName : mediumActScoreName
             infoArray.append(GCInfo(identifier: bestIdentifier, value: Int64(score!), modifyValue: 0))
             infoArray.append(GCInfo(identifier: actIdentifier, value: Int64(score!)))
             if score! != 0 {
@@ -706,7 +706,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             }
             waitingForScores = true
             bestScoreLeaderboard = GKLeaderboard()
-            if GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue {
+            if GV.basicDataRecord.difficulty == GameType.CollectWords.rawValue {
                 bestScoreLeaderboard!.identifier = easyBestScoreName
             } else {
                 bestScoreLeaderboard!.identifier = mediumBestScoreName
@@ -758,7 +758,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             let difficulty = GV.basicDataRecord.difficulty
             leaderboardForBestScore = GKLeaderboard()
-            let leaderboardID = difficulty == GameDifficulty.Easy.rawValue ? easyBestScoreName : mediumBestScoreName
+            let leaderboardID = difficulty == GameType.CollectWords.rawValue ? easyBestScoreName : mediumBestScoreName
             leaderboardForBestScore!.identifier = leaderboardID
             leaderboardForBestScore!.playerScope = .global
             leaderboardForBestScore!.timeScope = .allTime
