@@ -77,6 +77,35 @@ func removeChildrenWithTypes(from: SKNode, types: [SKNodeSubclassType]) {
     }
 }
 
+func printChildren() {
+    for child in bgSprite!.children {
+        let printLine = (child.name == nil ? "NoName" : child.name!) + ": zPosition: \(child.zPosition)"
+        print(printLine)
+        if child.children.count > 0 {
+            for child1 in child.children {
+                let printLine = (child1.name == nil ? "NoName1" : child1.name!) + ": zPosition: \(child1.zPosition)"
+                print("   " + printLine)
+                if child1.children.count > 0 {
+                    for child2 in child1.children {
+                        var text = ""
+                        if child2.name != nil && child2.name == "°°°GameboardItemLabel°°°" {
+                            text = "Letter: " + (child2 as! SKLabelNode).text!
+                        }
+                        let printLine = (child2.name == nil ? "NoName2" : child2.name!) + ": zPosition: \(child2.zPosition) + \(text)"
+                        print("      " + printLine)
+                        if child2.children.count > 0 {
+                            for child3 in child2.children {
+                                let printLine = (child3.name == nil ? "NoName3" : child3.name!) + ": zPosition: \(child3.zPosition)"
+                                print("         " + printLine)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 
 

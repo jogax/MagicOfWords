@@ -152,7 +152,7 @@ ShowNewWordsInCloudSceneDelegate {
             view.presentScene(nil)
             wtSceneStarted = false
         }
-        showBackgroundPicture()
+        changeBackgroundPicture()
         switch start {
         case .NoMore: showMenu() //startMenuScene(showMenu: true)
         case .PreviousGame, .NextGame: startWTScene(new: false, next: start, gameNumber: 0)
@@ -178,7 +178,7 @@ ShowNewWordsInCloudSceneDelegate {
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         if UIDevice.current.userInterfaceIdiom == .phone {
-            return .allButUpsideDown
+            return .portrait
         } else {
             return .all
         }
@@ -438,7 +438,7 @@ ShowNewWordsInCloudSceneDelegate {
         GV.wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         GV.actHeight = UIScreen.main.bounds.height //self.view.frame.size.height
         GV.actWidth = UIScreen.main.bounds.width // self.view.frame.size.width
-        showBackgroundPicture()
+        changeBackgroundPicture()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         if GV.basicDataRecord.actLanguage == "" { //basicDataRecord not loaded yet
             generateBasicDataRecordIfNeeded()
@@ -708,17 +708,18 @@ ShowNewWordsInCloudSceneDelegate {
                     }
                 }
             }
-            let allRecordsPerLanguage = realm.objects(GameDataModel.self).filter("language = %@ and gameType = %d", language!, GameType.GameNotSelected.rawValue)
+            let allRecordsPerLanguage = realm.objects(GameDataModel.self).filter("language = %@", language!)
             for record in allRecordsPerLanguage {
-                try! realm.safeWrite {
-                    if record.gameNumber < 1000 {
-                        record.gameType = GameType.CollectWords.rawValue
-                    } else {
-                        record.gameType = GameType.FixLetter.rawValue
+                if (record.gameNumber < 1000 && record.gameType != GameType.CollectWords.rawValue) || (record.gameNumber > 1000 && record.gameType != GameType.FixLetter.rawValue) {
+                    try! realm.safeWrite {
+                        if record.gameNumber < 1000 {
+                            record.gameType = GameType.CollectWords.rawValue
+                        } else {
+                            record.gameType = GameType.FixLetter.rawValue
+                        }
+                        record.sizeOfGrid = GV.calculatedSize[record.rounds[0].gameArray.count]!
                     }
-                    record.sizeOfGrid = GV.calculatedSize[record.rounds[0].gameArray.count]!
                 }
-
             }
             let allRecordsPerLanguage1 = realm.objects(GameDataModel.self).filter("language = %@", language!).sorted(byKeyPath: "combinedKey", ascending: true)
             for record in allRecordsPerLanguage1 {
@@ -726,6 +727,14 @@ ShowNewWordsInCloudSceneDelegate {
                     try! realm.safeWrite {
                         record.created = record.combinedKey.toDate()
                     }
+                }
+            }
+        }
+        let oldRecords = realm.objects(GameDataModel.self).filter("lastPlayed == nil")
+        if oldRecords.count > 0 {
+            for oldRecord in oldRecords {
+                try! realm.safeWrite {
+                    oldRecord.lastPlayed = oldRecord.combinedKey.toDate()
                 }
             }
         }
@@ -780,12 +789,39 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     
-    private func showBackgroundPicture() {
-        let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
-        
-        backgroundImage.image = UIImage(named: GV.actHeight > GV.actWidth ? "backgroundP.png" : "backgroundL.png")
-        backgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
-        self.view.insertSubview(backgroundImage, at: 0)
+    private func changeBackgroundPicture() {
+
+            let uiImage = UIImage(named: GV.actHeight > GV.actWidth ? "backgroundP.png" : "backgroundL.png")
+            
+            // Get image width and height.
+            let imageWidth:CGFloat = GV.actWidth
+                
+            let imageHeight:CGFloat = GV.actHeight
+            
+            // Calculate the image view's top left point's x axis position value.
+            let xPos = 0
+            let yPos = 0
+            
+            // Create a CGRect object to render the image.
+            let imageFrame: CGRect = CGRect(x:CGFloat(xPos), y:CGFloat(yPos), width:imageWidth, height:imageHeight)
+            
+            // Create a UIView object which use above CGRect object.
+            let imageView = UIView(frame: imageFrame)
+            
+            // Create a UIColor object which use above UIImage object.
+            let backgroundColor = UIColor(patternImage: uiImage!)
+            
+            // Set above image as UIView's background.
+            imageView.backgroundColor = backgroundColor
+            
+            // Add above UIView object as the main view's subview.
+        if self.view.subviews.count == 0 {
+            self.view.addSubview(imageView)
+        } else {
+            self.view.subviews[0].removeFromSuperview()
+            self.view.insertSubview(imageView, at: 0)
+        }
+
     }
     let callerName = "MainViewController"
     ////
@@ -817,10 +853,14 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     @objc func deviceRotated() {
+//        showBackgroundPicture()
         if GV.orientationHandler != nil && GV.target != nil {
             _ = GV.target!.perform(GV.orientationHandler!)
+        } else {
+            changeBackgroundPicture()
         }
     }
+    
 
     var oldConnectedToInternet = false
     

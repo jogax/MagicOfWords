@@ -383,9 +383,11 @@ class WTGameboard: SKShapeNode {
                 GV.gameArray[col][row].plPosSize = grid!.gridPosition(col: col, row: row) //+
                 GV.gameArray[col][row].name = "GBD/\(col)/\(row)"
                 grid!.addChild(GV.gameArray[col][row])
+//                bgSprite!.addChild(GV.gameArray[col][row])
             }
         }
         self.name = gameboardName
+        self.zPosition = -1
         bgSprite!.addChild(self)
         generateNetOfColsAndRows()
     }
@@ -468,6 +470,7 @@ class WTGameboard: SKShapeNode {
         grid!.setActPosSize()
         grid!.nodeType = .Grid
 //        self.addChild(grid!)
+//        grid!.zPosition = 100
         bgSprite!.addChild(grid!)
     }
     

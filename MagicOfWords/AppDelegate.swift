@@ -85,7 +85,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 76, // used since 2020-09-05
+            schemaVersion: 77, // used since 2020-09-08
 //            schemaVersion: 60, // used since 2020-02-05
 //            schemaVersion: 59, // used since 2019-08-30
 //            schemaVersion: 30, // optimize BasicDataModel

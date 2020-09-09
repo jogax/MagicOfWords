@@ -696,7 +696,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         self.name = "WTScene"
         self.view!.isMultipleTouchEnabled = false
         self.view!.subviews.forEach { $0.removeFromSuperview() }
-        GV.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
+//        GV.blockSize = self.frame.size.width * (GV.onIpad ? 0.70 : 0.90) / CGFloat(12)
         self.tilesForGame.removeAll()
 //        self.gameNumberForGenerating = GV.basicDataRecord.difficulty == GameDifficulty.Easy.rawValue ? GV.DemoEasyGameNumber : GV.DemoMediumGameNumber
         if self.children.count > 0 {
@@ -759,6 +759,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            myAlert.name = self.myAlertName
 //            self.bgSprite!.addChild(myAlert)
 //        }
+//        print(printChildren())
    }
     
     @objc private func didRotated() {
@@ -796,6 +797,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
 
     private func goBackToWTScene(start: StartType) {
+        GV.target = nil
+        GV.orientationHandler = nil
+        try! realm.safeWrite {
+            GV.playingRecord.lastPlayed = Date()
+        }
+
         wtSceneDelegate!.gameFinished(start: start)
     }
     
@@ -843,7 +850,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         
-        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber).sorted(byKeyPath: "score", ascending: false)
+        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameType = %d", GV.actLanguage, GV.gameType.rawValue).sorted(byKeyPath: "created", ascending: true)
         
         if actGames.count == 0 {
             new = true
@@ -2526,8 +2533,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var gameFinished = false
     
     private func hasRecords(before: Bool)->Bool {
-        let allRecords = realm.objects(GameDataModel.self).filter("gameNumber >= %d and gameNumber < %d and language = %@",
-              GV.minGameNumber, GV.maxGameNumber, GV.actLanguage).sorted(byKeyPath: "score", ascending: false)
+        let allRecords = realm.objects(GameDataModel.self).filter("gameType = %d and language = %@",
+                                      GV.gameType.rawValue, GV.actLanguage).sorted(byKeyPath: "created", ascending: true)
         if allRecords.count > 1 {
             if before && allRecords[0].nowPlaying || !before && allRecords.last!.nowPlaying {
                 return false
@@ -4189,7 +4196,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         
     }
 
-    private func printGameArray() {
+    static public func printGameArray() {
         let line = "____________________________________________"
         for row in 0..<GV.sizeOfGrid {
             var infoLine = "|"
@@ -4226,6 +4233,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         print(founded.count)
+    }
+    
+    public func printAllRecords(language: String = "ru", gameType: Int = 0, sizeOfGrid: Int = 5) {
+        print("===========================================")
+        var count = 1
+        for record in realm.objects(GameDataModel.self).filter("language = %d and gameType = %d and sizeOfGrid = %d", language, gameType, sizeOfGrid) {
+            print("\(count > 9 ? String(count) : " " + String(count)). sizeOfGrid: \(record.sizeOfGrid), gameType: \(record.gameType), gameNumber: \(record.gameNumber)")
+            count += 1
+        }
+        print("===========================================")
     }
 
 

@@ -58,6 +58,7 @@ class WTGameboardItem: SKSpriteNode {
     private var fontSize: CGFloat = 0
     init(blockSize: CGFloat, fontSize: CGFloat) {
         label = SKLabelNode()
+        label.name = "°°°GameboardItemLabel°°°"
         // Call the init        
         countWordsLabel = SKLabelNode()
         self.fontSize = fontSize
