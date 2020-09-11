@@ -850,7 +850,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         
-        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameType = %d", GV.actLanguage, GV.gameType.rawValue).sorted(byKeyPath: "created", ascending: true)
+        let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameType = %d and sizeOfGrid = %d", GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid).sorted(byKeyPath: "created", ascending: true)
         
         if actGames.count == 0 {
             new = true
@@ -2533,8 +2533,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var gameFinished = false
     
     private func hasRecords(before: Bool)->Bool {
-        let allRecords = realm.objects(GameDataModel.self).filter("gameType = %d and language = %@",
-                                      GV.gameType.rawValue, GV.actLanguage).sorted(byKeyPath: "created", ascending: true)
+        let allRecords = realm.objects(GameDataModel.self).filter("gameType = %d and language = %@ and sizeOfGrid = %d",
+                                                                  GV.gameType.rawValue, GV.actLanguage, GV.sizeOfGrid).sorted(byKeyPath: "created", ascending: true)
         if allRecords.count > 1 {
             if before && allRecords[0].nowPlaying || !before && allRecords.last!.nowPlaying {
                 return false
@@ -3425,14 +3425,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             message = GV.language.getText(.tcGameFinished2)
             myAlert = MyAlertController(title: title, message: message, target: self, type: .Red)
             if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
-                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "5"), action: #selector(newGame5ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "6"), action: #selector(newGame6ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "7"), action: #selector(newGame7ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "8"), action: #selector(newGame8ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "9"), action: #selector(newGame9ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "10"), action: #selector(newGame10ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "11"), action: #selector(newGame11ButtonTapped))
-                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "12"), action: #selector(newGame12ButtonTapped))
+                myAlert.addAction(text: GV.language.getText(.tcNewGame), action: #selector(newGameButtonTapped))
+//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "6"), action: #selector(newGame6ButtonTapped))
+//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "7"), action: #selector(newGame7ButtonTapped))
+//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "8"), action: #selector(newGame8ButtonTapped))
+//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "9"), action: #selector(newGame9ButtonTapped))
+//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "10"), action: #selector(newGame10ButtonTapped))
+//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "11"), action: #selector(newGame11ButtonTapped))
+//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "12"), action: #selector(newGame12ButtonTapped))
                 myAlert.addAction(text: GV.language.getText(.tcBack), action: #selector(continueAction))
             } else {
                 myAlert.addAction(text: GV.language.getText(.tcNewGame), action: #selector(newGameButtonTapped))

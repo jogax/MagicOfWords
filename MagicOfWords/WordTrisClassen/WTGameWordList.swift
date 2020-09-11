@@ -356,6 +356,9 @@ public class WTGameWordList {
                 let selectedWord = SelectedWord(from: selectedWordString)
 //                selectedWord.setScore(round: round)
                 if selectedWord.word.length > 0 {
+                    if selectedWord.word == "РОВЕСНИЦА" {
+                        print("at selected Word: \(selectedWord.word)")
+                    }
                     _ = addWord(selectedWord: selectedWord, doAnimate: false, round: round)
 //                    addWordToAllWords(selectedWord: selectedWord, round: round)
                 }
