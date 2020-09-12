@@ -27,6 +27,7 @@ class HintEngine {
             fileURL: URL(string: Bundle.main.path(forResource: "Hints", ofType:"realm")!),
             // Open the file in read-only mode as application bundles are not writeable
             readOnly: true,
+            schemaVersion: 1,
             objectTypes: [HintModel.self])
 
         let realmMandatoryList: Realm = try! Realm(configuration: mandatoryListConfig)
