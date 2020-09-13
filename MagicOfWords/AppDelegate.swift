@@ -52,6 +52,8 @@ let mandatoryListConfig  = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "Hints", ofType:"realm")!),
     // Open the file in read-only mode as application bundles are not writeable
     readOnly: true,
+    schemaVersion: 1, // new item words
+
     objectTypes: [HintModel.self])
 
 //// Open the Realm with the configuration
@@ -89,7 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // handle error compacting or opening Realm
             }
 
-            let gamesRealm = try! Realm(configuration: config)
+//            let gamesRealm = try! Realm(configuration: config)
          }
         
         func updateWordList() {
@@ -115,7 +117,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // handle error compacting or opening Realm
             }
 
-            let wordListRealm = try! Realm(configuration: config)
+//            let wordListRealm = try! Realm(configuration: config)
          }
         
         func updateMandatory() {
@@ -141,7 +143,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // handle error compacting or opening Realm
             }
 
-            let mandatoryRealm = try! Realm(configuration: config)
+//            let mandatoryRealm = try! Realm(configuration: config)
          }
         
 
@@ -168,7 +170,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 77, // used since 2020-09-08
+            schemaVersion: 78, // used since 2020-09-08
 //            schemaVersion: 60, // used since 2020-02-05
 //            schemaVersion: 59, // used since 2019-08-30
 //            schemaVersion: 30, // optimize BasicDataModel

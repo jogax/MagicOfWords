@@ -843,13 +843,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
         }
         
-        let demoGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d", GV.actLanguage, 9999)
-        if demoGames.count > 0 {
-            try! realm.safeWrite() {
-                realm.delete(demoGames)
-            }
-        }
-        
+//        let demoGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d", GV.actLanguage, 9999)
+//        if demoGames.count > 0 {
+//            try! realm.safeWrite() {
+//                realm.delete(demoGames)
+//            }
+//        }
+//
         let actGames = realm.objects(GameDataModel.self).filter("language = %@ and gameType = %d and sizeOfGrid = %d", GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid).sorted(byKeyPath: "created", ascending: true)
         
         if actGames.count == 0 {
@@ -885,7 +885,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //            createPlayingRecord(gameNumber: gameNumber)
 //        } else
         if new {
-            let emptyRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and score = 0", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+            let emptyRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameType = %d and sizeOfGrid = %d and score = 0", GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
             if emptyRecords.count > 0 {
                 try! realm.safeWrite() {
                     realm.delete(emptyRecords)
@@ -966,7 +966,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumberForMandatoryRecord, GV.actLanguage).first!
         if mandatoryRecord != nil {
             try! realm.safeWrite() {
-                let oldRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d and gameNumber <= %d and nowPlaying = true", GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+                let oldRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameType = %d and sizeOfGrid = %d and nowPlaying = true", GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
                 for oldRecord in oldRecords {
                     oldRecord.nowPlaying = false
                 }
@@ -981,6 +981,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 GV.playingRecord.mandatoryWords = newString
                 GV.playingRecord.gameNumber = gameNumber
                 GV.playingRecord.language = GV.actLanguage
+                GV.playingRecord.gameType = GV.gameType.rawValue
+                GV.playingRecord.sizeOfGrid = GV.sizeOfGrid
                 GV.playingRecord.time = timeInitValue
                 GV.playingRecord.nowPlaying = true
                 realm.add(GV.playingRecord)
@@ -1424,6 +1426,14 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func hideScreen(hide: Bool) {
+        func moveGameArray(hide: Bool) {
+            for col in 0..<GV.sizeOfGrid {
+                for row in 0..<GV.sizeOfGrid {
+                    GV.gameArray[col][row].plPosSize!.PPos.y -= hide ? wtGameboardMovedBy : -wtGameboardMovedBy
+                    GV.gameArray[col][row].plPosSize!.LPos.y -= hide ? wtGameboardMovedBy : -wtGameboardMovedBy
+                }
+            }
+        }
 //  hide the bottom buttons
         timerIsCounting = !hide
         inDefiningSearchingWord = hide
@@ -1434,13 +1444,13 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        wtGameboardMovedBy = self.frame.height - (gridPosition.y + gridSize.height / 2)
         for row in 0...GV.sizeOfGrid {
             if let child = bgSprite!.childNode(withName: "Row\(row)") {
-                child.position.y -= hide ? wtGameboardMovedBy : -wtGameboardMovedBy
+//                child.position.y -= hide ? wtGameboardMovedBy : -wtGameboardMovedBy
+                child.plPosSize?.PPos.y -= hide ? wtGameboardMovedBy : -wtGameboardMovedBy
+                child.plPosSize?.LPos.y -= hide ? wtGameboardMovedBy : -wtGameboardMovedBy
             }
         }
-        if hide {
-            wtGameboard!.position = CGPoint(x: wtGameboard!.position.x, y: wtGameboard!.position.y - wtGameboardMovedBy)
-        } else {
-            wtGameboard!.position = CGPoint(x: wtGameboard!.position.x, y: wtGameboard!.position.y + wtGameboardMovedBy)
+        moveGameArray(hide: hide)
+        if !hide {
             doneButton!.removeFromSuperview()
             questionMarkButton!.removeFromSuperview()
             starButton!.removeFromSuperview()
@@ -2045,7 +2055,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        wtSceneDelegate!.gameFinished(start: .SetMedium)
     }
     
-    let firstButtonColumn: CGFloat = 0.10
+    let firstButtonColumn: CGFloat = GV.onIpad ? 0.12 : 0.10
     let secondButtonColumn: CGFloat = 0.43
     let thirdButtonColumn: CGFloat = 0.65
     let fourthButtonColumn: CGFloat = 0.80

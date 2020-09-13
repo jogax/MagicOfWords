@@ -223,7 +223,10 @@ ShowNewWordsInCloudSceneDelegate {
     
     func startGame() {
         let actGame = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d and sizeOfGrid = %d",GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
-//        let actPlay = realm.objects(GameDataModel.self).filter("language = %d and gameNumber >= %d and gameNumber <= %d",GV.actLanguage, GV.minGameNumber, GV.maxGameNumber)
+        try! realm.safeWrite {
+            GV.basicDataRecord.difficulty = GV.gameType.rawValue
+            GV.basicDataRecord.sizeOfGrid = GV.sizeOfGrid
+        }
         if actGame.isEmpty {
             let gameNumber = GV.basicDataRecord.difficulty * 1000
             startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
@@ -438,6 +441,7 @@ ShowNewWordsInCloudSceneDelegate {
         GV.wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         GV.actHeight = UIScreen.main.bounds.height //self.view.frame.size.height
         GV.actWidth = UIScreen.main.bounds.width // self.view.frame.size.width
+        GV.sizeOfGrid = 10
         changeBackgroundPicture()
         print("\(String(describing: Realm.Configuration.defaultConfiguration.fileURL))")
         if GV.basicDataRecord.actLanguage == "" { //basicDataRecord not loaded yet
@@ -710,14 +714,19 @@ ShowNewWordsInCloudSceneDelegate {
             }
             let allRecordsPerLanguage = realm.objects(GameDataModel.self).filter("language = %@", language!)
             for record in allRecordsPerLanguage {
+                print("language: \(language), gameNumber: \(record.gameNumber), gameType: \(record.gameType)")
                 if (record.gameNumber < 1000 && record.gameType != GameType.CollectWords.rawValue) || (record.gameNumber > 1000 && record.gameType != GameType.FixLetter.rawValue) {
                     try! realm.safeWrite {
-                        if record.gameNumber < 1000 {
-                            record.gameType = GameType.CollectWords.rawValue
+                        if record.gameType == -1 {
+                            realm.delete(record)
                         } else {
-                            record.gameType = GameType.FixLetter.rawValue
+                            if record.gameNumber < 1000 {
+                                record.gameType = GameType.CollectWords.rawValue
+                            } else {
+                                record.gameType = GameType.FixLetter.rawValue
+                            }
+                            record.sizeOfGrid = GV.sizeOfGrid
                         }
-                        record.sizeOfGrid = GV.calculatedSize[record.rounds[0].gameArray.count]!
                     }
                 }
             }

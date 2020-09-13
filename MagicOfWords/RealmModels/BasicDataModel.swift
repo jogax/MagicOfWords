@@ -18,6 +18,7 @@ class BasicDataModel: Object {
     @objc dynamic var ID = 0
     @objc dynamic var actLanguage = ""
     @objc dynamic var difficulty = 0
+    @objc dynamic var sizeOfGrid = 10
     @objc dynamic var creationTime = Date()
     @objc dynamic var searchPhrase = ""
     @objc dynamic var showingRow = 0

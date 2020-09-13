@@ -386,6 +386,7 @@ class WTGameboard: SKShapeNode {
 //                bgSprite!.addChild(GV.gameArray[col][row])
             }
         }
+        self.plPosSize = PLPosSize(PPos: CGPoint(), LPos: CGPoint(), PSize: CGSize(), LSize: CGSize())
         self.name = gameboardName
         self.zPosition = -1
         bgSprite!.addChild(self)
