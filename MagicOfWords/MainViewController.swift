@@ -326,25 +326,52 @@ ShowNewWordsInCloudSceneDelegate {
             self.startGame()
         })
         alertController!.addAction(choose10x10Action)
-        
-        //--------------------- 11 x 11  ---------------------
-        let choose11x11Action = UIAlertAction(title: "11x11", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.sizeOfGrid = 11
-            self.startGame()
-        })
-        alertController!.addAction(choose11x11Action)
-        
-        //--------------------- 12 x 12  ---------------------
-        let choose12x12Action = UIAlertAction(title: "12x12", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.sizeOfGrid = 12
-            self.startGame()
-        })
-        alertController!.addAction(choose12x12Action)
-        
+        if GV.onIpad {
+            //--------------------- 11 x 11  ---------------------
+            let choose11x11Action = UIAlertAction(title: "11x11", style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.inMenu = false
+                GV.sizeOfGrid = 11
+                self.startGame()
+            })
+            alertController!.addAction(choose11x11Action)
+            
+            //--------------------- 12 x 12  ---------------------
+            let choose12x12Action = UIAlertAction(title: "12x12", style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.inMenu = false
+                GV.sizeOfGrid = 12
+                self.startGame()
+            })
+            alertController!.addAction(choose12x12Action)
+            
+            //--------------------- 13 x 13  ---------------------
+            let choose13x13Action = UIAlertAction(title: "13x13", style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.inMenu = false
+                GV.sizeOfGrid = 13
+                self.startGame()
+            })
+            alertController!.addAction(choose13x13Action)
+            
+            //--------------------- 14 x 14  ---------------------
+            let choose14x14Action = UIAlertAction(title: "14x14", style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.inMenu = false
+                GV.sizeOfGrid = 14
+                self.startGame()
+            })
+            alertController!.addAction(choose14x14Action)
+            
+            //--------------------- 15 x 15  ---------------------
+            let choose15x15Action = UIAlertAction(title: "15x15", style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.inMenu = false
+                GV.sizeOfGrid = 15
+                self.startGame()
+            })
+            alertController!.addAction(choose15x15Action)
+        }
         let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
             alert -> Void in
             self.showMenu()
@@ -714,7 +741,7 @@ ShowNewWordsInCloudSceneDelegate {
             }
             let allRecordsPerLanguage = realm.objects(GameDataModel.self).filter("language = %@", language!)
             for record in allRecordsPerLanguage {
-                print("language: \(language), gameNumber: \(record.gameNumber), gameType: \(record.gameType)")
+//                print("language: \(language), gameNumber: \(record.gameNumber), gameType: \(record.gameType)")
                 if (record.gameNumber < 1000 && record.gameType != GameType.CollectWords.rawValue) || (record.gameNumber > 1000 && record.gameType != GameType.FixLetter.rawValue) {
                     try! realm.safeWrite {
                         if record.gameType == -1 {

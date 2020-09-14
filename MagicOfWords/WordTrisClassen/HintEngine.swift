@@ -76,13 +76,13 @@ class HintEngine {
         if letter.col > 0 {
             arrayNumberLeft = GV.gameArray[letter.col - 1][letter.row].inFreeArray
         }
-        if letter.col < maxCol - 1 {
+        if letter.col < GV.sizeOfGrid - 1 {
             arrayNumberRight = GV.gameArray[letter.col + 1][letter.row].inFreeArray
         }
         if letter.row > 0 {
             arrayNumberUp = GV.gameArray[letter.col][letter.row - 1].inFreeArray
         }
-        if letter.row > maxCol - 1 {
+        if letter.row > GV.sizeOfGrid - 1 {
             arrayNumberDown = GV.gameArray[letter.col + 1][letter.row].inFreeArray
         }
         returnValue = arrayNumberLeft < 0 ? returnValue : (returnValue < freeArrays[arrayNumberLeft].countFree ? freeArrays[arrayNumberLeft].countFree : returnValue)

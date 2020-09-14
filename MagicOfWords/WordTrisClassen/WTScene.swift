@@ -927,7 +927,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             } else {
                 GV.playingRecord = nowPlaying.last!
             }
-            let sizeOfGrid: [Int:Int] = [0:10, 50:5, 72:6, 98:7, 128:8, 162:9, 200:10, 242:11, 288:12]
+            let sizeOfGrid: [Int:Int] = [0:10, 50:5, 72:6, 98:7, 128:8, 162:9, 200:10, 242:11, 288:12, 338:13, 392:14, 450:15]
             if GV.playingRecord.rounds.count > 0 {
                 GV.sizeOfGrid = sizeOfGrid[GV.playingRecord.rounds.first!.gameArray.count]!
             }
@@ -938,6 +938,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 if GV.playingRecord.countOfLettersMaxValue == 0 {
                     GV.playingRecord.countOfLettersMaxValue = 250
                 }
+                if GV.playingRecord.sizeOfGrid != GV.sizeOfGrid {
+                    GV.playingRecord.sizeOfGrid = GV.sizeOfGrid
+                }
             }
             GV.countOfWordsMaxValue = GV.playingRecord.countOfWordsMaxValue
             GV.countOfLettersMaxValue = GV.playingRecord.countOfLettersMaxValue
@@ -945,6 +948,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
         }
+        
         setMandatoryWords()
     }
     
@@ -2213,7 +2217,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 showFoundedWords()
                 modifyHeader()
                 let countFixLetters =  wtGameboard!.checkFixLetters()
-                var targetLetterCount = startValueForFixLetters + GV.playingRecord.rounds.count
+                var targetLetterCount = startValueForFixLetters[GV.sizeOfGrid]! + GV.playingRecord.rounds.count
                 targetLetterCount = (targetLetterCount > maxLetterCountForFixLetters) ? maxLetterCountForFixLetters : targetLetterCount
                 if targetLetterCount > countFixLetters {
 //                    less fixLetters as should be --> must be generated
@@ -2422,13 +2426,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     var actPlayer = ""
     var actScore = 0
     var lastPosition = CGPoint(x: 0, y: 0)
-    let startValueForFixLetters = 7 // Starts with startValue fixLetters
-    let maxLetterCountForFixLetters = 20
+    let startValueForFixLetters = [5: 3, 6: 5, 7: 7, 8: 7, 9: 7, 10: 7, 11: 11, 12: 13, 13: 15, 14: 19, 15: 23]
+    let maxCountersForFixletters = [5: 6, 6: 8, 7: 10, 8: 12, 9: 16, 10: 20, 11: 24, 12: 28, 13: 32, 14: 36, 15: 40]
+    var maxLetterCountForFixLetters = 0
 
     private func createFixLetters() {
         if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
             return
         }
+        maxLetterCountForFixLetters = maxCountersForFixletters[GV.sizeOfGrid]!
+
         var fixLetters = [UsedLetter]()
 //        let lettersProRound = [8, 8, 10, 10, 12, 12, 12, 12, 14, 14, 14, 14, 16, 16, 16, 16, 18, 18, 18, 18, 20]
 //        let useLettersProRound = GV.playingRecord.created > Date(year: 2019, month: 9, day: 1)
@@ -2438,7 +2445,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let random = MyRandom(gameNumber: gameNumber, modifier: (roundCount - 1) * 15)
 //        let countLettersOnGameboard = wtGameboard!.getCountLetters()
         let countActFixLetters = wtGameboard!.checkFixLetters()
-        var targetLetterCount = startValueForFixLetters + GV.playingRecord.rounds.count
+        var targetLetterCount = startValueForFixLetters[GV.sizeOfGrid]! + GV.playingRecord.rounds.count
         targetLetterCount = (targetLetterCount > maxLetterCountForFixLetters) ? maxLetterCountForFixLetters : targetLetterCount
         let countOfLetters = targetLetterCount - countActFixLetters
         var remainigLength = countOfLetters
@@ -2478,13 +2485,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         var OKPositions = [(col: Int, row: Int, quoters: Int8)]()
         var countFreePlaces = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 //            Analyse gameArray for free places
-        for col in 0...4 {
-            for row in 0...4 {
+        let maxCol = GV.sizeOfGrid / 2 - 1
+        let lastCol = GV.sizeOfGrid - 1
+        for col in 0...maxCol {
+            for row in 0...maxCol {
                 var quoters: Int8 = 0
                 quoters |= GV.gameArray[col][row].status == .Empty ? Q1 : 0
-                quoters |= GV.gameArray[9 - col][row].status == .Empty ? Q2 : 0
-                quoters |= GV.gameArray[col][9 - row].status == .Empty ? Q3 : 0
-                quoters |= GV.gameArray[9 - col][9 - row].status == .Empty ? Q4 : 0
+                quoters |= GV.gameArray[lastCol - col][row].status == .Empty ? Q2 : 0
+                quoters |= GV.gameArray[col][lastCol - row].status == .Empty ? Q3 : 0
+                quoters |= GV.gameArray[lastCol - col][lastCol - row].status == .Empty ? Q4 : 0
                 OKPositions.append((col, row, quoters))
                 if quoters > 0 {
                     countFreePlaces[Int(quoters)] += 1
@@ -2502,8 +2511,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             if counter < 0 {
                 var usedPositions = [(col:Int, row:Int)]()
                 repeat {
-                    let col = random.getRandomInt(0, max: 9)
-                    let row = random.getRandomInt(0, max: 9)
+                    let col = random.getRandomInt(0, max: GV.sizeOfGrid)
+                    let row = random.getRandomInt(0, max: GV.sizeOfGrid)
                     let item = GV.gameArray[col][row]
                     if usedPositions.firstIndex(where: {$0.col == col && $0.row == row}) == nil && item.status == .Used && !item.fixItem {
                         fixLetters.append(UsedLetter(col:col, row: row, letter: GV.gameArray[col][row].letter))
@@ -2524,15 +2533,15 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 letterIndex += 1
             }
             if letterIndex < countOfLetters && actQouterInfo & Q2 != 0 {
-                fixLetters.append(UsedLetter(col: 9 - col, row: row, letter: myLetters.char(at: letterIndex)))
+                fixLetters.append(UsedLetter(col: lastCol - col, row: row, letter: myLetters.char(at: letterIndex)))
                 letterIndex += 1
             }
             if letterIndex < countOfLetters && actQouterInfo & Q3 != 0 {
-                fixLetters.append(UsedLetter(col: col, row: 9 - row, letter: myLetters.char(at: letterIndex)))
+                fixLetters.append(UsedLetter(col: col, row: lastCol - row, letter: myLetters.char(at: letterIndex)))
                 letterIndex += 1
             }
             if letterIndex < countOfLetters  && actQouterInfo & Q4 != 0 {
-                fixLetters.append(UsedLetter(col: 9 - col, row: 9 - row, letter: myLetters.char(at: letterIndex)))
+                fixLetters.append(UsedLetter(col: lastCol - col, row: lastCol - row, letter: myLetters.char(at: letterIndex)))
                 letterIndex += 1
             }
         } while letterIndex < countOfLetters
@@ -3434,19 +3443,12 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             title = GV.language.getText(.tcGameFinished1)
             message = GV.language.getText(.tcGameFinished2)
             myAlert = MyAlertController(title: title, message: message, target: self, type: .Red)
-            if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
+//            if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
                 myAlert.addAction(text: GV.language.getText(.tcNewGame), action: #selector(newGameButtonTapped))
-//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "6"), action: #selector(newGame6ButtonTapped))
-//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "7"), action: #selector(newGame7ButtonTapped))
-//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "8"), action: #selector(newGame8ButtonTapped))
-//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "9"), action: #selector(newGame9ButtonTapped))
-//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "10"), action: #selector(newGame10ButtonTapped))
-//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "11"), action: #selector(newGame11ButtonTapped))
-//                myAlert.addAction(text: GV.language.getText(.tcNewGameX, values: "12"), action: #selector(newGame12ButtonTapped))
                 myAlert.addAction(text: GV.language.getText(.tcBack), action: #selector(continueAction))
-            } else {
-                myAlert.addAction(text: GV.language.getText(.tcNewGame), action: #selector(newGameButtonTapped))
-            }
+//            } else {
+//                myAlert.addAction(text: GV.language.getText(.tcNewGame), action: #selector(newGameButtonTapped))
+//            }
         } else {
             title = GV.language.getText(.tcTaskNotCompletedWithNoMoreSteps)
             message = GV.language.getText(.tcWillBeRestarted)
