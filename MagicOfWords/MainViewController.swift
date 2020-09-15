@@ -486,6 +486,15 @@ ShowNewWordsInCloudSceneDelegate {
         checkNewWordsInCloud()
 //        checkMyBonusMalus()
         _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
+        let lastPlayed = realm.objects(GameDataModel.self).filter("language = %@ and nowPlaying = true",GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: false)
+        switch lastPlayed.count {
+        case 0:
+            chooseGame()
+        default:
+            GV.gameType = GameType(rawValue: lastPlayed[0].gameType)!
+            GV.sizeOfGrid = lastPlayed[0].sizeOfGrid
+        }
+
     }
     
     private func checkDeviceRecordInCloud() {
@@ -719,12 +728,13 @@ ShowNewWordsInCloudSceneDelegate {
 //        var bestScore = 0
 //        var bestScoreIndex = 0
         var dayAdder = 1
+        let allRecords = realm.objects(GameDataModel.self).filter("recordVersion = %d", 0)
         for languageIndex in 0...3 {
             let language = GV.IntToLanguage[languageIndex]
             for difficulty in GameType.CollectWords.rawValue...GameType.SearchWords.rawValue {
                 let minGameNumber = difficulty * 1000
                 let maxGameNumber = minGameNumber + 999
-                let myPlayingRecords = realm.objects(GameDataModel.self).filter("language = %@ and combinedKey BEGINSWITH %@ and gameNumber >= %d and gameNumber <= %d", language!, language!, minGameNumber, maxGameNumber)
+                let myPlayingRecords = allRecords.filter("language = %@ and combinedKey BEGINSWITH %@ and gameNumber >= %d and gameNumber <= %d", language!, language!, minGameNumber, maxGameNumber)
                 if myPlayingRecords.count > 0 {
                     for myPlayingRecord in myPlayingRecords {
                         let combinedKey =  Calendar.current.date(byAdding: .hour, value: -dayAdder, to: Date())!.toString()
@@ -739,49 +749,31 @@ ShowNewWordsInCloudSceneDelegate {
                     }
                 }
             }
-            let allRecordsPerLanguage = realm.objects(GameDataModel.self).filter("language = %@", language!)
-            for record in allRecordsPerLanguage {
-//                print("language: \(language), gameNumber: \(record.gameNumber), gameType: \(record.gameType)")
-                if (record.gameNumber < 1000 && record.gameType != GameType.CollectWords.rawValue) || (record.gameNumber > 1000 && record.gameType != GameType.FixLetter.rawValue) {
-                    try! realm.safeWrite {
-                        if record.gameType == -1 {
-                            realm.delete(record)
-                        } else {
-                            if record.gameNumber < 1000 {
-                                record.gameType = GameType.CollectWords.rawValue
-                            } else {
-                                record.gameType = GameType.FixLetter.rawValue
-                            }
-                            record.sizeOfGrid = GV.sizeOfGrid
-                        }
+        }
+
+        for record in allRecords {
+            try! realm.safeWrite {
+                if record.gameType == -1 {
+                    realm.delete(record)
+                } else {
+                    if record.gameNumber < 1000 {
+                        record.gameType = GameType.CollectWords.rawValue
+                    } else {
+                        record.gameType = GameType.FixLetter.rawValue
                     }
-                }
-            }
-            let allRecordsPerLanguage1 = realm.objects(GameDataModel.self).filter("language = %@", language!).sorted(byKeyPath: "combinedKey", ascending: true)
-            for record in allRecordsPerLanguage1 {
-                if record.combinedKey.toDate() != record.created {
-                    try! realm.safeWrite {
+                    if record.combinedKey.toDate() != record.created {
                         record.created = record.combinedKey.toDate()
                     }
+                    if record.lastPlayed == nil {
+                        record.lastPlayed = record.combinedKey.toDate()
+                    }
+                    record.sizeOfGrid = GV.sizeOfGridValue[record.rounds.first!.gameArray.count]!
+                    record.recordVersion = 1
                 }
             }
+
         }
-        let oldRecords = realm.objects(GameDataModel.self).filter("lastPlayed == nil")
-        if oldRecords.count > 0 {
-            for oldRecord in oldRecords {
-                try! realm.safeWrite {
-                    oldRecord.lastPlayed = oldRecord.combinedKey.toDate()
-                }
-            }
-        }
-        let lastPlayed = realm.objects(GameDataModel.self).filter("language = %@ and nowPlaying = true",GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: false)
-        switch lastPlayed.count {
-        case 0:
-            chooseGame()
-        default:
-            GV.gameType = GameType(rawValue: lastPlayed[0].gameType)!
-            GV.sizeOfGrid = lastPlayed[0].sizeOfGrid
-        }
+        
     }
     
     @objc private func startDemoOrMenu() {
