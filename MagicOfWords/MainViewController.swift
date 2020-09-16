@@ -246,21 +246,29 @@ ShowNewWordsInCloudSceneDelegate {
                                             preferredStyle: .alert)
         
         //--------------------- StartGameAction ---------------------
-        let startGameAction = UIAlertAction(title: "\(GV.language.getText(.tcEasyPlay)) ", style: .default, handler: { [unowned self]
+        let collectWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcEasyPlay)) ", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.gameType = .CollectWords
             self.chooseGameSize()
         })
-        alertController!.addAction(startGameAction)
+        alertController!.addAction(collectWordsAction)
         //--------------------- Choose Game Type ---------------------
-        let chooseGameAction = UIAlertAction(title: "\(GV.language.getText(.tcMediumPlay)) ", style: .default, handler: { [unowned self]
+        let fixLettersAction = UIAlertAction(title: "\(GV.language.getText(.tcMediumPlay)) ", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.gameType = .FixLetter
             self.chooseGameSize()
         })
-        alertController!.addAction(chooseGameAction)
+        alertController!.addAction(fixLettersAction)
+        let searchWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcSearchWords)) ", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.gameType = .SearchWords
+            self.chooseGameSize()
+        })
+        alertController!.addAction(searchWordsAction)
+
         let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
             alert -> Void in
             self.showMenu()
@@ -729,6 +737,9 @@ ShowNewWordsInCloudSceneDelegate {
 //        var bestScoreIndex = 0
         var dayAdder = 1
         let allRecords = realm.objects(GameDataModel.self).filter("recordVersion = %d", 0)
+        if allRecords.count == 0 {
+            return
+        }
         for languageIndex in 0...3 {
             let language = GV.IntToLanguage[languageIndex]
             for difficulty in GameType.CollectWords.rawValue...GameType.SearchWords.rawValue {

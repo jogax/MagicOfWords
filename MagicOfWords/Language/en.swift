@@ -190,6 +190,10 @@ let enDictionary: [TextConstants: String] = [
     .tcAcceptedDescription: "You get % bonus points for each using!",
     .tcWordReportedTitle:    "The word has been sent to the developer!",
     .tcWordReportedMessage: "Please wait patiently for the answer!",
-    .tcHintsHeader: "Some hints",
-    .tcChooseGameSize:  "Choose game size",
+    .tcHintsHeader:             "Some hints",
+    .tcChooseGameSize:          "Choose game size",
+    .tcCongratulations:         "Congratulations!",
+    .tcFinishGameMessage:       "You have finished the Game. A new game starts",
+    .tcWordsToFind:             "Words to find:",
+
 ]

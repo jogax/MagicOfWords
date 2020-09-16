@@ -453,8 +453,8 @@ class WTGameboard: SKShapeNode {
             gameArray.append( [WTGameboardItem]() )
             
             for j in 0..<countCols {
-                gameArray[i].append( WTGameboardItem(blockSize: GV.blockSize, fontSize: parentScene.frame.width * 0.040) )
-                _ = gameArray[i][j].setLetter(letter: emptyLetter, toStatus: .Empty, calledFrom: "")
+                gameArray[i].append( WTGameboardItem() )
+                _ = gameArray[i][j].setLetter(letter: emptyLetter, toStatus: .Empty)
             }
         }
         return gameArray
@@ -512,7 +512,7 @@ class WTGameboard: SKShapeNode {
             let calculatedCol = myCol + itemCol //- colAdder
             let calculatedRow = myRow - itemRow //- rowAdder
             if calculatedRow < 0 {return false}
-        _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary, calledFrom: "startShowingSpriteOnGameboard")
+        _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary)
             let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
             usedItems.append(usedItem)
         }
@@ -557,7 +557,7 @@ class WTGameboard: SKShapeNode {
                     if calculatedRow > countCols - 1 {
                         calculatedRow = countCols - 1
                     }
-                    _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary, calledFrom: "moveSpriteOnGameboard - 1")
+                    _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary)
                     let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
                     usedItems.append(usedItem)
                 }
@@ -574,7 +574,7 @@ class WTGameboard: SKShapeNode {
                 let itemRow = formOfShape[index] / 10
                 let calculatedCol = myCol + itemCol // - adder
                 let calculatedRow = myRow - itemRow < 0 ? 0 : myRow - itemRow > countCols - 1 ? countCols - 1 : myRow - itemRow
-                _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary, calledFrom: "moveSpriteOnGameboard - 2")
+                _ = GV.gameArray[calculatedCol][calculatedRow].setLetter(letter: letter, toStatus: .Temporary)
                 let usedItem = UsedItems(col: calculatedCol, row: calculatedRow, item: GV.gameArray[calculatedCol][calculatedRow])
                 usedItems.append(usedItem)
             }
@@ -642,7 +642,7 @@ class WTGameboard: SKShapeNode {
                         let letter = origChoosedWord.usedLetters[index].letter
                         let actCol = usedItems[index].col
                         let actRow = usedItems[index].row
-                        _ = GV.gameArray[origCol][origRow].setLetter(letter: letter, toStatus: .Used, calledFrom: "stopShowingSpriteOnGameboard")
+                        _ = GV.gameArray[origCol][origRow].setLetter(letter: letter, toStatus: .Used)
                         _ = GV.gameArray[actCol][actRow].clearIfTemporary(col: actCol, row: actRow)
                     }
                 }
@@ -894,14 +894,14 @@ class WTGameboard: SKShapeNode {
             let colTo = movedItem.toLetters[index].col
             let rowTo = movedItem.toLetters[index].row
             let letter = movedItem.fromLetters[index].letter
-            _ = GV.gameArray[colFrom][rowFrom].setLetter(letter: letter, toStatus: .Used, calledFrom: "moveItemToOrigPlace")
+            _ = GV.gameArray[colFrom][rowFrom].setLetter(letter: letter, toStatus: .Used)
             GV.gameArray[colTo][rowTo].remove()
        }
     }
     
     public func addFixLettersToGamearray(fixLetters: [UsedLetter]) {
         for fixLetter in fixLetters {
-            _ = GV.gameArray[fixLetter.col][fixLetter.row].setLetter(letter: fixLetter.letter, toStatus: .FixItem, calledFrom: "addFixLettersToGamearray")
+            _ = GV.gameArray[fixLetter.col][fixLetter.row].setLetter(letter: fixLetter.letter, toStatus: .FixItem)
         }
     }
     

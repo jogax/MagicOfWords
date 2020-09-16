@@ -771,18 +771,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         setBackground()
         bgSprite!.setPosAndSizeForAllChildren()
     }
-    let BackgroundName = "BackgroundName"
     
-    private func setBackground() {
-        let background = SKSpriteNode(imageNamed: GV.actHeight > GV.actWidth ? "backgroundP" : "backgroundL")
-        background.size = frame.size
-        background.position = CGPoint(x: frame.midX, y: frame.midY)
-        background.zPosition = -50
-        background.nodeType = .Background
-        background.name = BackgroundName
-        removeChildrenWithTypes(from: bgSprite!, types: [.Background])
-        bgSprite!.addChild(background)
-    }
     private func setCountWords(count: Int, type: GameDifficulty) {
         try! realm.safeWrite() {
             if type == .Easy {
@@ -988,6 +977,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 GV.playingRecord.sizeOfGrid = GV.sizeOfGrid
                 GV.playingRecord.time = timeInitValue
                 GV.playingRecord.nowPlaying = true
+                GV.playingRecord.recordVersion = 1
                 realm.add(GV.playingRecord)
             }
         }

@@ -23,13 +23,15 @@ let noChange = ""
 class WTGameboardItem: SKSpriteNode {
     public var status: ItemStatus = .Empty
     private var origLetter: String = emptyLetter
-    private var origStatus: ItemStatus = .Empty
+    public var origStatus: ItemStatus = .Empty
     public var doubleUsed = false
     private var blockSize:CGFloat = 0
     private var label: SKLabelNode
     private var countWordsLabel: SKLabelNode
     private var connectionType = ConnectionType()
     private var countOccurencesInWords = 0
+    public var col: Int = 0
+    public var row: Int = 0
     public var fixItem = false
     public var inFreeArray = -1
     struct StatusType: Hashable {
@@ -56,12 +58,15 @@ class WTGameboardItem: SKSpriteNode {
 
     public var letter = emptyLetter
     private var fontSize: CGFloat = 0
-    init(blockSize: CGFloat, fontSize: CGFloat) {
+    init(/*blockSize: CGFloat, fontSize: CGFloat*/) {
         label = SKLabelNode()
         label.name = "°°°GameboardItemLabel°°°"
         // Call the init        
         countWordsLabel = SKLabelNode()
-        self.fontSize = fontSize
+//        self.fontSize = fontSize
+        self.fontSize = GV.buttonFontSize
+        self.blockSize = GV.blockSize
+
         let texture = SKTexture(imageNamed: "whiteSprite")
         super.init(texture: texture, color: .white, size: CGSize(width: blockSize, height: blockSize))
 //        label.fontName = "KohinoorTelugu-Regular"
@@ -107,7 +112,7 @@ class WTGameboardItem: SKSpriteNode {
         }
     }
     public func copyMe()->WTGameboardItem {
-        let copyed = WTGameboardItem(blockSize: self.size.height, fontSize: self.fontSize)
+        let copyed = WTGameboardItem()
         copyed.texture = self.texture
         copyed.position = self.position
         copyed.status = self.status
@@ -123,7 +128,7 @@ class WTGameboardItem: SKSpriteNode {
         copyed.countWordsLabel.zPosition = self.zPosition + 1
         return copyed
     }
-    public func setLetter(letter: String, toStatus: ItemStatus, calledFrom: String)->Bool {
+    public func setLetter(letter: String, toStatus: ItemStatus/*, calledFrom: String*/)->Bool {
         if letter != emptyLetter && toStatus == .Empty {
             print("hier at problem")
         }
@@ -419,7 +424,7 @@ class WTGameboardItem: SKSpriteNode {
         }
         letter = from.subString(at: 1, length: 1)
 //        showTime(string: "from.subString")
-        _ = setLetter(letter: letter, toStatus: status, calledFrom: "restore")
+        _ = setLetter(letter: letter, toStatus: status)
 //        showTime(string: "setLetter")
         origLetter = emptyLetter
         origStatus = .Empty

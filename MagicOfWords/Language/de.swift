@@ -193,8 +193,11 @@ let deDictionary: [TextConstants: String] = [
     .tcAcceptedDescription: "Du bekommst % Bonuspunkte für jede Verwendung!",
     .tcWordReportedTitle:    "Das Wort wurde an den Entwickler gesendet!",
     .tcWordReportedMessage: "Warte geduldig auf die Antwort!",
-    .tcHintsHeader: "Einige Tipps",
-    .tcChooseGameSize:  "Wähle eine Spielgröße",
+    .tcHintsHeader:             "Einige Tipps",
+    .tcChooseGameSize:          "Wähle eine Spielgröße",
+    .tcCongratulations:         "Herzliche Glückwünsche!",
+    .tcFinishGameMessage:       "Du hast das Spiel beendet. Ein neues Spiel beginnt.",
+    .tcWordsToFind:             "Wörter zu finden:",
 ]
 
 

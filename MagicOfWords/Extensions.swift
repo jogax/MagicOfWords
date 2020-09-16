@@ -1130,6 +1130,15 @@ extension SKNode {
             }
         }
     }
+    
+    public func setOrientationAllChildren() {
+        for child in children {
+            if child.nodeType != .Background {
+                child.setActPosSize()
+            }
+        }
+    }
+
 }
 
 extension UIApplication {

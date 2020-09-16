@@ -28,6 +28,14 @@ var realm: Realm = try! Realm(configuration: Realm.Configuration.defaultConfigur
 //    }
 //}
 
+let origGamesConfig = Realm.Configuration(
+fileURL: URL(string: Bundle.main.path(forResource: "Games", ofType: "realm")!),
+readOnly: true,
+schemaVersion: 1,
+objectTypes: [Games.self])
+var gamesRealm: Realm = try! Realm(configuration: origGamesConfig)
+
+
 let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,

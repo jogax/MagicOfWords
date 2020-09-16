@@ -25,6 +25,11 @@ let itemExternSeparator = "|"
 //enum GameType: Int {
 //    case GameNotSelected = 0, CollectWords, FixLetter, SearchWords
 //}
+
+public enum RealmType: Int {
+    case GamesRealm, PlayedGameRealm
+}
+
 enum LettersColor: String {
     case NoColor = "NoColor", Red = "Red", Green = "Green"
 }
@@ -203,6 +208,7 @@ struct GV {
     static var deviceOrientation: DeviceOrientation = .Portrait
     static var target: AnyObject?
     static var orientationHandler: Selector?
+    static var buttonFontSize: CGFloat = GV.onIpad ? 18 : 15
     static var gameType: GameDifficulty = .CollectWords
     static let minSide: CGFloat = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
     static let maxSide: CGFloat = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
@@ -216,9 +222,7 @@ struct GV {
     static var comeBackFromSleeping = false
     static var wordToSend = ""
     static var bonusForReport = 0
-
-//    static let ButtonTypeSimple = "S"
-//    static let ButtonTypeElite = "E"
+    static let darkGreen = UIColor(red: 11/255, green: 151/255, blue: 6/255, alpha: 1)
     static var countOfWords = 0
     static var countOfLetters = 0
     static var minGameNumber = 0
@@ -287,11 +291,17 @@ struct GV {
     static var gameArray: [[WTGameboardItem]] = [[WTGameboardItem]]()
     static var notificationToken: NotificationToken?
     static var sizeOfGrid = 10
-//    static var mandatoryScore = 0
+    static var score = 0
     static var ownScore = 0
     static var bonusScore = 0
     static var totalScore = 0
-//    static var myBonusMalus = 0
+    static let questionMark = "?"
+    static var innerSeparator = "°"
+    static var outerSeparator = "/"
+    static let fontName = "TimesNewRomanPS-BoldMT"
+    static let headerFontName = "Menlo-Bold"
+    static let wordsFontSize: CGFloat = GV.onIpad ? 18 : 11
+
 //    static var generateHelpInfo = false
     static var mandatoryWords = [String]()
     static var blinkingNodes = [WTGameboardItem]()

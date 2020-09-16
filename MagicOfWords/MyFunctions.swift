@@ -9,6 +9,7 @@
 import Foundation
 import AVFoundation
 import SpriteKit
+import RealmSwift
 
 func + (left: CGSize, right: CGSize) -> CGSize {
     return CGSize(width: left.width + right.width, height: left.height + right.height)
@@ -56,6 +57,19 @@ func getLocalDate()->Date {
     let UTCDate = Date()
     return UTCDate + TimeInterval(NSTimeZone.system.secondsFromGMT(for: UTCDate))
 }
+
+public func setBackground() {
+    let BackgroundName = "BackgroundName"
+    let background = SKSpriteNode(imageNamed: GV.actHeight > GV.actWidth ? "backgroundP" : "backgroundL")
+    background.size = UIScreen.main.bounds.size
+    background.position = CGPoint(x: UIScreen.main.bounds.midX, y: UIScreen.main.bounds.midY)
+    background.zPosition = -50
+    background.nodeType = .Background
+    background.name = BackgroundName
+    removeChildrenWithTypes(from: bgSprite!, types: [.Background])
+    bgSprite!.addChild(background)
+}
+
 
 func removeChildrenExceptTypes(from: SKNode, types: [SKNodeSubclassType]) {
     for child in from.children {
@@ -105,3 +119,47 @@ func printChildren() {
         }
     }
 }
+
+public  func getRealm(type: RealmType)->Realm {
+    let shemaVersion: UInt64 = type == .PlayedGameRealm ? 6 : 4
+    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    let gamesURL = documentsURL.appendingPathComponent(type == .GamesRealm ? "OrigGames.realm" : "PlayedGames.realm")
+    let config = Realm.Configuration(
+        fileURL: gamesURL,
+        schemaVersion: shemaVersion,
+        migrationBlock: { migration, oldSchemaVersion in
+            switch (type, oldSchemaVersion) {
+            case (.PlayedGameRealm, _):
+                migration.enumerateObjects(ofType: PlayedGame.className())
+                { oldObject, newObject in
+//                        newObject!["buttonType"] = GV.ButtonTypeSimple
+                }
+            case (.GamesRealm, _):
+                migration.enumerateObjects(ofType: Games.className())
+                { oldObject, newObject in
+//                        newObject!["buttonType"] = GV.ButtonTypeSimple
+                }
+            }
+        },
+        shouldCompactOnLaunch: { totalBytes, usedBytes in
+            // totalBytes refers to the size of the file on disk in bytes (data + free space)
+            // usedBytes refers to the number of bytes used by data in the file
+
+            // Compact if the file is over 100MB in size and less than 50% 'used'
+            let oneMB = 10 * 1024 * 1024
+            return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+    },
+        objectTypes: [type == .GamesRealm ? Games.self : PlayedGame.self])
+    do {
+        // Realm is compacted on the first open if the configuration block conditions were met.
+        _ = try Realm(configuration: config)
+    } catch {
+        print("error")
+        // handle error compacting or opening Realm
+    }
+
+    let realm = try! Realm(configuration: config)
+    return realm
+}
+
+
