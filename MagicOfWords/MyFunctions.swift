@@ -58,7 +58,7 @@ func getLocalDate()->Date {
     return UTCDate + TimeInterval(NSTimeZone.system.secondsFromGMT(for: UTCDate))
 }
 
-public func setBackground() {
+public func setBackground(to: SKSpriteNode? = bgSprite!) {
     let BackgroundName = "BackgroundName"
     let background = SKSpriteNode(imageNamed: GV.actHeight > GV.actWidth ? "backgroundP" : "backgroundL")
     background.size = UIScreen.main.bounds.size
@@ -66,8 +66,8 @@ public func setBackground() {
     background.zPosition = -50
     background.nodeType = .Background
     background.name = BackgroundName
-    removeChildrenWithTypes(from: bgSprite!, types: [.Background])
-    bgSprite!.addChild(background)
+    removeChildrenWithTypes(from: to!, types: [.Background])
+    to!.addChild(background)
 }
 
 

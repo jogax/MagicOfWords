@@ -109,7 +109,7 @@ let iTenMinutes = 600
 let iFiveMinutes = 300
 var wtGameboard: WTGameboard?
 
-var bgSprite: SKSpriteNode?
+public var bgSprite: SKSpriteNode?
 
 
 class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableViewDelegate {

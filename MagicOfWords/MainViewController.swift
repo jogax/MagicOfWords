@@ -213,28 +213,33 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     func startFindWordsScene() {
-        //        let findWordsScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
-        //        if let view = self.view as! SKView? {
-        //            wtScene.setDelegate(delegate: self)
-        //            view.presentScene(wtScene)
-        //        }
-        
+        let findWordsScene = FindWordsScene()
+        if let view = self.view as! SKView? {
+            findWordsScene.start(delegate: self)
+            self.view.subviews[0].removeFromSuperview()
+            view.presentScene(findWordsScene, transition: .fade(withDuration: 0))
+        }
+    
     }
     
     func startGame() {
-        let actGame = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d and sizeOfGrid = %d",GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
-        try! realm.safeWrite {
-            GV.basicDataRecord.difficulty = GV.gameType.rawValue
-            GV.basicDataRecord.sizeOfGrid = GV.sizeOfGrid
-        }
-        if actGame.isEmpty {
-            let gameNumber = GV.basicDataRecord.difficulty * 1000
-            startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
+        if GV.gameType == .SearchWords {
+            startFindWordsScene()
         } else {
-            let gameNumber = actGame.first!.gameNumber
-            GV.comeBackFromSleeping = false
-            startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
-//            }
+            let actGame = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d and sizeOfGrid = %d",GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
+            try! realm.safeWrite {
+                GV.basicDataRecord.difficulty = GV.gameType.rawValue
+                GV.basicDataRecord.sizeOfGrid = GV.sizeOfGrid
+            }
+            if actGame.isEmpty {
+                let gameNumber = GV.basicDataRecord.difficulty * 1000
+                startWTScene(new: true, next: .NoMore, gameNumber: gameNumber)
+            } else {
+                let gameNumber = actGame.first!.gameNumber
+                GV.comeBackFromSleeping = false
+                startWTScene(new: false, next: .NoMore, gameNumber: gameNumber)
+    //            }
+            }
         }
     }
     

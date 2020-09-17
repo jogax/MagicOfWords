@@ -147,6 +147,9 @@
 		20E70EA0233281A300185ECE /* FinishedGames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E70E9F233281A300185ECE /* FinishedGames.swift */; };
 		20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */; };
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
+		D004D7912513855900A1C491 /* OKWord.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D004D78F2513855900A1C491 /* OKWord.mp3 */; };
+		D004D7922513855900A1C491 /* NoSuchWord.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D004D7902513855900A1C491 /* NoSuchWord.mp3 */; };
+		D004D794251387ED00A1C491 /* Games.realm in Resources */ = {isa = PBXBuildFile; fileRef = D004D793251387EC00A1C491 /* Games.realm */; };
 		D016FAB023D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */; };
 		D02B3DA42510F40100D6FA71 /* FindWordsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D02B3DA32510F40100D6FA71 /* FindWordsScene.swift */; };
 		D02FE0BF251109F700B76FBE /* PlayedGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = D02FE0BE251109F600B76FBE /* PlayedGame.swift */; };
@@ -312,6 +315,9 @@
 		20E70E9F233281A300185ECE /* FinishedGames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishedGames.swift; sourceTree = "<group>"; };
 		20F3102D2201DD6C007EE1D0 /* ruMandatoryIgor.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ruMandatoryIgor.txt; sourceTree = "<group>"; };
 		20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MandatoryModel.swift; sourceTree = "<group>"; };
+		D004D78F2513855900A1C491 /* OKWord.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = OKWord.mp3; sourceTree = "<group>"; };
+		D004D7902513855900A1C491 /* NoSuchWord.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = NoSuchWord.mp3; sourceTree = "<group>"; };
+		D004D793251387EC00A1C491 /* Games.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Games.realm; sourceTree = "<group>"; };
 		D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNewWordsInCloudScene.swift; sourceTree = "<group>"; };
 		D02B3DA32510F40100D6FA71 /* FindWordsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindWordsScene.swift; sourceTree = "<group>"; };
 		D02FE0BE251109F600B76FBE /* PlayedGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayedGame.swift; sourceTree = "<group>"; };
@@ -375,6 +381,7 @@
 				2085C9E622E1F4E700575AB7 /* GCHelper.swift */,
 				20858644223A89EF0097B62A /* MyButton.swift */,
 				201FB1CC20288CEA00EC9F36 /* MyFunctions.swift */,
+				D02FE0C225110E6600B76FBE /* MySounds.swift */,
 				20553D89225665C7001628D1 /* MyAlertController.swift */,
 				201FB1C920288CE900EC9F36 /* MyGlobals.swift */,
 				D089796A24F298090096EF86 /* MyLabel.swift */,
@@ -394,8 +401,6 @@
 				208326D12317FED3008F9C26 /* Music */,
 				20587FAF205A6D9F008C018A /* Pictures */,
 				20895DF921FA143900E54BF3 /* WordFiles */,
-				D02B3DA32510F40100D6FA71 /* FindWordsScene.swift */,
-				D02FE0C225110E6600B76FBE /* MySounds.swift */,
 			);
 			path = MagicOfWords;
 			sourceTree = "<group>";
@@ -415,6 +420,7 @@
 		201FB1E92028940D00EC9F36 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				D02B3DA32510F40100D6FA71 /* FindWordsScene.swift */,
 				20531C6720B6EA5400E060E2 /* ShowGamesScene.swift */,
 				D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */,
 			);
@@ -537,6 +543,7 @@
 		2074A64120C051780075432A /* ReadOnlyDB */ = {
 			isa = PBXGroup;
 			children = (
+				D004D793251387EC00A1C491 /* Games.realm */,
 				D0576F1D241FC8F30095943D /* Hints.realm */,
 				D0576F1B241FC8BD0095943D /* HelpInfo.realm */,
 				2078EE6322CA340000502C7C /* Mandatory.realm */,
@@ -549,6 +556,8 @@
 		208326D12317FED3008F9C26 /* Music */ = {
 			isa = PBXGroup;
 			children = (
+				D004D7902513855900A1C491 /* NoSuchWord.mp3 */,
+				D004D78F2513855900A1C491 /* OKWord.mp3 */,
 				208326D423180165008F9C26 /* MagicOfWords.mp3 */,
 			);
 			path = Music;
@@ -683,6 +692,7 @@
 				205EC41C222EAD380080D4ED /* LightBlueSprite.png in Resources */,
 				2078EE6522CA340000502C7C /* MandatoryList.realm in Resources */,
 				202EF6C621CA9DAD000E4DA4 /* online.png in Resources */,
+				D004D794251387ED00A1C491 /* Games.realm in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
 				D0748B9924531D01008DEC99 /* PromotionText.txt in Resources */,
@@ -734,6 +744,7 @@
 				204A8AD82029DDFF00E9C11F /* huWords.txt in Resources */,
 				202EF6C821CAA21A000E4DA4 /* offline.png in Resources */,
 				2051A54E2191E376001AD00B /* hook.png in Resources */,
+				D004D7922513855900A1C491 /* NoSuchWord.mp3 in Resources */,
 				2086F3EF228ED63200D845B7 /* Connection0001.png in Resources */,
 				204B6FD021CD3ADD00893D58 /* players.png in Resources */,
 				205EC426222EE2E90080D4ED /* RightElite.png in Resources */,
@@ -744,6 +755,7 @@
 				205CF7ED2129BC9300C1B89D /* UndoElite.png in Resources */,
 				20F3102E2201DD6C007EE1D0 /* ruMandatoryIgor.txt in Resources */,
 				201FB1BF20288C2B00EC9F36 /* Assets.xcassets in Resources */,
+				D004D7912513855900A1C491 /* OKWord.mp3 in Resources */,
 				206EA3FB2271D31300F184B4 /* MenuBG.png in Resources */,
 				2093C4BA22B116EE00B16649 /* DarkGoldSprite1.png in Resources */,
 				204C30B321EF789A008B1CB3 /* ruMandatory6.txt in Resources */,

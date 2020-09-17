@@ -113,7 +113,7 @@ public struct UsedWord {
 
 
 public protocol FindWordsSceneProtocol: class {
-    func goBack()
+//    func goBackFromFindWords()
 }
 class ObjectSP {
     var frame = CGRect(x: 0, y: 0, width: 0, height: 0)
@@ -143,18 +143,20 @@ class FindWordsScene: SKScene {
         oldOrientation = GV.actHeight > GV.actWidth
 //        setGlobalSizes()
 //        wordsFontSize = GV.minSide * wordFontSizeMpx
-        self.addChild(gameLayer)
-        gameLayer.size = CGSize(width: GV.actWidth, height: GV.actHeight)
+//        gameLayer.addChild(gameLayer)
+        self.backgroundColor = .green
+//        gameLayer.size = CGSize(width: GV.actWidth, height: GV.actHeight)
 //        gameLayer.position = CGPoint(x: GV.actWidth * 0.5, y: GV.actHeight * 0.5)
-        setBackground()
+        gameLayer = SKSpriteNode()
+        setBackground(to: gameLayer)
+        self.addChild(gameLayer)
         GV.target = self
         GV.orientationHandler = #selector(handleOrientation)
         self.size = CGSize(width: GV.actWidth, height: GV.actHeight)
         myFont = UIFont(name: myFontName, size: GV.actHeight * 0.03)!
         playedGamesRealm = getRealm(type: .PlayedGameRealm)
         myDelegate = delegate
-//        showBackground(to: gameLayer)
-//        showGamesMenu()
+        startNewGame()
     }
     
     var oldOrientation = false
@@ -167,9 +169,9 @@ class FindWordsScene: SKScene {
         oldOrientation = GV.actHeight > GV.actWidth
         self.size = CGSize(width: GV.actWidth,height: GV.actHeight)
         self.view!.frame = CGRect(x: 0, y: 0, width: GV.actWidth, height: GV.actHeight)
-        gameLayer.size = self.size
+//        gameLayer.size = self.size
         setBackground()
-        gameLayer.setOrientationAllChildren()
+//        gameLayer.setOrientationAllChildren()
 //        switch actScreenState {
 //        case .Nothing:
 //            return
@@ -185,13 +187,13 @@ class FindWordsScene: SKScene {
 //    private func showBackground() {
 ////        self.position = UIScreen.main.bounds
 //        let backGroundBild = SKSpriteNode(texture: SKTexture(imageNamed: GV.actHeight > GV.actWidth ? "PortraitBG" : "LandscapeBG"), color: .clear, size: self.size)
-//        self.addChild(backGroundBild)
+//        gameLayer.addChild(backGroundBild)
 //        let shortSide = max(self.frame.width, self.frame.height)
 //        let multiplier = shortSide / min(self.frame.width, self.frame.height)
 //        let longSide = shortSide * multiplier
 //        backGroundBild.position = CGPoint(x: UIScreen.main.bounds.midX + 100, y: UIScreen.main.bounds.midY)
 //        backGroundBild.size = CGSize(width: longSide, height: shortSide)
-//        self.addChild(menuLayer)
+//        gameLayer.addChild(menuLayer)
 //    }
     
 //    var GV.actHeight: CGFloat = 0
@@ -292,65 +294,65 @@ class FindWordsScene: SKScene {
 
     }
     
-    @objc private func startNew5x5Game() {
-        GV.sizeOfGrid = 5
-        startNewGame(new: true)
-    }
-    
-    @objc private func startNew6x6Game() {
-        GV.sizeOfGrid = 6
-        startNewGame(new: true)
-    }
-    
-    @objc private func startNew7x7Game() {
-        GV.sizeOfGrid = 7
-        startNewGame(new: true)
-    }
-    
-    @objc private func startNew8x8Game() {
-        GV.sizeOfGrid = 8
-        startNewGame(new: true)
-    }
-    
-    @objc private func startNew9x9Game() {
-        GV.sizeOfGrid = 9
-        startNewGame(new: true)
-    }
-    
-    @objc private func startNew10x10Game() {
-        GV.sizeOfGrid = 10
-        startNewGame(new: true)
-    }
-    
-    @objc private func startFinished5x5Game() {
-        GV.sizeOfGrid = 5
-        startNewGame(new: false)
-    }
-    
-    @objc private func startFinished6x6Game() {
-        GV.sizeOfGrid = 6
-        startNewGame(new: false)
-    }
-    
-    @objc private func startFinished7x7Game() {
-        GV.sizeOfGrid = 7
-        startNewGame(new: false)
-    }
-    
-    @objc private func startFinished8x8Game() {
-        GV.sizeOfGrid = 8
-        startNewGame(new: false)
-    }
-    
-    @objc private func startFinished9x9Game() {
-        GV.sizeOfGrid = 9
-        startNewGame(new: false)
-    }
-    
-    @objc private func startFinished10x10Game() {
-        GV.sizeOfGrid = 10
-        startNewGame(new: false)
-    }
+//    @objc private func startNew5x5Game() {
+//        GV.sizeOfGrid = 5
+//        startNewGame(new: true)
+//    }
+//    
+//    @objc private func startNew6x6Game() {
+//        GV.sizeOfGrid = 6
+//        startNewGame(new: true)
+//    }
+//    
+//    @objc private func startNew7x7Game() {
+//        GV.sizeOfGrid = 7
+//        startNewGame(new: true)
+//    }
+//    
+//    @objc private func startNew8x8Game() {
+//        GV.sizeOfGrid = 8
+//        startNewGame(new: true)
+//    }
+//    
+//    @objc private func startNew9x9Game() {
+//        GV.sizeOfGrid = 9
+//        startNewGame(new: true)
+//    }
+//    
+//    @objc private func startNew10x10Game() {
+//        GV.sizeOfGrid = 10
+//        startNewGame(new: true)
+//    }
+//    
+//    @objc private func startFinished5x5Game() {
+//        GV.sizeOfGrid = 5
+//        startNewGame(new: false)
+//    }
+//    
+//    @objc private func startFinished6x6Game() {
+//        GV.sizeOfGrid = 6
+//        startNewGame(new: false)
+//    }
+//    
+//    @objc private func startFinished7x7Game() {
+//        GV.sizeOfGrid = 7
+//        startNewGame(new: false)
+//    }
+//    
+//    @objc private func startFinished8x8Game() {
+//        GV.sizeOfGrid = 8
+//        startNewGame(new: false)
+//    }
+//    
+//    @objc private func startFinished9x9Game() {
+//        GV.sizeOfGrid = 9
+//        startNewGame(new: false)
+//    }
+//    
+//    @objc private func startFinished10x10Game() {
+//        GV.sizeOfGrid = 10
+//        startNewGame(new: false)
+//    }
     
     private func addButtonPL(to: SKNode, text: String, action: Selector, line: CGFloat) {
         let button = MyButton(fontName: GV.fontName, size: CGSize(width: GV.maxSide * 1.1, height: GV.minSide * 0.08))
@@ -415,12 +417,11 @@ class FindWordsScene: SKScene {
     let GoBack: CGFloat = 1000
     
     @objc private func goBack() {
-        removeChildrenExceptTypes(from: gameLayer, types: [.Background])
+        removeChildrenExceptTypes(from: self, types: [.Background])
 //        myDelegate!.goBack()
     }
     
-    @objc private func startNewGame(new: Bool) {
-//        GV.oldSize = GV.sizeOfGrid
+    @objc private func startNewGame() {
         myLabels.removeAll()
         allWords.removeAll()
         mandatoryWords.removeAll()
@@ -428,48 +429,39 @@ class FindWordsScene: SKScene {
         let startGameNumber = 0
         var primary = GV.actLanguage + GV.innerSeparator + "*" + GV.innerSeparator + String(GV.sizeOfGrid)
         playedGamesRealm = getRealm(type: .PlayedGameRealm)
-        let actGame = playedGamesRealm.objects(PlayedGame.self).filter("finished = %d AND primary like %@", new ? false : true, primary).sorted(byKeyPath: "timeStamp", ascending: new ? false : true)
+        let actGame = playedGamesRealm.objects(PlayedGame.self).filter("finished = %d AND primary like %@", false, primary).sorted(byKeyPath: "timeStamp", ascending: false)
         if actGame.count == 0 {
-            if new {
-                let finishedGames = playedGamesRealm.objects(PlayedGame.self).filter("primary like %@ AND finished = true",
-                                                                                      primary).sorted(byKeyPath: "gameNumber", ascending: false)
-                if finishedGames.count == 0 {
-    //                GV.sizeOfGrid = 8
-                    GV.gameNumber = startGameNumber
-                    primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.sizeOfGrid)
-                } else {
-                    let lastPlayed = finishedGames.first!
-                    GV.gameNumber = lastPlayed.gameNumber + 1
-    //                GV.sizeOfGrid = lastPlayed.gameSize
-                    if GV.gameNumber > maxGameNumber {
-    //                    GV.sizeOfGrid += 1
-                        GV.gameNumber = 1
-                    }
-                    primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.sizeOfGrid)
-                }
-                let origGame = gamesRealm.objects(Games.self).filter("primary = %@", primary)
-                if origGame.count > 0 {
-                    let newGame = PlayedGame()
-                    newGame.primary = primary
-                    newGame.gameSize = GV.sizeOfGrid
-                    newGame.language = GV.actLanguage
-                    newGame.gameNumber = origGame.first!.gameNumber
-                    newGame.gameArray = origGame.first!.gameArray
-                    newGame.wordsToFind = origGame.first!.words
-                    newGame.finished = false
-                    try! playedGamesRealm.safeWrite {
-                        playedGamesRealm.add(newGame)
-                    }
-                }
+            let finishedGames = playedGamesRealm.objects(PlayedGame.self).filter("primary like %@ AND finished = true",
+                                                                                  primary).sorted(byKeyPath: "gameNumber", ascending: false)
+            if finishedGames.count == 0 {
+//                GV.sizeOfGrid = 8
+                GV.gameNumber = startGameNumber
+                primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.sizeOfGrid)
             } else {
-                return
+                let lastPlayed = finishedGames.first!
+                GV.gameNumber = lastPlayed.gameNumber + 1
+//                GV.sizeOfGrid = lastPlayed.gameSize
+                if GV.gameNumber > maxGameNumber {
+//                    GV.sizeOfGrid += 1
+                    GV.gameNumber = 1
+                }
+                primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.sizeOfGrid)
+            }
+            let origGame = gamesRealm.objects(Games.self).filter("primary = %@", primary)
+            if origGame.count > 0 {
+                let newGame = PlayedGame()
+                newGame.primary = primary
+                newGame.gameSize = GV.sizeOfGrid
+                newGame.language = GV.actLanguage
+                newGame.gameNumber = origGame.first!.gameNumber
+                newGame.gameArray = origGame.first!.gameArray
+                newGame.wordsToFind = origGame.first!.words
+                newGame.finished = false
+                try! playedGamesRealm.safeWrite {
+                    playedGamesRealm.add(newGame)
+                }
             }
         } else {
-            if !new {
-                try! playedGamesRealm.safeWrite {
-                    actGame.first!.myWords = ""
-                }
-            }
             GV.gameNumber = actGame.first!.gameNumber
         }
         playingGame()
@@ -698,7 +690,7 @@ class FindWordsScene: SKScene {
                                           type: .Green)
         myAlert.addAction(text: GV.language.getText(.tcOK), action: #selector(self.startNewGame))
         myAlert.presentAlert()
-        self.addChild(myAlert)
+        gameLayer.addChild(myAlert)
     }
 
     
@@ -749,9 +741,10 @@ class FindWordsScene: SKScene {
     var positions = [ObjectSP]()
     var scoreLabel: MyLabel?
     public func playingGame() {
+//        let test = gameLayer
         let sizeMultiplierIPhone: [CGFloat] = [0, 0, 0, 0, 0, 0.13, 0.11, 0.095, 0.08, 0.07, 0.065]
         let sizeMultiplierIPad:   [CGFloat] = [0, 0, 0, 0, 0, 0.08, 0.075, 0.070, 0.055, 0.06, 0.05]
-        removeChildrenExceptTypes(from: gameLayer, types: [.Background])
+        removeChildrenExceptTypes(from: self, types: [.Background])
         let sizeMultiplier = GV.onIpad ? sizeMultiplierIPad : sizeMultiplierIPhone
         let blockSize = GV.minSide * sizeMultiplier[GV.sizeOfGrid]
         GV.blockSize = blockSize
@@ -764,7 +757,10 @@ class FindWordsScene: SKScene {
         let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.92),
                                            LPos: CGPoint(x: gridPosition.LPos.x , y: GV.minSide * 0.94))
         let gameHeader = MyLabel(text: GV.language.getText(.tcSearchWords), position: gameHeaderPosition, fontName: GV.headerFontName, fontSize: GV.minSide * headerMpx)
-        gameLayer.addChild(gameHeader) // index 0
+//        gameLayer.addChild(gameHeader) // index 0
+        gameLayer.addChild(gameHeader)
+        let test = gameLayer
+
         playingGrid!.plPosSize = gridPosition
         playingGrid!.setActPosSize()
         playingGrid!.zPosition = 20
@@ -796,7 +792,7 @@ class FindWordsScene: SKScene {
 //                    playedGame.myWords = ""
 //                }
             }
-            addButtonPL(to: gameLayer, text: GV.language.getText(.tcBack), action: #selector(goBackToMainMenu), line: GoBack)
+            addButtonPL(to: self, text: GV.language.getText(.tcBack), action: #selector(goBackToMainMenu), line: GoBack)
 //            let test = gameLayer
             possibleLineCountP = abs((gameLayer.children[lastHeaderIndex].plPosSize?.PPos.y)! - (gameLayer.children[buttonIndex].frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
             possibleLineCountL = abs((gameLayer.children[lastHeaderIndex].plPosSize?.LPos.y)! - (gameLayer.children[buttonIndex].frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
@@ -804,8 +800,6 @@ class FindWordsScene: SKScene {
             firstWordPositionYL = ((gameLayer.children[lastHeaderIndex].plPosSize?.LPos.y)!) - GV.maxSide * 0.04
             fillMandatoryWords()
             setGameArrayToActualState()
-//            let test = gameLayer
-            
         }
 //        setPlayingGameSizesAndPositions()
     }
@@ -859,8 +853,8 @@ class FindWordsScene: SKScene {
     
 
     @objc private func goBackToMainMenu() {
-//        removeChildrenWithNames(from: gameLayer, names: actNames)
-//        showGamesMenu()
+//        self.children.removeAll()
+//        myDelegate.goBackFromFindWords()
     }
 //    var mandatoryWordLabels = [MyWordLabel]()
     

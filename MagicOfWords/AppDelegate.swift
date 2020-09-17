@@ -153,11 +153,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 //            let mandatoryRealm = try! Realm(configuration: config)
          }
-        
+
+    func updateGames() {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let MandatoryURL = documentsURL.appendingPathComponent("Games.realm")
+        let config = Realm.Configuration(
+            fileURL: MandatoryURL,
+            schemaVersion: 1, // new item words
+            shouldCompactOnLaunch: { totalBytes, usedBytes in
+                // totalBytes refers to the size of the file on disk in bytes (data + free space)
+                // usedBytes refers to the number of bytes used by data in the file
+
+                // Compact if the file is over 100MB in size and less than 50% 'used'
+                let oneMB = 10 * 1024 * 1024
+                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+        },
+            objectTypes: [WordListModel.self])
+        do {
+            // Realm is compacted on the first open if the configuration block conditions were met.
+            _ = try Realm(configuration: config)
+        } catch {
+            print("error")
+            // handle error compacting or opening Realm
+        }
+
+//            let gamesRealm = try! Realm(configuration: config)
+     }
+
 
 //        updateHints()
 //        updateWordList()
 //        updateMandatory()
+//        updateGames()
         
         let config1 = Realm.Configuration(shouldCompactOnLaunch: { totalBytes, usedBytes in
             // totalBytes refers to the size of the file on disk in bytes (data + free space)
