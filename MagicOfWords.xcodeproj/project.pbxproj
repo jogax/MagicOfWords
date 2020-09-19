@@ -61,7 +61,6 @@
 		20531C6820B6EA5400E060E2 /* ShowGamesScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20531C6720B6EA5400E060E2 /* ShowGamesScene.swift */; };
 		20553D8A225665C7001628D1 /* MyAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20553D89225665C7001628D1 /* MyAlertController.swift */; };
 		2055B489211C74A9000FD7A9 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2055B488211C74A9000FD7A9 /* CustomTableViewCell.swift */; };
-		2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
 		205850F42170D2C900D89B9A /* RealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205850F32170D2C900D89B9A /* RealmManager.swift */; };
 		205BF79A21E4D952006633C6 /* huMandatory.txt in Resources */ = {isa = PBXBuildFile; fileRef = 205BF79921E4D952006633C6 /* huMandatory.txt */; };
 		205CF7EB2129A21000C1B89D /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CF7EA2129A21000C1B89D /* finger.png */; };
@@ -129,11 +128,6 @@
 		2097391A2295796F00360819 /* DarkGoldSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 209739192295796E00360819 /* DarkGoldSprite.png */; };
 		209739202295BE3C00360819 /* whiteSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 2097391F2295BE3B00360819 /* whiteSprite.png */; };
 		2098BB8E20601B0B00C3641B /* magier.png in Resources */ = {isa = PBXBuildFile; fileRef = 2098BB8D20601B0B00C3641B /* magier.png */; };
-		20A0415D236DBC59009C3C9F /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 208C0F90233D0EF600770B47 /* CloudKit.framework */; };
-		20A04160236DBC5C009C3C9F /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
-		20A04162236DBC5F009C3C9F /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20437F99217B793100F16F99 /* Reachability.framework */; };
-		20A04168236DBD89009C3C9F /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250A21F73D44009897BD /* RealmSwift.framework */; };
-		20A0416B236DBD9F009C3C9F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250C21F73D65009897BD /* Realm.framework */; };
 		20A604B32035D93A00DC48F0 /* MyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A604B22035D93A00DC48F0 /* MyRandom.swift */; };
 		20A6913D203088FF00AB47C0 /* enWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = 20A6913C203088FF00AB47C0 /* enWords.txt */; };
 		20A6914020309B9F00AB47C0 /* WTPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A6913F20309B9F00AB47C0 /* WTPiece.swift */; };
@@ -161,11 +155,42 @@
 		D0576F1A241FB9770095943D /* HintModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0576F19241FB9770095943D /* HintModel.swift */; };
 		D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1B241FC8BD0095943D /* HelpInfo.realm */; };
 		D0576F1E241FC8F30095943D /* Hints.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1D241FC8F30095943D /* Hints.realm */; };
+		D062DB682516187C003E863B /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20437F99217B793100F16F99 /* Reachability.framework */; };
+		D062DB692516187C003E863B /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 20437F99217B793100F16F99 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D062DB6B25161880003E863B /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; };
+		D062DB6C25161880003E863B /* GameKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA292029F591000DF337 /* GameKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D062DB6D25161882003E863B /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 208C0F90233D0EF600770B47 /* CloudKit.framework */; };
+		D062DB6E25161882003E863B /* CloudKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 208C0F90233D0EF600770B47 /* CloudKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D062DB6F2516188F003E863B /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250C21F73D65009897BD /* Realm.framework */; };
+		D062DB702516188F003E863B /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250C21F73D65009897BD /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D062DB7125161892003E863B /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250A21F73D44009897BD /* RealmSwift.framework */; };
+		D062DB7225161892003E863B /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 203D250A21F73D44009897BD /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D062DB7325161895003E863B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; };
+		D062DB7425161895003E863B /* StoreKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2057BA272029F57B000DF337 /* StoreKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D0748B9924531D01008DEC99 /* PromotionText.txt in Resources */ = {isa = PBXBuildFile; fileRef = D0748B9824531D01008DEC99 /* PromotionText.txt */; };
 		D089796B24F298090096EF86 /* MyLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D089796A24F298090096EF86 /* MyLabel.swift */; };
 		D089796D24F2A7080096EF86 /* backgroundL.png in Resources */ = {isa = PBXBuildFile; fileRef = D089796C24F2A7080096EF86 /* backgroundL.png */; };
 		D0CE00F224F0188B001376CA /* backgroundP.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CE00F124F0188B001376CA /* backgroundP.png */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D062DB6A2516187C003E863B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D062DB702516188F003E863B /* Realm.framework in Embed Frameworks */,
+				D062DB7225161892003E863B /* RealmSwift.framework in Embed Frameworks */,
+				D062DB6E25161882003E863B /* CloudKit.framework in Embed Frameworks */,
+				D062DB7425161895003E863B /* StoreKit.framework in Embed Frameworks */,
+				D062DB692516187C003E863B /* Reachability.framework in Embed Frameworks */,
+				D062DB6C25161880003E863B /* GameKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		20009AF82260C47900D34ACD /* HelpInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpInfo.swift; sourceTree = "<group>"; };
@@ -340,12 +365,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				20A0416B236DBD9F009C3C9F /* Realm.framework in Frameworks */,
-				20A04162236DBC5F009C3C9F /* Reachability.framework in Frameworks */,
-				20A04168236DBD89009C3C9F /* RealmSwift.framework in Frameworks */,
-				20A04160236DBC5C009C3C9F /* GameKit.framework in Frameworks */,
-				20A0415D236DBC59009C3C9F /* CloudKit.framework in Frameworks */,
-				2057BA282029F57B000DF337 /* StoreKit.framework in Frameworks */,
+				D062DB6F2516188F003E863B /* Realm.framework in Frameworks */,
+				D062DB682516187C003E863B /* Reachability.framework in Frameworks */,
+				D062DB7125161892003E863B /* RealmSwift.framework in Frameworks */,
+				D062DB7325161895003E863B /* StoreKit.framework in Frameworks */,
+				D062DB6D25161882003E863B /* CloudKit.framework in Frameworks */,
+				D062DB6B25161880003E863B /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -622,6 +647,7 @@
 				201FB1AB20288C2B00EC9F36 /* Frameworks */,
 				201FB1AC20288C2B00EC9F36 /* Resources */,
 				20F1760A21626C6000AF37D7 /* ShellScript */,
+				D062DB6A2516187C003E863B /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
