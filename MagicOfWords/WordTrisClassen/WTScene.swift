@@ -3846,7 +3846,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        var generateLength = 0
         var typesWithLen1 = [MyShapes]()
         var typesWithLen2 = [MyShapes]()
-        var typesWithLen3 = [MyShapes]()
+        let typesWithLen3 = [MyShapes]()
 //        var typesWithLen4 = [MyShapes]()
         var usedWords = [String]()
         var wordsString = ""

@@ -759,7 +759,7 @@ class FindWordsScene: SKScene {
         let gameHeader = MyLabel(text: GV.language.getText(.tcSearchWords), position: gameHeaderPosition, fontName: GV.headerFontName, fontSize: GV.minSide * headerMpx)
 //        gameLayer.addChild(gameHeader) // index 0
         gameLayer.addChild(gameHeader)
-        let test = gameLayer
+//        let test = gameLayer
 
         playingGrid!.plPosSize = gridPosition
         playingGrid!.setActPosSize()
@@ -930,11 +930,11 @@ class FindWordsScene: SKScene {
                 if myWord.mandatory {
                     myWord.setQuestionMarks()
                     if allWords.contains(where: {$0 == myWord.usedWord!}) {
-                        myWord.fontColor = GV.darkGreen
+                        myWord.fontColor = UIColor(red: 7/255, green: 125/255, blue: 21/255, alpha: 1.0)
                         myWord.founded = true
                      }
                 } else {
-                    myWord.fontColor = .red
+                    myWord.fontColor = UIColor(red: 115/255, green: 6/255, blue: 66/255, alpha: 1.0)//.red
                     GV.score += (myWord.usedWord!.word.count - 3) * 50
                 }
             }

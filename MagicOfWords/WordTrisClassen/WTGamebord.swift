@@ -643,7 +643,7 @@ class WTGameboard: SKShapeNode {
                         let actCol = usedItems[index].col
                         let actRow = usedItems[index].row
                         _ = GV.gameArray[origCol][origRow].setLetter(letter: letter, toStatus: .Used)
-                        _ = GV.gameArray[actCol][actRow].clearIfTemporary(col: actCol, row: actRow)
+                        GV.gameArray[actCol][actRow].clearIfTemporary(col: actCol, row: actRow)
                     }
                 }
             } else {
