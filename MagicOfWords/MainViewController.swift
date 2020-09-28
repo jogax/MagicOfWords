@@ -86,10 +86,13 @@ ShowNewWordsInCloudSceneDelegate {
 //        if animationScene != nil {
 //            return
 //        }
-        if GV.wtScene != nil {
-            GV.wtScene!.modifyHeader()
-        } else {
-            showMenu()
+        let lastPlayed = realm.objects(GameDataModel.self).filter("language = %@ and nowPlaying = true",GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: false)
+
+        if lastPlayed.count == 0 {
+            chooseGame()
+//            GV.wtScene!.createHeader()
+        } else if lastPlayed.count > 0 {
+            startGame()
         }
     }
     
@@ -213,12 +216,12 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     func startFindWordsScene() {
-        let findWordsScene = FindWordsScene()
-        if let view = self.view as! SKView? {
-            findWordsScene.start(delegate: self)
-            self.view.subviews[0].removeFromSuperview()
-            view.presentScene(findWordsScene, transition: .fade(withDuration: 0))
-        }
+//        let findWordsScene = FindWordsScene()
+//        if let view = self.view as! SKView? {
+//            findWordsScene.start(delegate: self)
+//            self.view.subviews[0].removeFromSuperview()
+//            view.presentScene(findWordsScene, transition: .fade(withDuration: 0))
+//        }
     
     }
     
@@ -246,7 +249,7 @@ ShowNewWordsInCloudSceneDelegate {
     func chooseGame() {
 
 
-        alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
+        alertController = UIAlertController(title: GV.language.getText(.tcChooseGame),
                                             message: "",
                                             preferredStyle: .alert)
         
@@ -494,11 +497,11 @@ ShowNewWordsInCloudSceneDelegate {
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
         convertIfNeeded()
-        checkDeviceRecordInCloud()
+//        checkDeviceRecordInCloud()
         checkReportedWordsInCloud()
         checkNewWordsInCloud()
 //        checkMyBonusMalus()
-        _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
+//        _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
         let lastPlayed = realm.objects(GameDataModel.self).filter("language = %@ and nowPlaying = true",GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: false)
         switch lastPlayed.count {
         case 0:
@@ -921,6 +924,8 @@ ShowNewWordsInCloudSceneDelegate {
         case .none:
             GV.connectedToInternet = false
         case .unavailable:
+            GV.connectedToInternet = false
+        default:
             GV.connectedToInternet = false
         }
         if oldConnectedToInternet != GV.connectedToInternet {

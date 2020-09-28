@@ -151,12 +151,6 @@
 		D02FE0C325110E6600B76FBE /* MySounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = D02FE0C225110E6600B76FBE /* MySounds.swift */; };
 		D043788324127B0E001DD098 /* HintEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D043788224127B0E001DD098 /* HintEngine.swift */; };
 		D047E98523DF26900047F124 /* WordsFromCloud.swift in Sources */ = {isa = PBXBuildFile; fileRef = D047E98423DF26900047F124 /* WordsFromCloud.swift */; };
-		D04C012A2518F505006F2074 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D04C01292518F505006F2074 /* Reachability.framework */; };
-		D04C012B2518F505006F2074 /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D04C01292518F505006F2074 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D04C012D2518F50B006F2074 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D04C012C2518F50A006F2074 /* Realm.framework */; };
-		D04C012E2518F50B006F2074 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D04C012C2518F50A006F2074 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D04C01302518F50E006F2074 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D04C012F2518F50E006F2074 /* RealmSwift.framework */; };
-		D04C01312518F50E006F2074 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D04C012F2518F50E006F2074 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D04D82D723D8B0FA002B1023 /* MyReportedWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */; };
 		D0576F1A241FB9770095943D /* HintModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0576F19241FB9770095943D /* HintModel.swift */; };
 		D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1B241FC8BD0095943D /* HelpInfo.realm */; };
@@ -165,6 +159,12 @@
 		D089796B24F298090096EF86 /* MyLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D089796A24F298090096EF86 /* MyLabel.swift */; };
 		D089796D24F2A7080096EF86 /* backgroundL.png in Resources */ = {isa = PBXBuildFile; fileRef = D089796C24F2A7080096EF86 /* backgroundL.png */; };
 		D0CE00F224F0188B001376CA /* backgroundP.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CE00F124F0188B001376CA /* backgroundP.png */; };
+		D0D3EC3C251F75AF0062CF49 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC3B251F75AF0062CF49 /* Reachability.framework */; };
+		D0D3EC3D251F75AF0062CF49 /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC3B251F75AF0062CF49 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D0D3EC3F251F75B90062CF49 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC3E251F75B90062CF49 /* Realm.framework */; };
+		D0D3EC40251F75B90062CF49 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC3E251F75B90062CF49 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D0D3EC42251F75BE0062CF49 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC41251F75BE0062CF49 /* RealmSwift.framework */; };
+		D0D3EC43251F75BE0062CF49 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC41251F75BE0062CF49 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -174,9 +174,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				D04C012E2518F50B006F2074 /* Realm.framework in Embed Frameworks */,
-				D04C012B2518F505006F2074 /* Reachability.framework in Embed Frameworks */,
-				D04C01312518F50E006F2074 /* RealmSwift.framework in Embed Frameworks */,
+				D0D3EC40251F75B90062CF49 /* Realm.framework in Embed Frameworks */,
+				D0D3EC3D251F75AF0062CF49 /* Reachability.framework in Embed Frameworks */,
+				D0D3EC43251F75BE0062CF49 /* RealmSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -334,9 +334,6 @@
 		D02FE0C225110E6600B76FBE /* MySounds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySounds.swift; sourceTree = "<group>"; };
 		D043788224127B0E001DD098 /* HintEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintEngine.swift; sourceTree = "<group>"; };
 		D047E98423DF26900047F124 /* WordsFromCloud.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsFromCloud.swift; sourceTree = "<group>"; };
-		D04C01292518F505006F2074 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
-		D04C012C2518F50A006F2074 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
-		D04C012F2518F50E006F2074 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyReportedWords.swift; sourceTree = "<group>"; };
 		D0576F19241FB9770095943D /* HintModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HintModel.swift; sourceTree = "<group>"; };
 		D0576F1B241FC8BD0095943D /* HelpInfo.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = HelpInfo.realm; sourceTree = "<group>"; };
@@ -345,6 +342,9 @@
 		D089796A24F298090096EF86 /* MyLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLabel.swift; sourceTree = "<group>"; };
 		D089796C24F2A7080096EF86 /* backgroundL.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backgroundL.png; sourceTree = "<group>"; };
 		D0CE00F124F0188B001376CA /* backgroundP.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backgroundP.png; sourceTree = "<group>"; };
+		D0D3EC3B251F75AF0062CF49 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
+		D0D3EC3E251F75B90062CF49 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
+		D0D3EC41251F75BE0062CF49 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -352,9 +352,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D04C012D2518F50B006F2074 /* Realm.framework in Frameworks */,
-				D04C012A2518F505006F2074 /* Reachability.framework in Frameworks */,
-				D04C01302518F50E006F2074 /* RealmSwift.framework in Frameworks */,
+				D0D3EC3F251F75B90062CF49 /* Realm.framework in Frameworks */,
+				D0D3EC3C251F75AF0062CF49 /* Reachability.framework in Frameworks */,
+				D0D3EC42251F75BE0062CF49 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,9 +609,9 @@
 		D04C01282518F505006F2074 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D04C012F2518F50E006F2074 /* RealmSwift.framework */,
-				D04C012C2518F50A006F2074 /* Realm.framework */,
-				D04C01292518F505006F2074 /* Reachability.framework */,
+				D0D3EC41251F75BE0062CF49 /* RealmSwift.framework */,
+				D0D3EC3E251F75B90062CF49 /* Realm.framework */,
+				D0D3EC3B251F75AF0062CF49 /* Reachability.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1020,7 +1020,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 29;
 				DEVELOPMENT_TEAM = WT499VC842;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator14.0]" = arm64;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",

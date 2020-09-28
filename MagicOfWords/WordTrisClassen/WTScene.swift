@@ -1008,7 +1008,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
     }
     
-    private func createHeader() {
+    public func createHeader() {
         var widthMpx = CGFloat(0)
         var heightMpx = CGFloat(0)
         let lineAdderP = GV.maxSide * 0.02
