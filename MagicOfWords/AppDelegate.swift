@@ -8,7 +8,7 @@
 
 import UIKit
 import RealmSwift
-import Reachability
+//import Reachability
 import AVFoundation
 
 //#if !GENERATELETTERFREQUENCY && !GENERATEWORDLIST && !GENERATEMANDATORY && !CREATEMANDATORY && !CREATEWORDLIST
@@ -40,7 +40,6 @@ let wordListConfig = Realm.Configuration(
     fileURL: URL(string: Bundle.main.path(forResource: "WordList", ofType: "realm")!),
     readOnly: true,
     objectTypes: [WordListModel.self])
-var reachability: Reachability?
 // Open the Realm with the configuration
 let realmWordList:Realm = try! Realm(configuration: wordListConfig)
 
@@ -237,25 +236,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Tell Realm to use this new configuration object for the default Realm
         Realm.Configuration.defaultConfiguration = config
 //        loginToRealmSync()
-        if reachability == nil {
-            try! reachability = Reachability()
-        }
-        reachability!.whenReachable = { reachability in
-            if reachability.connection == .wifi {
-                print("Reachable via WiFi")
-            } else {
-                print("Reachable via Cellular")
-            }
-        }
-        reachability!.whenUnreachable = { _ in
-            print("Not reachable")
-        }
-        
-        do {
-            try reachability!.startNotifier()
-        } catch {
-            print("Unable to start notifier")
-        }
+//        if reachability == nil {
+//            try! reachability = Reachability()
+//        }
+//        reachability!.whenReachable = { reachability in
+//            if reachability.connection == .wifi {
+//                print("Reachable via WiFi")
+//            } else {
+//                print("Reachable via Cellular")
+//            }
+//        }
+//        reachability!.whenUnreachable = { _ in
+//            print("Not reachable")
+//        }
+//        
+//        do {
+//            try reachability!.startNotifier()
+//        } catch {
+//            print("Unable to start notifier")
+//        }
         
 //        let session = AVAudioSession.sharedInstance()
 //        do {

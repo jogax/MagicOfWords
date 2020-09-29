@@ -161,13 +161,15 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     return
                 }
                 if let gcAuthViewController = gcAuthViewController {
+                    self.delegate?.localPlayerNotAuthenticated()
+                    return
                     // Pause any activities that require user interaction, then present the
                     // gcAuthViewController to the player.
-                    if viewController.presentedViewController==nil{
-                        viewController.present(gcAuthViewController, animated: true, completion: nil)
-                    }else{
-                        viewController.presentedViewController!.present(gcAuthViewController, animated: true, completion: nil)
-                    }
+//                    if viewController.presentedViewController==nil{
+//                        viewController.present(gcAuthViewController, animated: true, completion: nil)
+//                    }else{
+//                        viewController.presentedViewController!.present(gcAuthViewController, animated: true, completion: nil)
+//                    }
 //                    viewController.present(gcAuthViewController, animated:true, completion:nil)
                 } else if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
                     authAdmin()

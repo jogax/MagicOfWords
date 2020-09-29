@@ -11,6 +11,7 @@ import AVFoundation
 import UIKit
 import RealmSwift
 import GameKit
+import Reachability
 
 //let actVersion = "0.991" // Build 23, Version 1.23
 //let actVersion = "1.0" // Build 25, Version 1.25
@@ -198,6 +199,7 @@ struct GV {
             return GV.language.getText(.tcAktLanguage)
         }
     }
+    static var reachability: Reachability!
     static let sizeOfGridValue: [Int:Int] = [0:10, 50:5, 72:6, 98:7, 128:8, 162:9, 200:10, 242:11, 288:12, 338:13, 392:14, 450:15]
     static var globalInfoTable = [PlayerData]()
     static var blockSize = CGFloat(0)

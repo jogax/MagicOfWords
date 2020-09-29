@@ -40,19 +40,20 @@ ShowNewWordsInCloudSceneDelegate {
         
     }
     func localPlayerNotAuthenticated() {
-        let alertController = UIAlertController(title: GV.language.getText(.tcLocalPlayerNotAuth),
-                                                message: "",
-                                                preferredStyle: .alert)
-        let OKAction = UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler:  { [unowned self]
-            alert -> Void in
-                self.showMenu()
-        })
-        alertController.addAction(OKAction)
-        present(alertController, animated: true, completion: nil)
-        if showGamesScene != nil {
-            showGamesScene!.goBack()
-        }
-
+        self.showMenu()
+//        let alertController = UIAlertController(title: GV.language.getText(.tcLocalPlayerNotAuth),
+//                                                message: "",
+//                                                preferredStyle: .alert)
+//        let OKAction = UIAlertAction(title: GV.language.getText(.tcOK), style: .default, handler:  { [unowned self]
+//            alert -> Void in
+//                self.showMenu()
+//        })
+//        alertController.addAction(OKAction)
+//        present(alertController, animated: true, completion: nil)
+//        if showGamesScene != nil {
+//            showGamesScene!.goBack()
+//        }
+//
     }
     
     var tenMinutesTimer: Timer?
@@ -497,6 +498,7 @@ ShowNewWordsInCloudSceneDelegate {
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
         convertIfNeeded()
+        startReachability()
 //        checkDeviceRecordInCloud()
         checkReportedWordsInCloud()
         checkNewWordsInCloud()
@@ -509,6 +511,7 @@ ShowNewWordsInCloudSceneDelegate {
         default:
             GV.gameType = GameType(rawValue: lastPlayed[0].gameType)!
             GV.sizeOfGrid = lastPlayed[0].sizeOfGrid
+            startGame()
         }
 
     }
@@ -876,12 +879,12 @@ ShowNewWordsInCloudSceneDelegate {
         super.viewWillAppear(animated)
         GV.deviceHasNotch = UIApplication.shared.hasNotch
         NotificationCenter.default.addObserver(self, selector: #selector(deviceRotated), name: UIDevice.orientationDidChangeNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: reachability)
-        do {
-            try reachability!.startNotifier()
-        }catch{
-            print("could not start reachability notifier")
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: GV.reachability)
+//        do {
+//            try GV.reachability!.startNotifier()
+//        }catch{
+//            print("could not start reachability notifier")
+//        }
     }
     override func viewWillDisappear(_ animated: Bool) {
         NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
@@ -1063,47 +1066,48 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     func manageGameCenter() {
-        switch GV.basicDataRecord.GameCenterEnabled {
-        case GCEnabledType.GameCenterEnabled.rawValue:
-            if GCHelper.shared.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
-                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
-//                self.startDemoOrMenu()
-            }
-        case GCEnabledType.AskForGameCenter.rawValue:
-            let alert = UIAlertController(title: GV.language.getText(.tcAskForGameCenter),
-                                          message: "",
-                                          preferredStyle: .alert)
-            let connectAction = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default,
-                                              handler: {(paramAction:UIAlertAction!) in
-                                                try! realm.safeWrite() {
-                                                    GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterEnabled.rawValue
-                                                }
-                                                self.connectToGameCenter()
+        GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+//        switch GV.basicDataRecord.GameCenterEnabled {
+//        case GCEnabledType.GameCenterEnabled.rawValue:
+//            if GCHelper.shared.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
+//                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+////                self.startDemoOrMenu()
+//            }
+//        case GCEnabledType.AskForGameCenter.rawValue:
+//            let alert = UIAlertController(title: GV.language.getText(.tcAskForGameCenter),
+//                                          message: "",
+//                                          preferredStyle: .alert)
+//            let connectAction = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default,
+//                                              handler: {(paramAction:UIAlertAction!) in
+//                                                try! realm.safeWrite() {
+//                                                    GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterEnabled.rawValue
+//                                                }
+//                                                self.connectToGameCenter()
+////                                                self.startDemoOrMenu()
+//            })
+//            
+//            alert.addAction(connectAction)
+//            
+//            let askLaterAction = UIAlertAction(title: GV.language.getText(.tcAskLater), style: .default,
+//                                               handler: {(paramAction:UIAlertAction!) in
 //                                                self.startDemoOrMenu()
-            })
-            
-            alert.addAction(connectAction)
-            
-            let askLaterAction = UIAlertAction(title: GV.language.getText(.tcAskLater), style: .default,
-                                               handler: {(paramAction:UIAlertAction!) in
-                                                self.startDemoOrMenu()
-            })
-            
-            alert.addAction(askLaterAction)
-            let askNoMoreAction = UIAlertAction(title: GV.language.getText(.tcAskNoMore), style: .default,
-                                                handler: {(paramAction:UIAlertAction!) in
-                                                    try! realm.safeWrite({
-                                                        GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterSupressed.rawValue
-                                                    })
-                                                    self.startDemoOrMenu()
-            })
-            
-            alert.addAction(askNoMoreAction)
-            present(alert, animated: true, completion: nil)
-        default:
-            break
-        }
-        
+//            })
+//            
+//            alert.addAction(askLaterAction)
+//            let askNoMoreAction = UIAlertAction(title: GV.language.getText(.tcAskNoMore), style: .default,
+//                                                handler: {(paramAction:UIAlertAction!) in
+//                                                    try! realm.safeWrite({
+//                                                        GV.basicDataRecord.GameCenterEnabled = GCEnabledType.GameCenterSupressed.rawValue
+//                                                    })
+//                                                    self.startDemoOrMenu()
+//            })
+//            
+//            alert.addAction(askNoMoreAction)
+//            present(alert, animated: true, completion: nil)
+//        default:
+//            break
+//        }
+//        
 
     }
     

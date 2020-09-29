@@ -10,6 +10,7 @@ import Foundation
 import AVFoundation
 import SpriteKit
 import RealmSwift
+import Reachability
 
 func + (left: CGSize, right: CGSize) -> CGSize {
     return CGSize(width: left.width + right.width, height: left.height + right.height)
@@ -160,6 +161,31 @@ public  func getRealm(type: RealmType)->Realm {
 
     let realm = try! Realm(configuration: config)
     return realm
+}
+
+
+
+public func startReachability() {
+    if GV.reachability == nil {
+        try! GV.reachability = Reachability()
+    }
+    GV.reachability!.whenReachable = { reachability in
+        if reachability.connection == .wifi {
+            print("Reachable via WiFi")
+        } else {
+            print("Reachable via Cellular")
+        }
+    }
+    GV.reachability!.whenUnreachable = { _ in
+        print("Not reachable")
+    }
+    
+    do {
+        try GV.reachability!.startNotifier()
+    } catch {
+        print("Unable to start notifier")
+    }
+
 }
 
 
