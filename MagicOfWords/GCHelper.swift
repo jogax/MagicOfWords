@@ -140,7 +140,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     /// Authenticates the user with their Game Center account if possible
     public func authenticateLocalUser(theDelegate: GCHelperDelegate, presentingViewController: UIViewController) {
         delegate = theDelegate
-        let viewController = presentingViewController
+//        let viewController = presentingViewController
 
         authenticateStatus = .authenticatingInProgress
         func authAdmin() {
@@ -160,7 +160,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     self.delegate?.localPlayerNotAuthenticated()
                     return
                 }
-                if let gcAuthViewController = gcAuthViewController {
+                if let _ = gcAuthViewController {
                     self.delegate?.localPlayerNotAuthenticated()
                     return
                     // Pause any activities that require user interaction, then present the

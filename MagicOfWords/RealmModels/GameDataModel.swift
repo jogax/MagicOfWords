@@ -29,13 +29,15 @@ class GameDataModel: Object {
     @objc dynamic var countOfWordsMaxValue = 1000
     @objc dynamic var countOfLettersMaxValue = 250
     @objc dynamic var created: Date = Date()
-    @objc dynamic var lastPlayed: Date? = nil
+    @objc dynamic var modified: Date = Date2000_1_1
     @objc dynamic var recordVersion = 0
 //    @objc dynamic var randomCounts = 0
     let rounds = List<RoundDataModel>()
     override  class func primaryKey() -> String {
         return "combinedKey"
     }
+    static public var Date2000_1_1 = Date(year: 2000, month: 1, day: 1)
+
     
     public func copy(newCombinedKey: String)->GameDataModel {
         let newRecord = GameDataModel()

@@ -789,7 +789,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         GV.target = nil
         GV.orientationHandler = nil
         try! realm.safeWrite {
-            GV.playingRecord.lastPlayed = Date()
+            GV.playingRecord.modified = Date()
         }
 
         wtSceneDelegate!.gameFinished(start: start)
@@ -935,6 +935,9 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         if GV.playingRecord.gameStatus == GV.GameStatusContinued {
             goOnPlaying = true
+        }
+        try! realm.safeWrite {
+            GV.playingRecord.modified = Date()
         }
         
         setMandatoryWords()
@@ -3521,7 +3524,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             actRound = 1
         }
         try! realm.safeWrite() {
-//            GV.playingRecord.ownWords = tempOwnWords
+            GV.playingRecord.modified = Date()
             GV.playingRecord.score = GV.totalScore
             GV.playingRecord.pieces = pieces
             GV.playingRecord.gameStatus = goOnPlaying ? GV.GameStatusContinued : GV.GameStatusPlaying

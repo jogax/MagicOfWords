@@ -248,6 +248,7 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     func chooseGame() {
+        var gamesForChoose: Results<GameDataModel>!
 
 
         alertController = UIAlertController(title: GV.language.getText(.tcChooseGame),
@@ -255,7 +256,9 @@ ShowNewWordsInCloudSceneDelegate {
                                             preferredStyle: .alert)
         
         //--------------------- StartGameAction ---------------------
-        let collectWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcEasyPlay)) ", style: .default, handler: { [unowned self]
+        gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GameType.CollectWords.rawValue)
+        let collectParam = "(\(gamesForChoose.count))"
+        let collectWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcEasyPlay, values: collectParam)) ", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.gameType = .CollectWords
@@ -263,20 +266,24 @@ ShowNewWordsInCloudSceneDelegate {
         })
         alertController!.addAction(collectWordsAction)
         //--------------------- Choose Game Type ---------------------
-        let fixLettersAction = UIAlertAction(title: "\(GV.language.getText(.tcMediumPlay)) ", style: .default, handler: { [unowned self]
+        gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GameType.FixLetter.rawValue)
+        let fixLetterParam = "(\(gamesForChoose.count))"
+        let fixLettersAction = UIAlertAction(title: "\(GV.language.getText(.tcMediumPlay, values: fixLetterParam)) ", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.gameType = .FixLetter
             self.chooseGameSize()
         })
         alertController!.addAction(fixLettersAction)
-        let searchWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcSearchWords)) ", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.gameType = .SearchWords
-            self.chooseGameSize()
-        })
-        alertController!.addAction(searchWordsAction)
+        //--------------------- Choose Game Type ---------------------
+
+//        let searchWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcSearchWords)) ", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//            GV.gameType = .SearchWords
+//            self.chooseGameSize()
+//        })
+//        alertController!.addAction(searchWordsAction)
 
         let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
             alert -> Void in
@@ -288,12 +295,13 @@ ShowNewWordsInCloudSceneDelegate {
     }
     
     private func chooseGameSize() {
+        let gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GV.gameType.rawValue)
         alertController = UIAlertController(title: GV.language.getText(.tcChooseGameSize),
                                             message: "",
                                             preferredStyle: .alert)
         
         //--------------------- 5 x 5 ---------------------
-        let choose5x5Action = UIAlertAction(title: "5x5", style: .default, handler: { [unowned self]
+        let choose5x5Action = UIAlertAction(title: "5x5 (\(gamesForChoose.filter("sizeOfGrid = %d", 5).count))", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 5
@@ -301,7 +309,7 @@ ShowNewWordsInCloudSceneDelegate {
         })
         alertController!.addAction(choose5x5Action)
         //--------------------- 6 x 6  ---------------------
-        let choose6x6Action = UIAlertAction(title: "6x6", style: .default, handler: { [unowned self]
+        let choose6x6Action = UIAlertAction(title: "6x6 (\(gamesForChoose.filter("sizeOfGrid = %d", 6).count))", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 6
@@ -309,7 +317,7 @@ ShowNewWordsInCloudSceneDelegate {
         })
         alertController!.addAction(choose6x6Action)
         //--------------------- 7 x 7  ---------------------
-        let choose7x7Action = UIAlertAction(title: "7x7", style: .default, handler: { [unowned self]
+        let choose7x7Action = UIAlertAction(title: "7x7 (\(gamesForChoose.filter("sizeOfGrid = %d", 7).count))", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 7
@@ -318,7 +326,7 @@ ShowNewWordsInCloudSceneDelegate {
         alertController!.addAction(choose7x7Action)
         
         //--------------------- 8 x 8  ---------------------
-        let choose8x8Action = UIAlertAction(title: "8x8", style: .default, handler: { [unowned self]
+        let choose8x8Action = UIAlertAction(title: "8x8 (\(gamesForChoose.filter("sizeOfGrid = %d", 8).count))", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 8
@@ -327,7 +335,7 @@ ShowNewWordsInCloudSceneDelegate {
         alertController!.addAction(choose8x8Action)
         
         //--------------------- 9 x 9  ---------------------
-        let choose9x9Action = UIAlertAction(title: "9x9", style: .default, handler: { [unowned self]
+        let choose9x9Action = UIAlertAction(title: "9x9 (\(gamesForChoose.filter("sizeOfGrid = %d", 9).count))", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 9
@@ -336,7 +344,7 @@ ShowNewWordsInCloudSceneDelegate {
         alertController!.addAction(choose9x9Action)
         
         //--------------------- 10 x 10  ---------------------
-        let choose10x10Action = UIAlertAction(title: "10x10", style: .default, handler: { [unowned self]
+        let choose10x10Action = UIAlertAction(title: "10x10 (\(gamesForChoose.filter("sizeOfGrid = %d", 10).count))", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
             GV.sizeOfGrid = 10
@@ -345,7 +353,7 @@ ShowNewWordsInCloudSceneDelegate {
         alertController!.addAction(choose10x10Action)
         if GV.onIpad {
             //--------------------- 11 x 11  ---------------------
-            let choose11x11Action = UIAlertAction(title: "11x11", style: .default, handler: { [unowned self]
+            let choose11x11Action = UIAlertAction(title: "11x11 (\(gamesForChoose.filter("sizeOfGrid = %d", 11).count))", style: .default, handler: { [unowned self]
                 alert -> Void in
                 self.inMenu = false
                 GV.sizeOfGrid = 11
@@ -354,7 +362,7 @@ ShowNewWordsInCloudSceneDelegate {
             alertController!.addAction(choose11x11Action)
             
             //--------------------- 12 x 12  ---------------------
-            let choose12x12Action = UIAlertAction(title: "12x12", style: .default, handler: { [unowned self]
+            let choose12x12Action = UIAlertAction(title: "12x12 (\(gamesForChoose.filter("sizeOfGrid = %d", 12).count))", style: .default, handler: { [unowned self]
                 alert -> Void in
                 self.inMenu = false
                 GV.sizeOfGrid = 12
@@ -363,7 +371,7 @@ ShowNewWordsInCloudSceneDelegate {
             alertController!.addAction(choose12x12Action)
             
             //--------------------- 13 x 13  ---------------------
-            let choose13x13Action = UIAlertAction(title: "13x13", style: .default, handler: { [unowned self]
+            let choose13x13Action = UIAlertAction(title: "13x13 (\(gamesForChoose.filter("sizeOfGrid = %d", 13).count))", style: .default, handler: { [unowned self]
                 alert -> Void in
                 self.inMenu = false
                 GV.sizeOfGrid = 13
@@ -372,7 +380,7 @@ ShowNewWordsInCloudSceneDelegate {
             alertController!.addAction(choose13x13Action)
             
             //--------------------- 14 x 14  ---------------------
-            let choose14x14Action = UIAlertAction(title: "14x14", style: .default, handler: { [unowned self]
+            let choose14x14Action = UIAlertAction(title: "14x14 (\(gamesForChoose.filter("sizeOfGrid = %d", 14).count))", style: .default, handler: { [unowned self]
                 alert -> Void in
                 self.inMenu = false
                 GV.sizeOfGrid = 14
@@ -381,7 +389,7 @@ ShowNewWordsInCloudSceneDelegate {
             alertController!.addAction(choose14x14Action)
             
             //--------------------- 15 x 15  ---------------------
-            let choose15x15Action = UIAlertAction(title: "15x15", style: .default, handler: { [unowned self]
+            let choose15x15Action = UIAlertAction(title: "15x15 (\(gamesForChoose.filter("sizeOfGrid = %d", 15).count))", style: .default, handler: { [unowned self]
                 alert -> Void in
                 self.inMenu = false
                 GV.sizeOfGrid = 15
@@ -504,10 +512,21 @@ ShowNewWordsInCloudSceneDelegate {
         checkNewWordsInCloud()
 //        checkMyBonusMalus()
 //        _ = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(waitForInternet(timerX: )), userInfo: nil, repeats: false)
-        let lastPlayed = realm.objects(GameDataModel.self).filter("language = %@ and nowPlaying = true",GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: false)
+        let lastPlayed = realm.objects(GameDataModel.self).filter("language = %@ and nowPlaying = true",GV.actLanguage).sorted(byKeyPath: "modified", ascending: false)
         switch lastPlayed.count {
         case 0:
             chooseGame()
+        case 2...1000:
+            for (index, record) in lastPlayed.enumerated() {
+                if index > 0 {
+                    try! realm.safeWrite {
+                        record.nowPlaying = false
+                    }
+                }
+            }
+            GV.gameType = GameType(rawValue: lastPlayed[0].gameType)!
+            GV.sizeOfGrid = lastPlayed[0].sizeOfGrid
+            startGame()
         default:
             GV.gameType = GameType(rawValue: lastPlayed[0].gameType)!
             GV.sizeOfGrid = lastPlayed[0].sizeOfGrid
@@ -747,7 +766,7 @@ ShowNewWordsInCloudSceneDelegate {
 //        var bestScore = 0
 //        var bestScoreIndex = 0
         var dayAdder = 1
-        let allRecords = realm.objects(GameDataModel.self).filter("recordVersion = %d", 0)
+        let allRecords = realm.objects(GameDataModel.self)//.filter("recordVersion = %d", 0)
         if allRecords.count == 0 {
             return
         }
@@ -786,8 +805,8 @@ ShowNewWordsInCloudSceneDelegate {
                     if record.combinedKey.toDate() != record.created {
                         record.created = record.combinedKey.toDate()
                     }
-                    if record.lastPlayed == nil {
-                        record.lastPlayed = record.combinedKey.toDate()
+                    if record.modified <= GameDataModel.Date2000_1_1 {
+                        record.modified = record.combinedKey.toDate()
                     }
                     record.sizeOfGrid = GV.sizeOfGridValue[record.rounds.first!.gameArray.count]!
                     record.recordVersion = 1
