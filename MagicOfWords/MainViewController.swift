@@ -16,8 +16,12 @@ import GameKit
 import CloudKit
 //import SCLAlertView
 
-class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate, GKGameCenterControllerDelegate,  ShowGameCenterViewControllerDelegate,
-ShowNewWordsInCloudSceneDelegate {
+class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDelegate, GCHelperDelegate, ShowGamesSceneDelegate,
+                          GKGameCenterControllerDelegate,  ShowGameCenterViewControllerDelegate, ShowNewWordsInCloudSceneDelegate, MenuSceneDelegate {
+    func startGameChoosed() {
+        startGame()
+    }
+    
     func backFromShowGameCenterViewController() {
         showMenu()
     }
@@ -1004,6 +1008,13 @@ ShowNewWordsInCloudSceneDelegate {
             return
         }
         
+        if let view = self.view as! SKView? {
+            let menuScene = MenuScene()
+            menuScene.setDelegate (self)
+            view.presentScene(menuScene)
+        }
+
+        return
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
                                             message: "",
                                             preferredStyle: .alert)
