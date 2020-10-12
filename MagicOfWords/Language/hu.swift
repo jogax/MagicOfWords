@@ -88,7 +88,7 @@ let huDictionary: [TextConstants: String] = [
     .tcNicknameUsedwithout: "A '%' becenevet másik eszközön használják kulcsszó nélkül!",
     .tcNicknameActivating:  "Ha ez a te másik eszközöd, nyisd meg az eszközt, és adj egy kulcsszót becenévhez!",
     .tcAddKeyWord:          "Ha ez a te másik eszközöd, írd be itt ugyanazt a kulcsszót mint azon az eszközön, egyébként válassz más becenevet!",
-    .tcChooseAction:        "Válassz!",
+    .tcChooseAction:        "Főmenü",
     .tcTableOfEasyBestscores:"%Szógyűjtő eredmények",
     .tcTableOfMediumBestscores:"%Fix-Betű eredmények",
     .tcTableOfWordCounts:    "Szó számlálók",
@@ -194,4 +194,6 @@ let huDictionary: [TextConstants: String] = [
     .tcCongratulations:         "Gratulálok!",
     .tcFinishGameMessage:       "Befejezted a játékot. Új játék indul.",
     .tcWordsToFind:             "Keresendő szavak:",
+    .tclengthOfGame:            "Fordulók száma",
+    .tcPrefillWithLetters:      "Előtöltési százalék",
 ]

@@ -89,7 +89,7 @@ let enDictionary: [TextConstants: String] = [
     .tcNicknameUsedwithout: "Nickname '%' is used on another device without keyword!",
     .tcNicknameActivating:  "If this is your device, open it and add a keyword to the nickname!",
     .tcAddKeyWord:          "If this is your device, add hier the same keyword otherwise choose another nickname!",
-    .tcChooseAction:        "Choose please!",
+    .tcChooseAction:        "Main menu",
     .tcTableOfEasyBestscores:"Scores of \"Collect-Words\"",
     .tcTableOfMediumBestscores:"Scores of \"Use-Fixed-Letters\"",
     .tcTableOfWordCounts:    "Word counters",
@@ -195,5 +195,7 @@ let enDictionary: [TextConstants: String] = [
     .tcCongratulations:         "Congratulations!",
     .tcFinishGameMessage:       "You have finished the Game. A new game starts",
     .tcWordsToFind:             "Words to find:",
+    .tclengthOfGame:            "Count of rounds",
+    .tcPrefillWithLetters:      "Prefill Percentage"
 
 ]

@@ -56,6 +56,7 @@ class MyAlertController: SKSpriteNode {
         }
         
         super.init(texture: nil /*SKTexture(imageNamed: "MenuBG")*/, color: .clear, size: CGSize(width: 1, height: 1))
+        self.name = "MyAlertController"
     }
     public func addAction(text: String, action:Selector) {
         myTexts.append(text)

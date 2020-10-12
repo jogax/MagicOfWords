@@ -89,7 +89,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcNicknameUsedwithout: "Псевдоним '%' используется на другом устройстве без ключевого слова!",
     .tcNicknameActivating:  "Если это твоё устройство, открой его и добавь ключевое слово к псевдониму!",
     .tcAddKeyWord:          "Если это твоё устройство, добавь тут то же ключевое слово, иначе выбери другой псевдоним!",
-    .tcChooseAction:        "Выбери пожалуйста!",
+    .tcChooseAction:        "Главное меню",
     .tcTableOfEasyBestscores:"Лучшие результаты Собери-Слова",
     .tcTableOfMediumBestscores:"Лучшие результаты Неподвижные-Буквы",
     .tcTableOfWordCounts:    "Счетчики слов",
@@ -196,5 +196,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcCongratulations:         "Поздравляю!",
     .tcFinishGameMessage:       "Ты закончил игру. Новая игра начинается.",
     .tcWordsToFind:             "Найди слова:",
+    .tclengthOfGame:            "Количество раундов",
+    .tcPrefillWithLetters:      "Процент предв. заполнения"
 ]
 

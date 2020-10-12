@@ -17,6 +17,8 @@ class GameDataModel: Object {
     @objc dynamic var sizeOfGrid = 10
     @objc dynamic var gameType = -1
     @objc dynamic var nowPlaying = false
+    @objc dynamic var prefillPercentage = 0
+    @objc dynamic var countRounds = 1
     @objc dynamic var gameStatus = 0 // 0: new, 1: playing, 2: finished, 3: continued
     @objc dynamic var mandatoryWords = ""
     @objc dynamic var ownWords = ""

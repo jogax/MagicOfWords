@@ -268,6 +268,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             GV.gameType = .CollectWords
             self.chooseGameSize()
         })
+        if GV.gameType == GameType.CollectWords {
+            collectWordsAction.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
         alertController!.addAction(collectWordsAction)
         //--------------------- Choose Game Type ---------------------
         gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GameType.FixLetter.rawValue)
@@ -278,6 +281,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             GV.gameType = .FixLetter
             self.chooseGameSize()
         })
+        if GV.gameType == GameType.FixLetter {
+            fixLettersAction.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
         alertController!.addAction(fixLettersAction)
         //--------------------- Choose Game Type ---------------------
 
@@ -311,6 +317,10 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             GV.sizeOfGrid = 5
             self.startGame()
         })
+        if GV.sizeOfGrid == 5 {
+            choose5x5Action.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
+
         alertController!.addAction(choose5x5Action)
         //--------------------- 6 x 6  ---------------------
         let choose6x6Action = UIAlertAction(title: "6x6 (\(gamesForChoose.filter("sizeOfGrid = %d", 6).count))", style: .default, handler: { [unowned self]
@@ -319,6 +329,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             GV.sizeOfGrid = 6
             self.startGame()
         })
+        if GV.sizeOfGrid == 6 {
+            choose6x6Action.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
         alertController!.addAction(choose6x6Action)
         //--------------------- 7 x 7  ---------------------
         let choose7x7Action = UIAlertAction(title: "7x7 (\(gamesForChoose.filter("sizeOfGrid = %d", 7).count))", style: .default, handler: { [unowned self]
@@ -327,6 +340,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             GV.sizeOfGrid = 7
             self.startGame()
         })
+        if GV.sizeOfGrid == 7 {
+            choose7x7Action.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
         alertController!.addAction(choose7x7Action)
         
         //--------------------- 8 x 8  ---------------------
@@ -336,6 +352,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             GV.sizeOfGrid = 8
             self.startGame()
         })
+        if GV.sizeOfGrid == 8 {
+            choose8x8Action.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
         alertController!.addAction(choose8x8Action)
         
         //--------------------- 9 x 9  ---------------------
@@ -345,6 +364,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             GV.sizeOfGrid = 9
             self.startGame()
         })
+        if GV.sizeOfGrid == 9 {
+            choose9x9Action.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
         alertController!.addAction(choose9x9Action)
         
         //--------------------- 10 x 10  ---------------------
@@ -354,6 +376,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             GV.sizeOfGrid = 10
             self.startGame()
         })
+        if GV.sizeOfGrid == 10 {
+            choose10x10Action.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
         alertController!.addAction(choose10x10Action)
         if GV.onIpad {
             //--------------------- 11 x 11  ---------------------
@@ -363,6 +388,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
                 GV.sizeOfGrid = 11
                 self.startGame()
             })
+            if GV.sizeOfGrid == 11 {
+                choose11x11Action.setValue(UIColor.red, forKey: "TitleTextColor")
+            }
             alertController!.addAction(choose11x11Action)
             
             //--------------------- 12 x 12  ---------------------
@@ -372,6 +400,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
                 GV.sizeOfGrid = 12
                 self.startGame()
             })
+            if GV.sizeOfGrid == 12 {
+                choose12x12Action.setValue(UIColor.red, forKey: "TitleTextColor")
+            }
             alertController!.addAction(choose12x12Action)
             
             //--------------------- 13 x 13  ---------------------
@@ -381,6 +412,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
                 GV.sizeOfGrid = 13
                 self.startGame()
             })
+            if GV.sizeOfGrid == 13 {
+                choose13x13Action.setValue(UIColor.red, forKey: "TitleTextColor")
+            }
             alertController!.addAction(choose13x13Action)
             
             //--------------------- 14 x 14  ---------------------
@@ -390,6 +424,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
                 GV.sizeOfGrid = 14
                 self.startGame()
             })
+            if GV.sizeOfGrid == 14 {
+                choose14x14Action.setValue(UIColor.red, forKey: "TitleTextColor")
+            }
             alertController!.addAction(choose14x14Action)
             
             //--------------------- 15 x 15  ---------------------
@@ -399,6 +436,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
                 GV.sizeOfGrid = 15
                 self.startGame()
             })
+            if GV.sizeOfGrid == 15 {
+                choose15x15Action.setValue(UIColor.red, forKey: "TitleTextColor")
+            }
             alertController!.addAction(choose15x15Action)
         }
         let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
@@ -1000,21 +1040,18 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         }
     }
     
+    @objc func menuItem1() {
+        self.startGame()
+    }
 
 
+    var menuScene: MenuScene!
     
     func showMenu() {
         if GV.playing {
             return
         }
         
-        if let view = self.view as! SKView? {
-            let menuScene = MenuScene()
-            menuScene.setDelegate (self)
-            view.presentScene(menuScene)
-        }
-
-        return
         alertController = UIAlertController(title: GV.language.getText(.tcChooseAction),
                                             message: "",
                                             preferredStyle: .alert)
@@ -1026,13 +1063,6 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
                 self.startGame()
         })
         alertController!.addAction(startGameAction)
-        //--------------------- Choose Game Type ---------------------
-        let chooseGameAction = UIAlertAction(title: "\(GV.language.getText(.tcChooseGame)) ", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-                self.chooseGame()
-        })
-        alertController!.addAction(chooseGameAction)
         //--------------------- bestScoreAction ---------------------
         let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
             alert -> Void in
@@ -1043,21 +1073,12 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             alertController!.addAction(bestScoreAction)
         }
         //--------------------- chooseLanguageAction ---------------------
-        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+        let chooseSettingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
-            self.chooseLanguage()
+            self.showSettingsMenu()
         })
-        alertController!.addAction(chooseLanguageAction)
-        //--------------------- showHelpAction ---------------------
-//        let showHelpAction = UIAlertAction(title: GV.language.getText(.tcShowHelp), style: .default, handler: { [unowned self]
-//            alert -> Void in
-//            //            self.showHowToPlay()
-//            self.inMenu = false
-//            self.startWelcomeScene()
-//        })
-//        inMenu = true
-//        alertController!.addAction(showHelpAction)
+        alertController!.addAction(chooseSettingsAction)
 
 // --------------------- Show GameCenter Question ---------------------
         if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterSupressed.rawValue {
@@ -1215,18 +1236,44 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         let myAlertController = UIAlertController(title: GV.language.getText(.tcSettings),
                                             message: "",
                                             preferredStyle: .alert)
+        //--------------------- Choose Game Type ---------------------
+        let chooseGameAction = UIAlertAction(title: "\(GV.language.getText(.tcChooseGame)) ", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+                self.chooseGame()
+        })
+        myAlertController.addAction(chooseGameAction)
+
         //--------------------- chooseLanguageAction ---------------------
         let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
             alert -> Void in
             self.chooseLanguage()
         })
         myAlertController.addAction(chooseLanguageAction)
+
+        //--------------------- Choose Game Length ---------------------
+        let chooseLengthAction = UIAlertAction(title: "\(GV.language.getText(.tclengthOfGame)) ", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+                self.chooseLengthOfGame()
+        })
+        myAlertController.addAction(chooseLengthAction)
+
+        //--------------------- Choose Game Length ---------------------
+        let choosePrefillAction = UIAlertAction(title: "\(GV.language.getText(.tcPrefillWithLetters)) ", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+                self.choosePrefillProcent()
+        })
+        myAlertController.addAction(choosePrefillAction)
+
+        //--------------------- Cancel ---------------------
         let cancelAction =  UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
             alert -> Void in
             self.showMenu()
         })
         myAlertController.addAction(cancelAction)
-
+        
         present(myAlertController, animated: true, completion: nil)
     }
     
@@ -1240,6 +1287,14 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         GCHelper.shared.getBestScore(completion: {self.callModifyHeader()})
 //        GCHelper.shared.getAllScores(completion: {})
 //        self.showMenu()
+    }
+    
+    @objc private func choosePrefillProcent() {
+        showMenu()
+    }
+    
+    @objc private func chooseLengthOfGame() {
+        showMenu()
     }
     
     private func generateBasicDataRecordIfNeeded() {

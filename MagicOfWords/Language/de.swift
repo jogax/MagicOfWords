@@ -89,7 +89,7 @@ let deDictionary: [TextConstants: String] = [
     .tcNicknameUsedwithout: "Spitzname '%' wird auf einem anderen Gerät verwendet ohne Schlüsselwort!",
     .tcNicknameActivating:  "Wenn dies Dein Gerät ist, öffne es und füge ein Schlüsselwort dem Spitzname hinzu!",
     .tcAddKeyWord:          "Wenn dies Dein Gerät ist, füge hier dasselbe Schlüsselwort hinzu, ansonsten wähle einen anderen Spitznamen!",
-    .tcChooseAction:        "Bitte wählen!",
+    .tcChooseAction:        "Hauptmenü",
     .tcTableOfEasyBestscores:"Ergebnisse von Sammle-Wörter",
     .tcTableOfMediumBestscores:"Ergebnisse von Verwende-Feste-Buchstaben",
     .tcTableOfWordCounts:    "Wort Zählers",
@@ -198,6 +198,8 @@ let deDictionary: [TextConstants: String] = [
     .tcCongratulations:         "Herzliche Glückwünsche!",
     .tcFinishGameMessage:       "Du hast das Spiel beendet. Ein neues Spiel beginnt.",
     .tcWordsToFind:             "Wörter zu finden:",
+    .tclengthOfGame:            "Anzahl der Runden",
+    .tcPrefillWithLetters:      "Prozentsatz der Vorfüllung"
 ]
 
 
