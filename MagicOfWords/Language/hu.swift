@@ -163,7 +163,8 @@ let huDictionary: [TextConstants: String] = [
     .tcMediumActScore:  "Fix-BetűAct",
     .tcCountPlays:      "Játszott",
     .tcBlank:           " ",
-    .tcStartGame:       "Játék",
+    .tcStartCollectWordsGame:   "Szógyűjtő játék",
+    .tcStartFixLettersGame:     "Fix-Betű játék",
     .tcWordCount:       "Szó számlálók",
     .tcLocalPlayerNotAuth: "Nem sikerült a kapcsolatfelvétel!",
     .tcChooseWhatYouWant: "Válassz egy táblázatot",
@@ -196,4 +197,5 @@ let huDictionary: [TextConstants: String] = [
     .tcWordsToFind:             "Keresendő szavak:",
     .tclengthOfGame:            "Fordulók száma",
     .tcPrefillWithLetters:      "Előtöltési százalék",
+    .tcCountOfRoundsHeader:     "Válaszd ki a fordulók számát",
 ]

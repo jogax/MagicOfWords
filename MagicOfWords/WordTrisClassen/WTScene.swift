@@ -1238,7 +1238,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
         createFixLetters()
         
-//        movePiecesToGameArray()
+        movePiecesToGameArray()
 //        HintEngine.shared.createHints()
         createHintsInBackground()
         saveActualState()
@@ -2241,7 +2241,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        saveActualState()
 //        fillTippIndexes()
         
-//        movePiecesToGameArray()
+        movePiecesToGameArray()
 //        HintEngine.shared.createHints()
         createHintsInBackground()
         saveActualState()
@@ -2254,93 +2254,93 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        setGameStatus()
     }
     
-//    private func movePiecesToGameArray() {
-//        #if GALINA
-//            return
-//        #endif
-//        var words = GV.playingRecord.words.components(separatedBy: itemSeparator)
-//        var wordIndex = 0
-//        let pieceFromPosition = 0
-//        let movedIndex = 0
-//        let random = MyRandom(gameNumber: GV.playingRecord.gameNumber % 1000, modifier: (GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count - 1) * 22)
-//        let gameArraySize = GV.sizeOfGrid - 1
-//
-//
-//        func moveWordToGameArray() {
-//            let actWord = words[wordIndex]
-//            wordIndex += 1
-//            var remainingLength = actWord.length
-//            repeat {
-//                let piece = pieceArray[pieceFromPosition]
-//                let form = myForms[piece.myType]![piece.rotateIndex]
-//                var placeIsOK = true
-//                func getFreePosition()->(col: Int, row: Int) {
-//                    var randomCol = 0
-//                    var randomRow = 0
-//                    repeat {
-//                        placeIsOK = true
-//                        randomCol = random.getRandomInt(0, max: gameArraySize)
-//                        randomRow = random.getRandomInt(0, max: gameArraySize)
-//                        if GV.gameArray[randomCol][randomRow].status != .Empty {
-//                            placeIsOK = false
-//                            continue
-//                        }
-//                    } while !placeIsOK
-//                    return (col: randomCol, row: randomRow)
-//                }
-//                var gameArrayPositions = [GameArrayPositions]()
-//                for index in 0..<form.points.count {
-//                    let (col, row) = getFreePosition()
-//                    let letter = piece.letters[index]
-//                    if GV.gameArray[col][row].status != .Empty {
-//                        print("error at col: \(col), row: \(row)")
-//                    }
-//                    _ = GV.gameArray[col][row].setLetter(letter: letter, toStatus: .Used, calledFrom: "moveWordToGameArray")
-//                    gameArrayPositions.append(GameArrayPositions(col:col,row: row))
-//                }
-//                remainingLength -= form.points.count
-//                piece.setGameArrayPositions(gameArrayPositions: gameArrayPositions)
-//                piece.isOnGameboard = true
-//                piece.pieceFromPosition = pieceFromPosition
-//                let activityItem = ActivityItem(type: .FromBottom, fromBottomIndex: pieceArray[pieceFromPosition].getArrayIndex())
-//                if activityRoundItem.count == 0 {
-//                    activityRoundItem.append(ActivityRound())
-//                }
-//                if activityRoundItem.last!.activityItems.count == 0 {
-//                    activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
-//                }
-//                activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
-//                setUndoButton(enabled: true)
-//                let lastIndex = pieceArray.count - 1
-//                for index in 0...lastIndex {
-//                    removeNodesWith(name: "Pos\(String(index))")
-//                }
-//                if movedIndex < lastIndex {
-//                    for index in movedIndex..<lastIndex {
-//                        pieceArray[index] = pieceArray[index + 1]
-//                        pieceArray[index].name = "Pos\(String(index))"
-//                        pieceArray[index].plPosSize = origPosition[index]
-//                        pieceArray[index].setPieceFromPosition(index: index)
-//                        origSize[index] = pieceArray[index].size
-//                    }
-//                }
-//                pieceArray[lastIndex] = getNextPiece(/*horizontalPosition: lastIndex*/)
-//                pieceArray[lastIndex].plPosSize = origPosition[lastIndex]
-//                pieceArray[lastIndex].name = "Pos\(lastIndex)"
-//                pieceArray[lastIndex].setPieceFromPosition(index: lastIndex)
-//                words = GV.playingRecord.words.components(separatedBy: itemSeparator)
-//                for index in 0...lastIndex {
-//                    bgSprite!.addChild(pieceArray[index])
-//                }
-//            } while remainingLength > 0
-////            GV.hintTable.append(actWord)
-//        }
-//        while wtGameboard!.getCountFreePlaces() > countRemainingFreePlaces {
-//            moveWordToGameArray()
-//        }
-//    }
-    
-//    let countRemainingFreePlaces = 36
+    private func movePiecesToGameArray() {
+        if GV.basicDataRecord.prefill == 0 {
+            return
+        }
+        var words = GV.playingRecord.words.components(separatedBy: itemSeparator)
+        var wordIndex = 0
+        let pieceFromPosition = 0
+        let movedIndex = 0
+        let random = MyRandom(gameNumber: GV.playingRecord.gameNumber % 1000, modifier: (GV.playingRecord.rounds.count == 0 ? 1 : GV.playingRecord.rounds.count - 1) * 22)
+        let gameArraySize = GV.sizeOfGrid - 1
+
+
+        func moveWordToGameArray() {
+            let actWord = words[wordIndex]
+            wordIndex += 1
+            var remainingLength = actWord.length
+            repeat {
+                let piece = pieceArray[pieceFromPosition]
+                let form = myForms[piece.myType]![piece.rotateIndex]
+                var placeIsOK = true
+                func getFreePosition()->(col: Int, row: Int) {
+                    var randomCol = 0
+                    var randomRow = 0
+                    repeat {
+                        placeIsOK = true
+                        randomCol = random.getRandomInt(0, max: gameArraySize)
+                        randomRow = random.getRandomInt(0, max: gameArraySize)
+                        if GV.gameArray[randomCol][randomRow].status != .Empty {
+                            placeIsOK = false
+                            continue
+                        }
+                    } while !placeIsOK
+                    return (col: randomCol, row: randomRow)
+                }
+                var gameArrayPositions = [GameArrayPositions]()
+                for index in 0..<form.points.count {
+                    let (col, row) = getFreePosition()
+                    let letter = piece.letters[index]
+                    if GV.gameArray[col][row].status != .Empty {
+                        print("error at col: \(col), row: \(row)")
+                    }
+                    _ = GV.gameArray[col][row].setLetter(letter: letter, toStatus: .Used)
+                    gameArrayPositions.append(GameArrayPositions(col:col,row: row))
+                }
+                remainingLength -= form.points.count
+                piece.setGameArrayPositions(gameArrayPositions: gameArrayPositions)
+                piece.isOnGameboard = true
+                piece.pieceFromPosition = pieceFromPosition
+                let activityItem = ActivityItem(type: .FromBottom, fromBottomIndex: pieceArray[pieceFromPosition].getArrayIndex())
+                if activityRoundItem.count == 0 {
+                    activityRoundItem.append(ActivityRound())
+                }
+                if activityRoundItem.last!.activityItems.count == 0 {
+                    activityRoundItem[activityRoundItem.count - 1].activityItems = [ActivityItem]()
+                }
+                activityRoundItem[activityRoundItem.count - 1].activityItems.append(activityItem)
+                setUndoButton(enabled: true)
+                let lastIndex = pieceArray.count - 1
+                for index in 0...lastIndex {
+                    removeNodesWith(name: "Pos\(String(index))")
+                }
+                if movedIndex < lastIndex {
+                    for index in movedIndex..<lastIndex {
+                        pieceArray[index] = pieceArray[index + 1]
+                        pieceArray[index].name = "Pos\(String(index))"
+                        pieceArray[index].plPosSize = origPosition[index]
+                        pieceArray[index].setPieceFromPosition(index: index)
+                        origSize[index] = pieceArray[index].size
+                    }
+                }
+                pieceArray[lastIndex] = getNextPiece(/*horizontalPosition: lastIndex*/)
+                pieceArray[lastIndex].plPosSize = origPosition[lastIndex]
+                pieceArray[lastIndex].name = "Pos\(lastIndex)"
+                pieceArray[lastIndex].setPieceFromPosition(index: lastIndex)
+                words = GV.playingRecord.words.components(separatedBy: itemSeparator)
+                for index in 0...lastIndex {
+                    bgSprite!.addChild(pieceArray[index])
+                }
+            } while remainingLength > 0
+//            GV.hintTable.append(actWord)
+        }
+        let countCells = GV.sizeOfGrid * GV.sizeOfGrid
+        let enabledCountCells = (countCells * GV.basicDataRecord.prefill) / 100
+        while wtGameboard!.getCountUsedPlaces() < enabledCountCells {
+            moveWordToGameArray()
+        }
+    }
     
     private func fillTippIndexes() {
         tippIndexes = [:]

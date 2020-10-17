@@ -164,7 +164,8 @@ let enDictionary: [TextConstants: String] = [
     .tcMediumActScore:  "UseAct",
     .tcCountPlays:      "Played",
     .tcBlank:           " ",
-    .tcStartGame:       "Play",
+    .tcStartCollectWordsGame:   "CollectWords Game",
+    .tcStartFixLettersGame:     "FixLetters Game",
     .tcWordCount:       "Word counters",
     .tcLocalPlayerNotAuth: "Local player not authenticated!",
     .tcChooseWhatYouWant: "Choose what to show",
@@ -196,6 +197,6 @@ let enDictionary: [TextConstants: String] = [
     .tcFinishGameMessage:       "You have finished the Game. A new game starts",
     .tcWordsToFind:             "Words to find:",
     .tclengthOfGame:            "Count of rounds",
-    .tcPrefillWithLetters:      "Prefill Percentage"
-
+    .tcPrefillWithLetters:      "Prefill Percentage",
+    .tcCountOfRoundsHeader:     "Choose count of rounds",
 ]

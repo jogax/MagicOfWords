@@ -234,6 +234,7 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         if GV.gameType == .SearchWords {
             startFindWordsScene()
         } else {
+            GV.sizeOfGrid = GV.onIpad ? 10 : 8
             let actGame = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d and sizeOfGrid = %d",GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
             try! realm.safeWrite {
                 GV.basicDataRecord.difficulty = GV.gameType.rawValue
@@ -1057,12 +1058,21 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
                                             preferredStyle: .alert)
         
         //--------------------- StartGameAction ---------------------
-        let startGameAction = UIAlertAction(title: "\(GV.language.getText(.tcStartGame)) ", style: .default, handler: { [unowned self]
+        let startCollectLettersGameAction = UIAlertAction(title: "\(GV.language.getText(.tcStartCollectWordsGame)) ", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
-                self.startGame()
+            GV.gameType = GameType.CollectWords
+            self.startGame()
         })
-        alertController!.addAction(startGameAction)
+        alertController!.addAction(startCollectLettersGameAction)
+        //--------------------- StartGameAction ---------------------
+        let startFixLetersGameAction = UIAlertAction(title: "\(GV.language.getText(.tcStartFixLettersGame)) ", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+            GV.gameType = GameType.FixLetter
+            self.startGame()
+        })
+        alertController!.addAction(startFixLetersGameAction)
         //--------------------- bestScoreAction ---------------------
         let bestScoreAction = UIAlertAction(title: GV.language.getText(.tcBestScore), style: .default, handler: { [unowned self]
             alert -> Void in
@@ -1073,26 +1083,42 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             alertController!.addAction(bestScoreAction)
         }
         //--------------------- chooseLanguageAction ---------------------
-        let chooseSettingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
+        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.chooseLanguage()
+        })
+        alertController!.addAction(chooseLanguageAction)
+
+        //--------------------- Choose Prefill ---------------------
+        let choosePrefillAction = UIAlertAction(title: "\(GV.language.getText(.tcPrefillWithLetters)) ", style: .default, handler: { [unowned self]
             alert -> Void in
             self.inMenu = false
-            self.showSettingsMenu()
+                self.choosePrefillProcent()
         })
-        alertController!.addAction(chooseSettingsAction)
+        alertController!.addAction(choosePrefillAction)
 
+
+//        //--------------------- chooseLanguageAction ---------------------
+//        let chooseSettingsAction = UIAlertAction(title: GV.language.getText(.tcSettings), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//            self.showSettingsMenu()
+//        })
+//        alertController!.addAction(chooseSettingsAction)
+//
 // --------------------- Show GameCenter Question ---------------------
-        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterSupressed.rawValue {
-            let askForGameCenterAction = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default, handler: { [unowned self]
-                alert -> Void in
-                    if GCHelper.shared.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
-                        GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
-                    }
-                self.inMenu = false
-                self.showMenu()
-            })
-            inMenu = true
-            alertController!.addAction(askForGameCenterAction)
-        }
+//        if GV.basicDataRecord.GameCenterEnabled == GCEnabledType.GameCenterSupressed.rawValue {
+//            let askForGameCenterAction = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                    if GCHelper.shared.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
+//                        GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+//                    }
+//                self.inMenu = false
+//                self.showMenu()
+//            })
+//            inMenu = true
+//            alertController!.addAction(askForGameCenterAction)
+//        }
 //        var GCTitle = ""
 //        var chooseGCAction: UIAlertAction
 //        if GCHelper.shared.authenticateStatus != GCHelper.AuthenticatingStatus.authenticated {
@@ -1220,6 +1246,7 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
     }
     
     var showNewWordsInCloudScene: ShowNewWordsInCloudScene?
+    
     private func startShowNewWordsInCloudScene() {
         showNewWordsInCloudScene = ShowNewWordsInCloudScene(size: CGSize(width: view.frame.width, height: view.frame.height))
         showNewWordsInCloudScene?.setDelegate(delegate: self)
@@ -1232,51 +1259,51 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
     #endif
 
     
-    private func showSettingsMenu() {
-        let myAlertController = UIAlertController(title: GV.language.getText(.tcSettings),
-                                            message: "",
-                                            preferredStyle: .alert)
-        //--------------------- Choose Game Type ---------------------
-        let chooseGameAction = UIAlertAction(title: "\(GV.language.getText(.tcChooseGame)) ", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-                self.chooseGame()
-        })
-        myAlertController.addAction(chooseGameAction)
-
-        //--------------------- chooseLanguageAction ---------------------
-        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.chooseLanguage()
-        })
-        myAlertController.addAction(chooseLanguageAction)
-
-        //--------------------- Choose Game Length ---------------------
-        let chooseLengthAction = UIAlertAction(title: "\(GV.language.getText(.tclengthOfGame)) ", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-                self.chooseLengthOfGame()
-        })
-        myAlertController.addAction(chooseLengthAction)
-
-        //--------------------- Choose Game Length ---------------------
-        let choosePrefillAction = UIAlertAction(title: "\(GV.language.getText(.tcPrefillWithLetters)) ", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-                self.choosePrefillProcent()
-        })
-        myAlertController.addAction(choosePrefillAction)
-
-        //--------------------- Cancel ---------------------
-        let cancelAction =  UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.showMenu()
-        })
-        myAlertController.addAction(cancelAction)
-        
-        present(myAlertController, animated: true, completion: nil)
-    }
-    
+//    private func showSettingsMenu() {
+//        let myAlertController = UIAlertController(title: GV.language.getText(.tcSettings),
+//                                            message: "",
+//                                            preferredStyle: .alert)
+//        //--------------------- Choose Game Type ---------------------
+//        let chooseGameAction = UIAlertAction(title: "\(GV.language.getText(.tcChooseGame)) ", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//                self.chooseGame()
+//        })
+//        myAlertController.addAction(chooseGameAction)
+//
+//        //--------------------- chooseLanguageAction ---------------------
+//        let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.chooseLanguage()
+//        })
+//        myAlertController.addAction(chooseLanguageAction)
+//
+//        //--------------------- Choose Game Length ---------------------
+//        let chooseLengthAction = UIAlertAction(title: "\(GV.language.getText(.tclengthOfGame)) ", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//                self.chooseLengthOfGame()
+//        })
+//        myAlertController.addAction(chooseLengthAction)
+//
+//        //--------------------- Choose Prefill ---------------------
+//        let choosePrefillAction = UIAlertAction(title: "\(GV.language.getText(.tcPrefillWithLetters)) ", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//                self.choosePrefillProcent()
+//        })
+//        myAlertController.addAction(choosePrefillAction)
+//
+//        //--------------------- Cancel ---------------------
+//        let cancelAction =  UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.showMenu()
+//        })
+//        myAlertController.addAction(cancelAction)
+//
+//        present(myAlertController, animated: true, completion: nil)
+//    }
+//
     private func setGameType(gameType: GameType) {
         try! realm.safeWrite() {
             GV.basicDataRecord.difficulty = gameType.rawValue
@@ -1290,11 +1317,65 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
     }
     
     @objc private func choosePrefillProcent() {
-        showMenu()
+        let actProcent = GV.basicDataRecord.prefill
+        let myAlertController = UIAlertController(title: GV.language.getText(.tcPrefillWithLetters),
+                                            message: "",
+                                            preferredStyle: .alert)
+        let choosePrefill0ProcentAction = UIAlertAction(title: "0 %", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+                self.prefillProcentChoosed(0)
+        })
+        if actProcent == 0 {
+            choosePrefill0ProcentAction.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
+ 
+        myAlertController.addAction(choosePrefill0ProcentAction)
+        
+        let choosePrefill15ProcentAction = UIAlertAction(title: "15 %", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+                self.prefillProcentChoosed(15)
+        })
+        if actProcent == 15 {
+            choosePrefill15ProcentAction.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
+
+        myAlertController.addAction(choosePrefill15ProcentAction)
+        let choosePrefill30ProcentAction = UIAlertAction(title: "30 %", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+                self.prefillProcentChoosed(30)
+        })
+        if actProcent == 30 {
+            choosePrefill30ProcentAction.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
+        myAlertController.addAction(choosePrefill30ProcentAction)
+        
+        let choosePrefill45ProcentAction = UIAlertAction(title: "45 %", style: .default, handler: { [unowned self]
+            alert -> Void in
+            self.inMenu = false
+                self.prefillProcentChoosed(45)
+        })
+        if actProcent == 45 {
+            choosePrefill45ProcentAction.setValue(UIColor.red, forKey: "TitleTextColor")
+        }
+        myAlertController.addAction(choosePrefill45ProcentAction)
+        
+        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
+            alert -> Void in
+            self.showMenu()
+        })
+        myAlertController.addAction(cancelAction)
+        
+        present(myAlertController, animated: true, completion: nil)
     }
     
-    @objc private func chooseLengthOfGame() {
-        showMenu()
+    @objc func prefillProcentChoosed(_ procent: Int) {
+        try! realm.safeWrite {
+            GV.basicDataRecord.prefill = procent
+        }
+        self.showMenu()
     }
     
     private func generateBasicDataRecordIfNeeded() {
@@ -1307,9 +1388,6 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             }
         }
         if realm.objects(BasicDataModel.self).count == 0 {
-//            minden GC-her felküldött paramétert 10 jegyü timeintervallal kezdeni, hogy ne legyenek azonos értékek!
-//            ezt a sendGlobalInfos modul intézze, a leszedést is!
-//            let myName = GV.language.getText(.tcPlayer)
             GV.basicDataRecord = BasicDataModel()
             GV.basicDataRecord.actLanguage = GV.language.getText(.tcAktLanguage)
             GV.basicDataRecord.creationTime = Date()
@@ -1449,48 +1527,6 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             }
         }
     }
-//    private func initiateHelpModel() {
-//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-//        let helpInfoURL = documentsURL.appendingPathComponent("HelpInfo.realm")
-//        let config1 = Realm.Configuration(
-//            fileURL: helpInfoURL,
-//            shouldCompactOnLaunch: { totalBytes, usedBytes in
-//                // totalBytes refers to the size of the file on disk in bytes (data + free space)
-//                // usedBytes refers to the number of bytes used by data in the file
-//                
-//                // Compact if the file is over 100MB in size and less than 50% 'used'
-//                let oneMB = 10 * 1024 * 1024
-//                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
-//        },
-//            objectTypes: [HelpInfo.self])
-//        do {
-//            // Realm is compacted on the first open if the configuration block conditions were met.
-//            _ = try Realm(configuration: config1)
-//        } catch {
-//            print("error")
-//            // handle error compacting or opening Realm
-//        }
-//        let helpInfoConfig = Realm.Configuration(
-//            fileURL: helpInfoURL,
-//            schemaVersion: 0, // new item words
-//            // Set the block which will be called automatically when opening a Realm with
-//            // a schema version lower than the one set above
-//            migrationBlock: { migration, oldSchemaVersion in
-//                switch oldSchemaVersion {
-////                case 0...3:
-////                    migration.deleteData(forType: HelpModel.className())
-////                    
-//                default: migration.enumerateObjects(ofType: BasicDataModel.className())
-//                { oldObject, newObject in
-//                    }
-//                }
-//        },
-//            objectTypes: [HelpInfo.self])
-//        
-//        realmHelpInfo = try! Realm(configuration: helpInfoConfig)
-//        
-//    }
-    
     deinit {
         print("deinit of mainViewController")
     }

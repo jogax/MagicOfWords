@@ -165,7 +165,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcMediumActScore:  "Неподвижные-БуквыАкт",
     .tcCountPlays:      "Игры",
     .tcBlank:           " ",
-    .tcStartGame:       "Играть",
+    .tcStartCollectWordsGame:   "Игра Собери-Слова",
+    .tcStartFixLettersGame:     "Игра Неподвижные-Буквы",
     .tcWordCount:       "Счетчики слов",
     .tcLocalPlayerNotAuth: "Подключение не удалось!",
     .tcChooseWhatYouWant: "Выбери, что показать",
@@ -197,6 +198,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcFinishGameMessage:       "Ты закончил игру. Новая игра начинается.",
     .tcWordsToFind:             "Найди слова:",
     .tclengthOfGame:            "Количество раундов",
-    .tcPrefillWithLetters:      "Процент предв. заполнения"
+    .tcPrefillWithLetters:      "Процент предв. заполнения",
+    .tcCountOfRoundsHeader:     "Выбери количество раундов",
 ]
 

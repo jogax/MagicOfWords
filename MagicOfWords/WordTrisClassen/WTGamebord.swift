@@ -408,7 +408,7 @@ class WTGameboard: SKShapeNode {
 //                colSprite.alpha = 0.5
 //                colSprite.color = .red
 //            }
-
+//
             bgSprite!.addChild(colSprite)
         }
         let colSprite = SKSpriteNode()
@@ -998,11 +998,11 @@ class WTGameboard: SKShapeNode {
         return false
     }
     
-    public func getCountFreePlaces()->Int {
+    public func getCountUsedPlaces()->Int {
         var returnValue = 0
         for col in 0..<countCols {
             for row in 0..<countCols {
-                if GV.gameArray[col][row].status == .Empty {
+                if GV.gameArray[col][row].status != .Empty {
                     returnValue += 1
                 }
             }

@@ -212,6 +212,7 @@ struct GV {
     static var orientationHandler: Selector?
     static var buttonFontSize: CGFloat = GV.onIpad ? 18 : 15
     static var gameType: GameDifficulty = .CollectWords
+    static var countRounds = 1
     static let minSide: CGFloat = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
     static let maxSide: CGFloat = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
     static var actLanguageInt = GV.languageToInt[actLanguage]

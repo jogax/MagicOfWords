@@ -19,7 +19,7 @@ let deDictionary: [TextConstants: String] = [
     .tcHungarianShort:   "hu",
     .tcRussianShort:     "ru",
     .tcEasyPlay:         "Sammle-Wörter %",
-    .tcMediumPlay:       "Verwende-Feste-Buchstaben %",
+    .tcMediumPlay:       "Feste-Buchstaben %",
     .tcPlayer:           "Spieler",
     .tcNewGame:          "Neues Spiel",
     .tcNewGameX:         "Neues Spiel (%)",
@@ -167,7 +167,8 @@ let deDictionary: [TextConstants: String] = [
     .tcMediumActScore:  "VerwendeAct",
     .tcCountPlays:      "Gespielt",
     .tcBlank:           " ",
-    .tcStartGame:       "Spielen",
+    .tcStartCollectWordsGame:   "Sammle-Wörter Spiel",
+    .tcStartFixLettersGame:     "Feste-Buchstaben Spiel",
     .tcWordCount:       "Wortzähler",
     .tcLocalPlayerNotAuth: "Verbindung fehlgeschlagen!",
     .tcChooseWhatYouWant: "Wähle, was angezeigt werden soll",
@@ -199,7 +200,8 @@ let deDictionary: [TextConstants: String] = [
     .tcFinishGameMessage:       "Du hast das Spiel beendet. Ein neues Spiel beginnt.",
     .tcWordsToFind:             "Wörter zu finden:",
     .tclengthOfGame:            "Anzahl der Runden",
-    .tcPrefillWithLetters:      "Prozentsatz der Vorfüllung"
+    .tcPrefillWithLetters:      "Prozentsatz der Vorfüllung",
+    .tcCountOfRoundsHeader:     "Wähle die Anzahl der Runden",
 ]
 
 

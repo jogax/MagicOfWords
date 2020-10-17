@@ -145,7 +145,8 @@ enum TextConstants: Int {
     tcMediumActScore,
     tcCountPlays,
     tcBlank,
-    tcStartGame,
+    tcStartCollectWordsGame,
+    tcStartFixLettersGame,
     tcWordCount,
     tcLocalPlayerNotAuth,
     tcChooseWhatYouWant,
@@ -173,7 +174,8 @@ enum TextConstants: Int {
     tcFinishGameMessage,
     tcWordsToFind,
     tclengthOfGame,
-    tcPrefillWithLetters
+    tcPrefillWithLetters,
+    tcCountOfRoundsHeader
 }
 
     let LanguageEN = "en" // index 0
