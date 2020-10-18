@@ -2211,7 +2211,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 let countFixLetters =  wtGameboard!.checkFixLetters()
                 var targetLetterCount = startValueForFixLetters[GV.sizeOfGrid]! + GV.playingRecord.rounds.count
                 targetLetterCount = (targetLetterCount > maxLetterCountForFixLetters) ? maxLetterCountForFixLetters : targetLetterCount
-                if targetLetterCount > countFixLetters {
+                if targetLetterCount > countFixLetters && GV.playingRecord.gameType == GameType.FixLetter.rawValue {
 //                    less fixLetters as should be --> must be generated
                     createFixLetters()
                 }
@@ -3469,46 +3469,46 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         }
     }
     
-    @objc private func newGame5ButtonTapped() {
-        GV.sizeOfGrid = 5
-        newGameButtonTapped()
-    }
-    
-    @objc private func newGame6ButtonTapped() {
-        GV.sizeOfGrid = 6
-        newGameButtonTapped()
-    }
-    
-    @objc private func newGame7ButtonTapped() {
-        GV.sizeOfGrid = 7
-        newGameButtonTapped()
-    }
-    
-    @objc private func newGame8ButtonTapped() {
-        GV.sizeOfGrid = 8
-        newGameButtonTapped()
-    }
-    
-    @objc private func newGame9ButtonTapped() {
-        GV.sizeOfGrid = 9
-        newGameButtonTapped()
-    }
-    
-    @objc private func newGame10ButtonTapped() {
-        GV.sizeOfGrid = 10
-        newGameButtonTapped()
-    }
-    
-    @objc private func newGame11ButtonTapped() {
-        GV.sizeOfGrid = 11
-        newGameButtonTapped()
-    }
-    
-    @objc private func newGame12ButtonTapped() {
-        GV.sizeOfGrid = 12
-        newGameButtonTapped()
-    }
-    
+//    @objc private func newGame5ButtonTapped() {
+//        GV.sizeOfGrid = 5
+//        newGameButtonTapped()
+//    }
+//
+//    @objc private func newGame6ButtonTapped() {
+//        GV.sizeOfGrid = 6
+//        newGameButtonTapped()
+//    }
+//
+//    @objc private func newGame7ButtonTapped() {
+//        GV.sizeOfGrid = 7
+//        newGameButtonTapped()
+//    }
+//
+//    @objc private func newGame8ButtonTapped() {
+//        GV.sizeOfGrid = 8
+//        newGameButtonTapped()
+//    }
+//
+//    @objc private func newGame9ButtonTapped() {
+//        GV.sizeOfGrid = 9
+//        newGameButtonTapped()
+//    }
+//
+//    @objc private func newGame10ButtonTapped() {
+//        GV.sizeOfGrid = 10
+//        newGameButtonTapped()
+//    }
+//
+//    @objc private func newGame11ButtonTapped() {
+//        GV.sizeOfGrid = 11
+//        newGameButtonTapped()
+//    }
+//
+//    @objc private func newGame12ButtonTapped() {
+//        GV.sizeOfGrid = 12
+//        newGameButtonTapped()
+//    }
+//
     @objc private func goBackButtonTapped2() {
 //        saveHelpInfo(action: .ContinueGameEasy)
         gameboardEnabled = true

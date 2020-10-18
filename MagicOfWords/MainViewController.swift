@@ -94,7 +94,8 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         let lastPlayed = realm.objects(GameDataModel.self).filter("language = %@ and nowPlaying = true",GV.actLanguage).sorted(byKeyPath: "combinedKey", ascending: false)
 
         if lastPlayed.count == 0 {
-            chooseGame()
+            showMenu()
+//            chooseGame()
 //            GV.wtScene!.createHeader()
         } else if lastPlayed.count > 0 {
             startGame()
@@ -252,204 +253,206 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         }
     }
     
-    func chooseGame() {
-        var gamesForChoose: Results<GameDataModel>!
-
-
-        alertController = UIAlertController(title: GV.language.getText(.tcChooseGame),
-                                            message: "",
-                                            preferredStyle: .alert)
-        
-        //--------------------- StartGameAction ---------------------
-        gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GameType.CollectWords.rawValue)
-        let collectParam = "(\(gamesForChoose.count))"
-        let collectWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcEasyPlay, values: collectParam)) ", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.gameType = .CollectWords
-            self.chooseGameSize()
-        })
-        if GV.gameType == GameType.CollectWords {
-            collectWordsAction.setValue(UIColor.red, forKey: "TitleTextColor")
-        }
-        alertController!.addAction(collectWordsAction)
-        //--------------------- Choose Game Type ---------------------
-        gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GameType.FixLetter.rawValue)
-        let fixLetterParam = "(\(gamesForChoose.count))"
-        let fixLettersAction = UIAlertAction(title: "\(GV.language.getText(.tcMediumPlay, values: fixLetterParam)) ", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.gameType = .FixLetter
-            self.chooseGameSize()
-        })
-        if GV.gameType == GameType.FixLetter {
-            fixLettersAction.setValue(UIColor.red, forKey: "TitleTextColor")
-        }
-        alertController!.addAction(fixLettersAction)
-        //--------------------- Choose Game Type ---------------------
-
-//        let searchWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcSearchWords)) ", style: .default, handler: { [unowned self]
+//    func chooseGame() {
+//        var gamesForChoose: Results<GameDataModel>!
+//
+//
+//        alertController = UIAlertController(title: GV.language.getText(.tcChooseGame),
+//                                            message: "",
+//                                            preferredStyle: .alert)
+//
+//        //--------------------- StartGameAction ---------------------
+//        gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GameType.CollectWords.rawValue)
+//        let collectParam = "(\(gamesForChoose.count))"
+//        let collectWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcEasyPlay, values: collectParam)) ", style: .default, handler: { [unowned self]
 //            alert -> Void in
 //            self.inMenu = false
-//            GV.gameType = .SearchWords
-//            self.chooseGameSize()
+//            GV.gameType = .CollectWords
+//            GV.sizeOfGrid = GV.onIpad ? 10 : 8
+//            self.startGame()
 //        })
-//        alertController!.addAction(searchWordsAction)
-
-        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
-            alert -> Void in
-            self.showMenu()
-        })
-        alertController!.addAction(cancelAction)
-        present(alertController!, animated: true, completion: nil)
-        
-    }
+//        if GV.gameType == GameType.CollectWords {
+//            collectWordsAction.setValue(UIColor.red, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(collectWordsAction)
+//        //--------------------- Choose Game Type ---------------------
+//        gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GameType.FixLetter.rawValue)
+//        let fixLetterParam = "(\(gamesForChoose.count))"
+//        let fixLettersAction = UIAlertAction(title: "\(GV.language.getText(.tcMediumPlay, values: fixLetterParam)) ", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//            GV.gameType = .FixLetter
+//            GV.sizeOfGrid = GV.onIpad ? 10 : 8
+//            self.startGame()
+//        })
+//        if GV.gameType == GameType.FixLetter {
+//            fixLettersAction.setValue(UIColor.red, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(fixLettersAction)
+//        //--------------------- Choose Game Type ---------------------
+//
+////        let searchWordsAction = UIAlertAction(title: "\(GV.language.getText(.tcSearchWords)) ", style: .default, handler: { [unowned self]
+////            alert -> Void in
+////            self.inMenu = false
+////            GV.gameType = .SearchWords
+////            self.chooseGameSize()
+////        })
+////        alertController!.addAction(searchWordsAction)
+//
+//        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
+//            alert -> Void in
+//            self.showMenu()
+//        })
+//        alertController!.addAction(cancelAction)
+//        present(alertController!, animated: true, completion: nil)
+//
+//    }
     
-    private func chooseGameSize() {
-        let gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GV.gameType.rawValue)
-        alertController = UIAlertController(title: GV.language.getText(.tcChooseGameSize),
-                                            message: "",
-                                            preferredStyle: .alert)
-        
-        //--------------------- 5 x 5 ---------------------
-        let choose5x5Action = UIAlertAction(title: "5x5 (\(gamesForChoose.filter("sizeOfGrid = %d", 5).count))", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.sizeOfGrid = 5
-            self.startGame()
-        })
-        if GV.sizeOfGrid == 5 {
-            choose5x5Action.setValue(UIColor.red, forKey: "TitleTextColor")
-        }
-
-        alertController!.addAction(choose5x5Action)
-        //--------------------- 6 x 6  ---------------------
-        let choose6x6Action = UIAlertAction(title: "6x6 (\(gamesForChoose.filter("sizeOfGrid = %d", 6).count))", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.sizeOfGrid = 6
-            self.startGame()
-        })
-        if GV.sizeOfGrid == 6 {
-            choose6x6Action.setValue(UIColor.red, forKey: "TitleTextColor")
-        }
-        alertController!.addAction(choose6x6Action)
-        //--------------------- 7 x 7  ---------------------
-        let choose7x7Action = UIAlertAction(title: "7x7 (\(gamesForChoose.filter("sizeOfGrid = %d", 7).count))", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.sizeOfGrid = 7
-            self.startGame()
-        })
-        if GV.sizeOfGrid == 7 {
-            choose7x7Action.setValue(UIColor.red, forKey: "TitleTextColor")
-        }
-        alertController!.addAction(choose7x7Action)
-        
-        //--------------------- 8 x 8  ---------------------
-        let choose8x8Action = UIAlertAction(title: "8x8 (\(gamesForChoose.filter("sizeOfGrid = %d", 8).count))", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.sizeOfGrid = 8
-            self.startGame()
-        })
-        if GV.sizeOfGrid == 8 {
-            choose8x8Action.setValue(UIColor.red, forKey: "TitleTextColor")
-        }
-        alertController!.addAction(choose8x8Action)
-        
-        //--------------------- 9 x 9  ---------------------
-        let choose9x9Action = UIAlertAction(title: "9x9 (\(gamesForChoose.filter("sizeOfGrid = %d", 9).count))", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.sizeOfGrid = 9
-            self.startGame()
-        })
-        if GV.sizeOfGrid == 9 {
-            choose9x9Action.setValue(UIColor.red, forKey: "TitleTextColor")
-        }
-        alertController!.addAction(choose9x9Action)
-        
-        //--------------------- 10 x 10  ---------------------
-        let choose10x10Action = UIAlertAction(title: "10x10 (\(gamesForChoose.filter("sizeOfGrid = %d", 10).count))", style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.inMenu = false
-            GV.sizeOfGrid = 10
-            self.startGame()
-        })
-        if GV.sizeOfGrid == 10 {
-            choose10x10Action.setValue(UIColor.red, forKey: "TitleTextColor")
-        }
-        alertController!.addAction(choose10x10Action)
-        if GV.onIpad {
-            //--------------------- 11 x 11  ---------------------
-            let choose11x11Action = UIAlertAction(title: "11x11 (\(gamesForChoose.filter("sizeOfGrid = %d", 11).count))", style: .default, handler: { [unowned self]
-                alert -> Void in
-                self.inMenu = false
-                GV.sizeOfGrid = 11
-                self.startGame()
-            })
-            if GV.sizeOfGrid == 11 {
-                choose11x11Action.setValue(UIColor.red, forKey: "TitleTextColor")
-            }
-            alertController!.addAction(choose11x11Action)
-            
-            //--------------------- 12 x 12  ---------------------
-            let choose12x12Action = UIAlertAction(title: "12x12 (\(gamesForChoose.filter("sizeOfGrid = %d", 12).count))", style: .default, handler: { [unowned self]
-                alert -> Void in
-                self.inMenu = false
-                GV.sizeOfGrid = 12
-                self.startGame()
-            })
-            if GV.sizeOfGrid == 12 {
-                choose12x12Action.setValue(UIColor.red, forKey: "TitleTextColor")
-            }
-            alertController!.addAction(choose12x12Action)
-            
-            //--------------------- 13 x 13  ---------------------
-            let choose13x13Action = UIAlertAction(title: "13x13 (\(gamesForChoose.filter("sizeOfGrid = %d", 13).count))", style: .default, handler: { [unowned self]
-                alert -> Void in
-                self.inMenu = false
-                GV.sizeOfGrid = 13
-                self.startGame()
-            })
-            if GV.sizeOfGrid == 13 {
-                choose13x13Action.setValue(UIColor.red, forKey: "TitleTextColor")
-            }
-            alertController!.addAction(choose13x13Action)
-            
-            //--------------------- 14 x 14  ---------------------
-            let choose14x14Action = UIAlertAction(title: "14x14 (\(gamesForChoose.filter("sizeOfGrid = %d", 14).count))", style: .default, handler: { [unowned self]
-                alert -> Void in
-                self.inMenu = false
-                GV.sizeOfGrid = 14
-                self.startGame()
-            })
-            if GV.sizeOfGrid == 14 {
-                choose14x14Action.setValue(UIColor.red, forKey: "TitleTextColor")
-            }
-            alertController!.addAction(choose14x14Action)
-            
-            //--------------------- 15 x 15  ---------------------
-            let choose15x15Action = UIAlertAction(title: "15x15 (\(gamesForChoose.filter("sizeOfGrid = %d", 15).count))", style: .default, handler: { [unowned self]
-                alert -> Void in
-                self.inMenu = false
-                GV.sizeOfGrid = 15
-                self.startGame()
-            })
-            if GV.sizeOfGrid == 15 {
-                choose15x15Action.setValue(UIColor.red, forKey: "TitleTextColor")
-            }
-            alertController!.addAction(choose15x15Action)
-        }
-        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
-            alert -> Void in
-            self.showMenu()
-        })
-        alertController!.addAction(cancelAction)
-        present(alertController!, animated: true, completion: nil)
-    }
-    
+//    private func chooseGameSize() {
+//        let gamesForChoose = realm.objects(GameDataModel.self).filter("language = %d and gameType = %d", GV.actLanguage, GV.gameType.rawValue)
+//        alertController = UIAlertController(title: GV.language.getText(.tcChooseGameSize),
+//                                            message: "",
+//                                            preferredStyle: .alert)
+//
+//        //--------------------- 5 x 5 ---------------------
+//        let choose5x5Action = UIAlertAction(title: "5x5 (\(gamesForChoose.filter("sizeOfGrid = %d", 5).count))", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//            GV.sizeOfGrid = 5
+//            self.startGame()
+//        })
+//        if GV.sizeOfGrid == 5 {
+//            choose5x5Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//        }
+//
+//        alertController!.addAction(choose5x5Action)
+//        //--------------------- 6 x 6  ---------------------
+//        let choose6x6Action = UIAlertAction(title: "6x6 (\(gamesForChoose.filter("sizeOfGrid = %d", 6).count))", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//            GV.sizeOfGrid = 6
+//            self.startGame()
+//        })
+//        if GV.sizeOfGrid == 6 {
+//            choose6x6Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(choose6x6Action)
+//        //--------------------- 7 x 7  ---------------------
+//        let choose7x7Action = UIAlertAction(title: "7x7 (\(gamesForChoose.filter("sizeOfGrid = %d", 7).count))", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//            GV.sizeOfGrid = 7
+//            self.startGame()
+//        })
+//        if GV.sizeOfGrid == 7 {
+//            choose7x7Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(choose7x7Action)
+//
+//        //--------------------- 8 x 8  ---------------------
+//        let choose8x8Action = UIAlertAction(title: "8x8 (\(gamesForChoose.filter("sizeOfGrid = %d", 8).count))", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//            GV.sizeOfGrid = 8
+//            self.startGame()
+//        })
+//        if GV.sizeOfGrid == 8 {
+//            choose8x8Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(choose8x8Action)
+//
+//        //--------------------- 9 x 9  ---------------------
+//        let choose9x9Action = UIAlertAction(title: "9x9 (\(gamesForChoose.filter("sizeOfGrid = %d", 9).count))", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//            GV.sizeOfGrid = 9
+//            self.startGame()
+//        })
+//        if GV.sizeOfGrid == 9 {
+//            choose9x9Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(choose9x9Action)
+//
+//        //--------------------- 10 x 10  ---------------------
+//        let choose10x10Action = UIAlertAction(title: "10x10 (\(gamesForChoose.filter("sizeOfGrid = %d", 10).count))", style: .default, handler: { [unowned self]
+//            alert -> Void in
+//            self.inMenu = false
+//            GV.sizeOfGrid = 10
+//            self.startGame()
+//        })
+//        if GV.sizeOfGrid == 10 {
+//            choose10x10Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//        }
+//        alertController!.addAction(choose10x10Action)
+//        if GV.onIpad {
+//            //--------------------- 11 x 11  ---------------------
+//            let choose11x11Action = UIAlertAction(title: "11x11 (\(gamesForChoose.filter("sizeOfGrid = %d", 11).count))", style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                self.inMenu = false
+//                GV.sizeOfGrid = 11
+//                self.startGame()
+//            })
+//            if GV.sizeOfGrid == 11 {
+//                choose11x11Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//            }
+//            alertController!.addAction(choose11x11Action)
+//
+//            //--------------------- 12 x 12  ---------------------
+//            let choose12x12Action = UIAlertAction(title: "12x12 (\(gamesForChoose.filter("sizeOfGrid = %d", 12).count))", style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                self.inMenu = false
+//                GV.sizeOfGrid = 12
+//                self.startGame()
+//            })
+//            if GV.sizeOfGrid == 12 {
+//                choose12x12Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//            }
+//            alertController!.addAction(choose12x12Action)
+//
+//            //--------------------- 13 x 13  ---------------------
+//            let choose13x13Action = UIAlertAction(title: "13x13 (\(gamesForChoose.filter("sizeOfGrid = %d", 13).count))", style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                self.inMenu = false
+//                GV.sizeOfGrid = 13
+//                self.startGame()
+//            })
+//            if GV.sizeOfGrid == 13 {
+//                choose13x13Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//            }
+//            alertController!.addAction(choose13x13Action)
+//
+//            //--------------------- 14 x 14  ---------------------
+//            let choose14x14Action = UIAlertAction(title: "14x14 (\(gamesForChoose.filter("sizeOfGrid = %d", 14).count))", style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                self.inMenu = false
+//                GV.sizeOfGrid = 14
+//                self.startGame()
+//            })
+//            if GV.sizeOfGrid == 14 {
+//                choose14x14Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//            }
+//            alertController!.addAction(choose14x14Action)
+//
+//            //--------------------- 15 x 15  ---------------------
+//            let choose15x15Action = UIAlertAction(title: "15x15 (\(gamesForChoose.filter("sizeOfGrid = %d", 15).count))", style: .default, handler: { [unowned self]
+//                alert -> Void in
+//                self.inMenu = false
+//                GV.sizeOfGrid = 15
+//                self.startGame()
+//            })
+//            if GV.sizeOfGrid == 15 {
+//                choose15x15Action.setValue(UIColor.red, forKey: "TitleTextColor")
+//            }
+//            alertController!.addAction(choose15x15Action)
+//        }
+//        let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default, handler: {
+//            alert -> Void in
+//            self.showMenu()
+//        })
+//        alertController!.addAction(cancelAction)
+//        present(alertController!, animated: true, completion: nil)
+//    }
+//
 
     func chooseLanguage() {
         func setLanguage(language: String) {
@@ -560,7 +563,8 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         let lastPlayed = realm.objects(GameDataModel.self).filter("language = %@ and nowPlaying = true",GV.actLanguage).sorted(byKeyPath: "modified", ascending: false)
         switch lastPlayed.count {
         case 0:
-            chooseGame()
+//            chooseGame()
+            showMenu()
         case 2...1000:
             for (index, record) in lastPlayed.enumerated() {
                 if index > 0 {
