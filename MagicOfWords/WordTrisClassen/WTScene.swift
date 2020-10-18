@@ -2625,7 +2625,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             try! realm.safeWrite() {
                 GV.playingRecord.words = ""
             }
-            let pieces = generateArrayOfWordPieces(first: true)
+//            let pieces = generateArrayOfWordPieces(first: true) --- orig
+            let pieces = generateArrayOfWordPieces(first: false)
             try! realm.safeWrite() {
                 GV.playingRecord.pieces = pieces
             }
@@ -3957,7 +3958,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 //        let number = GV.playingRecord.gameNumber + 50
 //        var allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("word BEGINSWITH %d", GV.actLanguage)
 //        myTimer!.startTimeMessing()
-        for _ in 1...(first ? 4 : 10) {
+//        for _ in 1...(first ? 4 : 10) { -- original
+        for _ in 1...10 {
             var letters = [String]()
             let sortedLetterCounters = letterCounters.sorted(by: { $0.0 < $1.0 })
             var minValue = 1000
@@ -3977,14 +3979,18 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             var allRecords: Results<HintModel>
 //            var allRecords: Results<HintsModel>
             repeat {
-                allRecords = realmMandatoryList.objects(HintModel.self).filter("language = %d", GV.actLanguage).filter("word CONTAINS %@", letters[index].lowercased())
+                let likeValue = "?????*"
+                allRecords = realmMandatoryList.objects(HintModel.self)
+                    .filter("language = %d", GV.actLanguage)
+                    .filter("word CONTAINS %@", letters[index].lowercased())
+                    .filter("word like %@", likeValue)
                 counter = allRecords.count
                 if counter < 10 {
                     letters.remove(at: index)
                 } else {
                     index += 1
                 }
-            } while counter < 10
+            } while counter < 10 && letters.count > 0
             var countRepeats = 0
             var word = ""
             repeat {
@@ -4019,7 +4025,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             word += index < tilesForGame.count - 1 ?  "-" : ""
         }
-//        print("letters: \(word)")
+        print("letters: \(word)")
+        print(usedWords)
         return generatedArrayInStringForm
 
     }

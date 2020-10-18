@@ -553,7 +553,7 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         }
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
-        convertIfNeeded()
+//        convertIfNeeded()
         startReachability()
 //        checkDeviceRecordInCloud()
         checkReportedWordsInCloud()
@@ -841,28 +841,28 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             }
         }
 
-        for record in allRecords {
-            try! realm.safeWrite {
-                if record.gameType == -1 {
-                    realm.delete(record)
-                } else {
-                    if record.gameNumber < 1000 {
-                        record.gameType = GameType.CollectWords.rawValue
-                    } else {
-                        record.gameType = GameType.FixLetter.rawValue
-                    }
-                    if record.combinedKey.toDate() != record.created {
-                        record.created = record.combinedKey.toDate()
-                    }
-                    if record.modified <= GameDataModel.Date2000_1_1 {
-                        record.modified = record.combinedKey.toDate()
-                    }
-                    record.sizeOfGrid = GV.sizeOfGridValue[record.rounds.first!.gameArray.count]!
-                    record.recordVersion = 1
-                }
-            }
-
-        }
+//        for record in allRecords {
+//            try! realm.safeWrite {
+//                if record.gameType == -1 {
+//                    realm.delete(record)
+//                } else {
+//                    if record.gameNumber < 1000 {
+//                        record.gameType = GameType.CollectWords.rawValue
+//                    } else {
+//                        record.gameType = GameType.FixLetter.rawValue
+//                    }
+//                    if record.combinedKey.toDate() != record.created {
+//                        record.created = record.combinedKey.toDate()
+//                    }
+//                    if record.modified <= GameDataModel.Date2000_1_1 {
+//                        record.modified = record.combinedKey.toDate()
+//                    }
+//                    record.sizeOfGrid = GV.sizeOfGridValue[record.rounds.first!.gameArray.count]!
+//                    record.recordVersion = 1
+//                }
+//            }
+//
+//        }
         
     }
     
