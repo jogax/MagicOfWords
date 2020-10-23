@@ -1273,7 +1273,7 @@ class WTGameboard: SKShapeNode {
             adder = grid!.blockSize
             toPositionX += adder
         }
-        let movingAction = SKAction.move(to: CGPoint(x: toPositionX, y: parent!.frame.maxY), duration: 0.75)
+        let movingAction = SKAction.move(to: CGPoint(x: toPositionX, y: GV.actHeight), duration: 0.75)
         let removeNodeAction = SKAction.removeFromParent()
         actions.append(SKAction.sequence([clearAction, waitAction, movingAction, removeNodeAction]))
         //        actions.append(SKAction.sequence([waitAction, fadeAway, removeNode]))

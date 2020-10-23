@@ -815,22 +815,22 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func getPlayingRecord(next: StartType, gameNumber: Int/*, showHelp: Bool = false*/) {
-        func setMandatoryWords() {
-            if GV.playingRecord.mandatoryWords == "" {
-                let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", GV.playingRecord.gameNumber, GV.actLanguage).first!
-                if mandatoryRecord != nil {
-                    let components = mandatoryRecord!.mandatoryWords.components(separatedBy: itemSeparator)
-                    var newString = ""
-                    for index in 0...5 {
-                        newString += components[index] + itemSeparator
-                    }
-                    newString.removeLast()
-                    try! realm.safeWrite() {
-                        GV.playingRecord.mandatoryWords = newString
-                    }
-                }
-            }
-        }
+//        func setMandatoryWords() {
+//            if GV.playingRecord.mandatoryWords == "" {
+//                let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", GV.playingRecord.gameNumber, GV.actLanguage).first!
+//                if mandatoryRecord != nil {
+//                    let components = mandatoryRecord!.mandatoryWords.components(separatedBy: itemSeparator)
+//                    var newString = ""
+//                    for index in 0...5 {
+//                        newString += components[index] + itemSeparator
+//                    }
+//                    newString.removeLast()
+//                    try! realm.safeWrite() {
+//                        GV.playingRecord.mandatoryWords = newString
+//                    }
+//                }
+//            }
+//        }
         
 //        let demoGames = realm.objects(GameDataModel.self).filter("language = %@ and gameNumber >= %d", GV.actLanguage, 9999)
 //        if demoGames.count > 0 {
@@ -940,7 +940,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             GV.playingRecord.modified = Date()
         }
         
-        setMandatoryWords()
+//        setMandatoryWords()
     }
     
     private func calculatePlace()->Int {
@@ -957,23 +957,23 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     }
     
     private func createPlayingRecord(gameNumber: Int) {
-        let gameNumberForMandatoryRecord = gameNumber % 1000
-        let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumberForMandatoryRecord, GV.actLanguage).first!
-        if mandatoryRecord != nil {
+//        let gameNumberForMandatoryRecord = gameNumber % 1000
+//        let mandatoryRecord: MandatoryModel? = realmMandatory.objects(MandatoryModel.self).filter("gameNumber = %d and language = %@", gameNumberForMandatoryRecord, GV.actLanguage).first!
+//        if mandatoryRecord != nil {
             try! realm.safeWrite() {
                 let oldRecords = realm.objects(GameDataModel.self).filter("language = %@ and gameType = %d and sizeOfGrid = %d and nowPlaying = true", GV.actLanguage, GV.gameType.rawValue, GV.sizeOfGrid)
                 for oldRecord in oldRecords {
                     oldRecord.nowPlaying = false
                 }
-                let components = mandatoryRecord!.mandatoryWords.components(separatedBy: itemSeparator)
-                var newString = ""
-                for index in 0...5 {
-                    newString += components[index] + itemSeparator
-                }
-                newString.removeLast()
+//                let components = mandatoryRecord!.mandatoryWords.components(separatedBy: itemSeparator)
+//                var newString = ""
+//                for index in 0...5 {
+//                    newString += components[index] + itemSeparator
+//                }
+//                newString.removeLast()
                 GV.playingRecord = GameDataModel()
                 GV.playingRecord.combinedKey = Date().toString()//GV.actLanguage + String(gameNumber)
-                GV.playingRecord.mandatoryWords = newString
+//                GV.playingRecord.mandatoryWords = newString
                 GV.playingRecord.gameNumber = gameNumber
                 GV.playingRecord.language = GV.actLanguage
                 GV.playingRecord.gameType = GV.gameType.rawValue
@@ -983,7 +983,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                 GV.playingRecord.recordVersion = 1
                 realm.add(GV.playingRecord)
             }
-        }
+//        }
 //        hideButtons(hide: false)
     }
 
@@ -2421,7 +2421,41 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
     let startValueForFixLetters = [5: 3, 6: 5, 7: 7, 8: 7, 9: 7, 10: 7, 11: 11, 12: 13, 13: 15, 14: 19, 15: 23]
     let maxCountersForFixletters = [5: 6, 6: 8, 7: 10, 8: 12, 9: 16, 10: 20, 11: 24, 12: 28, 13: 32, 14: 36, 15: 40]
     var maxLetterCountForFixLetters = 0
-
+    
+    private func getFreeWordsForFixLetters()->[(String, Int)] {
+        func checkTilesForGame() {
+            for tile in tilesForGame {
+                if tile.letters.count == 1 && !tile.isOnGameboard {
+                    
+                }
+            }
+        }
+//        _ = generateArrayOfWordPieces(first: false)
+        checkTilesForGame()
+        var wordsForGeneratingFixLetters = [(String, Int)]()
+        let words = GV.playingRecord.words.components(separatedBy: GV.innerSeparator)
+        var pieceIndex = 0
+        for word in words {
+            let startPieceIndex = pieceIndex
+            var wordIsOK = true
+            var wordFromPieces = ""
+            while word.count > wordFromPieces.count && pieceIndex < tilesForGame.count {
+                if tilesForGame[pieceIndex].isOnGameboard {
+                    wordIsOK = false
+                }
+                for letter in tilesForGame[pieceIndex].letters {
+                    wordFromPieces += letter
+                }
+                pieceIndex += 1
+            }
+            if wordIsOK {
+                wordsForGeneratingFixLetters.append((word, startPieceIndex))
+            }
+            
+        }
+        return wordsForGeneratingFixLetters
+    }
+    
     private func createFixLetters() {
         if GV.basicDataRecord.difficulty != GameDifficulty.Medium.rawValue {
             return
@@ -3842,7 +3876,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         let date = Date()
         let calendar = Calendar.current
         let theDayOfMonth = calendar.component(.day, from: date)
-        let gameNumberForSelect = GV.playingRecord.gameNumber % 1000
+//        let gameNumberForSelect = GV.playingRecord.gameNumber % 1000
         let gameNumberForRandom = GV.playingRecord.gameNumber * theDayOfMonth
         let random = MyRandom(gameNumber: gameNumberForRandom, modifier: GV.playingRecord.words.count)
         var tileType = MyShapes.NotUsed
@@ -3937,16 +3971,16 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
 
             } while inputWord.length > 0
         }
-        if first {
-            let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(gameNumberForSelect))[0]
-            let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
-            for word in words {
-//                print(word)
-                splittingWord(word: word)
-                
-            }
-            
-        } else {
+//        if first {
+//            let actRecord = realmMandatory.objects(MandatoryModel.self).filter("combinedKey = %d", GV.actLanguage + String(gameNumberForSelect))[0]
+//            let words = actRecord.mandatoryWords.components(separatedBy: itemSeparator)
+//            for word in words {
+////                print(word)
+//                splittingWord(word: word)
+//
+//            }
+//
+//        } else {
             for word in usedWords {
                 for letter in word.uppercased() {
                     if let _ = letterCounters[String(letter)] {
@@ -3954,7 +3988,7 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
                     }
                 }
             }
-        }
+//        }
 //        let number = GV.playingRecord.gameNumber + 50
 //        var allRecords = realmMandatoryList.objects(MandatoryListModel.self).filter("word BEGINSWITH %d", GV.actLanguage)
 //        myTimer!.startTimeMessing()
@@ -4025,8 +4059,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
             }
             word += index < tilesForGame.count - 1 ?  "-" : ""
         }
-        print("letters: \(word)")
-        print(usedWords)
+//        print("letters: \(word)")
+//        print(usedWords)
         return generatedArrayInStringForm
 
     }

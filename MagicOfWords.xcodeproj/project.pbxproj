@@ -80,7 +80,6 @@
 		206EA3FB2271D31300F184B4 /* MenuBG.png in Resources */ = {isa = PBXBuildFile; fileRef = 206EA3FA2271D31200F184B4 /* MenuBG.png */; };
 		2078EE6522CA340000502C7C /* MandatoryList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6122CA33FF00502C7C /* MandatoryList.realm */; };
 		2078EE6622CA340000502C7C /* WordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6222CA33FF00502C7C /* WordList.realm */; };
-		2078EE6722CA340000502C7C /* Mandatory.realm in Resources */ = {isa = PBXBuildFile; fileRef = 2078EE6322CA340000502C7C /* Mandatory.realm */; };
 		207B678A2243C9F8001456C8 /* save.png in Resources */ = {isa = PBXBuildFile; fileRef = 207B67892243C9F7001456C8 /* save.png */; };
 		208073802242933700BE38E9 /* WelcomeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2080737F2242933700BE38E9 /* WelcomeScene.swift */; };
 		208173E12103577900960800 /* BalloonSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = 208173E02103577800960800 /* BalloonSimple.png */; };
@@ -143,7 +142,6 @@
 		20FA4DBF20C18EC600D93882 /* MandatoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FA4DBE20C18EC600D93882 /* MandatoryModel.swift */; };
 		D004D7912513855900A1C491 /* OKWord.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D004D78F2513855900A1C491 /* OKWord.mp3 */; };
 		D004D7922513855900A1C491 /* NoSuchWord.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D004D7902513855900A1C491 /* NoSuchWord.mp3 */; };
-		D004D794251387ED00A1C491 /* Games.realm in Resources */ = {isa = PBXBuildFile; fileRef = D004D793251387EC00A1C491 /* Games.realm */; };
 		D016FAB023D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D016FAAF23D9EC4300A25D09 /* ShowNewWordsInCloudScene.swift */; };
 		D0201CB525261B6C0089F3F7 /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0201CB425261B6C0089F3F7 /* MenuScene.swift */; };
 		D02B3DA42510F40100D6FA71 /* FindWordsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D02B3DA32510F40100D6FA71 /* FindWordsScene.swift */; };
@@ -154,7 +152,6 @@
 		D047E98523DF26900047F124 /* WordsFromCloud.swift in Sources */ = {isa = PBXBuildFile; fileRef = D047E98423DF26900047F124 /* WordsFromCloud.swift */; };
 		D04D82D723D8B0FA002B1023 /* MyReportedWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04D82D623D8B0FA002B1023 /* MyReportedWords.swift */; };
 		D0576F1A241FB9770095943D /* HintModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0576F19241FB9770095943D /* HintModel.swift */; };
-		D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1B241FC8BD0095943D /* HelpInfo.realm */; };
 		D0576F1E241FC8F30095943D /* Hints.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0576F1D241FC8F30095943D /* Hints.realm */; };
 		D0748B9924531D01008DEC99 /* PromotionText.txt in Resources */ = {isa = PBXBuildFile; fileRef = D0748B9824531D01008DEC99 /* PromotionText.txt */; };
 		D089796B24F298090096EF86 /* MyLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D089796A24F298090096EF86 /* MyLabel.swift */; };
@@ -695,13 +692,11 @@
 				2051004922944816008521E7 /* DarkGreenSprite.png in Resources */,
 				D089796D24F2A7080096EF86 /* backgroundL.png in Resources */,
 				205211342221B37A00B25072 /* UnDelete.png in Resources */,
-				D0576F1C241FC8BD0095943D /* HelpInfo.realm in Resources */,
 				2086F3FD228EEE8A00D845B7 /* Connection1010.png in Resources */,
 				204D760A221B26A900DBB1B5 /* Minus.png in Resources */,
 				205EC41C222EAD380080D4ED /* LightBlueSprite.png in Resources */,
 				2078EE6522CA340000502C7C /* MandatoryList.realm in Resources */,
 				202EF6C621CA9DAD000E4DA4 /* online.png in Resources */,
-				D004D794251387ED00A1C491 /* Games.realm in Resources */,
 				20439FEF20BC40DB00D44286 /* Versions.txt in Resources */,
 				205CF7EB2129A21000C1B89D /* finger.png in Resources */,
 				D0748B9924531D01008DEC99 /* PromotionText.txt in Resources */,
@@ -745,7 +740,6 @@
 				2078EE6622CA340000502C7C /* WordList.realm in Resources */,
 				2086F404228EEE8B00D845B7 /* Connection1111.png in Resources */,
 				2098BB8E20601B0B00C3641B /* magier.png in Resources */,
-				2078EE6722CA340000502C7C /* Mandatory.realm in Resources */,
 				205EC425222EE2E90080D4ED /* LeftElite.png in Resources */,
 				2086F3F0228ED63200D845B7 /* Connection1000.png in Resources */,
 				2086F402228EEE8A00D845B7 /* Connection0110.png in Resources */,

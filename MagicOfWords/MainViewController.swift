@@ -461,9 +461,9 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
                 GV.basicDataRecord.actLanguage = language
                 GV.basicDataRecord.land = GV.convertLocaleToInt()
             }
-            GCHelper.shared.getBestScore(completion: {[unowned self] in
-                self.callModifyHeader()
-            })
+//            GCHelper.shared.getBestScore(completion: {[unowned self] in
+//                self.callModifyHeader()
+//            })
             GCHelper.shared.restartGlobalInfosTimer()
             self.showMenu()
         }
@@ -553,7 +553,7 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         }
         oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
 
-//        convertIfNeeded()
+        convertIfNeeded()
         startReachability()
 //        checkDeviceRecordInCloud()
         checkReportedWordsInCloud()
@@ -841,28 +841,28 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
             }
         }
 
-//        for record in allRecords {
-//            try! realm.safeWrite {
-//                if record.gameType == -1 {
-//                    realm.delete(record)
-//                } else {
-//                    if record.gameNumber < 1000 {
-//                        record.gameType = GameType.CollectWords.rawValue
-//                    } else {
-//                        record.gameType = GameType.FixLetter.rawValue
-//                    }
-//                    if record.combinedKey.toDate() != record.created {
-//                        record.created = record.combinedKey.toDate()
-//                    }
-//                    if record.modified <= GameDataModel.Date2000_1_1 {
-//                        record.modified = record.combinedKey.toDate()
-//                    }
-//                    record.sizeOfGrid = GV.sizeOfGridValue[record.rounds.first!.gameArray.count]!
-//                    record.recordVersion = 1
-//                }
-//            }
-//
-//        }
+        for record in allRecords {
+            try! realm.safeWrite {
+                if record.gameType == -1 {
+                    realm.delete(record)
+                } else {
+                    if record.gameNumber < 1000 {
+                        record.gameType = GameType.CollectWords.rawValue
+                    } else {
+                        record.gameType = GameType.FixLetter.rawValue
+                    }
+                    if record.combinedKey.toDate() != record.created {
+                        record.created = record.combinedKey.toDate()
+                    }
+                    if record.modified <= GameDataModel.Date2000_1_1 {
+                        record.modified = record.combinedKey.toDate()
+                    }
+                    record.sizeOfGrid = GV.sizeOfGridValue[record.rounds.first!.gameArray.count]!
+                    record.recordVersion = 1
+                }
+            }
+
+        }
         
     }
     
@@ -1508,29 +1508,29 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         }
         
     }
-    func checkMandatoryWords() {
-        for language in ["en", "de","hu","ru"] {
-            let mandatoryRecords = realmMandatory.objects(MandatoryModel.self).filter("language = %@",language)
-            for mandatoryRecord in mandatoryRecords {
-                let words = mandatoryRecord.mandatoryWords.components(separatedBy: "°")
-                if words.count != 8 {
-                    print("words count NOK: \(words) ================================")
-                }
-                for word in words {
-                    if word.length < 5 {
-                        print("word too short: \(word) -----------------------------")
-                    } else if word.length > 12 {
-                        print("word too long: \(word) -----------------------------")
-                    }
-                    let toSearch = "\(language)\(word.lowercased())"
-                    if realmWordList.objects(WordListModel.self).filter("word = %@", toSearch).count == 0 {
-                        print("\(word) --> not found in Database!")
-                    }
-                    
-                }
-            }
-        }
-    }
+//    func checkMandatoryWords() {
+//        for language in ["en", "de","hu","ru"] {
+//            let mandatoryRecords = realmMandatory.objects(MandatoryModel.self).filter("language = %@",language)
+//            for mandatoryRecord in mandatoryRecords {
+//                let words = mandatoryRecord.mandatoryWords.components(separatedBy: "°")
+//                if words.count != 8 {
+//                    print("words count NOK: \(words) ================================")
+//                }
+//                for word in words {
+//                    if word.length < 5 {
+//                        print("word too short: \(word) -----------------------------")
+//                    } else if word.length > 12 {
+//                        print("word too long: \(word) -----------------------------")
+//                    }
+//                    let toSearch = "\(language)\(word.lowercased())"
+//                    if realmWordList.objects(WordListModel.self).filter("word = %@", toSearch).count == 0 {
+//                        print("\(word) --> not found in Database!")
+//                    }
+//                    
+//                }
+//            }
+//        }
+//    }
     deinit {
         print("deinit of mainViewController")
     }

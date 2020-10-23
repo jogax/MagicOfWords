@@ -43,15 +43,15 @@ let wordListConfig = Realm.Configuration(
 // Open the Realm with the configuration
 let realmWordList:Realm = try! Realm(configuration: wordListConfig)
 
-let mandatoryConfig = Realm.Configuration(
-    // Get the path to the bundled file
-    fileURL: URL(string: Bundle.main.path(forResource: "Mandatory", ofType:"realm")!),
-    // Open the file in read-only mode as application bundles are not writeable
-    readOnly: true,
-    objectTypes: [MandatoryModel.self])
-
-// Open the Realm with the configuration
-let realmMandatory: Realm = try! Realm(configuration: mandatoryConfig)
+//let mandatoryConfig = Realm.Configuration(
+//    // Get the path to the bundled file
+//    fileURL: URL(string: Bundle.main.path(forResource: "Mandatory", ofType:"realm")!),
+//    // Open the file in read-only mode as application bundles are not writeable
+//    readOnly: true,
+//    objectTypes: [MandatoryModel.self])
+//
+//// Open the Realm with the configuration
+//let realmMandatory: Realm = try! Realm(configuration: mandatoryConfig)
 
 let mandatoryListConfig  = Realm.Configuration(
     // Get the path to the bundled file
@@ -204,7 +204,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 83, // used since 2020-10-12
+            schemaVersion: 82, // used since 2020-10-12
 //            schemaVersion: 60, // used since 2020-02-05
 //            schemaVersion: 59, // used since 2019-08-30
 //            schemaVersion: 30, // optimize BasicDataModel
@@ -214,7 +214,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
                 switch oldSchemaVersion {
-                case 0...82:
+                case 0...18:
                     migration.deleteData(forType: GameDataModel.className())
                     migration.deleteData(forType: RoundDataModel.className())
                     migration.deleteData(forType: BasicDataModel.className())
