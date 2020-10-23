@@ -102,7 +102,8 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
         let image = origImage.resizeImage(newWidth: cellHeight * 0.6)
         let index = indexOfAlias
         cell.addButton(image: image, xPos: cellHeight * 0.5, callBack: buttonTapped)
-        cell.addColumn(text: " " + (GV.globalInfoTable[indexPath.row].alias.fixLength(length: lengths[index], leadingBlanks: false)), /*color: actColor,*/ xPos: cellHeight * 1.0) // WordColumn
+        let alias = GV.globalInfoTable[indexPath.row].alias.convertSpecialCharsToUnderScore()
+        cell.addColumn(text: " " + (alias.fixLength(length: lengths[index], leadingBlanks: false).startingSubString(length: lengths[index])), /*color: actColor,*/ xPos: cellHeight * 1.0) // WordColumn
         switch showingModus {
         case .Left:
             cell.addColumn(text: (GV.globalInfoTable[indexPath.row].device.fixLength(length: lengths[index + 1], leadingBlanks: false))/*, color: actColor*/)
@@ -180,8 +181,9 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
             }
         }
         let index = indexOfAlias
+        lengths[indexOfAlias] = 13
         for item in GV.globalInfoTable {
-            lengths[indexOfAlias] = item.alias.length > lengths[indexOfAlias] ? item.alias.length : lengths[indexOfAlias]
+//            lengths[indexOfAlias] = item.alias.length > lengths[indexOfAlias] ? item.alias.length : lengths[indexOfAlias]
             if showingModus == ShowingModus.Left {
                 lengths[index + 1] = item.device.length > lengths[index + 1] ? item.device.length : lengths[index + 1]
                 lengths[index + 2] = item.version.length > lengths[index + 2] ? item.version.length : lengths[index + 2]
@@ -467,6 +469,7 @@ class ShowGameCenterViewController: UIViewController, WTTableViewDelegate {
     
     @objc private func showPlayerActivity() {
         let textHeight = GV.language.getText(.tcBlank)
+        GV.globalInfoTable = GV.globalInfoTable.sorted(by: {$0.lastDay > $1.lastDay})
         calculateColumnWidths()
         let origin = CGPoint(x: 0, y: 0)
         let maxHeight = view.frame.height * 0.8

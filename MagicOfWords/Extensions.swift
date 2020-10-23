@@ -129,7 +129,8 @@ public extension UIDevice {
         case "iPhone12,1":                              return "iPhone 11"
         case "iPhone12,3":                              return "iPhone 11 Pro"
         case "iPhone12,5":                              return "iPhone 11 Pro Max"
-            
+        case "iPhone12,8":                              return "iPhone SE 2nd"
+
         case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":return "iPad 2"
         case "iPad3,1", "iPad3,2", "iPad3,3":           return "iPad 3"
         case "iPad3,4", "iPad3,5", "iPad3,6":           return "iPad 4"
@@ -140,13 +141,16 @@ public extension UIDevice {
         case "iPad4,7", "iPad4,8", "iPad4,9":           return "iPad Mini 3rd"
         case "iPad5,1", "iPad5,2":                      return "iPad Mini 4th"
         case "iPad6,3", "iPad6,4":                      return "iPad Pro 9.7"
+        case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9"
         case "iPad6,11", "iPad6,12":                    return "iPad 9.7 5th"
+        case "iPad7,1", "iPad7,2":                      return "iPad Pro 2nd 12.9"
         case "iPad7,3", "iPad7,4":                      return "iPad Pro 10.5"
         case "iPad7,5", "iPad7,6":                      return "iPad 9.7 6th"
+        case "iPad7,11", "iPad7,12":                    return "iPad 7th Gen"
         case "iPad8,1", "iPad8,2", "iPad8,3", "iPad8,4":return "iPad Pro 11"
-        case "iPad6,7", "iPad6,8":                      return "iPad Pro 12.9"
-        case "iPad7,1", "iPad7,2":                      return "iPad Pro 12.9 2th"
         case "iPad8,5", "iPad8,6", "iPad8,7", "iPad8,8":return "iPad Pro 12.9 3th"
+        case "iPad8,9", "iPad8,10":                     return "iPad Pro 11 2nd"
+        case "iPad8,11", "iPad8,12":                    return "iPad Pro 12.9 4th"
         case "iPad11,1", "iPad11,2":                    return "iPad mini 5th"
         case "iPad11,3", "iPad11,4":                    return "iPad Air 3rd"
 
@@ -423,6 +427,23 @@ public extension Float {
 
 
 extension String {
+   var containsSpecialCharacter: Bool {
+      let regex = ".*[^A-Za-z0-9].*"
+      let testString = NSPredicate(format:"SELF MATCHES %@", regex)
+      return testString.evaluate(with: self)
+   }
+    
+    func convertSpecialCharsToUnderScore()->String {
+        var returnValue = ""
+        for char in self {
+            if String(char).containsSpecialCharacter {
+                returnValue.append("_")
+            } else {
+                returnValue.append(String(char))
+            }
+        }
+        return returnValue
+    }
         
     func contains(strings: [String])->Bool {
         for string in strings {

@@ -532,7 +532,8 @@ class WTScene: SKScene, WTGameboardDelegate, WTGameWordListDelegate, WTTableView
         balloon.zPosition = 100
 //        let atY = score >= 0 ? self.frame.size.height * 0.1 : self.frame.size.height * 0.98
 //        let startPos = wtGameboard!.getCellPosition(col: word.usedLetters[0].col, row: word.usedLetters[0].row)
-        let startPos = CGPoint(x: self.frame.width * 0.5, y: allWordsButton!.frame.maxY + balloon.size.height * 2)
+//        let startPos = CGPoint(x: self.frame.width * 0.5, y: allWordsButton!.frame.maxY + balloon.size.height * 2)
+        let startPos = CGPoint(x: self.frame.width * 0.5, y: GV.actHeight - balloon.size.height * 2)
 //        let startPosY = startPos.y
 //        let endPosY = score > 0 ? self.frame.size.height * 0.80 : self.frame.size.height * -0.04
         balloon.position = CGPoint(x: startPos.x, y: startPos.y )

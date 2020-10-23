@@ -230,3 +230,31 @@ Orosz:
 - Исправление ошибок
 
 Buld 30, Version 1.30 (1.2)
+
+Angol:
+- iPhone: 8x8 playing field
+- iPad: Can be played in portrait and landscape mode
+- Game field prefill rate can be selected from the main menu: 0, 15, 30, 45%
+- Game type can be selected from the main menu: CollectWords game, FixLetters game
+- Game Center connection is now automatic
+
+Német:
+- iPhone: 8x8 Spielfeld
+- iPad: Kann im Hoch- und Querformat gespielt werden
+- Die Vorfüllrate des Spielfelds kann im Hauptmenü ausgewählt werden: 0, 15, 30, 45%
+- Der Spieltyp kann aus dem Hauptmenü ausgewählt werden: Sammle-Wörter-Spiel, Feste-Buchstaben-Spiel
+- Die Game Center Verbindung erfolgt jetzt automatisch
+
+Magyar:
+- iPhone: játékmező 8x8
+- iPad: portret és landscape módban is játszható
+- játékmező előtöltési aránya a főmenűből választható: 0, 15, 30, 45 %
+- játékmód a főmenűből választható: szógyűjtő játék, Fix-betű játék
+- Game Centerhez csatlakozás automatikus
+
+Orosz:
+- iPhone: Размер игрового поля 8x8
+- iPad: можно играть в портретном и ландшафтном режимах
+- Процент предварительного заполнения игрового поля можно выбрать в главном меню: 0, 15, 30, 45%
+- Тип игры можно выбрать в главном меню: игра Собери-Слова, игра Неподвижные-Буквы
+- Подключение Game Center теперь автоматическое
