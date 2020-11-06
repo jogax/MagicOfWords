@@ -15,7 +15,8 @@ import Reachability
 
 //let actVersion = "0.991" // Build 23, Version 1.23
 //let actVersion = "1.0" // Build 25, Version 1.25
-let actVersion = "1.1" // Build 27, Version 1.27
+//let actVersion = "1.1" // Build 27, Version 1.27
+let actVersion = "1.2" // Build 31, Version 1.31
 let exclamationMark = "!"
 public let roundSeparator = "/" 
 let itemSeparator = "°"

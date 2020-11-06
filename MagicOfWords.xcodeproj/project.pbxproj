@@ -156,30 +156,12 @@
 		D0748B9924531D01008DEC99 /* PromotionText.txt in Resources */ = {isa = PBXBuildFile; fileRef = D0748B9824531D01008DEC99 /* PromotionText.txt */; };
 		D089796B24F298090096EF86 /* MyLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D089796A24F298090096EF86 /* MyLabel.swift */; };
 		D089796D24F2A7080096EF86 /* backgroundL.png in Resources */ = {isa = PBXBuildFile; fileRef = D089796C24F2A7080096EF86 /* backgroundL.png */; };
+		D09C0929254866DB002B2F3C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09C0928254866DB002B2F3C /* CloudKit.framework */; };
 		D0CE00F224F0188B001376CA /* backgroundP.png in Resources */ = {isa = PBXBuildFile; fileRef = D0CE00F124F0188B001376CA /* backgroundP.png */; };
 		D0D3EC3C251F75AF0062CF49 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC3B251F75AF0062CF49 /* Reachability.framework */; };
-		D0D3EC3D251F75AF0062CF49 /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC3B251F75AF0062CF49 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D0D3EC3F251F75B90062CF49 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC3E251F75B90062CF49 /* Realm.framework */; };
-		D0D3EC40251F75B90062CF49 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC3E251F75B90062CF49 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D0D3EC42251F75BE0062CF49 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC41251F75BE0062CF49 /* RealmSwift.framework */; };
-		D0D3EC43251F75BE0062CF49 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D0D3EC41251F75BE0062CF49 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		D062DB6A2516187C003E863B /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				D0D3EC40251F75B90062CF49 /* Realm.framework in Embed Frameworks */,
-				D0D3EC3D251F75AF0062CF49 /* Reachability.framework in Embed Frameworks */,
-				D0D3EC43251F75BE0062CF49 /* RealmSwift.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		20009AF82260C47900D34ACD /* HelpInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpInfo.swift; sourceTree = "<group>"; };
@@ -340,6 +322,7 @@
 		D0748B9824531D01008DEC99 /* PromotionText.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = PromotionText.txt; sourceTree = "<group>"; };
 		D089796A24F298090096EF86 /* MyLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLabel.swift; sourceTree = "<group>"; };
 		D089796C24F2A7080096EF86 /* backgroundL.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backgroundL.png; sourceTree = "<group>"; };
+		D09C0928254866DB002B2F3C /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		D0CE00F124F0188B001376CA /* backgroundP.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backgroundP.png; sourceTree = "<group>"; };
 		D0D3EC3B251F75AF0062CF49 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		D0D3EC3E251F75B90062CF49 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
@@ -352,6 +335,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0D3EC3F251F75B90062CF49 /* Realm.framework in Frameworks */,
+				D09C0929254866DB002B2F3C /* CloudKit.framework in Frameworks */,
 				D0D3EC3C251F75AF0062CF49 /* Reachability.framework in Frameworks */,
 				D0D3EC42251F75BE0062CF49 /* RealmSwift.framework in Frameworks */,
 			);
@@ -609,6 +593,7 @@
 		D04C01282518F505006F2074 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D09C0928254866DB002B2F3C /* CloudKit.framework */,
 				D0D3EC41251F75BE0062CF49 /* RealmSwift.framework */,
 				D0D3EC3E251F75B90062CF49 /* Realm.framework */,
 				D0D3EC3B251F75AF0062CF49 /* Reachability.framework */,
@@ -627,7 +612,6 @@
 				201FB1AB20288C2B00EC9F36 /* Frameworks */,
 				201FB1AC20288C2B00EC9F36 /* Resources */,
 				20F1760A21626C6000AF37D7 /* ShellScript */,
-				D062DB6A2516187C003E863B /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
