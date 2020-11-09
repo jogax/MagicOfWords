@@ -34,6 +34,7 @@ class BasicDataModel: Object {
     @objc dynamic var countPlays = 0
     @objc dynamic var musicOn = false
     @objc dynamic var prefill = 0
+    @objc dynamic var isDeveloper = false
     @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
     @objc dynamic var startAnimationShown = false
     @objc dynamic var showingScoreType = 0 // ScoreType

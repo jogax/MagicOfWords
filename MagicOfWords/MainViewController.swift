@@ -114,7 +114,7 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         
     }
 
-    #if DEBUG
+//    #if DEBUG
     func displayGameCenterViewController(dataSource: DataSource) {
         let gameCenterViewController = ShowGameCenterViewController()
         gameCenterViewController.myDelegate = self
@@ -122,7 +122,7 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         gameCenterViewController.setDataSource(dataSource: dataSource)
         self.present(gameCenterViewController, animated: true, completion: nil)
     }
-    #endif
+//    #endif
     var showGamesScene: ShowGamesScene?
     func backFromSettingsScene() {
         try! realm.safeWrite() {
@@ -521,7 +521,6 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         var oneMinutesTimer: Timer?
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
-//        delete temporary files
         let path = NSTemporaryDirectory()
         let subDirs = FileManager().subpaths(atPath: NSTemporaryDirectory())
         for file in subDirs! {
@@ -535,7 +534,6 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
                 }
             }
         }
-//        let subDirsAfter = FileManager().subpaths(atPath: NSTemporaryDirectory())
         GV.mainViewController = self
         setDarkMode()
         GV.wtScene = WTScene(size: CGSize(width: view.frame.width, height: view.frame.height))
@@ -1033,10 +1031,10 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
     var nickNameAction: UIAlertAction?
     var collectMandatoryAction: UIAlertAction?
 
-    #if DEBUG
+//    #if DEBUG
     var showGlobalDataAction: UIAlertAction?
     var createMandatoryAction: UIAlertAction?
-    #endif
+//    #endif
     
     public func setDarkMode() {
         GV.darkMode = false
@@ -1134,13 +1132,13 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
 //            alertController!.addAction(chooseGCAction)
 //       }
 
-        #if DEBUG
-        let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
-            alert -> Void in
-            self.developerMenuChoosed()
-        })
-        alertController!.addAction(developerMenuAction)
-        #endif
+        if GV.basicDataRecord.isDeveloper {
+            let developerMenuAction = UIAlertAction(title: GV.language.getText(.tcDeveloperMenu), style: .default, handler: { [unowned self]
+                alert -> Void in
+                self.developerMenuChoosed()
+            })
+            alertController!.addAction(developerMenuAction)
+        }
         //--------------------- Present alert ---------------------
         present(alertController!, animated: true, completion: nil)
         
@@ -1202,7 +1200,7 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
 
 
     var realmHelpInfo: Realm?
-    #if DEBUG
+//    #if DEBUG
     @objc private func developerMenuChoosed() {
 //        initiateHelpModel()
 //        let countContinueGames = realmHelpInfo!.objects(HelpInfo.self).filter("language = %@", GV.actLanguage).count
@@ -1260,7 +1258,7 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
     }
     
     
-    #endif
+//    #endif
 
     
 //    private func showSettingsMenu() {
@@ -1431,6 +1429,11 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
 
         GV.minGameNumber = GV.basicDataRecord.difficulty * 1000
         GV.maxGameNumber = GV.minGameNumber + 999
+        #if DEBUG
+            try! realm.safeWrite {
+                GV.basicDataRecord.isDeveloper = true
+            }
+        #endif
     }
 
     func printFonts() {
