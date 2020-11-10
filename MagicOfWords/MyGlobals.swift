@@ -16,7 +16,7 @@ import Reachability
 //let actVersion = "0.991" // Build 23, Version 1.23
 //let actVersion = "1.0" // Build 25, Version 1.25
 //let actVersion = "1.1" // Build 27, Version 1.27
-let actVersion = "1.2" // Build 31, Version 1.31
+let actVersion: String = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
 let exclamationMark = "!"
 public let roundSeparator = "/" 
 let itemSeparator = "°"
@@ -396,13 +396,13 @@ struct GV {
         return UIApplication.shared.statusBarOrientation
     }
 
-    static var myUser: SyncUser? = nil {
-        willSet(newValue) {
-            for callBack in callBackMyUser {
-                callBack.callBackFunc()
-            }
-        }
-    }
+//    static var myUser: SyncUser? = nil {
+//        willSet(newValue) {
+//            for callBack in callBackMyUser {
+//                callBack.callBackFunc()
+//            }
+//        }
+//    }
 //    static var expertUser = false {
 //        didSet(newValue) {
 //            for callBack in callBackExpertUser {

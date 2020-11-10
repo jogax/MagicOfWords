@@ -365,7 +365,7 @@ class WTGameboard: SKShapeNode {
     
 
     init(countCols: Int, parentScene: SKScene, delegate: WTGameboardDelegate, yCenter: CGFloat) {
-        let blockSizeMultiplierForIpad: [Int:CGFloat] = [5: 0.08, 6: 0.08, 7: 0.08, 8: 0.075, 9: 0.07, 10: 0.065, 11: 0.060, 12: 0.06, 13: 0.055, 14: 0.050, 15: 0.050]
+        let blockSizeMultiplierForIpad: [Int:CGFloat] = [5: 0.08, 6: 0.08, 7: 0.08, 8: 0.075, 9: 0.07, 10: 0.075, 11: 0.060, 12: 0.06, 13: 0.055, 14: 0.050, 15: 0.050]
         let blockSizeMultiplierForIPhone: [Int:CGFloat] = [5: 0.15, 6: 0.14, 7: 0.13, 8: 0.11, 9: 0.10, 10: 0.090, 11:0.078, 12: 0.075]
 
         self.countCols = GV.sizeOfGrid
