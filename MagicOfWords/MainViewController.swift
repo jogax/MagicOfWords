@@ -840,8 +840,8 @@ class MainViewController: UIViewController, /*WelcomeSceneDelegate, */WTSceneDel
         }
 
         for record in allRecords {
-            try! realm.safeWrite {
-                if record.gameType == -1 {
+            try! realm.safeWrite() {
+                if record.gameType == -1 || record.rounds.count == 0 {
                     realm.delete(record)
                 } else {
                     if record.gameNumber < 1000 {
